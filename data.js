@@ -36,7 +36,7 @@ const AGENDA = [
   {jour:"Jour 1",date:"Samedi 29 aout",heure:"20:30 - 21:00",type:"PREPA & LOGITICS",atelier:"PREPA CONCERT (SHIVA)",lieu:"SHIVA",fac1:"",fac2:"",traduction:"",helper1:"Alexandre Sattler",helper2:"Virginie Bertrand",helper3:"",angel:"",note:"",logisticId:""},
   {jour:"Jour 1",date:"Samedi 29 aout",heure:"21:00 - 23:00",type:"CEREMONIE & CONCERT",atelier:"SOIREE ECSTATIC DANSE",lieu:"SHIVA",fac1:"Pascal de Lacaze",fac2:"",traduction:"",helper1:"Emma Roussel",helper2:"Cedric Vesper",helper3:"",angel:"Aurelie Lechardeur",note:"",logisticId:""},
   {jour:"Jour 1",date:"Samedi 29 aout",heure:"07:15 - 08:00",type:"POOL PARTY",atelier:"TEST MATT",lieu:"SHIVA",fac1:"Matthieu Chapeleau (Atman)",fac2:"",traduction:"Alexandre Fourcault",helper1:"Alexandre Fourcault",helper2:"",helper3:"",angel:"Aurelie Lechardeur",note:"Shift Colibri",logisticId:""},
-  {jour:"Jour 1",date:"Samedi 29 aout",heure:"Heure manuelle UPDATE",type:"PREPA & LOGITICS",atelier:"TEST 3",lieu:"CHENREZIG",fac1:"Matthieu Chapeleau (Atman)",fac2:"",traduction:"Emma Roussel",helper1:"Sevda Duroy",helper2:"Sevda Duroy",helper3:"",angel:"",note:"Atelier + long",logisticId:""},
+  {jour:"Jour 1",date:"Samedi 29 aout",heure:"Heure manuelle UPDATE",type:"PREPA & LOGITICS",atelier:"TEST 3",lieu:"CHENREZIG",fac1:"TEST",fac2:"",traduction:"TEST",helper1:"TEST",helper2:"TEST",helper3:"",angel:"",note:"Atelier + long",logisticId:""},
 
   // ─── Jour 2 — Dimanche 30 aout ──────────────────────────────────────
   {jour:"Jour 2",date:"Dimanche 30 aout",heure:"7:30 - 9:00",type:"MEDITATION / YOGA",atelier:"Yoga2",lieu:"CHENREZIG",fac1:"Paul Raj Amar",fac2:"",traduction:"",helper1:"Delphine Del Dupre",helper2:"",helper3:"",angel:"",note:"",logisticId:""},
