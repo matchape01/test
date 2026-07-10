@@ -79,49 +79,32 @@ async function githubSaveFile(filename, content) {
   }
 
   const apiBase = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filename}`;
-  const repoBase = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}`;
   const headers = {
     'Authorization': `token ${token}`,
     'Accept':        'application/vnd.github+json',
     'Content-Type':  'application/json'
   };
-  // Headers pour les GET (jamais de cache)
-  const getHeaders = { ...headers, 'Cache-Control': 'no-cache, no-store' };
 
-  // 1. Récupérer le SHA via l'API Git Trees (non mise en cache, toujours frais)
-  //    On récupère d'abord le SHA du dernier commit de la branche, puis on
-  //    parcourt le tree pour trouver le blob correspondant au fichier.
+  // 1. Récupérer le SHA actuel du fichier via /contents
+  //    L'header "If-None-Match: ''" désactive le cache ETag côté GitHub CDN
+  //    Le timestamp dans l'URL empêche le cache navigateur
   let sha = null;
   try {
-    // 1a. SHA du HEAD de la branche
-    const branchRes = await fetch(
-      `${repoBase}/git/ref/heads/${GITHUB_BRANCH}?_=${Date.now()}`,
-      { headers: getHeaders, cache: 'no-store' }
-    );
-    if (branchRes.status === 401) {
+    const getRes = await fetch(`${apiBase}?ref=${GITHUB_BRANCH}&_=${Date.now()}`, {
+      headers: { ...headers, 'If-None-Match': '""' },
+      cache: 'no-store'
+    });
+    if (getRes.status === 401) {
       localStorage.removeItem('tm_gh_token');
       _ensureConfigBanner();
       throw new Error('Token invalide ou expiré — saisis-en un nouveau.');
     }
-    if (branchRes.ok) {
-      const branchData = await branchRes.json();
-      const treeSha = branchData.object.sha;
-
-      // 1b. Récupérer le tree récursif pour trouver le blob du fichier
-      const treeRes = await fetch(
-        `${repoBase}/git/trees/${treeSha}?recursive=1&_=${Date.now()}`,
-        { headers: getHeaders, cache: 'no-store' }
-      );
-      if (treeRes.ok) {
-        const treeData = await treeRes.json();
-        const entry = treeData.tree.find(e => e.path === filename);
-        if (entry) {
-          sha = entry.sha;
-          console.log(`[github-api] SHA frais pour ${filename}: ${sha}`);
-        }
-      }
+    if (getRes.ok) {
+      const data = await getRes.json();
+      sha = data.sha;
+      console.log(`[github-api] SHA pour ${filename}: ${sha}`);
     }
-    // Si on ne trouve pas le fichier → sha reste null → création
+    // 404 = fichier n'existe pas encore → sha reste null → création
   } catch (err) {
     if (err.message.includes('Token')) throw err;
     throw new Error(`Erreur réseau lors de la lecture de ${filename} : ${err.message}`);
