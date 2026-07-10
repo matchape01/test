@@ -185,7 +185,7 @@ const AGENDA = [
   {jour:"Jour 6",date:"Jeudi 3 septembre",heure:"11:15 - 13:30",type:"ATELIERS TANTRA (AM)",atelier:"Angel - ATELIERS TANTRA (AM)",lieu:"",fac1:"",fac2:"",traduction:"",helper1:"",helper2:"",helper3:"",angel:"Boris Desvignes",note:"",logisticId:""},
 
   // ─── Jour 1 — Samedi 29 aout ────────────────────────────────────────
-  {jour:"Jour 1",date:"Samedi 29 aout",heure:"11:00 - 13:30",type:"POOL PARTY",atelier:"TEST 5",lieu:"SALLE DREAM TEAM 5",fac1:"",fac2:"",traduction:"",helper1:"",helper2:"",helper3:"",angel:"",note:"",logisticId:""},
+  {jour:"Jour 1",date:"Samedi 29 aout",heure:"11:00 - 13:30",type:"POOL PARTY",atelier:"TEST 5",lieu:"SALLE DREAM TEAM 5 bis",fac1:"",fac2:"",traduction:"",helper1:"",helper2:"",helper3:"",angel:"",note:"",logisticId:""},
 
   // ─── Jour 6 — Jeudi 3 septembre ─────────────────────────────────────
   {jour:"Jour 6",date:"Jeudi 3 septembre",heure:"12:30 - 14:30",type:"REPAS & PAUSE",atelier:"DEJEUNER",lieu:"",fac1:"",fac2:"",traduction:"",helper1:"",helper2:"",helper3:"",angel:"",note:"",logisticId:""},
