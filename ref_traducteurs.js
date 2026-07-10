@@ -31,5 +31,5 @@ const REF_TRADUCTEURS = [
   { id: "TR_VERONIQUE", value: "Veronique Santini Bottemer" },
   { id: "TR_VIRGINIE", value: "Virginie Bertrand" },
   { id: "TR_YANNICK", value: "Yannick Bohrer" },
-  { id: "TR_NEW1", value: "TEST" },
+  { id: "TR_NEW1", value: "TEST 12" },
 ];
