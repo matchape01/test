@@ -86,9 +86,10 @@ async function githubSaveFile(filename, content) {
   };
 
   // 1. Récupérer le SHA actuel du fichier (nécessaire pour le PUT)
+  // Le ?_=${Date.now()} force un bypass du cache navigateur pour toujours avoir le SHA frais
   let sha = null;
   try {
-    const getRes = await fetch(`${apiBase}?ref=${GITHUB_BRANCH}`, { headers });
+    const getRes = await fetch(`${apiBase}?ref=${GITHUB_BRANCH}&_=${Date.now()}`, { headers, cache: 'no-store' });
     if (getRes.ok) {
       const data = await getRes.json();
       sha = data.sha;
