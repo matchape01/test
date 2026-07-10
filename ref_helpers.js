@@ -34,4 +34,5 @@ const REF_HELPERS = [
   { id: "H_YANNICK", value: "Yannick Bohrer" },
   { id: "H_NEW1", value: "Matthieu Chapeleau (Atman)" },
   { id: "H_NEW2", value: "Echo Clem (Clement Marchal)" },
+  { id: "H_NEW3", value: "RESOURCE TEST" },
 ];
