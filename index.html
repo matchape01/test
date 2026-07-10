@@ -236,6 +236,20 @@
 const PW = '007';
 let _dest = '';
 
+// Ajoute un timestamp à l'URL pour forcer un rechargement sans cache
+function withTs(url) {
+  return url + '?v=' + Date.now();
+}
+
+// Remplace tous les liens de rapports par des versions avec timestamp
+document.querySelectorAll('a.card[href]').forEach(a => {
+  const base = a.getAttribute('href');
+  a.addEventListener('click', function(e) {
+    e.preventDefault();
+    window.open(withTs(base), '_blank', 'noopener');
+  });
+});
+
 function openPw(url, label) {
   _dest = url;
   document.getElementById('pwTarget').textContent = label;
@@ -253,7 +267,7 @@ function closePw() {
 function checkPw() {
   if (document.getElementById('pwInput').value === PW) {
     closePw();
-    window.open(_dest, '_blank', 'noopener');
+    window.open(withTs(_dest), '_blank', 'noopener');
   } else {
     document.getElementById('pwError').textContent = 'Mot de passe incorrect.';
     document.getElementById('pwInput').select();
