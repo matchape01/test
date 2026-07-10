@@ -87,7 +87,7 @@
     </div>
     <div class="header-actions">
       <a class="mode-btn" href="index.html">🏠 Home</a>
-      <button class="mode-btn" onclick="location.reload()">🔄 Refresh</button>
+      <button class="mode-btn" onclick="hardReload()">🔄 Refresh</button>
       <button class="mode-btn" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
     </div>
   </header>
@@ -217,6 +217,15 @@ function showRecap(r) {
   } else {
     logBox.textContent = 'Aucune information logistique renseignée pour cet atelier.';
     logBox.className   = 'logistics-box logistic-box empty-log';
+  }
+}
+
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
+      .finally(() => location.reload(true));
+  } else {
+    location.reload(true);
   }
 }
 

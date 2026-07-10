@@ -97,6 +97,7 @@
     </div>
     <div class="header-actions">
       <a class="btn-ghost" href="index.html">🏠 Home</a>
+      <button class="btn-ghost" onclick="hardReload()">🔄 Refresh</button>
       <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
     </div>
   </header>
@@ -352,6 +353,15 @@ function init() {
   });
 
   renderConflits();
+}
+
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
+      .finally(() => location.reload(true));
+  } else {
+    location.reload(true);
+  }
 }
 
 function toggleMode() {

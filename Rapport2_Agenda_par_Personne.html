@@ -120,7 +120,7 @@
     </div>
     <div class="header-actions">
       <a class="mode-btn" href="index.html">🏠 Home</a>
-      <button class="mode-btn" onclick="location.reload()">🔄 Refresh</button>
+      <button class="mode-btn" onclick="hardReload()">🔄 Refresh</button>
       <button class="mode-btn" id="viewBtn" onclick="toggleView()">📱 Vue Mobile</button>
       <button class="mode-btn" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
     </div>
@@ -489,6 +489,15 @@ function setView(mobile) {
 }
 
 function toggleView() { setView(!isMobileView); }
+
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
+      .finally(() => location.reload(true));
+  } else {
+    location.reload(true);
+  }
+}
 
 function toggleMode() {
   const isDark = document.body.classList.toggle('dark');
