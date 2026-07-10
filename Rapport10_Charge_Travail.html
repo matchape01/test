@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Rapport 10 · Charge de travail</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --header-bg: #f0f4fb;
+    --helper-bg: #e0f2fe; --helper-border: #7dd3fc; --helper-text: #0369a1;
+    --angel-bg:  #fce7f3; --angel-border:  #f9a8d4; --angel-text:  #9d174d;
+    --green: #166534; --green-bg: #dcfce7; --green-border: #86efac;
+    --orange: #c2410c; --orange-bg: #fff7ed; --orange-border: #fdba74;
+    --red: #dc2626; --red-bg: #fef2f2; --red-border: #fca5a5;
+    --purple-bg: #f5f3ff; --purple-border: #c4b5fd; --purple-text: #6d28d9;
+  }
+  .dark {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --header-bg: #1c2333;
+    --helper-bg: #0c2d48; --helper-border: #1e4a8a; --helper-text: #7dd3fc;
+    --angel-bg:  #3b1030; --angel-border:  #9d174d; --angel-text:  #f9a8d4;
+    --green-bg: #052e16; --green-border: #166534;
+    --orange-bg: #1c1000; --orange-border: #92400e;
+    --red-bg: #2d0a0a; --red-border: #991b1b;
+    --purple-bg: #1e1b4b; --purple-border: #5b21b6; --purple-text: #c4b5fd;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+  .logo h1 { font-size: 20px; font-weight: 700; }
+  .logo p  { font-size: 26px; font-weight: 800; color: var(--accent); line-height: 1.2; margin-top: 2px; }
+  .logo small { font-size: 12px; color: var(--muted); display: block; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .btn-ghost { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* ── FILTRES ── */
+  .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; align-items: flex-end; }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; }
+  .filter-group label { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 600; }
+  select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 13px; color: var(--text); font-family: inherit; min-width: 160px; cursor: pointer; }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 6px; margin-bottom: 24px; flex-wrap: wrap; }
+  .tab { cursor: pointer; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; border: 2px solid var(--border); background: var(--surface); color: var(--muted); font-family: inherit; transition: all .15s; }
+  .tab:hover { border-color: var(--accent); color: var(--accent); }
+  .tab.active-h { border-color: var(--helper-text); background: var(--helper-bg); color: var(--helper-text); }
+  .tab.active-a { border-color: var(--angel-text);  background: var(--angel-bg);  color: var(--angel-text); }
+  .tab.active-s { border-color: var(--purple-text); background: var(--purple-bg); color: var(--purple-text); }
+
+  /* ── CARTES PERSONNE ── */
+  .person-grid { display: flex; flex-direction: column; gap: 14px; }
+  .person-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .person-header {
+    display: flex; align-items: center; gap: 14px; padding: 14px 18px;
+    background: var(--surface); flex-wrap: wrap; cursor: pointer;
+  }
+  .person-header:hover { background: var(--border); }
+  .person-rank { font-size: 18px; font-weight: 800; color: var(--muted); min-width: 28px; }
+  .person-name { font-size: 15px; font-weight: 700; flex: 1; }
+  .person-role-badge {
+    font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px;
+    border: 1px solid; white-space: nowrap;
+  }
+  .badge-h { background: var(--helper-bg); border-color: var(--helper-border); color: var(--helper-text); }
+  .badge-a { background: var(--angel-bg);  border-color: var(--angel-border);  color: var(--angel-text); }
+  .badge-b { background: var(--purple-bg); border-color: var(--purple-border); color: var(--purple-text); }
+
+  .person-stats { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; margin-left: auto; }
+  .stat-block { text-align: center; }
+  .stat-num   { font-size: 20px; font-weight: 800; line-height: 1; }
+  .stat-lbl   { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; }
+  .stat-num.h { color: var(--helper-text); }
+  .stat-num.a { color: var(--angel-text); }
+
+  /* Barre de charge */
+  .load-bar-wrap { height: 6px; background: var(--border); border-radius: 3px; margin-top: 6px; min-width: 80px; }
+  .load-bar { height: 6px; border-radius: 3px; transition: width .4s; }
+  .load-bar.low    { background: #16a34a; }
+  .load-bar.medium { background: #f59e0b; }
+  .load-bar.high   { background: #dc2626; }
+
+  /* Détail ateliers (collapsible) */
+  .person-detail { display: none; padding: 0 18px 16px; }
+  .person-detail.open { display: block; }
+  .detail-day { margin-top: 12px; }
+  .detail-day-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom: 6px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+  .detail-row { display: flex; gap: 10px; align-items: flex-start; padding: 5px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-heure { font-size: 11px; color: var(--muted); min-width: 110px; white-space: nowrap; }
+  .detail-atelier { font-size: 13px; flex: 1; }
+  .detail-role { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 99px; border: 1px solid; white-space: nowrap; }
+  .detail-dedupe { font-size: 10px; color: var(--muted); font-style: italic; }
+
+  /* ── SECTION HARMONISATION ── */
+  .section-title { font-size: 16px; font-weight: 700; margin: 36px 0 16px; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .harmony-intro { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; }
+  .harmony-grid { display: flex; flex-direction: column; gap: 12px; }
+  .harmony-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; background: var(--bg); }
+  .harmony-card-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .harmony-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .harmony-card ul { font-size: 13px; color: var(--muted); padding-left: 20px; line-height: 1.8; }
+  .tag-overload { background: var(--red-bg); border-color: var(--red-border); }
+  .tag-light    { background: var(--green-bg); border-color: var(--green-border); }
+  .tag-suggest  { background: var(--orange-bg); border-color: var(--orange-border); }
+
+  /* ── SUMMARY PILLS ── */
+  .summary-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+  .sum-pill { flex: 1; min-width: 100px; border-radius: 8px; padding: 12px 16px; border: 1px solid var(--border); background: var(--surface); text-align: center; }
+  .sum-pill .num { font-size: 26px; font-weight: 800; line-height: 1; color: var(--accent); }
+  .sum-pill .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+
+  footer { margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Charge de travail — Helpers &amp; Angels</p>
+      <small>Workload Analysis Report</small>
+    </div>
+    <div class="header-actions">
+      <a class="btn-ghost" href="index.html">🏠 Home</a>
+      <button class="btn-ghost" onclick="hardReload()">🔄 Refresh</button>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+
+  <!-- FILTRES -->
+  <div class="filters">
+    <div class="filter-group">
+      <label>Jour</label>
+      <select id="filterJour" onchange="render()">
+        <option value="">Tous les jours</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ONGLETS -->
+  <div class="tabs">
+    <button class="tab active-h" id="tab-h" onclick="setTab('h')">🤝 Helpers</button>
+    <button class="tab"          id="tab-a" onclick="setTab('a')">👼 Angels</button>
+    <button class="tab"          id="tab-s" onclick="setTab('s')">📊 Vue combinée</button>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-bar" id="summaryBar"></div>
+
+  <!-- LISTE PERSONNES -->
+  <div class="person-grid" id="personGrid"></div>
+
+  <!-- SECTION HARMONISATION -->
+  <div class="section-title" id="harmonySection">⚖️ Propositions d'harmonisation</div>
+  <div class="harmony-intro">
+    Les propositions ci-dessous sont générées automatiquement à partir de la distribution actuelle des affectations.
+    Elles sont présentées à titre indicatif et <strong>ne tiennent pas compte des conflits d'horaires</strong> — 
+    toute réaffectation doit être vérifiée manuellement avant d'être appliquée.
+  </div>
+  <div class="harmony-grid" id="harmonyGrid"></div>
+
+</div>
+
+<footer><p>Made with IBM Bob</p></footer>
+
+<script src="ref_jours.js"></script>
+<script src="data.js"></script>
+<script>
+
+// ════════════════════════════════════════════════
+// CONFIGURATION
+// ════════════════════════════════════════════════
+// Types d'ateliers pris en compte (exclut repas, prep, réunions internes)
+const TYPES_ACTIFS = new Set([
+  'ATELIERS TANTRA (AM)', 'ATELIERS TANTRA (PM)',
+  'ATELIER ARTISTIQUE (AM)', 'ATELIER ARTISTIQUE (PM)',
+  'MEDITATION / YOGA', 'RASSEMBLEMENT',
+  'CEREMONIE & CONCERT', "REUNION D'EQUIPE",
+  'LOVE TEMPLE', 'SUPPORT EMOTIONNEL',
+  'POOL PARTY', 'PREPA & LOGITICS',
+  'TANTRA CAFÉ & CONFERENCE'
+]);
+
+const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+let currentTab = 'h'; // 'h' = helpers, 'a' = angels, 's' = combined
+
+// ════════════════════════════════════════════════
+// PARSING HEURE → minutes depuis minuit
+// ════════════════════════════════════════════════
+function parseMinutes(str) {
+  if (!str) return null;
+  const s = String(str).replace(/\./g, ':').trim();
+  const m = s.match(/(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  return parseInt(m[1]) * 60 + parseInt(m[2]);
+}
+
+function parseDuration(heure) {
+  if (!heure) return 0;
+  const parts = String(heure).split(/[-–—â€"]/);
+  if (parts.length < 2) return 0;
+  let start = parseMinutes(parts[0]);
+  let end   = parseMinutes(parts[1]);
+  if (start === null || end === null) return 0;
+  if (end < start) end += 24 * 60; // passe minuit
+  return end - start;
+}
+
+// ════════════════════════════════════════════════
+// CALCUL DES STATS PAR PERSONNE
+// ════════════════════════════════════════════════
+function buildStats(jourFilter) {
+  const filtered = AGENDA.filter(e =>
+    TYPES_ACTIFS.has(e.type) &&
+    (jourFilter === '' || e.jour === jourFilter)
+  );
+
+  // Map nom → { assignments: [{atelier, jour, heure, type, role}], ... }
+  const helpers = {};
+  const angels  = {};
+
+  function addHelper(nom, entry) {
+    if (!nom) return;
+    if (!helpers[nom]) helpers[nom] = [];
+    helpers[nom].push(entry);
+  }
+  function addAngel(nom, entry) {
+    if (!nom) return;
+    if (!angels[nom]) angels[nom] = [];
+    angels[nom].push(entry);
+  }
+
+  filtered.forEach(e => {
+    const base = { atelier: e.atelier, jour: e.jour, heure: e.heure, type: e.type, date: e.date };
+    addHelper(e.helper1, { ...base, role: 'Helper' });
+    addHelper(e.helper2, { ...base, role: 'Helper' });
+    addHelper(e.helper3, { ...base, role: 'Helper' });
+    addAngel(e.angel,    { ...base, role: 'Angel'  });
+  });
+
+  // Pour les angels : dédupliquer les ateliers même jour + même heure
+  // (un angel peut couvrir plusieurs salles simultanément → compte 1 seul)
+  function computeAngelStats(assignments) {
+    const seen = new Set();
+    let unique = 0;
+    let totalMin = 0;
+    const deduped = assignments.map(a => {
+      const key = `${a.jour}||${a.heure}`;
+      const isDupe = seen.has(key);
+      if (!isDupe) {
+        seen.add(key);
+        unique++;
+        totalMin += parseDuration(a.heure);
+      }
+      return { ...a, isDupe };
+    });
+    return { assignments: deduped, count: unique, minutes: totalMin };
+  }
+
+  function computeHelperStats(assignments) {
+    return {
+      assignments,
+      count:   assignments.length,
+      minutes: assignments.reduce((s, a) => s + parseDuration(a.heure), 0)
+    };
+  }
+
+  const helperStats = Object.entries(helpers).map(([nom, list]) => ({
+    nom, role: 'Helper', ...computeHelperStats(list)
+  })).sort((a, b) => b.count - a.count || b.minutes - a.minutes);
+
+  const angelStats = Object.entries(angels).map(([nom, list]) => ({
+    nom, role: 'Angel', ...computeAngelStats(list)
+  })).sort((a, b) => b.count - a.count || b.minutes - a.minutes);
+
+  return { helperStats, angelStats };
+}
+
+// ════════════════════════════════════════════════
+// AFFICHAGE
+// ════════════════════════════════════════════════
+function fmtMin(min) {
+  if (!min) return '—';
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return h + 'h' + (m ? String(m).padStart(2, '0') : '');
+}
+
+function loadBar(count, max) {
+  const pct = max ? Math.round((count / max) * 100) : 0;
+  const cls = pct < 40 ? 'low' : pct < 70 ? 'medium' : 'high';
+  return `<div class="load-bar-wrap"><div class="load-bar ${cls}" style="width:${pct}%"></div></div>`;
+}
+
+function renderPersonCard(person, rank, max, roleOverride) {
+  const role = roleOverride || person.role;
+  const badgeCls = role === 'Helper' ? 'badge-h' : role === 'Angel' ? 'badge-a' : 'badge-b';
+  const statCls  = role === 'Helper' ? 'h' : 'a';
+  const id = 'card-' + person.nom.replace(/\W/g, '_');
+
+  // Grouper les ateliers par jour
+  const byDay = {};
+  person.assignments.forEach(a => {
+    if (!byDay[a.jour]) byDay[a.jour] = [];
+    byDay[a.jour].push(a);
+  });
+
+  const detailHtml = JOUR_ORDER
+    .filter(j => byDay[j])
+    .map(j => {
+      const rows = byDay[j].map(a => `
+        <div class="detail-row">
+          <span class="detail-heure">${a.heure || '—'}</span>
+          <span class="detail-atelier">${a.atelier}</span>
+          <span class="detail-role ${badgeCls}">${a.role}</span>
+          ${a.isDupe ? '<span class="detail-dedupe">⟳ dédupliqué (même heure)</span>' : ''}
+        </div>`).join('');
+      return `<div class="detail-day">
+        <div class="detail-day-label">${j} — ${byDay[j][0].date}</div>
+        ${rows}
+      </div>`;
+    }).join('');
+
+  return `
+    <div class="person-card" id="${id}">
+      <div class="person-header" onclick="toggleDetail('${id}')">
+        <div class="person-rank">#${rank}</div>
+        <div class="person-name">${person.nom}</div>
+        <span class="person-role-badge ${badgeCls}">${role}</span>
+        <div class="person-stats">
+          <div class="stat-block">
+            <div class="stat-num ${statCls}">${person.count}</div>
+            <div class="stat-lbl">ateliers</div>
+            ${loadBar(person.count, max)}
+          </div>
+          <div class="stat-block">
+            <div class="stat-num ${statCls}">${fmtMin(person.minutes)}</div>
+            <div class="stat-lbl">durée totale</div>
+          </div>
+        </div>
+        <span style="color:var(--muted);font-size:16px;margin-left:8px;">▾</span>
+      </div>
+      <div class="person-detail" id="detail-${id}">
+        ${detailHtml}
+      </div>
+    </div>`;
+}
+
+function toggleDetail(id) {
+  const d = document.getElementById('detail-' + id);
+  if (d) d.classList.toggle('open');
+}
+
+// ════════════════════════════════════════════════
+// HARMONISATION
+// ════════════════════════════════════════════════
+function buildHarmony(helperStats, angelStats) {
+  const cards = [];
+  const AVG_H = helperStats.reduce((s, p) => s + p.count, 0) / (helperStats.length || 1);
+  const AVG_A = angelStats.reduce((s,  p) => s + p.count, 0) / (angelStats.length || 1);
+  const MAX_H = helperStats.length ? helperStats[0].count : 0;
+  const MIN_H = helperStats.length ? helperStats[helperStats.length - 1].count : 0;
+  const MAX_A = angelStats.length  ? angelStats[0].count  : 0;
+  const MIN_A = angelStats.length  ? angelStats[angelStats.length - 1].count  : 0;
+
+  // Helpers surchargés
+  const overH = helperStats.filter(p => p.count > AVG_H * 1.4);
+  if (overH.length) {
+    cards.push({
+      cls: 'tag-overload',
+      icon: '🔴',
+      title: 'Helpers avec charge élevée',
+      body: `<p>Les helpers suivants ont un nombre d'ateliers significativement supérieur à la moyenne (${AVG_H.toFixed(1)}) :</p>
+             <ul>${overH.map(p => `<li><strong>${p.nom}</strong> — ${p.count} ateliers (${fmtMin(p.minutes)})</li>`).join('')}</ul>
+             <p style="margin-top:8px;">💡 Envisager de redistribuer 1 à 2 de leurs ateliers vers des helpers moins chargés.</p>`
+    });
+  }
+
+  // Helpers peu chargés
+  const lightH = helperStats.filter(p => p.count < AVG_H * 0.6 && p.count > 0);
+  if (lightH.length) {
+    cards.push({
+      cls: 'tag-light',
+      icon: '🟢',
+      title: 'Helpers avec disponibilité',
+      body: `<p>Les helpers suivants ont une charge inférieure à la moyenne :</p>
+             <ul>${lightH.map(p => `<li><strong>${p.nom}</strong> — ${p.count} atelier${p.count > 1 ? 's' : ''} (${fmtMin(p.minutes)})</li>`).join('')}</ul>
+             <p style="margin-top:8px;">💡 Ces personnes peuvent absorber des ateliers supplémentaires sans conflit probable.</p>`
+    });
+  }
+
+  // Angels surchargés
+  const overA = angelStats.filter(p => p.count > AVG_A * 1.4);
+  if (overA.length) {
+    cards.push({
+      cls: 'tag-overload',
+      icon: '🔴',
+      title: 'Angels avec charge élevée',
+      body: `<p>Les angels suivants couvrent un nombre d'ateliers supérieur à la moyenne (${AVG_A.toFixed(1)}) :</p>
+             <ul>${overA.map(p => `<li><strong>${p.nom}</strong> — ${p.count} atelier${p.count > 1 ? 's' : ''} unique(s) (${fmtMin(p.minutes)})</li>`).join('')}</ul>
+             <p style="margin-top:8px;">💡 Vérifier si un autre angel peut prendre le relais sur certains créneaux.</p>`
+    });
+  }
+
+  // Angels peu chargés
+  const lightA = angelStats.filter(p => p.count < AVG_A * 0.6 && p.count > 0);
+  if (lightA.length) {
+    cards.push({
+      cls: 'tag-light',
+      icon: '🟢',
+      title: 'Angels avec disponibilité',
+      body: `<p>Ces angels ont une charge légère et pourraient couvrir des créneaux supplémentaires :</p>
+             <ul>${lightA.map(p => `<li><strong>${p.nom}</strong> — ${p.count} atelier${p.count > 1 ? 's' : ''} (${fmtMin(p.minutes)})</li>`).join('')}</ul>`
+    });
+  }
+
+  // Déséquilibre global
+  if (MAX_H - MIN_H > 5) {
+    cards.push({
+      cls: 'tag-suggest',
+      icon: '⚠️',
+      title: 'Déséquilibre global helpers',
+      body: `<p>L'écart entre le helper le plus chargé (<strong>${helperStats[0]?.nom}</strong> — ${MAX_H} ateliers) et le moins chargé (<strong>${helperStats[helperStats.length-1]?.nom}</strong> — ${MIN_H} ateliers) est de <strong>${MAX_H - MIN_H} ateliers</strong>.</p>
+             <p style="margin-top:8px;">💡 Une distribution plus homogène viserait un maximum de ${Math.ceil(AVG_H * 1.3)} ateliers par helper.</p>`
+    });
+  }
+
+  if (MAX_A - MIN_A > 3) {
+    cards.push({
+      cls: 'tag-suggest',
+      icon: '⚠️',
+      title: 'Déséquilibre global angels',
+      body: `<p>L'écart entre l'angel le plus chargé (<strong>${angelStats[0]?.nom}</strong> — ${MAX_A} ateliers) et le moins chargé (<strong>${angelStats[angelStats.length-1]?.nom}</strong> — ${MIN_A} ateliers) est de <strong>${MAX_A - MIN_A} ateliers</strong>.</p>
+             <p style="margin-top:8px;">💡 Cible recommandée : maximum ${Math.ceil(AVG_A * 1.3)} ateliers uniques par angel.</p>`
+    });
+  }
+
+  // Rappel important
+  cards.push({
+    cls: '',
+    icon: '⚠️',
+    title: 'Important — Vérification des conflits',
+    body: `<p>Ces suggestions sont basées uniquement sur les <strong>volumes d'ateliers</strong>. Avant toute modification :</p>
+           <ul>
+             <li>Vérifier l'absence de conflit horaire via le <strong>Rapport 4 — Conflits de planning</strong></li>
+             <li>Confirmer la disponibilité de la personne pour le créneau concerné</li>
+             <li>Obtenir l'accord de l'intéressé(e)</li>
+             <li>Mettre à jour <code>data.js</code> via la page <strong>Admin</strong></li>
+           </ul>`
+  });
+
+  return cards;
+}
+
+// ════════════════════════════════════════════════
+// RENDER PRINCIPAL
+// ════════════════════════════════════════════════
+function render() {
+  const jourFilter = document.getElementById('filterJour').value;
+  const { helperStats, angelStats } = buildStats(jourFilter);
+
+  // Summary bar
+  const totalH = helperStats.reduce((s, p) => s + p.count, 0);
+  const totalA = angelStats.reduce((s, p) => s + p.count, 0);
+  const avgH   = helperStats.length ? (totalH / helperStats.length).toFixed(1) : 0;
+  const avgA   = angelStats.length  ? (totalA / angelStats.length).toFixed(1)  : 0;
+
+  document.getElementById('summaryBar').innerHTML = `
+    <div class="sum-pill"><div class="num" style="color:var(--helper-text)">${helperStats.length}</div><div class="lbl">Helpers actifs</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--helper-text)">${totalH}</div><div class="lbl">Missions helpers</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--helper-text)">${avgH}</div><div class="lbl">Moy. / helper</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${angelStats.length}</div><div class="lbl">Angels actifs</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${totalA}</div><div class="lbl">Missions angels</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${avgA}</div><div class="lbl">Moy. / angel</div></div>
+  `;
+
+  // Person grid
+  const grid = document.getElementById('personGrid');
+
+  if (currentTab === 'h') {
+    const max = helperStats.length ? helperStats[0].count : 1;
+    grid.innerHTML = helperStats.length
+      ? helperStats.map((p, i) => renderPersonCard(p, i + 1, max, 'Helper')).join('')
+      : '<p style="color:var(--muted);padding:20px 0;">Aucun helper trouvé.</p>';
+  } else if (currentTab === 'a') {
+    const max = angelStats.length ? angelStats[0].count : 1;
+    grid.innerHTML = angelStats.length
+      ? angelStats.map((p, i) => renderPersonCard(p, i + 1, max, 'Angel')).join('')
+      : '<p style="color:var(--muted);padding:20px 0;">Aucun angel trouvé.</p>';
+  } else {
+    // Vue combinée : merge + tri par count
+    const combined = [
+      ...helperStats.map(p => ({ ...p, role: 'Helper' })),
+      ...angelStats.map(p => {
+        // Vérifier si déjà helper
+        const isAlsoHelper = helperStats.find(h => h.nom === p.nom);
+        return { ...p, role: isAlsoHelper ? 'Les deux' : 'Angel' };
+      }).filter(p => !helperStats.find(h => h.nom === p.nom))
+    ];
+    // Gérer les personnes qui sont à la fois helper ET angel
+    const bothMap = {};
+    helperStats.forEach(h => {
+      const a = angelStats.find(x => x.nom === h.nom);
+      if (a) bothMap[h.nom] = { ...h, role: 'Les deux', count: h.count + a.count, minutes: h.minutes + a.minutes,
+        assignments: [...h.assignments, ...a.assignments] };
+    });
+    const finalList = [
+      ...Object.values(bothMap),
+      ...helperStats.filter(h => !bothMap[h.nom]).map(p => ({ ...p, role: 'Helper' })),
+      ...angelStats.filter(a => !bothMap[a.nom]).map(p => ({ ...p, role: 'Angel' }))
+    ].sort((a, b) => b.count - a.count || b.minutes - a.minutes);
+
+    const max = finalList.length ? finalList[0].count : 1;
+    grid.innerHTML = finalList.map((p, i) => renderPersonCard(p, i + 1, max, p.role)).join('');
+  }
+
+  // Harmonisation
+  const harmonyCards = buildHarmony(helperStats, angelStats);
+  document.getElementById('harmonyGrid').innerHTML = harmonyCards.map(c => `
+    <div class="harmony-card ${c.cls}">
+      <div class="harmony-card-title">${c.icon} ${c.title}</div>
+      ${c.body}
+    </div>`).join('');
+}
+
+// ════════════════════════════════════════════════
+// ONGLETS
+// ════════════════════════════════════════════════
+function setTab(t) {
+  currentTab = t;
+  document.getElementById('tab-h').className = 'tab' + (t === 'h' ? ' active-h' : '');
+  document.getElementById('tab-a').className = 'tab' + (t === 'a' ? ' active-a' : '');
+  document.getElementById('tab-s').className = 'tab' + (t === 's' ? ' active-s' : '');
+  render();
+}
+
+// ════════════════════════════════════════════════
+// INIT FILTRES
+// ════════════════════════════════════════════════
+(function initFilters() {
+  const sel = document.getElementById('filterJour');
+  JOUR_ORDER.forEach(j => {
+    if (AGENDA.some(e => e.jour === j)) {
+      const o = document.createElement('option');
+      o.value = j; o.textContent = j;
+      sel.appendChild(o);
+    }
+  });
+})();
+
+// ════════════════════════════════════════════════
+// DARK MODE + HARD RELOAD
+// ════════════════════════════════════════════════
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
+      .finally(() => location.reload(true));
+  } else {
+    location.reload(true);
+  }
+}
+
+function toggleMode() {
+  const isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+
+// Auto-refresh si ouvert depuis Home (paramètre ?v= présent)
+if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
+  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
+  hardReload();
+}
+
+render();
+</script>
+</body>
+</html>
