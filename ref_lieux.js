@@ -13,5 +13,5 @@ const REF_LIEUX = [
   { id: "L_GANESH", value: "GANESH", label: "GANESH" },
   { id: "L_PISCINE", value: "PISCINE", label: "PISCINE" },
   { id: "L_EXTERIEUR", value: "EXTERIEUR", label: "EXTERIEUR" },
-  { id: "L_DREAM", value: "SALLE DREAM TEAM 5", label: "SALLE DREAM TEAM 5" },
+  { id: "L_DREAM", value: "SALLE DREAM TEAM 5 bis", label: "SALLE DREAM TEAM 5 bis" },
 ];
