@@ -303,6 +303,7 @@
 <footer><p>Made with IBM Bob</p></footer>
 
 <!-- ── RÉFÉRENTIELS ── -->
+<script src="github-api.js"></script>
 <script src="ref_jours.js"></script>
 <script src="ref_lieux.js"></script>
 <script src="ref_types.js"></script>
@@ -595,16 +596,10 @@ function agendaToRaw(entries) {
 // ════════════════════════════════════════════════
 async function sauverFichier(filename, content) {
   try {
-    const r = await fetch('http://localhost:3000/save', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filename, content })
-    });
-    const json = await r.json();
-    if (!json.ok) throw new Error(json.error);
+    await githubSaveFile(filename, content);
     return true;
   } catch(e) {
-    toast(`❌ Serveur inaccessible — lance start.bat puis réessaie.\n(${e.message})`, true);
+    toast(`❌ Sauvegarde impossible : ${e.message}`, true);
     return false;
   }
 }

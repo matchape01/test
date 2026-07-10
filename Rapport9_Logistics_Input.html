@@ -222,6 +222,7 @@
 
 <footer><p>Made with IBM Bob</p></footer>
 
+<script src="github-api.js"></script>
 <script src="ref_facilitateurs.js"></script>
 <script src="ref_lieux.js"></script>
 <script src="data.js"></script>
@@ -519,14 +520,8 @@ function agendaToRaw(entries) {
 
 // ─── API save ────────────────────────────────────────────────────────────────
 async function saveFile(filename, content) {
-  const res = await fetch('http://localhost:3000/save', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ filename, content })
-  });
-  const json = await res.json();
-  if (!json.ok) throw new Error(json.error || 'Erreur serveur');
-  return json;
+  await githubSaveFile(filename, content);
+  return { ok: true };
 }
 
 // ─── Toast ───────────────────────────────────────────────────────────────────
