@@ -425,7 +425,7 @@ const COL_FIELDS = {
 
 function renderTable(data) {
   const tb = document.getElementById('tbody');
-  if(!data.length) { tb.innerHTML=`<tr><td colspan="10" class="empty">Aucun résultat</td></tr>`; return; }
+  if(!data.length) { tb.innerHTML=`<tr><td colspan="11" class="empty">Aucun résultat</td></tr>`; return; }
   tb.innerHTML = data.map(r => {
     const cf = getConflictFields(r);
     const rowCls = cf ? ' class="conflict-row"' : '';
