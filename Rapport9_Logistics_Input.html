@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Saisie Logistique</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --green: #166534; --green-bg: #dcfce7; --green-border: #86efac;
+    --red: #dc2626; --red-bg: #fef2f2; --red-border: #fca5a5;
+    --orange: #c2410c; --orange-bg: #fff7ed; --orange-border: #fdba74;
+    --pill-f-bg: #dcfce7; --pill-f-t: #166534;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+  .logo h1 { font-size: 19px; font-weight: 700; }
+  .logo p  { font-size: 22px; font-weight: 800; color: var(--accent); line-height: 1.2; margin-top: 2px; }
+  .logo small { font-size: 12px; color: var(--muted); display: block; margin-top: 2px; }
+  .btn { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 14px; font-size: 13px; color: var(--text); font-family: inherit; transition: background .15s; text-decoration: none; display: inline-block; }
+  .btn:hover { background: var(--border); }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+  .btn-primary:hover { background: #2563eb; border-color: #2563eb; }
+  .btn-danger  { background: var(--red); color: #fff; border-color: var(--red); font-weight: 600; }
+  .btn-danger:hover { background: #b91c1c; }
+
+  /* ── ÉTAPE 1 : sélection facilitateur ── */
+  #step1 {}
+  .step-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+  .step-sub   { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
+  .search-box { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  select.big  { flex: 1; min-width: 240px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 15px; color: var(--text); font-family: inherit; cursor: pointer; }
+  select.big:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  /* ── LISTE DES ATELIERS ── */
+  #step2 { display: none; }
+  .back-link { font-size: 13px; color: var(--accent); cursor: pointer; margin-bottom: 20px; display: inline-flex; align-items: center; gap: 4px; }
+  .back-link:hover { text-decoration: underline; }
+  .fac-name  { font-size: 20px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
+  .fac-sub   { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+  /* Sélecteur d'atelier */
+  .ws-selector-wrap { margin-bottom: 24px; }
+  .ws-selector-label { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+  select.ws-select { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; font-size: 14px; color: var(--text); font-family: inherit; cursor: pointer; }
+  select.ws-select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  /* Fiche atelier sélectionné */
+  #workshopPanel { display: none; }
+  .ws-jour  { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); margin-bottom: 4px; }
+  .ws-title { font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+  .ws-meta  { font-size: 13px; color: var(--muted); display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 20px; }
+  .ws-status { font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 99px; white-space: nowrap; }
+  .ws-status.filled { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+  .ws-status.empty  { background: var(--orange-bg); color: var(--orange); border: 1px solid var(--orange-border); }
+
+  /* ── Éditeur (intégré dans étape 2) ── */
+  .editor-header { margin-bottom: 20px; }
+  .editor-header .ws-title { font-size: 18px; }
+  .editor-header .ws-meta  { font-size: 13px; }
+
+  /* étape 3 cachée (conservée pour compatibilité) */
+  #step3 { display: none; }
+  .field-label { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+  .readonly-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; margin-bottom: 24px; padding: 14px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+  .ro-item {}
+  .ro-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; }
+  .ro-value { font-size: 13px; color: var(--text); }
+  .badge { display: inline-block; border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 600; background: var(--surface); border: 1px solid var(--border); }
+
+  .toolbar { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 6px; }
+  .tb-btn { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 4px 9px; font-size: 12px; font-family: inherit; color: var(--text); }
+  .tb-btn:hover { background: var(--border); }
+
+  #logisticEditor {
+    min-height: 200px; max-height: 420px; overflow-y: auto;
+    border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 14px; font-size: 14px; line-height: 1.6;
+    background: var(--bg); color: var(--text); outline: none;
+  }
+  #logisticEditor:focus { border-color: var(--accent); outline: 2px solid rgba(59,130,212,.15); }
+  #logisticEditor p, #logisticEditor ul, #logisticEditor ol { margin-bottom: 4px; }
+  #logisticEditor ul, #logisticEditor ol { padding-left: 20px; }
+  .editor-hint { font-size: 12px; color: var(--muted); margin-top: 6px; margin-bottom: 20px; }
+
+  .editor-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-top: 20px; }
+
+  /* ── MODALE CONFIRMATION ── */
+  #confirmOverlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.45); z-index: 9999;
+    align-items: center; justify-content: center;
+  }
+  .confirm-box {
+    background: #fff; border-radius: 12px; padding: 32px 28px;
+    max-width: 400px; width: 92%;
+  }
+  .confirm-box h2 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .confirm-box p  { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+  .confirm-warning { background: var(--red-bg); border: 1px solid var(--red-border); border-radius: 8px; padding: 12px 14px; font-size: 13px; color: var(--red); font-weight: 600; margin-bottom: 20px; }
+  .confirm-actions { display: flex; gap: 10px; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+    background: #1f2328; color: #fff; border-radius: 8px; padding: 12px 22px;
+    font-size: 13px; font-weight: 600; z-index: 10000;
+    transition: transform .3s, opacity .3s; opacity: 0;
+    white-space: nowrap;
+  }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  #toast.ok   { background: #166534; }
+  #toast.err  { background: #dc2626; }
+
+  footer { margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Saisie des besoins logistiques</p>
+      <small>Logistics Needs Input</small>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <a class="btn" href="index.html">🏠 Home</a>
+    </div>
+  </header>
+
+  <!-- ══════════════════════════════════════
+       ÉTAPE 1 — Choisir son nom
+  ══════════════════════════════════════ -->
+  <div id="step1">
+    <p class="step-title">Qui êtes-vous ?</p>
+    <p class="step-sub">Sélectionnez votre nom pour accéder à vos ateliers et saisir vos besoins logistiques.</p>
+    <div class="search-box">
+      <select class="big" id="selFac" onchange="onFacSelect()">
+        <option value="">— Choisissez votre nom —</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       ÉTAPE 2 — Sélection + édition atelier
+  ══════════════════════════════════════ -->
+  <div id="step2">
+    <span class="back-link" onclick="goStep1()">← Changer de facilitateur</span>
+    <div class="fac-name" id="facName"></div>
+    <div class="fac-sub" id="facSub"></div>
+
+    <!-- Sélecteur d'atelier -->
+    <div class="ws-selector-wrap">
+      <div class="ws-selector-label">Choisissez un atelier</div>
+      <select class="ws-select" id="selWorkshop" onchange="onWorkshopSelect()">
+        <option value="">— Sélectionnez un atelier —</option>
+      </select>
+    </div>
+
+    <!-- Fiche + éditeur (apparaît après sélection) -->
+    <div id="workshopPanel">
+
+      <!-- En-tête lecture seule -->
+      <div class="ws-jour" id="edJour"></div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+        <div class="ws-title" id="edTitle" style="margin-bottom:0;"></div>
+        <span id="edStatus"></span>
+      </div>
+      <div class="ws-meta" id="edMeta"></div>
+
+      <!-- Grille infos lecture seule -->
+      <div class="field-label" style="margin-bottom:8px;">Informations de l'atelier <span style="font-weight:400;text-transform:none;letter-spacing:0;">(lecture seule)</span></div>
+      <div class="readonly-grid" id="readonlyGrid"></div>
+
+      <!-- Éditeur logistique -->
+      <div class="field-label">📝 Besoins logistiques <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--muted)">(saisie libre)</span></div>
+      <div class="toolbar">
+        <button class="tb-btn" onclick="fmt('bold')"><strong>G</strong></button>
+        <button class="tb-btn" onclick="fmt('italic')"><em>I</em></button>
+        <button class="tb-btn" onclick="fmt('insertUnorderedList')">• Liste</button>
+        <button class="tb-btn" onclick="fmt('insertOrderedList')">1. Liste</button>
+        <button class="tb-btn" onclick="fmt('removeFormat')">Eff. format</button>
+      </div>
+      <div id="logisticEditor" contenteditable="true" spellcheck="true"></div>
+      <p class="editor-hint">Décrivez vos besoins matériels, de salle, techniques ou autres. Utilisez la liste à puces pour plus de clarté.</p>
+
+      <div class="editor-actions">
+        <button class="btn btn-primary" onclick="askConfirm()">💾 Enregistrer</button>
+        <button class="btn" onclick="resetWorkshopPanel()">Annuler</button>
+        <span id="edSavedAt" style="font-size:12px;color:var(--muted);margin-left:8px;"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- étape 3 cachée (non utilisée mais conservée) -->
+  <div id="step3"></div>
+
+</div>
+
+<!-- ── MODALE CONFIRMATION ── -->
+<div id="confirmOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
+  <div class="confirm-box">
+    <h2>⚠️ Confirmer l'enregistrement</h2>
+    <p>Vous êtes sur le point de sauvegarder les besoins logistiques pour :</p>
+    <p style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;" id="confirmAtelier"></p>
+    <div class="confirm-warning">
+      Attention — ce changement est définitif et sera immédiatement visible par toute l'équipe. Vérifiez bien votre saisie avant de confirmer.
+    </div>
+    <div class="confirm-actions">
+      <button class="btn" style="flex:1" onclick="closeConfirm()">Annuler</button>
+      <button class="btn btn-danger" style="flex:1" onclick="doSave()">✔ Confirmer et enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div id="toast"></div>
+
+<footer><p>Made with IBM Bob</p></footer>
+
+<script src="ref_facilitateurs.js"></script>
+<script src="ref_lieux.js"></script>
+<script src="data.js"></script>
+<script src="logistics.js"></script>
+<script>
+// ─── Constantes ─────────────────────────────────────────────────────────────
+const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+// Types d'ateliers éditables (les facilitateurs ont un rôle pédagogique dessus)
+// On exclut les entrées purement logistiques sans facilitateur
+const TYPES_AVEC_FACILITATEUR = new Set([
+  'ATELIERS TANTRA (AM)', 'ATELIERS TANTRA (PM)',
+  'ATELIER ARTISTIQUE (AM)', 'ATELIER ARTISTIQUE (PM)',
+  'MEDITATION / YOGA', 'RASSEMBLEMENT',
+  'CEREMONIE & CONCERT', 'REUNION D\'EQUIPE',
+  'LOVE TEMPLE', 'SUPPORT EMOTIONNEL',
+  'POOL PARTY'
+]);
+
+// ─── Données brutes ──────────────────────────────────────────────────────────
+// On travaille directement sur AGENDA (pas RAW) pour avoir logisticId
+const DATA = AGENDA;
+
+// ─── Peupler le select facilitateurs ────────────────────────────────────────
+(function populateFac() {
+  // Récupérer tous les facilitateurs présents dans les données
+  const present = new Set();
+  DATA.forEach(e => {
+    if (e.fac1) present.add(e.fac1);
+    if (e.fac2) present.add(e.fac2);
+  });
+
+  const sel = document.getElementById('selFac');
+  // On prend REF_FACILITATEURS dans l'ordre mais ne garde que ceux présents
+  REF_FACILITATEURS
+    .filter(f => present.has(f.value))
+    .forEach(f => {
+      const o = document.createElement('option');
+      o.value = f.value;
+      o.textContent = f.value;
+      sel.appendChild(o);
+    });
+})();
+
+// ─── État courant ────────────────────────────────────────────────────────────
+let currentFac   = '';  // nom du facilitateur sélectionné
+let currentIdx   = -1;  // index dans DATA de l'atelier en cours d'édition
+let currentLogId = '';  // logisticId de l'atelier en cours
+let workshops    = [];  // liste des ateliers du facilitateur courant
+
+// ─── Navigation ──────────────────────────────────────────────────────────────
+function show(id) {
+  ['step1','step2','step3'].forEach(s => {
+    document.getElementById(s).style.display = (s === id) ? '' : 'none';
+  });
+}
+
+function goStep1() {
+  document.getElementById('selFac').value = '';
+  currentFac = '';
+  show('step1');
+}
+
+function onFacSelect() {
+  const val = document.getElementById('selFac').value;
+  if (!val) return;
+  currentFac = val;
+  loadFacStep(val);
+  show('step2');
+}
+
+// ─── Chargement étape 2 ───────────────────────────────────────────────────────
+function getWorkshops(fac) {
+  return DATA
+    .filter(e => e.fac1 === fac || e.fac2 === fac)
+    .sort((a, b) => {
+      const dj = JOUR_ORDER.indexOf(a.jour) - JOUR_ORDER.indexOf(b.jour);
+      return dj !== 0 ? dj : heureMin(a.heure) - heureMin(b.heure);
+    });
+}
+
+function heureMin(h) {
+  if (!h) return 9999;
+  const m = String(h).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1])*60 + parseInt(m[2]) : 9999;
+}
+
+function loadFacStep(fac) {
+  workshops = getWorkshops(fac);
+  document.getElementById('facName').textContent = fac;
+  document.getElementById('facSub').textContent =
+    workshops.length === 0 ? 'Aucun atelier trouvé.'
+    : `${workshops.length} atelier${workshops.length > 1 ? 's' : ''} assigné${workshops.length > 1 ? 's' : ''}`;
+
+  // Peupler le select d'atelier
+  const sel = document.getElementById('selWorkshop');
+  sel.innerHTML = '<option value="">— Sélectionnez un atelier —</option>';
+  workshops.forEach((e, i) => {
+    const hasLogistic = e.logisticId && LOGISTICS[e.logisticId];
+    const status = hasLogistic ? '✔' : '⚠';
+    const label = `${status}  ${e.jour}  •  ${e.atelier || '—'}${e.heure ? '  ('+e.heure+')' : ''}`;
+    const o = document.createElement('option');
+    o.value = String(i);
+    o.textContent = label;
+    sel.appendChild(o);
+  });
+
+  // Cacher le panel jusqu'à sélection
+  resetWorkshopPanel();
+}
+
+function resetWorkshopPanel() {
+  document.getElementById('selWorkshop').value = '';
+  document.getElementById('workshopPanel').style.display = 'none';
+}
+
+// ─── Sélection d'un atelier ───────────────────────────────────────────────────
+function onWorkshopSelect() {
+  const val = document.getElementById('selWorkshop').value;
+  if (val === '') { resetWorkshopPanel(); return; }
+
+  const wsIdx = parseInt(val, 10);
+  const e = workshops[wsIdx];
+  currentIdx   = DATA.indexOf(e);
+  currentLogId = e.logisticId || '';
+
+  // En-tête
+  document.getElementById('edJour').textContent = `${e.jour} — ${e.date}`;
+  document.getElementById('edTitle').textContent = e.atelier || '—';
+  document.getElementById('edMeta').innerHTML = [
+    e.heure && `<span>🕐 ${e.heure}</span>`,
+    e.lieu  && `<span>📍 ${e.lieu}</span>`,
+    e.type  && `<span>🏷 ${e.type}</span>`,
+  ].filter(Boolean).join('');
+
+  // Badge statut
+  const hasLogistic = currentLogId && LOGISTICS[currentLogId];
+  const updatedAt   = hasLogistic ? LOGISTICS[currentLogId].updatedAt : '';
+  document.getElementById('edStatus').innerHTML = hasLogistic
+    ? `<span class="ws-status filled">✔ Rempli${updatedAt ? ' · '+updatedAt : ''}</span>`
+    : `<span class="ws-status empty">⚠ À remplir</span>`;
+
+  // Grille lecture seule
+  document.getElementById('readonlyGrid').innerHTML = [
+    ['Jour',            e.jour       || '—'],
+    ['Date',            e.date       || '—'],
+    ['Heure',           e.heure      || '—'],
+    ['Lieu',            e.lieu       || '—'],
+    ['Type',            e.type       || '—'],
+    ['Facilitateur(s)', [e.fac1, e.fac2].filter(Boolean).join(' / ') || '—'],
+    ['Traducteur',      e.traduction || '—'],
+    ['Helper(s)',       [e.helper1, e.helper2, e.helper3].filter(Boolean).join(', ') || '—'],
+    ['Angel',           e.angel      || '—'],
+  ].map(([l, v]) => `<div class="ro-item"><div class="ro-label">${l}</div><div class="ro-value">${v}</div></div>`).join('');
+
+  // Contenu logistique existant
+  const existing = hasLogistic ? LOGISTICS[currentLogId].html : '';
+  document.getElementById('logisticEditor').innerHTML = existing || '<p></p>';
+  document.getElementById('edSavedAt').textContent = updatedAt ? `Dernière mise à jour : ${updatedAt}` : '';
+
+  // Afficher le panel
+  document.getElementById('workshopPanel').style.display = '';
+  document.getElementById('workshopPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function fmt(cmd) {
+  document.getElementById('logisticEditor').focus();
+  document.execCommand(cmd, false, null);
+}
+
+// ─── Confirmation + Sauvegarde ───────────────────────────────────────────────
+function askConfirm() {
+  const e = DATA[currentIdx];
+  document.getElementById('confirmAtelier').textContent = `${e.atelier} (${e.jour} — ${e.date})`;
+  document.getElementById('confirmOverlay').style.display = 'flex';
+}
+
+function closeConfirm() {
+  document.getElementById('confirmOverlay').style.display = 'none';
+}
+
+async function doSave() {
+  closeConfirm();
+
+  const e = DATA[currentIdx];
+  const editorEl = document.getElementById('logisticEditor');
+  const html = editorEl.innerHTML.trim();
+  const text = editorEl.innerText.trim();
+  const today = new Date().toISOString().slice(0, 10);
+
+  // Générer un logisticId si l'atelier n'en a pas encore
+  if (!e.logisticId) {
+    const safeName = e.atelier.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 30).toUpperCase();
+    const jourKey  = e.jour.replace(/\s+/g, '').toUpperCase(); // "JOUR1"
+    e.logisticId = `${jourKey}_${safeName}`;
+    currentLogId = e.logisticId;
+  }
+
+  // Mettre à jour LOGISTICS en mémoire
+  LOGISTICS[currentLogId] = { html, text, updatedAt: today };
+
+  try {
+    await saveFile('logistics.js', buildLogisticsJs());
+    await saveFile('data.js',      buildDataJs());
+
+    // Mettre à jour le badge statut + date dans l'UI
+    const updatedAt = today;
+    document.getElementById('edSavedAt').textContent = `Dernière mise à jour : ${updatedAt}`;
+    document.getElementById('edStatus').innerHTML =
+      `<span class="ws-status filled">✔ Rempli · ${updatedAt}</span>`;
+
+    // Rafraîchir le select (badge ✔/⚠ dans les options)
+    loadFacStep(currentFac);
+    // Ré-afficher la fiche pour l'atelier en cours
+    document.getElementById('selWorkshop').value =
+      String(workshops.findIndex(w => DATA.indexOf(w) === currentIdx));
+    onWorkshopSelect();
+
+    showToast('✔ Sauvegardé avec succès', 'ok');
+  } catch (err) {
+    showToast('❌ Erreur lors de la sauvegarde : ' + err.message, 'err');
+  }
+}
+
+// ─── Sérialisation ───────────────────────────────────────────────────────────
+function esc(s) {
+  if (!s) return '';
+  return String(s)
+    .replace(/\\/g, '\\\\')
+    .replace(/"/g, '\\"')
+    .replace(/\r?\n/g, '\\n')
+    .replace(/\t/g, '\\t');
+}
+
+function buildLogisticsJs() {
+  const entries = Object.entries(LOGISTICS).map(([id, v]) => {
+    const html = esc(v.html || '');
+    const text = esc(v.text || '');
+    const date = esc(v.updatedAt || '');
+    return `  "${id}": {\n    html: "${html}",\n    text: "${text}",\n    updatedAt: "${date}"\n  }`;
+  }).join(',\n\n');
+
+  return `/**
+ * TANTRAMOUR 2026 — Informations Logistiques
+ * ===========================================
+ * Généré automatiquement — ne pas modifier manuellement.
+ */
+
+const LOGISTICS = {
+
+${entries}
+
+};`;
+}
+
+function buildDataJs() {
+  const header = `/**
+ * TANTRAMOUR 2026 — Référentiel de données commun
+ * ================================================
+ * Source unique pour les rapports HTML.
+ *
+ * Structure de chaque entrée :
+ *   jour, date, heure, type, atelier, lieu,
+ *   fac1, fac2, traduction, helper1, helper2, helper3,
+ *   angel, note, logisticId
+ */
+
+const AGENDA = [
+`;
+
+  const lines = DATA.map(e => {
+    return `  {jour:"${esc(e.jour)}",date:"${esc(e.date)}",heure:"${esc(e.heure)}",type:"${esc(e.type)}",atelier:"${esc(e.atelier)}",lieu:"${esc(e.lieu)}",fac1:"${esc(e.fac1)}",fac2:"${esc(e.fac2)}",traduction:"${esc(e.traduction)}",helper1:"${esc(e.helper1)}",helper2:"${esc(e.helper2)}",helper3:"${esc(e.helper3)}",angel:"${esc(e.angel)}",note:"${esc(e.note)}",logisticId:"${esc(e.logisticId)}"}`;
+  }).join(',\n');
+
+  const footer = `
+];
+
+/**
+ * Convertit un objet AGENDA en tableau positionnel [15 colonnes]
+ * Indice : [0]jour [1]date [2]heure [3]type [4]atelier [5]lieu
+ *          [6]fac1 [7]fac2 [8]traduction [9]helper1 [10]helper2
+ *          [11]helper3 [12]angel [13]note [14]logisticId
+ */
+function agendaToRaw(entries) {
+  return entries.map(e => [
+    e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,
+    e.fac1, e.fac2, e.traduction,
+    e.helper1, e.helper2, e.helper3,
+    e.angel, e.note, e.logisticId
+  ]);
+}`;
+
+  return header + lines + footer;
+}
+
+// ─── API save ────────────────────────────────────────────────────────────────
+async function saveFile(filename, content) {
+  const res = await fetch('http://localhost:3000/save', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ filename, content })
+  });
+  const json = await res.json();
+  if (!json.ok) throw new Error(json.error || 'Erreur serveur');
+  return json;
+}
+
+// ─── Toast ───────────────────────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg, type = '') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { el.className = ''; }, 3200);
+}
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+show('step1');
+</script>
+</body>
+</html>

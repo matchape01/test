@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Admin</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --header-bg: #f0f4fb;
+    --badge-h: #e0f2fe; --badge-ht: #0369a1;
+    --badge-a: #fce7f3; --badge-at: #9d174d;
+    --badge-f: #dcfce7; --badge-ft: #166534;
+    --warn: #b45309; --warn-bg: #fffbeb; --warn-border: #fcd34d;
+    --success: #166534; --success-bg: #dcfce7; --success-border: #86efac;
+  }
+  .dark {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --header-bg: #1c2333;
+    --badge-h: #0c2d48; --badge-ht: #58a6ff;
+    --badge-a: #3b1030; --badge-at: #f0abca;
+    --badge-f: #0a2e1a; --badge-ft: #4ade80;
+    --warn-bg: #1c1500; --warn-border: #92400e;
+    --success-bg: #052e16; --success-border: #166534;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 24px 20px; }
+
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+  .logo h1 { font-size: 20px; font-weight: 700; }
+  .logo p { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: .3px; line-height: 1.2; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .btn-ghost { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-ghost:hover { background: var(--border); }
+
+  .selector-section { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 28px; }
+  .selector-section h2 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom: 16px; }
+  .selector-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+  .sel-group { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 200px; }
+  .sel-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); }
+  select { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 8px 10px; font-size: 13px; color: var(--text); font-family: inherit; width: 100%; cursor: pointer; }
+  select:disabled { opacity: .4; cursor: not-allowed; }
+
+  .edit-section { display: none; }
+  .edit-section.visible { display: block; }
+  .edit-card { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 24px; margin-bottom: 20px; }
+  .edit-card-title { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .badge-admin { background: var(--warn-bg); color: var(--warn); border: 1px solid var(--warn-border); border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; letter-spacing: .4px; white-space: nowrap; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+  .editor-toolbar { display: flex; gap: 4px; flex-wrap: wrap; padding: 6px 8px; background: var(--surface); border: 1px solid var(--border); border-bottom: none; border-radius: 6px 6px 0 0; }
+  .editor-toolbar button { cursor: pointer; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 3px 8px; font-size: 12px; color: var(--text); font-family: inherit; font-weight: 600; transition: background .1s; }
+  .editor-toolbar button:hover { background: var(--border); }
+  .editor-toolbar .sep { width: 1px; background: var(--border); margin: 2px 2px; }
+  #fLogisticEditor { width: 100%; min-height: 200px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 0 0 6px 6px; font-size: 13px; background: var(--bg); color: var(--text); outline: none; line-height: 1.7; overflow-y: auto; }
+  #fLogisticEditor:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59,130,212,.15); }
+  #fLogisticEditor ul, #fLogisticEditor ol { padding-left: 24px; }
+  #fLogisticEditor p { margin: 0 0 6px; }
+  #fLogisticEditor p:last-child { margin-bottom: 0; }
+  .log-id-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .log-id-badge { font-size: 11px; color: var(--muted); font-family: monospace; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 2px 7px; }
+  .form-group input, .form-group textarea, .form-group select.form-select {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 6px;
+    padding: 8px 10px; font-size: 13px; color: var(--text); font-family: inherit;
+    width: 100%; transition: border-color .15s;
+  }
+  .form-group input:focus, .form-group textarea:focus, .form-group select.form-select:focus {
+    outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,212,.1);
+  }
+  .form-group textarea { resize: vertical; min-height: 70px; }
+  .field-hint { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  .role-f { display: inline-block; background: var(--badge-f); color: var(--badge-ft); border-radius: 4px; padding: 1px 6px; font-size: 10px; font-weight: 700; margin-left: 4px; }
+  .role-h { display: inline-block; background: var(--badge-h); color: var(--badge-ht); border-radius: 4px; padding: 1px 6px; font-size: 10px; font-weight: 700; margin-left: 4px; }
+  .role-a { display: inline-block; background: var(--badge-a); color: var(--badge-at); border-radius: 4px; padding: 1px 6px; font-size: 10px; font-weight: 700; margin-left: 4px; }
+
+  .actions-bar { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-top: 4px; }
+  .btn { cursor: pointer; border-radius: 6px; padding: 9px 20px; font-size: 14px; font-weight: 600; font-family: inherit; border: none; transition: filter .15s; }
+  .btn:hover { filter: brightness(.92); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-save-now { background: #16a34a; color: #fff; }
+  .btn-cancel { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .btn-cancel:hover { background: var(--border); filter: none; }
+  .btn-danger { background: #dc2626; color: #fff; }
+  .badge-new { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; letter-spacing: .4px; white-space: nowrap; }
+
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100; align-items: center; justify-content: center; }
+  .overlay.open { display: flex; }
+  .dialog { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; max-width: 440px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,.2); }
+  .dialog-icon { font-size: 32px; margin-bottom: 12px; }
+  .dialog h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .dialog p { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+  .dialog-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); border-radius: 8px; padding: 12px 18px; font-size: 13px; font-weight: 600; z-index: 200; display: none; box-shadow: 0 4px 16px rgba(0,0,0,.12); }
+  .toast.show { display: block; animation: slideIn .25s ease; }
+  @keyframes slideIn { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  .placeholder { text-align: center; padding: 48px 24px; color: var(--muted); border: 2px dashed var(--border); border-radius: 10px; }
+  .placeholder p { font-size: 15px; margin-bottom: 6px; }
+  .placeholder small { font-size: 12px; }
+
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<script>
+(function(){
+  var pw = sessionStorage.getItem('tm_admin_auth');
+  if(pw !== '007') {
+    var entered = prompt('🔒 Accès restreint — Mot de passe :');
+    if(entered !== '007') { document.write('<div style="font-family:system-ui;padding:60px;text-align:center;"><h2>Accès refusé</h2><p style=\"margin-top:12px;color:#57606a\">Mot de passe incorrect.</p><br><a href=\"index.html\">← Retour</a></div>'); document.close(); throw 'access denied'; }
+    sessionStorage.setItem('tm_admin_auth','007');
+  }
+})();
+</script>
+
+<div class="wrap">
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Admin — Édition des ateliers</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-primary" onclick="ouvrirNouvelAtelier()" style="font-size:13px;padding:7px 14px;">➕ Nouvel atelier</button>
+      <a class="btn-ghost" href="index.html">🏠 Home</a>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+
+  <!-- ── SÉLECTEUR ── -->
+  <div class="selector-section">
+    <h2>1. Choisir l'atelier à modifier</h2>
+    <div class="selector-row">
+      <div class="sel-group">
+        <label>Jour</label>
+        <select id="selJour" onchange="onJourChange()">
+          <option value="">-- Sélectionner un jour --</option>
+        </select>
+      </div>
+      <div class="sel-group">
+        <label>Atelier</label>
+        <select id="selAtelier" disabled onchange="onAtelierChange()">
+          <option value="">-- Choisir un jour d'abord --</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PLACEHOLDER ── -->
+  <div class="placeholder" id="placeholder">
+    <p>Sélectionnez un jour puis un atelier</p>
+    <small>Le formulaire d'édition s'affichera ici</small>
+  </div>
+
+  <!-- ── FORMULAIRE D'ÉDITION ── -->
+  <div class="edit-section" id="editSection">
+    <div class="edit-card">
+      <div class="edit-card-title">
+        <span id="editCardTitle">—</span>
+        <span class="badge-admin" id="editBadge">MODE ÉDITION</span>
+      </div>
+
+      <div class="form-grid">
+
+        <!-- Jour + Date -->
+        <div class="form-group">
+          <label>Jour</label>
+          <select id="fJour" class="form-select">
+            <option value="">— Sélectionner —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="text" id="fDate" readonly style="background:var(--surface);cursor:default;color:var(--muted);">
+        </div>
+
+        <!-- Heure + Lieu -->
+        <div class="form-group">
+          <label>Heure</label>
+          <input type="text" id="fHeure" placeholder="ex: 11:15 - 13:00">
+        </div>
+        <div class="form-group">
+          <label>Lieu / Salle</label>
+          <select id="fLieu" class="form-select">
+            <option value="">— Sélectionner —</option>
+          </select>
+        </div>
+
+        <!-- Type + Nom atelier -->
+        <div class="form-group">
+          <label>Type d'atelier</label>
+          <select id="fType" class="form-select">
+            <option value="">— Sélectionner —</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Nom de l'atelier</label>
+          <input type="text" id="fAtelier" placeholder="Titre de l'atelier">
+        </div>
+
+        <!-- Facilitateurs -->
+        <div class="form-group">
+          <label>Facilitateur 1 <span class="role-f">F</span></label>
+          <select id="fFac1" class="form-select"><option value="">— Aucun —</option></select>
+        </div>
+        <div class="form-group">
+          <label>Facilitateur 2 <span class="role-f">F</span></label>
+          <select id="fFac2" class="form-select"><option value="">— Aucun —</option></select>
+        </div>
+
+        <!-- Traducteur -->
+        <div class="form-group full">
+          <label>Traducteur</label>
+          <select id="fTraduction" class="form-select"><option value="">— Aucun —</option></select>
+        </div>
+
+        <!-- Helpers -->
+        <div class="form-group">
+          <label>Helper 1 <span class="role-h">H</span></label>
+          <select id="fHelper1" class="form-select"><option value="">— Aucun —</option></select>
+        </div>
+        <div class="form-group">
+          <label>Helper 2 <span class="role-h">H</span></label>
+          <select id="fHelper2" class="form-select"><option value="">— Aucun —</option></select>
+        </div>
+        <div class="form-group">
+          <label>Helper 3 <span class="role-h">H</span></label>
+          <select id="fHelper3" class="form-select"><option value="">— Aucun —</option></select>
+        </div>
+
+        <!-- Angel -->
+        <div class="form-group">
+          <label>Angel <span class="role-a">A</span></label>
+          <select id="fAngel" class="form-select"><option value="">— Aucun —</option></select>
+        </div>
+
+        <!-- Note -->
+        <div class="form-group full">
+          <label>Note</label>
+          <select id="fNote" class="form-select"><option value="">— Aucune —</option></select>
+          <span class="field-hint">Cette note apparaît dans le Rapport 3 — Logistique</span>
+        </div>
+
+        <!-- Logistique -->
+        <div class="form-group full">
+          <label>Informations Logistiques</label>
+          <div class="editor-toolbar">
+            <button onclick="fmt('bold')" title="Gras"><b>B</b></button>
+            <button onclick="fmt('italic')" title="Italique"><i>I</i></button>
+            <button onclick="fmt('underline')" title="Souligné"><u>U</u></button>
+            <div class="sep"></div>
+            <button onclick="fmt('insertUnorderedList')" title="Liste à puces">• Liste</button>
+            <button onclick="fmt('insertOrderedList')"   title="Liste numérotée">1. Liste</button>
+            <div class="sep"></div>
+            <button onclick="fmtH('h3')" title="Titre">Titre</button>
+            <button onclick="fmt('removeFormat')" title="Effacer la mise en forme">✕ Format</button>
+          </div>
+          <div id="fLogisticEditor" contenteditable="true" spellcheck="true"></div>
+          <div class="log-id-row">
+            <span class="field-hint">ID logistique :</span>
+            <span class="log-id-badge" id="fLogisticId">—</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Boutons actions -->
+    <div class="actions-bar" id="actionsBar">
+      <button class="btn btn-primary" onclick="demanderValidation()">✅ Valider et sauvegarder data.js</button>
+      <button class="btn btn-cancel" id="btnAnnuler" onclick="annulerChangements()">✖ Annuler</button>
+      <button class="btn btn-danger" id="btnAnnulerNew" onclick="hideEdit()" style="display:none;">✖ Abandonner</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── CONFIRM DIALOG ── -->
+<div class="overlay" id="overlay">
+  <div class="dialog">
+    <div class="dialog-icon">💾</div>
+    <h3>Valider et sauvegarder</h3>
+    <p id="dialogMsg"></p>
+    <p style="font-size:12px;margin-bottom:20px;color:var(--warn);font-weight:600;">Les fichiers <strong>data.js</strong> et <strong>logistics.js</strong> seront mis à jour sur le serveur.</p>
+    <div class="dialog-actions">
+      <button class="btn btn-cancel" onclick="fermerDialog()">Annuler</button>
+      <button class="btn btn-save-now" onclick="confirmerValidation()">💾 Oui, sauvegarder</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<footer><p>Made with IBM Bob</p></footer>
+
+<!-- ── RÉFÉRENTIELS ── -->
+<script src="ref_jours.js"></script>
+<script src="ref_lieux.js"></script>
+<script src="ref_types.js"></script>
+<script src="ref_facilitateurs.js"></script>
+<script src="ref_helpers.js"></script>
+<script src="ref_angels.js"></script>
+<script src="ref_traducteurs.js"></script>
+<script src="ref_notes.js"></script>
+<!-- ── LOGISTIQUE & DONNÉES ── -->
+<script src="logistics.js"></script>
+<script src="data.js"></script>
+
+<script>
+// ════════════════════════════════════════════════
+// RÉFÉRENTIELS → SELECTS
+// ════════════════════════════════════════════════
+function populateSelect(id, items, valueKey, labelKey) {
+  const el = document.getElementById(id);
+  items.forEach(item => {
+    const o = document.createElement('option');
+    o.value = item[valueKey];
+    o.textContent = item[labelKey] || item[valueKey];
+    el.appendChild(o);
+  });
+}
+
+populateSelect('selJour',   REF_JOURS,         'value', 'label');
+populateSelect('fJour',     REF_JOURS,         'value', 'label');
+populateSelect('fLieu',     REF_LIEUX,         'value', 'label');
+populateSelect('fType',     REF_TYPES,         'value', 'label');
+populateSelect('fFac1',       REF_FACILITATEURS, 'value', 'value');
+populateSelect('fFac2',       REF_FACILITATEURS, 'value', 'value');
+populateSelect('fTraduction', REF_TRADUCTEURS,   'value', 'value');
+populateSelect('fHelper1',    REF_HELPERS,       'value', 'value');
+populateSelect('fHelper2',    REF_HELPERS,       'value', 'value');
+populateSelect('fHelper3',    REF_HELPERS,       'value', 'value');
+populateSelect('fAngel',      REF_ANGELS,        'value', 'value');
+populateSelect('fNote',       REF_NOTES,         'value', 'value');
+
+// ════════════════════════════════════════════════
+// SESSION EN MÉMOIRE (copie de AGENDA)
+// ════════════════════════════════════════════════
+let SESSION = AGENDA.map(e => ({...e}));
+let currentIndex = null;
+let modeCreation = false;
+
+// ════════════════════════════════════════════════
+// PRÉ-SÉLECTION VIA PARAMÈTRES URL
+// ?jour=Jour+2&idx=14  → sélectionne directement l'atelier
+// ════════════════════════════════════════════════
+(function autoSelectFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const jour   = params.get('jour');
+  const idx    = params.get('idx');
+  if (!jour || idx === null) return;
+
+  // Sélectionner le jour
+  const selJour = document.getElementById('selJour');
+  for (let i = 0; i < selJour.options.length; i++) {
+    if (selJour.options[i].value === jour) { selJour.selectedIndex = i; break; }
+  }
+  onJourChange(); // peuple le select atelier
+
+  // Attendre que le select atelier soit peuplé puis sélectionner l'atelier
+  const selAtelier = document.getElementById('selAtelier');
+  const numIdx = parseInt(idx, 10);
+  for (let i = 0; i < selAtelier.options.length; i++) {
+    if (parseInt(selAtelier.options[i].value, 10) === numIdx) {
+      selAtelier.selectedIndex = i;
+      break;
+    }
+  }
+  onAtelierChange(); // charge le formulaire
+
+  // Scroll vers le formulaire
+  setTimeout(() => {
+    const sec = document.getElementById('editSection');
+    if (sec) sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+})();
+
+// ════════════════════════════════════════════════
+// SÉLECTEUR JOUR → ATELIER
+// ════════════════════════════════════════════════
+function onJourChange() {
+  const jour = document.getElementById('selJour').value;
+  const sa = document.getElementById('selAtelier');
+  sa.innerHTML = '<option value="">-- Sélectionner un atelier --</option>';
+  if (!jour) { sa.disabled = true; hideEdit(); return; }
+  SESSION.forEach((e, i) => {
+    if (e.jour !== jour) return;
+    const o = document.createElement('option');
+    o.value = i;
+    o.text = e.heure ? `[${e.heure}]  ${e.atelier}` : e.atelier;
+    sa.appendChild(o);
+  });
+  sa.disabled = false;
+  hideEdit();
+}
+
+function onAtelierChange() {
+  const idx = document.getElementById('selAtelier').value;
+  if (idx === '') { hideEdit(); return; }
+  currentIndex = parseInt(idx);
+  chargerFormulaire(SESSION[currentIndex]);
+}
+
+// ════════════════════════════════════════════════
+// FORMULAIRE
+// ════════════════════════════════════════════════
+function setSelectVal(id, val) {
+  const el = document.getElementById(id);
+  for (let i = 0; i < el.options.length; i++) {
+    if (el.options[i].value === val) { el.selectedIndex = i; return; }
+  }
+  // valeur absente dans le référentiel → option temporaire
+  if (val) {
+    const o = document.createElement('option');
+    o.value = val; o.textContent = val + ' ⚠';
+    el.appendChild(o); el.value = val;
+  } else {
+    el.selectedIndex = 0;
+  }
+}
+
+function chargerFormulaire(e) {
+  setSelectVal('fJour', e.jour || '');
+  document.getElementById('fDate').value       = e.date       || '';
+  document.getElementById('fHeure').value      = e.heure      || '';
+  setSelectVal('fLieu',    e.lieu    || '');
+  setSelectVal('fType',    e.type    || '');
+  document.getElementById('fAtelier').value    = e.atelier    || '';
+  setSelectVal('fFac1',       e.fac1       || '');
+  setSelectVal('fFac2',       e.fac2       || '');
+  setSelectVal('fTraduction', e.traduction || '');
+  setSelectVal('fHelper1',    e.helper1    || '');
+  setSelectVal('fHelper2', e.helper2 || '');
+  setSelectVal('fHelper3', e.helper3 || '');
+  setSelectVal('fAngel',   e.angel   || '');
+  setSelectVal('fNote', e.note || '');
+  // Charger le contenu logistique depuis LOGISTICS via logisticId
+  const logId = e.logisticId || '';
+  const logEntry = logId ? (LOGISTICS[logId] || null) : null;
+  document.getElementById('fLogisticEditor').innerHTML = logEntry ? logEntry.html : '';
+  document.getElementById('fLogisticId').textContent = logId || '(aucun)';
+
+  document.getElementById('editCardTitle').textContent =
+    (e.heure ? e.heure + '  —  ' : '') + (e.atelier || 'Nouvel atelier');
+
+  document.getElementById('placeholder').style.display = 'none';
+  document.getElementById('editSection').classList.add('visible');
+}
+
+function ouvrirNouvelAtelier() {
+  modeCreation = true;
+  currentIndex = null;
+  // Vider le formulaire
+  chargerFormulaire({ jour:'', date:'', heure:'', lieu:'', type:'', atelier:'',
+    fac1:'', fac2:'', traduction:'', helper1:'', helper2:'', helper3:'',
+    angel:'', note:'', logisticId:'' });
+  document.getElementById('editCardTitle').textContent = 'Nouvel atelier';
+  document.getElementById('editBadge').textContent     = 'NOUVEAU';
+  document.getElementById('editBadge').className       = 'badge-new';
+  document.getElementById('btnAnnuler').style.display  = 'none';
+  document.getElementById('btnAnnulerNew').style.display = '';
+  // Scroll vers le formulaire
+  document.getElementById('editSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ════════════════════════════════════════════════
+// ÉDITEUR RICHE — TOOLBAR
+// ════════════════════════════════════════════════
+function fmt(cmd) {
+  document.getElementById('fLogisticEditor').focus();
+  document.execCommand(cmd, false, null);
+}
+function fmtH(tag) {
+  document.getElementById('fLogisticEditor').focus();
+  document.execCommand('formatBlock', false, tag);
+}
+
+// Génère un logisticId stable à partir du jour + atelier
+function genLogisticId(jour, atelier) {
+  const j = (jour||'').replace(/\s+/g,'').replace(/[^A-Za-z0-9]/g,'').toUpperCase().slice(0,3);
+  const a = (atelier||'').replace(/\s+/g,'_').replace(/[^A-Za-z0-9_]/g,'').toUpperCase().slice(0,20);
+  return j + '_' + a;
+}
+
+function lireFormulaire() {
+  const jour    = document.getElementById('fJour').value.trim();
+  const atelier = document.getElementById('fAtelier').value.trim();
+  // Récupérer ou créer le logisticId
+  const editorHtml = document.getElementById('fLogisticEditor').innerHTML.trim();
+  const hasContent = editorHtml && editorHtml !== '<br>' && editorHtml !== '<p><br></p>';
+  // Conserver l'id existant si disponible, sinon en générer un nouveau si du contenu est présent
+  const existingId = document.getElementById('fLogisticId').textContent.trim();
+  const validId = (existingId && existingId !== '(aucun)') ? existingId : '';
+  const logisticId = hasContent ? (validId || genLogisticId(jour, atelier)) : '';
+  return {
+    jour, atelier,
+    date:       document.getElementById('fDate').value.trim(),
+    heure:      document.getElementById('fHeure').value.trim(),
+    lieu:       document.getElementById('fLieu').value.trim(),
+    type:       document.getElementById('fType').value.trim(),
+    fac1:       document.getElementById('fFac1').value.trim(),
+    fac2:       document.getElementById('fFac2').value.trim(),
+    traduction: document.getElementById('fTraduction').value.trim(),
+    helper1:    document.getElementById('fHelper1').value.trim(),
+    helper2:    document.getElementById('fHelper2').value.trim(),
+    helper3:    document.getElementById('fHelper3').value.trim(),
+    angel:      document.getElementById('fAngel').value.trim(),
+    note:       document.getElementById('fNote').value.trim(),
+    logisticId,
+    _logisticHtml: hasContent ? editorHtml : '',
+  };
+}
+
+// Mise à jour automatique de la Date quand le Jour change
+document.getElementById('fJour').addEventListener('change', function() {
+  const ref = REF_JOURS.find(j => j.value === this.value);
+  if (ref) document.getElementById('fDate').value = ref.date;
+});
+
+function hideEdit() {
+  document.getElementById('editSection').classList.remove('visible');
+  document.getElementById('placeholder').style.display = '';
+  currentIndex = null;
+  modeCreation = false;
+  // Remettre le badge et les boutons en mode édition
+  document.getElementById('editBadge').textContent    = 'MODE ÉDITION';
+  document.getElementById('editBadge').className      = 'badge-admin';
+  document.getElementById('btnAnnuler').style.display    = '';
+  document.getElementById('btnAnnulerNew').style.display = 'none';
+}
+
+// ════════════════════════════════════════════════
+// ACTIONS
+// ════════════════════════════════════════════════
+function annulerChangements() {
+  if (currentIndex === null) return;
+  chargerFormulaire(SESSION[currentIndex]);
+}
+
+function demanderValidation() {
+  const e = lireFormulaire();
+  if (!e.atelier) { afficherToast('⚠️ Le nom de l\'atelier est obligatoire.', true); return; }
+  if (!e.jour)    { afficherToast('⚠️ Le jour est obligatoire.', true); return; }
+  if (modeCreation) {
+    document.getElementById('dialogMsg').innerHTML =
+      `Ajouter : <strong>${e.atelier}</strong><br>
+       <span style="font-size:12px;color:var(--muted)">${e.jour} — ${e.heure || '(heure non définie)'}</span>`;
+  } else {
+    if (currentIndex === null) return;
+    document.getElementById('dialogMsg').innerHTML =
+      `Modifications sur : <strong>${e.atelier}</strong><br>
+       <span style="font-size:12px;color:var(--muted)">${e.jour} — ${e.heure}</span>`;
+  }
+  document.getElementById('overlay').classList.add('open');
+}
+
+function fermerDialog() {
+  document.getElementById('overlay').classList.remove('open');
+}
+
+async function confirmerValidation() {
+  fermerDialog();
+  const e = lireFormulaire();
+
+  // Mettre à jour SESSION (sans le champ privé _logisticHtml)
+  const entryToSave = { ...e };
+  delete entryToSave._logisticHtml;
+
+  if (modeCreation) {
+    let insertAt = SESSION.length;
+    for (let i = SESSION.length - 1; i >= 0; i--) {
+      if (SESSION[i].jour === e.jour) { insertAt = i + 1; break; }
+    }
+    SESSION.splice(insertAt, 0, entryToSave);
+    hideEdit();
+    if (document.getElementById('selJour').value === e.jour) onJourChange();
+  } else {
+    if (currentIndex === null) return;
+    SESSION[currentIndex] = entryToSave;
+    const opt = document.querySelector(`#selAtelier option[value="${currentIndex}"]`);
+    if (opt) opt.text = e.heure ? `[${e.heure}]  ${e.atelier}` : e.atelier;
+  }
+
+  // Mettre à jour LOGISTICS en mémoire si du contenu existe
+  if (e.logisticId && e._logisticHtml) {
+    LOGISTICS[e.logisticId] = {
+      html: e._logisticHtml,
+      text: e._logisticHtml.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(),
+      updatedAt: new Date().toISOString().slice(0,10)
+    };
+  } else if (!e.logisticId) {
+    // Si on a effacé le contenu, on peut laisser l'ancienne entrée — elle sera simplement non référencée
+  }
+
+  // Sauvegarder les deux fichiers
+  const ok1 = await sauverFichier('data.js',     genererDataJs());
+  const ok2 = await sauverFichier('logistics.js', genererLogisticsJs());
+  if (ok1 && ok2) afficherToast('✅ data.js & logistics.js mis à jour — rechargez les rapports.');
+}
+
+// ════════════════════════════════════════════════
+// SAUVEGARDE VIA SERVEUR LOCAL
+// ════════════════════════════════════════════════
+async function sauverFichier(filename, content) {
+  try {
+    const r = await fetch('http://localhost:3000/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename, content })
+    });
+    const json = await r.json();
+    if (!json.ok) throw new Error(json.error);
+    return true;
+  } catch(e) {
+    afficherToast('❌ Serveur inaccessible — lance start.bat puis réessaie.', true);
+    return false;
+  }
+}
+
+// ════════════════════════════════════════════════
+// GÉNÉRATION data.js
+// ════════════════════════════════════════════════
+function esc(v) { return (v||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\r\n/g,'\\n').replace(/\r/g,'\\n').replace(/\n/g,'\\n'); }
+
+function genererDataJs() {
+  const header =
+`/**
+ * TANTRAMOUR 2026 — Référentiel de données commun
+ * ================================================
+ * Source unique pour les 3 rapports HTML.
+ * Pour mettre à jour : modifier uniquement ce fichier.
+ *
+ * Structure de chaque entrée :
+ *   jour       {string}  "Jour 1" … "Jour 7"
+ *   date       {string}  "Samedi 29 aout" …
+ *   heure      {string}  "9:45 - 11:00" | "Matin" | "APRES MIDI"
+ *   type       {string}  catégorie (ex: "ATELIERS TANTRA (AM)")
+ *   atelier    {string}  nom de l'atelier / activité
+ *   lieu       {string}  salle / espace (ex: "SHIVA", "CHENREZIG" …)
+ *   fac1       {string}  Facilitateur principal
+ *   fac2       {string}  Facilitateur secondaire
+ *   traduction {string}  Langue / traducteur
+ *   helper1    {string}  Helper 1
+ *   helper2    {string}  Helper 2
+ *   helper3    {string}  Helper 3
+ *   angel      {string}  Angel
+ *   note       {string}  Note logistique (ex: "Shift Colibri", "Atelier + long")
+ */
+
+const AGENDA = [`;
+
+  const lines = SESSION.map((e, i) => {
+    const prev = SESSION[i - 1];
+    let section = '';
+    if (!prev || prev.jour !== e.jour) {
+      const ref = REF_JOURS.find(j => j.value === e.jour);
+      const dateLabel = ref ? ref.date : e.date;
+      section = `\n  // ─── ${e.jour} — ${dateLabel} ${'─'.repeat(Math.max(0, 60 - e.jour.length - dateLabel.length))}\n`;
+    }
+    const line = `  {jour:"${esc(e.jour)}",date:"${esc(e.date)}",heure:"${esc(e.heure)}",type:"${esc(e.type)}",atelier:"${esc(e.atelier)}",lieu:"${esc(e.lieu)}",fac1:"${esc(e.fac1)}",fac2:"${esc(e.fac2)}",traduction:"${esc(e.traduction)}",helper1:"${esc(e.helper1)}",helper2:"${esc(e.helper2)}",helper3:"${esc(e.helper3)}",angel:"${esc(e.angel)}",note:"${esc(e.note)}",logisticId:"${esc(e.logisticId||'')}"},`;
+    return section + line;
+  }).join('\n');
+
+  return header + '\n' + lines + `
+];
+
+/**
+ * Convertit un objet AGENDA en tableau positionnel [14 colonnes]
+ * identique au format RAW utilisé par les rapports.
+ * Indice : [0]jour [1]date [2]heure [3]type [4]atelier [5]lieu
+ *          [6]fac1 [7]fac2 [8]traduction [9]helper1 [10]helper2
+ *          [11]helper3 [12]angel [13]note
+ */
+function agendaToRaw(entries) {
+  return entries.map(e => [
+    e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,
+    e.fac1, e.fac2, e.traduction,
+    e.helper1, e.helper2, e.helper3,
+    e.angel, e.note
+  ]);
+}`;
+}
+
+// ════════════════════════════════════════════════
+// GÉNÉRATION logistics.js
+// ════════════════════════════════════════════════
+function escHtml(s) {
+  // Échappe les backticks et backslashes pour un template literal JS
+  return (s||'').replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$\{/g,'\\${');
+}
+
+function genererLogisticsJs() {
+  const today = new Date().toISOString().slice(0,10);
+  const entries = Object.entries(LOGISTICS).map(([id, entry]) => {
+    return `  "${escHtml(id)}": {\n    html: \`${escHtml(entry.html||'')}\`,\n    text: \`${escHtml(entry.text||'')}\`,\n    updatedAt: "${entry.updatedAt || today}"\n  }`;
+  }).join(',\n\n');
+  return `/**
+ * TANTRAMOUR 2026 — Informations Logistiques
+ * ===========================================
+ * Fichier géré automatiquement par Admin.html.
+ * Ne pas modifier manuellement.
+ *
+ * Chaque entrée : { html, text, updatedAt }
+ *   html       : contenu riche (affiché dans les rapports)
+ *   text       : version texte brut (recherche)
+ *   updatedAt  : date de dernière modification
+ */
+
+const LOGISTICS = {
+
+${entries}
+
+};
+`;
+}
+
+function afficherToast(msg, erreur = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = erreur ? '#fef2f2' : 'var(--success-bg)';
+  t.style.color      = erreur ? '#dc2626' : 'var(--success)';
+  t.style.borderColor= erreur ? '#fca5a5' : 'var(--success-border)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 5000);
+}
+
+// ════════════════════════════════════════════════
+// MODE NUIT
+// ════════════════════════════════════════════════
+function toggleMode() {
+  const isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+
+document.getElementById('overlay').addEventListener('click', function(e) {
+  if (e.target === this) fermerDialog();
+});
+</script>
+</body>
+</html>

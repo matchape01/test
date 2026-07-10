@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Agenda par Jour</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --header-bg: #f0f4fb; --row-alt: #f7f8fa; --tag-bg: #eef2ff; --tag-text: #3b5bdb;
+    --badge-h: #e0f2fe; --badge-ht: #0369a1;
+    --badge-a: #fce7f3; --badge-at: #9d174d;
+    --badge-f: #dcfce7; --badge-ft: #166534;
+  }
+  .dark {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --header-bg: #1c2333; --row-alt: #161b22; --tag-bg: #1c2a4a; --tag-text: #79a8ff;
+    --badge-h: #0c2d48; --badge-ht: #58a6ff;
+    --badge-a: #3b1030; --badge-at: #f0abca;
+    --badge-f: #0a2e1a; --badge-ft: #4ade80;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 24px 20px; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .logo { display: flex; flex-direction: column; }
+  .logo h1 { font-size: 20px; font-weight: 700; letter-spacing: .3px; }
+  .logo p { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: .3px; line-height: 1.2; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .mode-btn { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; transition: background .15s; }
+  .mode-btn:hover { background: var(--border); }
+  .filters { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; align-items: flex-end; }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; }
+  .filter-group label { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 600; }
+  select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 13px; color: var(--text); font-family: inherit; min-width: 200px; cursor: pointer; }
+  .stats { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .stats span { color: var(--accent); font-weight: 600; }
+  /* ── TABLE VIEW ── */
+  .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; min-width: 900px; }
+  thead th { background: var(--header-bg); padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; position: sticky; top: 0; z-index: 1; }
+  thead th:hover { color: var(--accent); }
+  thead th .sort-icon { display: inline-block; margin-left: 4px; opacity: .5; font-size: 10px; }
+  thead th.sorted .sort-icon { opacity: 1; color: var(--accent); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--row-alt); }
+  tbody tr:nth-child(even) { background: var(--row-alt); }
+  tbody tr:nth-child(even):hover { filter: brightness(.97); }
+  tbody tr.conflict-row { background: #fff0f3 !important; }
+  tbody tr.conflict-row:hover { background: #ffe0e8 !important; }
+  td { padding: 9px 12px; font-size: 13px; vertical-align: top; }
+  td.conflict-cell { background: #fef08a !important; }
+  td.conflict-cell .pill, td.conflict-cell span.pill { background: #fef08a !important; color: #b91c1c !important; font-weight: 700 !important; border: 1px solid #f59e0b; }
+  td.conflict-cell-text { background: #fef08a !important; color: #b91c1c !important; font-weight: 700 !important; }
+  /* ── CARD VIEW ── */
+  .card-list { display: none; flex-direction: column; gap: 20px; }
+  /* Groupe jour */
+  .card-day-group { display: flex; flex-direction: column; gap: 0; }
+  .card-day-header { font-size: 15px; font-weight: 700; color: var(--text); padding: 10px 14px; background: var(--header-bg); border: 1px solid var(--border); border-radius: 10px 10px 0 0; border-bottom: none; }
+  .card-day-sub { font-size: 15px; font-weight: 700; color: var(--muted); margin-left: 6px; }
+  .card-day-body { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); border-radius: 0 0 10px 10px; overflow: hidden; }
+  /* Carte individuelle */
+  .card { background: var(--bg); padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  .card:last-child { border-bottom: none; }
+  .card-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .card-heure { font-size: 12px; color: var(--accent); white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 700; min-width: 80px; padding-top: 2px; }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; }
+  .card-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; padding-left: 90px; }
+  .card-rows { display: flex; flex-direction: column; gap: 5px; padding-left: 90px; }
+  .card-row { display: flex; gap: 8px; align-items: flex-start; }
+  .card-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; min-width: 80px; padding-top: 2px; }
+  .card-value { font-size: 13px; color: var(--text); flex: 1; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  /* ── SHARED ── */
+  .tag { display: inline-block; background: var(--tag-bg); color: var(--tag-text); border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .pill { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600; margin: 1px 2px; white-space: nowrap; }
+  .pill-h { background: var(--badge-h); color: var(--badge-ht); }
+  .pill-a { background: var(--badge-a); color: var(--badge-at); }
+  .pill-f { background: var(--badge-f); color: var(--badge-ft); }
+  .pill-t { background: var(--tag-bg); color: var(--tag-text); }
+  .heure { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .empty { text-align: center; padding: 48px; color: var(--muted); font-size: 14px; }
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+  /* ── RESPONSIVE AUTO-SWITCH ── */
+  @media (max-width: 767px) {
+    .wrap { padding: 16px 12px; }
+    select { min-width: 100%; }
+    .filters { gap: 10px; }
+  }
+</style>
+</head>
+<body>
+<!-- ── MODALE MOT DE PASSE ADMIN ── -->
+<div id="editPwOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;padding:36px 32px;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);font-family:-apple-system,'Segoe UI',system-ui,sans-serif;">
+    <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#57606a;margin-bottom:6px;">⚙️ Admin — Édition</p>
+    <p style="font-size:17px;font-weight:700;color:#1f2328;margin-bottom:6px;">🔒 Accès restreint</p>
+    <p style="font-size:13px;color:#57606a;margin-bottom:16px;" id="editPwAtelier"></p>
+    <input id="editPwInput" type="password" placeholder="Mot de passe" autocomplete="off"
+      style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:15px;outline:none;margin-bottom:8px;"
+      onkeydown="if(event.key==='Enter')checkEditPw()" />
+    <p id="editPwError" style="font-size:12px;color:#dc2626;min-height:18px;margin-bottom:12px;"></p>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeEditPw()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#f7f8fa;font-size:14px;cursor:pointer;">Annuler</button>
+      <button onclick="checkEditPw()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#3b82d4;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Ouvrir</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Rapport 1 — Agenda par Jour</p>
+    </div>
+    <div class="header-actions">
+      <a class="mode-btn" href="index.html">🏠 Home</a>
+      <button class="mode-btn" onclick="location.reload()">🔄 Refresh</button>
+      <button class="mode-btn" id="viewBtn" onclick="toggleView()">📱 Vue Mobile</button>
+      <button class="mode-btn" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label>Jour / Date</label>
+      <select id="filterJour" onchange="render()">
+        <option value="">Tous les jours</option>
+        <option value="Jour 1">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7">Jour 7 — Ven. 4 sept.</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Type d'atelier</label>
+      <select id="filterType" onchange="render()">
+        <option value="">Tous les types</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Lieu</label>
+      <select id="filterLieu" onchange="render()">
+        <option value="">Tous les lieux</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Facilitateur</label>
+      <select id="filterFac" onchange="render()">
+        <option value="">Tous les facilitateurs</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Traducteur</label>
+      <select id="filterTrad" onchange="render()">
+        <option value="">Tous les traducteurs</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Helper</label>
+      <select id="filterHelper" onchange="render()">
+        <option value="">Tous les helpers</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Angel</label>
+      <select id="filterAngel" onchange="render()">
+        <option value="">Tous les angels</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="table-wrap" id="tableView">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th onclick="sortBy(0)">Jour<span class="sort-icon" id="si0">⇅</span></th>
+          <th onclick="sortBy(1)">Date<span class="sort-icon" id="si1">⇅</span></th>
+          <th onclick="sortBy(2)">Heure<span class="sort-icon" id="si2">⇅</span></th>
+          <th onclick="sortBy(3)">Type d'atelier<span class="sort-icon" id="si3">⇅</span></th>
+          <th onclick="sortBy(4)">Atelier<span class="sort-icon" id="si4">⇅</span></th>
+          <th onclick="sortBy(5)">Lieu<span class="sort-icon" id="si5">⇅</span></th>
+          <th onclick="sortBy(6)">Facilitateur(s)<span class="sort-icon" id="si6">⇅</span></th>
+          <th onclick="sortBy(7)">Traducteur<span class="sort-icon" id="si7">⇅</span></th>
+          <th onclick="sortBy(8)">Helper(s)<span class="sort-icon" id="si8">⇅</span></th>
+          <th onclick="sortBy(9)">Angel<span class="sort-icon" id="si9">⇅</span></th>
+          <th style="cursor:default;width:36px;"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div class="card-list" id="cardView"></div>
+</div>
+<footer><p>Made with IBM Bob</p></footer>
+
+<script src="ref_lieux.js"></script>
+<script src="ref_facilitateurs.js"></script>
+<script src="ref_traducteurs.js"></script>
+<script src="ref_helpers.js"></script>
+<script src="ref_angels.js"></script>
+<script src="data.js"></script>
+<script>
+// RAW : chaque entrée est augmentée d'une propriété _idx = index dans AGENDA
+const RAW = AGENDA.map((e, i) => {
+  const r = [
+    e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,
+    e.fac1, e.fac2, e.traduction,
+    e.helper1, e.helper2, e.helper3,
+    e.angel, e.note, e.logisticId || ''
+  ];
+  r._idx = i; // index stable dans AGENDA
+  return r;
+});
+
+// ─── Détection des conflits (même logique que Rapport4) ──────────────────────
+function parseIntervalle(h) {
+  if (!h) return null;
+  const norm = h.replace(/\./g, ':').replace(/â€"|–|—/g, '-');
+  const m = norm.match(/(\d{1,2}):(\d{2})\s*[-–—]+\s*(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  const debut = parseInt(m[1]) * 60 + parseInt(m[2]);
+  let fin     = parseInt(m[3]) * 60 + parseInt(m[4]);
+  if (fin <= debut) fin += 24 * 60;
+  return [debut, fin];
+}
+function chevauche(a, b) { return a && b && a[0] < b[1] && b[0] < a[1]; }
+
+// Retourne une Map : "atelier||jour" → Set de noms en conflit + leurs rôles
+// et un Set de clés "atelier||jour" ayant au moins un conflit
+function buildConflictIndex() {
+  // parPersonne : nom → [{atelier, jour, heure, iv, role, field}]
+  const parPersonne = new Map();
+  AGENDA.forEach(e => {
+    const iv = parseIntervalle(e.heure);
+    if (!iv) return;
+    const add = (nom, role, field) => {
+      if (!nom) return;
+      if (!parPersonne.has(nom)) parPersonne.set(nom, []);
+      parPersonne.get(nom).push({ atelier: e.atelier, jour: e.jour, heure: e.heure, iv, role, field });
+    };
+    add(e.fac1,       'Facilitateur', 'fac1');
+    add(e.fac2,       'Facilitateur', 'fac2');
+    add(e.traduction, 'Traducteur',   'traduction');
+    add(e.helper1,    'Helper',       'helper1');
+    add(e.helper2,    'Helper',       'helper2');
+    add(e.helper3,    'Helper',       'helper3');
+    add(e.angel,      'Angel',        'angel');
+  });
+
+  // conflictFields : "atelier||jour" → Set de champs (fac1, helper2...) en conflit
+  const conflictFields = new Map(); // clé → Set<field>
+
+  parPersonne.forEach((slots, nom) => {
+    const parJour = new Map();
+    slots.forEach(s => {
+      if (!parJour.has(s.jour)) parJour.set(s.jour, []);
+      parJour.get(s.jour).push(s);
+    });
+    parJour.forEach(daySlots => {
+      for (let i = 0; i < daySlots.length; i++) {
+        for (let j = i + 1; j < daySlots.length; j++) {
+          const a = daySlots[i], b = daySlots[j];
+          if (a.role === 'Angel' && b.role === 'Angel') continue;
+          if (chevauche(a.iv, b.iv)) {
+            // Marquer les deux ateliers impliqués
+            [[a.atelier, a.jour, a.field], [b.atelier, b.jour, b.field]].forEach(([at, jr, fld]) => {
+              const k = `${at}||${jr}`;
+              if (!conflictFields.has(k)) conflictFields.set(k, new Set());
+              conflictFields.get(k).add(fld);
+            });
+          }
+        }
+      }
+    });
+  });
+
+  return conflictFields;
+}
+
+const CONFLICT_INDEX = buildConflictIndex();
+
+// Retourne le Set de champs en conflit pour une ligne RAW (ou null)
+function getConflictFields(r) {
+  const k = `${r[4]}||${r[0]}`; // atelier||jour
+  return CONFLICT_INDEX.get(k) || null;
+}
+
+// Peupler le filtre Type
+const types = [...new Set(RAW.map(r=>r[3]).filter(Boolean))].sort();
+const selType = document.getElementById('filterType');
+types.forEach(t => { const o=document.createElement('option'); o.value=t; o.text=t; selType.appendChild(o); });
+
+// Peupler le filtre Lieu depuis REF_LIEUX (seulement les lieux présents dans les données)
+const lieuxPresents = new Set(RAW.map(r=>r[5]).filter(Boolean));
+const selLieu = document.getElementById('filterLieu');
+REF_LIEUX.filter(l => lieuxPresents.has(l.value)).forEach(l => {
+  const o=document.createElement('option'); o.value=l.value; o.text=l.label||l.value; selLieu.appendChild(o);
+});
+
+// Peupler le filtre Facilitateur depuis REF_FACILITATEURS (seulement ceux présents dans les données)
+const facsPresents = new Set(RAW.flatMap(r=>[r[6],r[7]]).filter(Boolean));
+const selFac = document.getElementById('filterFac');
+REF_FACILITATEURS.filter(f => facsPresents.has(f.value)).forEach(f => {
+  const o=document.createElement('option'); o.value=f.value; o.text=f.value; selFac.appendChild(o);
+});
+
+// Peupler le filtre Traducteur depuis REF_TRADUCTEURS (seulement ceux présents dans les données)
+const tradsPresents = new Set(RAW.map(r=>r[8]).filter(Boolean));
+const selTrad = document.getElementById('filterTrad');
+REF_TRADUCTEURS.filter(t => tradsPresents.has(t.value)).forEach(t => {
+  const o=document.createElement('option'); o.value=t.value; o.text=t.value; selTrad.appendChild(o);
+});
+
+// Peupler le filtre Helper depuis REF_HELPERS (seulement ceux présents dans les données)
+const helpersPresents = new Set(RAW.flatMap(r=>[r[9],r[10],r[11]]).filter(Boolean));
+const selHelper = document.getElementById('filterHelper');
+REF_HELPERS.filter(h => helpersPresents.has(h.value)).forEach(h => {
+  const o=document.createElement('option'); o.value=h.value; o.text=h.value; selHelper.appendChild(o);
+});
+
+// Peupler le filtre Angel depuis REF_ANGELS (seulement ceux présents dans les données)
+const angelsPresents = new Set(RAW.map(r=>r[12]).filter(Boolean));
+const selAngel = document.getElementById('filterAngel');
+REF_ANGELS.filter(a => angelsPresents.has(a.value)).forEach(a => {
+  const o=document.createElement('option'); o.value=a.value; o.text=a.value; selAngel.appendChild(o);
+});
+
+let sortCol = -1, sortAsc = true;
+
+function getFiltered() {
+  const j = document.getElementById('filterJour').value;
+  const t = document.getElementById('filterType').value;
+  const l = document.getElementById('filterLieu').value;
+  const f = document.getElementById('filterFac').value;
+  const tr = document.getElementById('filterTrad').value;
+  const h = document.getElementById('filterHelper').value;
+  const a = document.getElementById('filterAngel').value;
+  return RAW.filter(r =>
+    (!j  || r[0]===j) &&
+    (!t  || r[3]===t) &&
+    (!l  || r[5]===l) &&
+    (!f  || r[6]===f || r[7]===f) &&
+    (!tr || r[8]===tr) &&
+    (!h  || r[9]===h || r[10]===h || r[11]===h) &&
+    (!a  || r[12]===a)
+  );
+}
+
+function sortBy(col) {
+  if(sortCol===col) sortAsc=!sortAsc; else { sortCol=col; sortAsc=true; }
+  for(let i=0;i<10;i++){
+    const si=document.getElementById('si'+i);
+    si.textContent='⇅'; si.parentElement.classList.remove('sorted');
+  }
+  const si=document.getElementById('si'+col);
+  si.textContent=sortAsc?'↑':'↓'; si.parentElement.classList.add('sorted');
+  render();
+}
+
+function getVal(row, col) {
+  switch(col){
+    case 0: return row[0]; case 1: return row[1]; case 2: return row[2]; case 3: return row[3];
+    case 4: return row[4]; case 5: return row[5];
+    case 6: return [row[6],row[7]].filter(Boolean).join(' / ');
+    case 7: return row[8];
+    case 8: return [row[9],row[10],row[11]].filter(Boolean).join(' / ');
+    case 9: return row[12];
+  }
+  return '';
+}
+
+function pills(vals, cls) {
+  return vals.filter(Boolean).map(v=>`<span class="pill ${cls}">${v}</span>`).join('');
+}
+
+let isMobileView = window.innerWidth < 768;
+
+// Convertit une heure texte en minutes pour le tri (ex: "11:15 - 13:00" → 675)
+// Les heures floues ("Matin", "APRES MIDI") sont renvoyées en fin de liste
+function heureEnMinutes(h) {
+  if (!h) return 9999;
+  const norm = h.replace(/\./g, ':');
+  const m = norm.match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : 9999;
+}
+
+function render() {
+  let data = getFiltered();
+  if(sortCol>=0) {
+    data = [...data].sort((a,b)=>{
+      const av=getVal(a,sortCol)||'', bv=getVal(b,sortCol)||'';
+      return sortAsc ? av.localeCompare(bv,'fr') : bv.localeCompare(av,'fr');
+    });
+  } else {
+    // Tri par défaut : jour (ordre naturel) puis heure de début
+    const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+    data = [...data].sort((a,b) => {
+      const dj = JOUR_ORDER.indexOf(a[0]) - JOUR_ORDER.indexOf(b[0]);
+      return dj !== 0 ? dj : heureEnMinutes(a[2]) - heureEnMinutes(b[2]);
+    });
+  }
+  document.getElementById('stats').innerHTML = `<span>${data.length}</span> atelier(s) affiché(s)`;
+  if (isMobileView) {
+    renderCards(data);
+  } else {
+    renderTable(data);
+  }
+}
+
+// Champs RAW → colonne tableau (index colonne → champ(s) de l'entrée AGENDA)
+const COL_FIELDS = {
+  6: ['fac1','fac2'],
+  7: ['traduction'],
+  8: ['helper1','helper2','helper3'],
+  9: ['angel'],
+};
+
+function renderTable(data) {
+  const tb = document.getElementById('tbody');
+  if(!data.length) { tb.innerHTML=`<tr><td colspan="10" class="empty">Aucun résultat</td></tr>`; return; }
+  tb.innerHTML = data.map(r => {
+    const cf = getConflictFields(r);
+    const rowCls = cf ? ' class="conflict-row"' : '';
+
+    // Détermine si une colonne contient un champ en conflit
+    const cc = (colIdx) => {
+      if (!cf) return '';
+      const fields = COL_FIELDS[colIdx] || [];
+      return fields.some(f => cf.has(f)) ? ' class="conflict-cell"' : '';
+    };
+    // Pour les pills : on entoure chaque valeur individuellement si son champ est en conflit
+    const pillsConflict = (vals, fields, cls) => vals.map((v, i) => {
+      if (!v) return '';
+      const inConflict = cf && cf.has(fields[i]);
+      return inConflict
+        ? `<span class="pill ${cls}" style="background:#fef08a;color:#b91c1c;font-weight:700;border:1px solid #f59e0b">${v}</span>`
+        : `<span class="pill ${cls}">${v}</span>`;
+    }).join('');
+
+    const realIdx = r._idx !== undefined ? r._idx : 0;
+    return `<tr${rowCls}>
+      <td>${r[0]||''}</td>
+      <td>${r[1]||''}</td>
+      <td class="heure">${r[2]||''}</td>
+      <td><span class="tag">${r[3]||''}</span></td>
+      <td>${r[4]||''}${r[13]?'<span style="color:#e53e3e;font-weight:700;margin-left:3px">*</span>':''}</td>
+      <td>${r[5]||''}</td>
+      <td${cc(6)}>${pillsConflict([r[6],r[7]],['fac1','fac2'],'pill-f')}</td>
+      <td${cc(7)}>${r[8]?`<span class="pill pill-t"${cf&&cf.has('traduction')?' style="background:#fef08a;color:#b91c1c;font-weight:700;border:1px solid #f59e0b"':''}>${r[8]}</span>`:''}</td>
+      <td${cc(8)}>${pillsConflict([r[9],r[10],r[11]],['helper1','helper2','helper3'],'pill-h')}</td>
+      <td${cc(9)}>${r[12]?`<span class="pill pill-a"${cf&&cf.has('angel')?' style="background:#fef08a;color:#b91c1c;font-weight:700;border:1px solid #f59e0b"':''}>${r[12]}</span>`:''}</td>
+      <td class="td-edit"><button class="btn-edit" title="Éditer dans Admin" onclick="openEditPw(${JSON.stringify(r[0])},${JSON.stringify(r[4])},${realIdx})">✏️</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// Extrait l'heure de début pour trier (ex: "9:45 - 11:00" → 9*60+45=585)
+function parseHeure(h) {
+  if (!h) return 9999;
+  const m = h.match(/(\d+)[:.h](\d+)/);
+  return m ? parseInt(m[1])*60 + parseInt(m[2]) : 9999;
+}
+
+function renderCards(data) {
+  const cv = document.getElementById('cardView');
+  if (!data.length) { cv.innerHTML=`<div class="empty">Aucun résultat</div>`; return; }
+
+  // Grouper par jour dans l'ordre chronologique
+  const DAY_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+  const dayMap = new Map();
+  data.forEach(r => {
+    const k = r[0];
+    if (!dayMap.has(k)) dayMap.set(k, { jour: r[0], date: r[1], items: [] });
+    dayMap.get(k).items.push(r);
+  });
+
+  // Trier les ateliers de chaque jour du plus tôt au plus tard
+  dayMap.forEach(g => g.items.sort((a,b) => parseHeure(a[2]) - parseHeure(b[2])));
+
+  const groups = DAY_ORDER.filter(j => dayMap.has(j)).map(j => dayMap.get(j));
+
+  cv.innerHTML = groups.map(g => {
+    const cards = g.items.map(r => {
+      const facs = pills([r[6],r[7]],'pill-f');
+      const helpers = pills([r[9],r[10],r[11]],'pill-h');
+      const angel = r[12] ? `<span class="pill pill-a">${r[12]}</span>` : '';
+      const trad = r[8] ? `<span class="pill pill-t">${r[8]}</span>` : '';
+      const lieu = r[5] ? `<span class="tag">${r[5]}</span>` : '';
+      return `<div class="card">
+        <div class="card-header">
+          <div class="card-heure">${r[2]||''}</div>
+          <div class="card-title">${r[4]||'—'}</div>
+        </div>
+        <div class="card-meta">
+          <span class="tag">${r[3]||''}</span>${lieu ? ' '+lieu : ''}
+        </div>
+        <div class="card-rows">
+          ${facs ? `<div class="card-row"><span class="card-label">Facilitateur</span><span class="card-value">${facs}</span></div>` : ''}
+          ${trad ? `<div class="card-row"><span class="card-label">Traducteur</span><span class="card-value">${trad}</span></div>` : ''}
+          ${helpers||r[13] ? `<div class="card-row"><span class="card-label">Helper(s)</span><span class="card-value">${helpers}${r[13]?`<span style="color:#e53e3e;font-weight:600;font-size:11px;margin-left:6px;border:1px solid #e53e3e;border-radius:4px;padding:1px 6px">${r[13]}</span>`:''}</span></div>` : ''}
+          ${angel ? `<div class="card-row"><span class="card-label">Angel</span><span class="card-value">${angel}</span></div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="card-day-group">
+      <div class="card-day-header">${g.jour}<span class="card-day-sub">${g.date}</span><span class="card-day-sub">(${g.items.length} atelier${g.items.length>1?'s':''})</span></div>
+      <div class="card-day-body">${cards}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── Modale mot de passe Admin ───────────────────────────────────────────────
+const ADMIN_PW = '007';
+let _editTarget = '';
+
+function openEditPw(jour, atelierName, agendaIdx) {
+  _editTarget = `Admin.html?jour=${encodeURIComponent(jour)}&idx=${agendaIdx}`;
+  document.getElementById('editPwAtelier').textContent = `${jour} — ${atelierName}`;
+  document.getElementById('editPwInput').value = '';
+  document.getElementById('editPwError').textContent = '';
+  document.getElementById('editPwOverlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('editPwInput').focus(), 50);
+}
+
+function closeEditPw() {
+  document.getElementById('editPwOverlay').style.display = 'none';
+}
+
+function checkEditPw() {
+  if (document.getElementById('editPwInput').value === ADMIN_PW) {
+    sessionStorage.setItem('tm_admin_auth', ADMIN_PW);
+    closeEditPw();
+    window.open(_editTarget, '_blank', 'noopener');
+  } else {
+    document.getElementById('editPwError').textContent = 'Mot de passe incorrect.';
+    document.getElementById('editPwInput').select();
+  }
+}
+
+document.getElementById('editPwOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeEditPw();
+});
+
+function setView(mobile) {
+  isMobileView = mobile;
+  document.getElementById('tableView').style.display = mobile ? 'none' : '';
+  document.getElementById('cardView').style.display = mobile ? 'flex' : 'none';
+  document.getElementById('viewBtn').textContent = mobile ? '🖥 Vue Tableau' : '📱 Vue Mobile';
+  render();
+}
+
+function toggleView() { setView(!isMobileView); }
+
+function toggleMode() {
+  const isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+
+// Auto-detect mobile on load
+setView(window.innerWidth < 768);
+</script>
+</body>
+</html>

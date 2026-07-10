@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Rapport 7 · Planning Traducteurs</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --header-bg: #f0f4fb;
+    --role-bg: #f3e8ff; --role-border: #d8b4fe; --role-text: #6b21a8;
+    --role-dark-bg: #f3e8ff; --role-accent: #7c3aed;
+    --tag-bg: #eef2ff; --tag-text: #3b5bdb;
+    --row-alt: #f7f8fa;
+  }
+  .dark {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --header-bg: #1c2333;
+    --role-bg: #1e1040; --role-border: #4c1d95; --role-text: #c4b5fd;
+    --role-dark-bg: #1e1040; --role-accent: #a78bfa;
+    --tag-bg: #1c2a4a; --tag-text: #79a8ff;
+    --row-alt: #161b22;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .logo h1 { font-size: 20px; font-weight: 700; }
+  .logo p  { font-size: 28px; font-weight: 800; color: var(--role-accent); letter-spacing: .3px; line-height: 1.2; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .btn-ghost { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* ── RÉSUMÉ ── */
+  .summary { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 24px; }
+  .sum-card { flex: 1; min-width: 130px; border-radius: 10px; padding: 14px 18px; border: 1px solid var(--role-border); background: var(--role-bg); }
+  .sum-num  { font-size: 30px; font-weight: 800; line-height: 1; margin-bottom: 4px; color: var(--role-accent); }
+  .sum-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+
+  /* ── FILTRES ── */
+  .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end; }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; }
+  .filter-group label { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 600; }
+  select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 13px; color: var(--text); font-family: inherit; min-width: 200px; cursor: pointer; }
+
+  .stats { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .stats span { color: var(--role-accent); font-weight: 600; }
+
+  /* ── CARTE ROLE ── */
+  .role-section { display: flex; flex-direction: column; gap: 24px; }
+
+  .role-block { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .role-header {
+    background: var(--role-bg); border-bottom: 1px solid var(--role-border);
+    padding: 14px 20px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .role-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--role-accent); color: #fff;
+    font-size: 16px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; letter-spacing: .5px;
+  }
+  .role-name { font-size: 18px; font-weight: 800; color: var(--text); }
+  .role-badge { display: inline-block; background: var(--role-accent); color: #fff; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; letter-spacing: .5px; }
+  .role-stats { margin-left: auto; font-size: 12px; color: var(--muted); text-align: right; }
+  .role-stats strong { color: var(--role-accent); font-size: 15px; }
+
+  /* ── SHIFT ── */
+  .shift { border-bottom: 1px solid var(--border); }
+  .shift:last-child { border-bottom: none; }
+  .shift-header {
+    padding: 12px 20px; background: var(--header-bg);
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+  .shift-jour { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); min-width: 56px; }
+  .shift-date { font-size: 13px; color: var(--muted); }
+  .shift-heure { font-size: 15px; font-weight: 800; color: var(--role-accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .shift-count { margin-left: auto; font-size: 11px; background: var(--tag-bg); color: var(--tag-text); border-radius: 999px; padding: 2px 9px; font-weight: 600; white-space: nowrap; }
+
+  /* ── TABLE ATELIERS ── */
+  .shift-table { width: 100%; border-collapse: collapse; }
+  .shift-table td { padding: 9px 20px; font-size: 13px; vertical-align: middle; border-bottom: 1px solid var(--border); }
+  .shift-table tr:last-child td { border-bottom: none; }
+  .shift-table tr:nth-child(even) { background: var(--row-alt); }
+  .shift-table .td-heure { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; width: 160px; }
+  .shift-table .td-lieu  { white-space: nowrap; }
+  .tag  { display: inline-block; background: var(--tag-bg); color: var(--tag-text); border-radius: 4px; padding: 1px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .tag-lieu { background: var(--surface); color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 1px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+
+  .empty { text-align: center; padding: 48px; color: var(--muted); font-size: 14px; border: 2px dashed var(--border); border-radius: 10px; }
+
+  /* ── VUE TABLEAU GLOBAL ── */
+  .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+  table.global { width: 100%; border-collapse: collapse; min-width: 700px; }
+  table.global thead th { background: var(--header-bg); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; }
+  table.global thead th:hover { color: var(--role-accent); }
+  table.global tbody td { padding: 9px 14px; font-size: 13px; vertical-align: top; border-bottom: 1px solid var(--border); }
+  table.global tbody tr:last-child td { border-bottom: none; }
+  table.global tbody tr:hover { background: var(--row-alt); }
+
+  .view-toggle { display: flex; gap: 8px; margin-bottom: 18px; }
+  .vbtn { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--muted); font-family: inherit; }
+  .vbtn.active { background: var(--role-bg); border-color: var(--role-border); color: var(--role-accent); font-weight: 600; }
+
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+
+  @media (max-width: 600px) {
+    .shift-header { gap: 8px; }
+    .shift-table .td-heure { width: auto; }
+    select { min-width: 100%; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Rapport 7 — Planning Traducteurs</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn-ghost" href="index.html">🏠 Home</a>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+
+  <!-- ── RÉSUMÉ ── -->
+  <div class="summary">
+    <div class="sum-card"><div class="sum-num" id="sumTraducteurs">—</div><div class="sum-label">Traducteurs</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumShifts">—</div><div class="sum-label">Shifts au total</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumAteliers">—</div><div class="sum-label">Ateliers couverts</div></div>
+  </div>
+
+  <!-- ── FILTRES ── -->
+  <div class="filters">
+    <div class="filter-group">
+      <label>Traducteur</label>
+      <select id="filterTraducteur" onchange="render()">
+        <option value="">Tous les traducteurs</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Jour</label>
+      <select id="filterJour" onchange="render()">
+        <option value="">Tous les jours</option>
+        <option value="Jour 1">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7">Jour 7 — Ven. 4 sept.</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ── BASCULE VUE ── -->
+  <div class="view-toggle">
+    <button class="vbtn active" id="vbtnCards" onclick="setView('cards')">👤 Vue par Traducteur</button>
+    <button class="vbtn"        id="vbtnTable" onclick="setView('table')">📋 Vue Tableau</button>
+  </div>
+
+  <div class="stats" id="stats"></div>
+  <div id="results"></div>
+
+</div>
+<footer><p>Made with IBM Bob</p></footer>
+
+<script src="data.js"></script>
+<script>
+
+// ════════════════════════════════════════════════
+// PARSE HEURE → minutes (début et fin)
+// ════════════════════════════════════════════════
+function parseIntervalle(h) {
+  if (!h) return null;
+  const norm = h.replace(/\./g, ':').replace(/[–\u2013\u2014]/g, '-').replace(/[""]/g, '-');
+  const m = norm.match(/(\d{1,2}):(\d{2})\s*-+\s*(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  const debut = parseInt(m[1]) * 60 + parseInt(m[2]);
+  let fin     = parseInt(m[3]) * 60 + parseInt(m[4]);
+  if (fin <= debut) fin += 24 * 60;
+  return { debut, fin };
+}
+
+function fmtMin(mins) {
+  const h = Math.floor((mins % 1440) / 60);
+  const m = mins % 60;
+  return `${h}:${String(m).padStart(2,'0')}`;
+}
+
+// ════════════════════════════════════════════════
+// CONSTRUIRE LES SHIFTS TRADUCTEURS
+// Collecte le champ traduction de chaque entrée AGENDA.
+// Regroupement en blocs contigus (gap toléré : 5 min) par personne et par jour.
+// ════════════════════════════════════════════════
+function construireShiftsTraducteurs() {
+  // 1. Collecter tous les ateliers par traducteur
+  const parTraducteur = new Map(); // nom → [{ atelier, jour, date, heure, lieu, type, iv }]
+
+  AGENDA.forEach(e => {
+    if (!e.traduction) return;
+    const iv = parseIntervalle(e.heure);
+    if (!iv) return;
+    if (!parTraducteur.has(e.traduction)) parTraducteur.set(e.traduction, []);
+    parTraducteur.get(e.traduction).push({
+      atelier: e.atelier, jour: e.jour, date: e.date,
+      heure: e.heure, lieu: e.lieu || '', type: e.type, iv
+    });
+  });
+
+  // 2. Pour chaque traducteur, regrouper par jour puis construire les shifts
+  const TRADUCTEURS_DATA = []; // [{ nom, shifts: [{ jour, date, debut, fin, ateliers }] }]
+  const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+  parTraducteur.forEach((slots, nom) => {
+    // Grouper par jour
+    const parJour = new Map();
+    slots.forEach(s => {
+      if (!parJour.has(s.jour)) parJour.set(s.jour, []);
+      parJour.get(s.jour).push(s);
+    });
+
+    const shifts = [];
+
+    parJour.forEach((daySlots, jour) => {
+      // Trier par heure de début
+      daySlots.sort((a,b) => a.iv.debut - b.iv.debut);
+
+      // Algorithme de fusion en blocs contigus (gap toléré : 5 min)
+      const blocs = [];
+      daySlots.forEach(s => {
+        if (!blocs.length) { blocs.push({ debut: s.iv.debut, fin: s.iv.fin, ateliers: [s], date: s.date }); return; }
+        const last = blocs[blocs.length - 1];
+        if (s.iv.debut <= last.fin + 5) {
+          last.fin = Math.max(last.fin, s.iv.fin);
+          last.ateliers.push(s);
+        } else {
+          blocs.push({ debut: s.iv.debut, fin: s.iv.fin, ateliers: [s], date: s.date });
+        }
+      });
+
+      blocs.forEach(b => shifts.push({ jour, date: b.date, debut: b.debut, fin: b.fin, ateliers: b.ateliers }));
+    });
+
+    // Trier shifts par jour puis heure
+    shifts.sort((a,b) => {
+      const dj = JOUR_ORDER.indexOf(a.jour) - JOUR_ORDER.indexOf(b.jour);
+      return dj !== 0 ? dj : a.debut - b.debut;
+    });
+
+    TRADUCTEURS_DATA.push({ nom, shifts });
+  });
+
+  // Trier traducteurs par nom
+  TRADUCTEURS_DATA.sort((a,b) => a.nom.localeCompare(b.nom, 'fr'));
+  return TRADUCTEURS_DATA;
+}
+
+// ════════════════════════════════════════════════
+// RENDU
+// ════════════════════════════════════════════════
+const TRADUCTEURS_DATA = construireShiftsTraducteurs();
+let currentView = 'cards';
+
+// Peupler filtre Traducteur
+const selT = document.getElementById('filterTraducteur');
+TRADUCTEURS_DATA.forEach(a => {
+  const o = document.createElement('option'); o.value = a.nom; o.text = a.nom; selT.appendChild(o);
+});
+
+// Résumé global
+document.getElementById('sumTraducteurs').textContent = TRADUCTEURS_DATA.length;
+document.getElementById('sumShifts').textContent      = TRADUCTEURS_DATA.reduce((s,a) => s + a.shifts.length, 0);
+document.getElementById('sumAteliers').textContent    = TRADUCTEURS_DATA.reduce((s,a) => s + a.shifts.reduce((ss,sh) => ss + sh.ateliers.length, 0), 0);
+
+function getFiltered() {
+  const ft = document.getElementById('filterTraducteur').value;
+  const fj = document.getElementById('filterJour').value;
+  return TRADUCTEURS_DATA
+    .filter(a => !ft || a.nom === ft)
+    .map(a => ({
+      ...a,
+      shifts: a.shifts.filter(sh => !fj || sh.jour === fj)
+    }))
+    .filter(a => a.shifts.length > 0);
+}
+
+function initiales(nom) {
+  return nom.split(' ').filter(Boolean).slice(0,2).map(w => w[0].toUpperCase()).join('');
+}
+
+function renderCards(data) {
+  if (!data.length) return `<div class="empty">Aucun résultat pour cette sélection.</div>`;
+  return `<div class="role-section">${data.map(a => {
+    const nbShifts   = a.shifts.length;
+    const nbAteliers = a.shifts.reduce((s,sh) => s + sh.ateliers.length, 0);
+    const shiftsHtml = a.shifts.map(sh => {
+      const rows = sh.ateliers
+        .sort((x,y) => x.iv.debut - y.iv.debut)
+        .map(at => `<tr>
+          <td class="td-heure">${at.heure}</td>
+          <td>${at.atelier}</td>
+          <td class="td-lieu">${at.lieu ? `<span class="tag-lieu">${at.lieu}</span>` : '<span style="color:var(--muted);font-size:12px">—</span>'}</td>
+          <td><span class="tag">${at.type}</span></td>
+        </tr>`).join('');
+      return `<div class="shift">
+        <div class="shift-header">
+          <span class="shift-jour">${sh.jour}</span>
+          <span class="shift-date">${sh.date}</span>
+          <span class="shift-heure">⏱ ${fmtMin(sh.debut)} — ${fmtMin(sh.fin % 1440)}</span>
+          <span class="shift-count">${sh.ateliers.length} atelier${sh.ateliers.length>1?'s':''}</span>
+        </div>
+        <table class="shift-table">
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+    }).join('');
+    return `<div class="role-block">
+      <div class="role-header">
+        <div class="role-avatar">${initiales(a.nom)}</div>
+        <div>
+          <div class="role-name">${a.nom}</div>
+          <span class="role-badge">🌐 Traducteur</span>
+        </div>
+        <div class="role-stats">
+          <strong>${nbShifts}</strong> shift${nbShifts>1?'s':''}<br>
+          <span>${nbAteliers} atelier${nbAteliers>1?'s':''} couverts</span>
+        </div>
+      </div>
+      ${shiftsHtml}
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function renderTable(data) {
+  if (!data.length) return `<div class="empty">Aucun résultat pour cette sélection.</div>`;
+  const rows = [];
+  data.forEach(a => {
+    a.shifts.forEach(sh => {
+      sh.ateliers
+        .sort((x,y) => x.iv.debut - y.iv.debut)
+        .forEach(at => {
+          rows.push({ nom: a.nom, jour: sh.jour, date: sh.date,
+            shiftDebut: sh.debut, shiftFin: sh.fin,
+            heure: at.heure, atelier: at.atelier, lieu: at.lieu, type: at.type });
+        });
+    });
+  });
+  const trs = rows.map(r => `<tr>
+    <td><span style="color:var(--role-accent);font-weight:700;">${r.nom}</span></td>
+    <td>${r.jour}</td>
+    <td>${r.date}</td>
+    <td style="white-space:nowrap;font-weight:700;color:var(--role-accent);">${fmtMin(r.shiftDebut)} — ${fmtMin(r.shiftFin % 1440)}</td>
+    <td style="white-space:nowrap;color:var(--accent);font-variant-numeric:tabular-nums;">${r.heure}</td>
+    <td>${r.atelier}</td>
+    <td>${r.lieu ? `<span class="tag-lieu">${r.lieu}</span>` : ''}</td>
+    <td><span class="tag">${r.type}</span></td>
+  </tr>`).join('');
+  return `<div class="table-wrap"><table class="global">
+    <thead><tr>
+      <th>Traducteur</th><th>Jour</th><th>Date</th><th>Shift</th>
+      <th>Heure atelier</th><th>Atelier</th><th>Lieu</th><th>Type</th>
+    </tr></thead>
+    <tbody>${trs}</tbody>
+  </table></div>`;
+}
+
+function render() {
+  const data = getFiltered();
+  const nbShifts   = data.reduce((s,a) => s + a.shifts.length, 0);
+  const nbAteliers = data.reduce((s,a) => s + a.shifts.reduce((ss,sh) => ss + sh.ateliers.length, 0), 0);
+  document.getElementById('stats').innerHTML =
+    `<span>${data.length}</span> traducteur${data.length>1?'s':''} · <span>${nbShifts}</span> shift${nbShifts>1?'s':''} · <span>${nbAteliers}</span> atelier${nbAteliers>1?'s':''}`;
+  document.getElementById('results').innerHTML =
+    currentView === 'cards' ? renderCards(data) : renderTable(data);
+}
+
+function setView(v) {
+  currentView = v;
+  document.getElementById('vbtnCards').classList.toggle('active', v === 'cards');
+  document.getElementById('vbtnTable').classList.toggle('active', v === 'table');
+  render();
+}
+
+function toggleMode() {
+  const isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+
+render();
+</script>
+</body>
+</html>

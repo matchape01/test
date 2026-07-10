@@ -1,0 +1,501 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Agenda par Personne</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --header-bg: #f0f4fb; --row-alt: #f7f8fa;
+    --tag-bg: #eef2ff; --tag-text: #3b5bdb;
+    --badge-h: #e0f2fe; --badge-ht: #0369a1;
+    --badge-a: #fce7f3; --badge-at: #9d174d;
+    --badge-f: #dcfce7; --badge-ft: #166534;
+  }
+  .dark {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --header-bg: #1c2333; --row-alt: #161b22;
+    --tag-bg: #1c2a4a; --tag-text: #79a8ff;
+    --badge-h: #0c2d48; --badge-ht: #58a6ff;
+    --badge-a: #3b1030; --badge-at: #f0abca;
+    --badge-f: #0a2e1a; --badge-ft: #4ade80;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 24px 20px; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .logo h1 { font-size: 20px; font-weight: 700; }
+  .logo p { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: .3px; line-height: 1.2; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .mode-btn { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; }
+  .mode-btn:hover { background: var(--border); }
+  .filters { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; align-items: flex-end; }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; }
+  .filter-group label { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 600; }
+  select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 13px; color: var(--text); font-family: inherit; min-width: 220px; cursor: pointer; }
+  .stats { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .stats span { color: var(--accent); font-weight: 600; }
+  /* ── TABLE VIEW ── */
+  .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; min-width: 1050px; }
+  /* Colonne Traducteur (9e) — largeur contrainte */
+  thead th:nth-child(9), tbody td:nth-child(9) { max-width: 80px; width: 80px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* Colonne Helper(s) (10e) — largeur réduite, contenu tronqué si trop long */
+  thead th:nth-child(10), tbody td:nth-child(10) { max-width: 160px; width: 160px; }
+  tbody td:nth-child(10) .pill { max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+  /* Colonne Angel (11e) — largeur fixe garantie */
+  thead th:nth-child(11), tbody td:nth-child(11) { min-width: 110px; width: 110px; }
+  thead th { background: var(--header-bg); padding: 10px 12px; text-align: left; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; position: sticky; top: 0; z-index: 1; }
+  thead th:hover { color: var(--accent); }
+  thead th .sort-icon { display: inline-block; margin-left: 4px; opacity: .5; font-size: 10px; }
+  thead th.sorted .sort-icon { opacity: 1; color: var(--accent); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--row-alt); }
+  tbody tr:nth-child(even) { background: var(--row-alt); }
+  td { padding: 9px 12px; font-size: 13px; vertical-align: top; }
+  /* ── CARD VIEW ── */
+  .card-list { display: none; flex-direction: column; gap: 20px; }
+  /* Groupe personne */
+  .card-person-group { display: flex; flex-direction: column; gap: 0; }
+  .card-person-header { font-size: 16px; font-weight: 700; color: var(--text); padding: 10px 14px; background: var(--header-bg); border: 1px solid var(--border); border-radius: 10px 10px 0 0; border-bottom: none; letter-spacing: .2px; }
+  .card-person-body { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); border-radius: 0 0 10px 10px; overflow: hidden; }
+  /* Bandeau jour — plus grand et coloré */
+  .card-day-header { font-size: 14px; font-weight: 800; letter-spacing: .4px; color: #fff; padding: 10px 14px 9px; background: var(--accent); border-bottom: 2px solid rgba(0,0,0,.15); display: flex; align-items: baseline; gap: 8px; }
+  .card-day-date { font-size: 14px; font-weight: 800; opacity: .88; }
+  .card-day-count { font-size: 11px; font-weight: 500; opacity: .75; margin-left: auto; }
+  /* Carte multi-ateliers regroupés */
+  .card-grouped { background: var(--bg); padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  .card-grouped:last-child { border-bottom: none; }
+  .card-grouped-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .card-grouped-role { margin-bottom: 8px; padding-left: 90px; }
+  .card-grouped-list { padding-left: 90px; display: flex; flex-direction: column; gap: 4px; }
+  .card-grouped-item { display: flex; align-items: flex-start; gap: 6px; font-size: 13px; color: var(--text); padding: 5px 8px; background: var(--surface); border-radius: 6px; border: 1px solid var(--border); }
+  .card-grouped-item-type { flex: 1; }
+  .card-grouped-item-lieu { }
+  .dark .card-day-header { background: #1d4ed8; }
+  .card-day-items { display: flex; flex-direction: column; gap: 0; }
+  /* Carte individuelle */
+  .card { background: var(--bg); padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  .card:last-child { border-bottom: none; }
+  .card-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .card-heure { font-size: 12px; color: var(--accent); white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 700; min-width: 80px; padding-top: 2px; }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; }
+  .card-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; padding-left: 90px; align-items: center; }
+  .card-rows { display: flex; flex-direction: column; gap: 5px; padding-left: 90px; }
+  .card-row { display: flex; gap: 8px; align-items: flex-start; }
+  .card-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; min-width: 80px; padding-top: 2px; }
+  .card-value { font-size: 13px; color: var(--text); flex: 1; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  /* ── SHARED ── */
+  .tag { display: inline-block; background: var(--tag-bg); color: var(--tag-text); border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .pill { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600; margin: 1px 2px; white-space: nowrap; }
+  .pill-h { background: var(--badge-h); color: var(--badge-ht); }
+  .pill-a { background: var(--badge-a); color: var(--badge-at); }
+  .pill-f { background: var(--badge-f); color: var(--badge-ft); }
+  .pill-t { background: var(--tag-bg); color: var(--tag-text); }
+  .role-badge { display: inline-block; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; letter-spacing: .3px; }
+  .role-F { background: var(--badge-f); color: var(--badge-ft); }
+  .role-H { background: var(--badge-h); color: var(--badge-ht); }
+  .role-A { background: var(--badge-a); color: var(--badge-at); }
+  .role-T { background: var(--tag-bg); color: var(--tag-text); }
+  /* ── RESPONSIVE ── */
+  @media (max-width: 767px) {
+    .wrap { padding: 16px 12px; }
+    select { min-width: 100%; }
+    .filters { gap: 10px; }
+  }
+  .empty { text-align: center; padding: 48px; color: var(--muted); }
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Rapport 2 — Agenda par Personne</p>
+    </div>
+    <div class="header-actions">
+      <a class="mode-btn" href="index.html">🏠 Home</a>
+      <button class="mode-btn" onclick="location.reload()">🔄 Refresh</button>
+      <button class="mode-btn" id="viewBtn" onclick="toggleView()">📱 Vue Mobile</button>
+      <button class="mode-btn" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+  <div class="filters">
+    <div class="filter-group">
+      <label>Personne</label>
+      <select id="filterPerson" onchange="render()">
+        <option value="">Toutes les personnes</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Jour / Date</label>
+      <select id="filterJour" onchange="render()">
+        <option value="">Tous les jours</option>
+        <option value="Jour 1">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7">Jour 7 — Ven. 4 sept.</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Rôle</label>
+      <select id="filterRole" onchange="render()">
+        <option value="">Tous les rôles</option>
+          <option value="F">Facilitateur</option>
+          <option value="H">Helper</option>
+          <option value="A">Angel</option>
+          <option value="T">Traducteur</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Type d'atelier</label>
+      <select id="filterType" onchange="render()">
+        <option value="">Tous les types</option>
+      </select>
+    </div>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="table-wrap" id="tableView">
+    <table>
+      <thead>
+        <tr>
+          <th onclick="sortBy(0)">Jour<span class="sort-icon" id="si0">⇅</span></th>
+          <th onclick="sortBy(1)">Date<span class="sort-icon" id="si1">⇅</span></th>
+          <th onclick="sortBy(2)">Heure<span class="sort-icon" id="si2">⇅</span></th>
+          <th onclick="sortBy(3)">Type d'atelier<span class="sort-icon" id="si3">⇅</span></th>
+          <th onclick="sortBy(4)">Atelier<span class="sort-icon" id="si4">⇅</span></th>
+          <th onclick="sortBy(5)">Lieu<span class="sort-icon" id="si5">⇅</span></th>
+          <th onclick="sortBy(6)">Rôle<span class="sort-icon" id="si6">⇅</span></th>
+          <th onclick="sortBy(7)">Facilitateur(s)<span class="sort-icon" id="si7">⇅</span></th>
+          <th onclick="sortBy(8)">Traducteur<span class="sort-icon" id="si8">⇅</span></th>
+          <th onclick="sortBy(9)">Helper(s)<span class="sort-icon" id="si9">⇅</span></th>
+          <th onclick="sortBy(10)">Angel<span class="sort-icon" id="si10">⇅</span></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div class="card-list" id="cardView"></div>
+</div>
+<footer><p>Made with IBM Bob</p></footer>
+<script src="data.js"></script>
+<script>
+const RAW = agendaToRaw(AGENDA);
+const DATA = RAW.map(r => { while(r.length<14) r.push(""); return r; });
+
+function heureEnMinutes(h) {
+  if (!h) return 9999;
+  const norm = h.replace(/\./g, ':');
+  const m = norm.match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : 9999;
+}
+
+const personRoleMap = {};
+function addPerson(name, role) {
+  if (!name || !name.trim()) return;
+  const n = name.trim();
+  if (!personRoleMap[n]) personRoleMap[n] = new Set();
+  personRoleMap[n].add(role);
+}
+DATA.forEach(r => {
+  addPerson(r[6],'F'); addPerson(r[7],'F');
+  addPerson(r[8],'T');
+  addPerson(r[9],'H'); addPerson(r[10],'H'); addPerson(r[11],'H');
+  addPerson(r[12],'A');
+});
+
+const persons = Object.keys(personRoleMap).sort((a,b)=>a.localeCompare(b,'fr'));
+const sel = document.getElementById('filterPerson');
+persons.forEach(p => { const o=document.createElement('option'); o.value=p; o.text=p; sel.appendChild(o); });
+
+const types = [...new Set(DATA.map(r=>r[3]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'fr'));
+const selType = document.getElementById('filterType');
+types.forEach(t => { const o=document.createElement('option'); o.value=t; o.text=t; selType.appendChild(o); });
+
+let sortCol = -1, sortAsc = true;
+
+function getMatches(person, role) {
+  const results = [];
+  DATA.forEach(r => {
+    const roles = [];
+    if (r[6]===person||r[7]===person) roles.push('F');
+    if (r[8]===person) roles.push('T');
+    if (r[9]===person||r[10]===person||r[11]===person) roles.push('H');
+    if (r[12]===person) roles.push('A');
+    // Si "Toutes les personnes" : inclure toutes les lignes qui ont au moins un rôle renseigné
+    if (!person) {
+      const allRoles = [];
+      if (r[6]||r[7]) allRoles.push('F');
+      if (r[8]) allRoles.push('T');
+      if (r[9]||r[10]||r[11]) allRoles.push('H');
+      if (r[12]) allRoles.push('A');
+      if (!allRoles.length) return;
+      if (role && !allRoles.includes(role)) return;
+      results.push({r, roles: role ? [role] : allRoles});
+      return;
+    }
+    if (!roles.length) return;
+    if (role && !roles.includes(role)) return;
+    results.push({r, roles: role ? [role] : roles});
+  });
+  return results;
+}
+
+function getVal(item, col) {
+  const r = item.r;
+  switch(col){
+    case 0: return r[0]; case 1: return r[1]; case 2: return r[2]; case 3: return r[3];
+    case 4: return r[4]; case 5: return r[5];
+    case 6: return item.roles.join('/');
+    case 7: return [r[6],r[7]].filter(Boolean).join('/');
+    case 8: return r[8];
+    case 9: return [r[9],r[10],r[11]].filter(Boolean).join('/');
+    case 10: return r[12];
+  }
+  return '';
+}
+
+function pills(vals, cls) {
+  return vals.filter(Boolean).map(v=>`<span class="pill ${cls}">${v}</span>`).join('');
+}
+
+let isMobileView = window.innerWidth < 768;
+
+function render() {
+  const p = document.getElementById('filterPerson').value;
+  const jour = document.getElementById('filterJour').value;
+  const role = document.getElementById('filterRole').value;
+  const type = document.getElementById('filterType').value;
+  let matches = getMatches(p, role);
+  if (jour) matches = matches.filter(({r}) => r[0] === jour);
+  if (type) matches = matches.filter(({r}) => r[3] === type);
+  if (sortCol >= 0) {
+    matches = [...matches].sort((a,b)=>{
+      const av=getVal(a,sortCol)||'', bv=getVal(b,sortCol)||'';
+      return sortAsc?av.localeCompare(bv,'fr'):bv.localeCompare(av,'fr');
+    });
+  }
+  const label = p ? `pour <strong>${p}</strong>` : `(toutes les personnes)`;
+  document.getElementById('stats').innerHTML = `<span>${matches.length}</span> atelier(s) ${label}`;
+  if (isMobileView) {
+    renderCards(matches);
+  } else {
+    renderTable(matches);
+  }
+}
+
+function renderTable(matches) {
+  const tb = document.getElementById('tbody');
+  if (!matches.length) { tb.innerHTML=`<tr><td colspan="11" class="empty">Aucun résultat</td></tr>`; return; }
+  tb.innerHTML = matches.map(({r,roles})=>{
+    const roleHtml = roles.map(ro=>{
+      const label = ro==='F'?'Facilitateur':ro==='H'?'Helper':ro==='A'?'Angel':'Traducteur';
+      return `<span class="role-badge role-${ro}">${label}</span>`;
+    }).join(' ');
+    return `<tr>
+      <td>${r[0]}</td><td>${r[1]}</td>
+      <td style="white-space:nowrap">${r[2]}</td>
+      <td><span class="tag">${r[3]}</span></td>
+      <td>${r[4]}${r[13]?'<span style="color:#e53e3e;font-weight:700;margin-left:3px">*</span>':''}</td><td>${r[5]}</td>
+      <td>${roleHtml}</td>
+      <td>${pills([r[6],r[7]],'pill-f')}</td>
+      <td>${r[8]?`<span class="pill pill-t">${r[8]}</span>`:''}</td>
+      <td>${pills([r[9],r[10],r[11]],'pill-h')}</td>
+      <td>${r[12]?`<span class="pill pill-a">${r[12]}</span>`:''}</td>
+    </tr>`;
+  }).join('');
+}
+
+// Rendu d'une carte simple (1 atelier)
+function cardHtml({r, roles}) {
+  const roleHtml = roles.map(ro => {
+    const lbl = ro==='F'?'Facilitateur':ro==='H'?'Helper':ro==='A'?'Angel':'Traducteur';
+    const cls = ro==='F'?'role-F':ro==='H'?'role-H':ro==='A'?'role-A':'role-T';
+    return `<span class="role-badge ${cls}">${lbl}</span>`;
+  }).join(' ');
+  const facs = pills([r[6],r[7]],'pill-f');
+  const helpers = pills([r[9],r[10],r[11]],'pill-h');
+  const angel = r[12] ? `<span class="pill pill-a">${r[12]}</span>` : '';
+  const trad = r[8] ? `<span class="pill pill-t">${r[8]}</span>` : '';
+  const lieu = r[5] ? `<span class="tag">${r[5]}</span>` : '';
+  return `<div class="card">
+    <div class="card-header">
+      <div class="card-heure">${r[2]||''}</div>
+      <div class="card-title">${r[4]||'—'}</div>
+    </div>
+    <div class="card-meta">
+      <span class="tag">${r[3]||''}</span>${lieu ? ' '+lieu : ''}
+    </div>
+    <div class="card-rows">
+      <div class="card-row"><span class="card-label">Rôle</span><span class="card-value">${roleHtml}${r[13]?`<span style="color:#e53e3e;font-weight:600;font-size:11px;margin-left:8px;border:1px solid #e53e3e;border-radius:4px;padding:1px 6px">${r[13]}</span>`:''}</span></div>
+      ${facs ? `<div class="card-row"><span class="card-label">Facilitateur</span><span class="card-value">${facs}</span></div>` : ''}
+      ${trad ? `<div class="card-row"><span class="card-label">Traducteur</span><span class="card-value">${trad}</span></div>` : ''}
+      ${helpers ? `<div class="card-row"><span class="card-label">Helper(s)</span><span class="card-value">${helpers}</span></div>` : ''}
+      ${angel ? `<div class="card-row"><span class="card-label">Angel</span><span class="card-value">${angel}</span></div>` : ''}
+    </div>
+  </div>`;
+}
+
+// Rendu d'une carte regroupée (plusieurs ateliers même heure + même rôle)
+function cardGroupedHtml(groupKey, items) {
+  const { heure, roles } = groupKey;
+  const roleHtml = roles.map(ro => {
+    const lbl = ro==='F'?'Facilitateur':ro==='H'?'Helper':ro==='A'?'Angel':'Traducteur';
+    const cls = ro==='F'?'role-F':ro==='H'?'role-H':ro==='A'?'role-A':'role-T';
+    return `<span class="role-badge ${cls}">${lbl}</span>`;
+  }).join(' ');
+  const atelierList = items.map(({r}) => {
+    const lieu = r[5] ? `<span class="tag">${r[5]}</span>` : '';
+    return `<div class="card-grouped-item">
+      <div class="card-grouped-item-type"><span class="tag" style="margin-right:4px">${r[3]||''}</span>${r[4]||'—'}</div>
+      ${lieu ? `<div class="card-grouped-item-lieu">${lieu}</div>` : ''}
+    </div>`;
+  }).join('');
+  return `<div class="card-grouped">
+    <div class="card-grouped-header">
+      <div class="card-heure">${heure}</div>
+      <div class="card-title" style="color:var(--muted);font-size:13px">${items.length} ateliers simultanés</div>
+    </div>
+    <div class="card-grouped-role">${roleHtml}</div>
+    <div class="card-grouped-list">${atelierList}</div>
+  </div>`;
+}
+
+// Groupe les matches par personne puis par jour
+// Retourne une structure : [ { person, days: [ { jour, date, items } ] } ]
+function groupByPersonThenDay(matches) {
+  // Collecte toutes les personnes impliquées dans chaque match
+  const personMap = new Map(); // person -> Map(jourKey -> {jour, date, items[]})
+  const DAY_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+  matches.forEach(item => {
+    const r = item.r;
+    // Identifier les personnes réellement présentes dans ce match
+    const persons = new Set();
+    item.roles.forEach(ro => {
+      if (ro==='F') { if(r[6]) persons.add(r[6]); if(r[7]) persons.add(r[7]); }
+      if (ro==='T') { if(r[8]) persons.add(r[8]); }
+      if (ro==='H') { if(r[9]) persons.add(r[9]); if(r[10]) persons.add(r[10]); if(r[11]) persons.add(r[11]); }
+      if (ro==='A') { if(r[12]) persons.add(r[12]); }
+    });
+    // Si filtre personne spécifique → une seule personne
+    const filterVal = document.getElementById('filterPerson').value;
+    const effectivePersons = filterVal ? [filterVal] : [...persons];
+
+    effectivePersons.forEach(person => {
+      if (!person || !person.trim()) return;
+      if (!personMap.has(person)) personMap.set(person, new Map());
+      const dayMap = personMap.get(person);
+      const jourKey = r[0];
+      if (!dayMap.has(jourKey)) dayMap.set(jourKey, { jour: r[0], date: r[1], items: [] });
+      dayMap.get(jourKey).items.push(item);
+    });
+  });
+
+  // Trier personnes alphabétiquement, jours dans l'ordre
+  return [...personMap.entries()]
+    .sort((a,b) => a[0].localeCompare(b[0],'fr'))
+    .map(([person, dayMap]) => ({
+      person,
+      days: DAY_ORDER
+        .filter(j => dayMap.has(j))
+        .map(j => {
+          const day = dayMap.get(j);
+          // Trier les items du jour par heure de début
+          day.items.sort((a,b) => heureEnMinutes(a.r[2]) - heureEnMinutes(b.r[2]));
+          return day;
+        })
+    }));
+}
+
+// Regroupe les items d'un jour : ceux qui ont même heure + même rôle sont fusionnés en une carte groupée
+function mergeByHeureRole(items) {
+  const buckets = new Map(); // clé = "heure|||role1+role2"
+  const order = [];
+  items.forEach(item => {
+    const key = item.r[2] + '|||' + item.roles.slice().sort().join('+');
+    if (!buckets.has(key)) { buckets.set(key, { key: { heure: item.r[2], roles: item.roles }, items: [] }); order.push(key); }
+    buckets.get(key).items.push(item);
+  });
+  return order.map(k => buckets.get(k));
+}
+
+function renderDayItems(items) {
+  return mergeByHeureRole(items).map(bucket => {
+    if (bucket.items.length === 1) return cardHtml(bucket.items[0]);
+    return cardGroupedHtml(bucket.key, bucket.items);
+  }).join('');
+}
+
+function renderCards(matches) {
+  const cv = document.getElementById('cardView');
+  if (!matches.length) { cv.innerHTML=`<div class="empty">Aucun résultat</div>`; return; }
+
+  const filterVal = document.getElementById('filterPerson').value;
+  const grouped = groupByPersonThenDay(matches);
+
+  if (filterVal) {
+    const person = grouped[0];
+    if (!person) { cv.innerHTML=`<div class="empty">Aucun résultat</div>`; return; }
+    cv.innerHTML = `<div class="card-person-group">
+      <div class="card-person-header">👤 ${person.person}</div>
+      <div class="card-person-body">
+        ${person.days.map(day => `
+          <div class="card-day-header">${day.jour}<span class="card-day-date">${day.date}</span><span class="card-day-count">${day.items.length} atelier${day.items.length>1?'s':''}</span></div>
+          <div class="card-day-items">${renderDayItems(day.items)}</div>
+        `).join('')}
+      </div>
+    </div>`;
+  } else {
+    cv.innerHTML = grouped.map(({person, days}) => `
+      <div class="card-person-group">
+        <div class="card-person-header">👤 ${person}</div>
+        <div class="card-person-body">
+          ${days.map(day => `
+            <div class="card-day-header">${day.jour}<span class="card-day-date">${day.date}</span><span class="card-day-count">${day.items.length} atelier${day.items.length>1?'s':''}</span></div>
+            <div class="card-day-items">${renderDayItems(day.items)}</div>
+          `).join('')}
+        </div>
+      </div>
+    `).join('');
+  }
+}
+
+function sortBy(col) {
+  if(sortCol===col) sortAsc=!sortAsc; else {sortCol=col;sortAsc=true;}
+  for(let i=0;i<11;i++){
+    const si=document.getElementById('si'+i);
+    si.textContent='⇅'; si.parentElement.classList.remove('sorted');
+  }
+  document.getElementById('si'+col).textContent=sortAsc?'↑':'↓';
+  document.getElementById('si'+col).parentElement.classList.add('sorted');
+  render();
+}
+
+function setView(mobile) {
+  isMobileView = mobile;
+  document.getElementById('tableView').style.display = mobile ? 'none' : '';
+  document.getElementById('cardView').style.display = mobile ? 'flex' : 'none';
+  document.getElementById('viewBtn').textContent = mobile ? '🖥 Vue Tableau' : '📱 Vue Mobile';
+  render();
+}
+
+function toggleView() { setView(!isMobileView); }
+
+function toggleMode() {
+  const isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+
+setView(window.innerWidth < 768);
+</script>
+</body>
+</html>

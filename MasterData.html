@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Master Data Management</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --header-bg: #f0f4fb;
+    --badge-f: #dcfce7; --badge-ft: #166534;
+    --badge-h: #e0f2fe; --badge-ht: #0369a1;
+    --badge-a: #fce7f3; --badge-at: #9d174d;
+    --warn: #b45309; --warn-bg: #fffbeb; --warn-border: #fcd34d;
+    --success: #166534; --success-bg: #dcfce7; --success-border: #86efac;
+    --danger: #dc2626; --danger-bg: #fef2f2; --danger-border: #fca5a5;
+  }
+  .dark {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --header-bg: #1c2333;
+    --badge-f: #0a2e1a; --badge-ft: #4ade80;
+    --badge-h: #0c2d48; --badge-ht: #58a6ff;
+    --badge-a: #3b1030; --badge-at: #f0abca;
+    --warn-bg: #1c1500; --warn-border: #92400e;
+    --success-bg: #052e16; --success-border: #166534;
+    --danger-bg: #2d0a0a; --danger-border: #991b1b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 24px 20px; }
+
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+  .logo h1 { font-size: 20px; font-weight: 700; }
+  .logo p { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: .3px; line-height: 1.2; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .btn-ghost { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* ── SÉLECTEUR MASTER DATA ── */
+  .md-selector { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
+  .md-tab {
+    cursor: pointer; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
+    border: 2px solid var(--border); background: var(--surface); color: var(--muted);
+    font-family: inherit; transition: all .15s;
+  }
+  .md-tab:hover { border-color: var(--accent); color: var(--accent); }
+  .md-tab.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+
+  /* ── SECTION LISTE ── */
+  .md-section { display: none; }
+  .md-section.visible { display: block; }
+  .md-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
+  .md-title { font-size: 16px; font-weight: 700; }
+  .md-count { font-size: 12px; color: var(--muted); margin-left: 8px; }
+
+  .md-table-wrap { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+  .md-table { width: 100%; border-collapse: collapse; }
+  .md-table thead th { background: var(--header-bg); padding: 9px 14px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); border-bottom: 1px solid var(--border); }
+  .md-table tbody tr { border-bottom: 1px solid var(--border); }
+  .md-table tbody tr:last-child { border-bottom: none; }
+  .md-table tbody tr:hover { background: var(--surface); }
+  .md-table td { padding: 8px 14px; font-size: 13px; vertical-align: middle; }
+  .td-id { font-family: 'Courier New', monospace; font-size: 11px; color: var(--muted); white-space: nowrap; width: 160px; }
+  .td-value { flex: 1; }
+  .td-actions { width: 100px; text-align: right; white-space: nowrap; }
+
+  /* ── INLINE EDIT ── */
+  .inline-input { background: var(--bg); border: 1px solid var(--accent); border-radius: 5px; padding: 5px 8px; font-size: 13px; color: var(--text); font-family: inherit; width: 100%; outline: none; box-shadow: 0 0 0 3px rgba(59,130,212,.1); }
+
+  /* ── BOUTONS ── */
+  .btn { cursor: pointer; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; font-family: inherit; border: none; transition: filter .15s; }
+  .btn:hover { filter: brightness(.9); }
+  .btn-edit   { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .btn-save   { background: #16a34a; color: #fff; }
+  .btn-cancel-sm { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+  .btn-delete { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
+  .btn-add-row { cursor: pointer; width: 100%; padding: 9px; background: var(--surface); border: 2px dashed var(--border); border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--muted); font-family: inherit; transition: all .15s; }
+  .btn-add-row:hover { border-color: var(--accent); color: var(--accent); background: var(--bg); }
+  .btn-download { background: var(--accent); color: #fff; cursor: pointer; border-radius: 6px; padding: 8px 18px; font-size: 13px; font-weight: 700; font-family: inherit; border: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-download:hover { filter: brightness(.92); }
+
+  /* ── DOWNLOAD BAR ── */
+  .download-bar { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: 8px; padding: 14px 18px; margin-top: 24px; display: none; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .download-bar.visible { display: flex; }
+  .download-bar-msg { font-size: 13px; font-weight: 600; color: var(--warn); }
+
+  /* ── TOAST ── */
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); border-radius: 8px; padding: 12px 18px; font-size: 13px; font-weight: 600; z-index: 200; display: none; box-shadow: 0 4px 16px rgba(0,0,0,.12); max-width: 420px; }
+  .toast.show { display: block; animation: slideIn .25s ease; }
+  @keyframes slideIn { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+  /* ── OVERLAY CONFIRM ── */
+  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100; align-items: center; justify-content: center; }
+  .overlay.open { display: flex; }
+  .dialog { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; max-width: 400px; width: 90%; }
+  .dialog h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+  .dialog p { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+  .dialog-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<script>
+(function(){
+  var pw = sessionStorage.getItem('tm_admin_auth');
+  if(pw !== '007') {
+    var entered = prompt('🔒 Accès restreint — Mot de passe :');
+    if(entered !== '007') { document.write('<div style="font-family:system-ui;padding:60px;text-align:center;"><h2>Accès refusé</h2><p style=\"margin-top:12px;color:#57606a\">Mot de passe incorrect.</p><br><a href=\"index.html\">← Retour</a></div>'); document.close(); throw 'access denied'; }
+    sessionStorage.setItem('tm_admin_auth','007');
+  }
+})();
+</script>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Master Data Management</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn-ghost" href="index.html">🏠 Home</a>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+
+  <!-- ── ONGLETS ── -->
+  <div class="md-selector">
+    <button class="md-tab active" onclick="selectTab('fac')">🎓 Facilitateurs</button>
+    <button class="md-tab" onclick="selectTab('hlp')">🤝 Helpers</button>
+    <button class="md-tab" onclick="selectTab('ang')">👼 Angels</button>
+    <button class="md-tab" onclick="selectTab('trad')">🌐 Traducteurs</button>
+    <button class="md-tab" onclick="selectTab('lieu')">📍 Lieux</button>
+    <button class="md-tab" onclick="selectTab('type')">🏷️ Types d'atelier</button>
+    <button class="md-tab" onclick="selectTab('note')">📝 Notes</button>
+  </div>
+
+  <!-- ── SECTION FACILITATEURS ── -->
+  <div class="md-section visible" id="sec-fac">
+    <div class="md-header">
+      <div><span class="md-title">Facilitateurs</span><span class="md-count" id="cnt-fac"></span></div>
+    </div>
+    <div class="md-table-wrap">
+      <table class="md-table">
+        <thead><tr><th>ID</th><th>Nom (value)</th><th></th></tr></thead>
+        <tbody id="tbody-fac"></tbody>
+      </table>
+    </div>
+    <button class="btn-add-row" onclick="ajouterLigne('fac')">+ Ajouter un facilitateur</button>
+    <div class="download-bar" id="bar-fac">
+      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-download" onclick="telecharger('fac')">💾 Télécharger ref_facilitateurs.js</button>
+        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('fac', true)">💾 + data.js mis à jour</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION HELPERS ── -->
+  <div class="md-section" id="sec-hlp">
+    <div class="md-header">
+      <div><span class="md-title">Helpers</span><span class="md-count" id="cnt-hlp"></span></div>
+    </div>
+    <div class="md-table-wrap">
+      <table class="md-table">
+        <thead><tr><th>ID</th><th>Nom (value)</th><th></th></tr></thead>
+        <tbody id="tbody-hlp"></tbody>
+      </table>
+    </div>
+    <button class="btn-add-row" onclick="ajouterLigne('hlp')">+ Ajouter un helper</button>
+    <div class="download-bar" id="bar-hlp">
+      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-download" onclick="telecharger('hlp')">💾 Télécharger ref_helpers.js</button>
+        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('hlp', true)">💾 + data.js mis à jour</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION ANGELS ── -->
+  <div class="md-section" id="sec-ang">
+    <div class="md-header">
+      <div><span class="md-title">Angels</span><span class="md-count" id="cnt-ang"></span></div>
+    </div>
+    <div class="md-table-wrap">
+      <table class="md-table">
+        <thead><tr><th>ID</th><th>Nom (value)</th><th></th></tr></thead>
+        <tbody id="tbody-ang"></tbody>
+      </table>
+    </div>
+    <button class="btn-add-row" onclick="ajouterLigne('ang')">+ Ajouter un angel</button>
+    <div class="download-bar" id="bar-ang">
+      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-download" onclick="telecharger('ang')">💾 Télécharger ref_angels.js</button>
+        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('ang', true)">💾 + data.js mis à jour</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION LIEUX ── -->
+  <div class="md-section" id="sec-lieu">
+    <div class="md-header">
+      <div><span class="md-title">Lieux / Salles</span><span class="md-count" id="cnt-lieu"></span></div>
+    </div>
+    <div class="md-table-wrap">
+      <table class="md-table">
+        <thead><tr><th>ID</th><th>Valeur (value)</th><th></th></tr></thead>
+        <tbody id="tbody-lieu"></tbody>
+      </table>
+    </div>
+    <button class="btn-add-row" onclick="ajouterLigne('lieu')">+ Ajouter un lieu</button>
+    <div class="download-bar" id="bar-lieu">
+      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-download" onclick="telecharger('lieu')">💾 Télécharger ref_lieux.js</button>
+        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('lieu', true)">💾 + data.js mis à jour</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION TYPES ── -->
+  <div class="md-section" id="sec-type">
+    <div class="md-header">
+      <div><span class="md-title">Types d'atelier</span><span class="md-count" id="cnt-type"></span></div>
+    </div>
+    <div class="md-table-wrap">
+      <table class="md-table">
+        <thead><tr><th>ID</th><th>Valeur (value)</th><th></th></tr></thead>
+        <tbody id="tbody-type"></tbody>
+      </table>
+    </div>
+    <button class="btn-add-row" onclick="ajouterLigne('type')">+ Ajouter un type</button>
+    <div class="download-bar" id="bar-type">
+      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-download" onclick="telecharger('type')">💾 Télécharger ref_types.js</button>
+        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('type', true)">💾 + data.js mis à jour</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── SECTION TRADUCTEURS ── -->
+  <div class="md-section" id="sec-note">
+    <div class="md-header">
+      <div><span class="md-title">Notes</span><span class="md-count" id="cnt-note"></span></div>
+    </div>
+    <div class="md-table-wrap">
+      <table class="md-table">
+        <thead><tr><th>ID</th><th>Valeur (value)</th><th></th></tr></thead>
+        <tbody id="tbody-note"></tbody>
+      </table>
+    </div>
+    <button class="btn-add-row" onclick="ajouterLigne('note')">+ Ajouter une note</button>
+    <div class="download-bar" id="bar-note">
+      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-download" onclick="telecharger('note')">💾 Télécharger ref_notes.js</button>
+        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('note', true)">💾 + data.js mis à jour</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="md-section" id="sec-trad">
+    <div class="md-header">
+      <div><span class="md-title">Traducteurs</span><span class="md-count" id="cnt-trad"></span></div>
+    </div>
+    <div class="md-table-wrap">
+      <table class="md-table">
+        <thead><tr><th>ID</th><th>Nom (value)</th><th></th></tr></thead>
+        <tbody id="tbody-trad"></tbody>
+      </table>
+    </div>
+    <button class="btn-add-row" onclick="ajouterLigne('trad')">+ Ajouter un traducteur</button>
+    <div class="download-bar" id="bar-trad">
+      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-download" onclick="telecharger('trad')">💾 Télécharger ref_traducteurs.js</button>
+        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('trad', true)">💾 + data.js mis à jour</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── CONFIRM DIALOG ── -->
+<div class="overlay" id="overlay">
+  <div class="dialog">
+    <h3 id="dlgTitle">Confirmer la suppression</h3>
+    <p id="dlgMsg"></p>
+    <div class="dialog-actions">
+      <button class="btn btn-cancel-sm btn-ghost" onclick="fermerDialog()">Annuler</button>
+      <button class="btn btn-delete" id="dlgConfirm">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── TOAST ── -->
+<div class="toast" id="toast"></div>
+
+<footer><p>Made with IBM Bob</p></footer>
+
+<!-- ── RÉFÉRENTIELS ── -->
+<script src="ref_jours.js"></script>
+<script src="ref_lieux.js"></script>
+<script src="ref_types.js"></script>
+<script src="ref_facilitateurs.js"></script>
+<script src="ref_helpers.js"></script>
+<script src="ref_angels.js"></script>
+<script src="ref_traducteurs.js"></script>
+<script src="ref_notes.js"></script>
+<script src="data.js"></script>
+
+<script>
+// ════════════════════════════════════════════════
+// CONFIG DES MASTER DATA
+// ════════════════════════════════════════════════
+const CONFIGS = {
+  fac:  { ref: 'REF_FACILITATEURS', varName: 'REF_FACILITATEURS', fileName: 'ref_facilitateurs.js', prefix: 'F_',  dataField: ['fac1','fac2'],                      label: 'Facilitateurs' },
+  hlp:  { ref: 'REF_HELPERS',       varName: 'REF_HELPERS',       fileName: 'ref_helpers.js',       prefix: 'H_',  dataField: ['helper1','helper2','helper3'],      label: 'Helpers' },
+  ang:  { ref: 'REF_ANGELS',        varName: 'REF_ANGELS',        fileName: 'ref_angels.js',        prefix: 'A_',  dataField: ['angel'],                            label: 'Angels' },
+  trad: { ref: 'REF_TRADUCTEURS',   varName: 'REF_TRADUCTEURS',   fileName: 'ref_traducteurs.js',   prefix: 'TR_', dataField: ['traduction'],                       label: 'Traducteurs' },
+  lieu: { ref: 'REF_LIEUX',         varName: 'REF_LIEUX',         fileName: 'ref_lieux.js',         prefix: 'L_',  dataField: ['lieu'],                             label: 'Lieux', hasLabel: true },
+  type: { ref: 'REF_TYPES',         varName: 'REF_TYPES',         fileName: 'ref_types.js',         prefix: 'T_',  dataField: ['type'],                             label: 'Types', hasLabel: true },
+  note: { ref: 'REF_NOTES',         varName: 'REF_NOTES',         fileName: 'ref_notes.js',         prefix: 'N_',  dataField: ['note'],                             label: 'Notes' },
+};
+
+// Copies de travail (deep copy)
+const STORE = {
+  fac:  REF_FACILITATEURS.map(x=>({...x})),
+  hlp:  REF_HELPERS.map(x=>({...x})),
+  ang:  REF_ANGELS.map(x=>({...x})),
+  trad: REF_TRADUCTEURS.map(x=>({...x})),
+  lieu: REF_LIEUX.map(x=>({...x})),
+  type: REF_TYPES.map(x=>({...x})),
+  note: REF_NOTES.map(x=>({...x})),
+};
+
+// Copie de travail de l'agenda
+let SESSION_AGENDA = AGENDA.map(e=>({...e}));
+
+// Suivi des renommages : { key: { oldValue, newValue }[] }
+const RENAMES = { fac:{}, hlp:{}, ang:{}, trad:{}, lieu:{}, type:{}, note:{} };
+
+// Dirty flags
+const DIRTY = { fac:false, hlp:false, ang:false, trad:false, lieu:false, type:false, note:false };
+
+let currentTab = 'fac';
+
+// ════════════════════════════════════════════════
+// ONGLETS
+// ════════════════════════════════════════════════
+function selectTab(key) {
+  currentTab = key;
+  document.querySelectorAll('.md-tab').forEach((t,i) => {
+    const keys = ['fac','hlp','ang','trad','lieu','type','note'];
+    t.classList.toggle('active', keys[i] === key);
+  });
+  document.querySelectorAll('.md-section').forEach(s => s.classList.remove('visible'));
+  document.getElementById('sec-' + key).classList.add('visible');
+}
+
+// ════════════════════════════════════════════════
+// RENDU DU TABLEAU
+// ════════════════════════════════════════════════
+function renderTable(key) {
+  const items = STORE[key];
+  const tbody = document.getElementById('tbody-' + key);
+  document.getElementById('cnt-' + key).textContent = ` (${items.length})`;
+
+  tbody.innerHTML = items.map((item, i) => `
+    <tr id="row-${key}-${i}">
+      <td class="td-id">${item.id}</td>
+      <td class="td-value" id="cell-${key}-${i}">${escHtml(item.value)}</td>
+      <td class="td-actions">
+        <button class="btn btn-edit" onclick="editerLigne('${key}',${i})">✏️</button>
+        <button class="btn btn-delete" onclick="confirmerSuppression('${key}',${i})" style="margin-left:4px">🗑</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// Initialisation
+Object.keys(STORE).forEach(k => renderTable(k));
+
+// ════════════════════════════════════════════════
+// ÉDITION INLINE
+// ════════════════════════════════════════════════
+let editingKey = null, editingIdx = null;
+
+function editerLigne(key, i) {
+  // Annule édition précédente si même tableau
+  if (editingKey === key && editingIdx !== null) annulerEdition(editingKey, editingIdx);
+
+  editingKey = key; editingIdx = i;
+  const cell = document.getElementById(`cell-${key}-${i}`);
+  const oldVal = STORE[key][i].value;
+  cell.innerHTML = `
+    <input class="inline-input" id="inp-${key}-${i}" value="${escHtml(oldVal)}" onkeydown="keyEdit(event,'${key}',${i})">
+  `;
+  // Remplace boutons par Sauv/Annuler
+  const actions = document.querySelector(`#row-${key}-${i} .td-actions`);
+  actions.innerHTML = `
+    <button class="btn btn-save"      onclick="sauverEdition('${key}',${i})">✔</button>
+    <button class="btn btn-cancel-sm" onclick="annulerEdition('${key}',${i})" style="margin-left:4px">✖</button>
+  `;
+  document.getElementById(`inp-${key}-${i}`).focus();
+}
+
+function keyEdit(e, key, i) {
+  if (e.key === 'Enter') sauverEdition(key, i);
+  if (e.key === 'Escape') annulerEdition(key, i);
+}
+
+function sauverEdition(key, i) {
+  const inp = document.getElementById(`inp-${key}-${i}`);
+  if (!inp) return;
+  const newVal = inp.value.trim();
+  if (!newVal) { toast('⚠️ La valeur ne peut pas être vide.', true); return; }
+
+  const oldVal = STORE[key][i].value;
+  if (newVal !== oldVal) {
+    // Enregistre le renommage pour data.js
+    if (!RENAMES[key][i]) RENAMES[key][i] = oldVal; // garde l'original
+    STORE[key][i].value = newVal;
+    // Sync label si existant
+    if (CONFIGS[key].hasLabel && STORE[key][i].label === oldVal) STORE[key][i].label = newVal;
+    marquerDirty(key);
+  }
+  editingKey = null; editingIdx = null;
+  renderTable(key);
+}
+
+function annulerEdition(key, i) {
+  editingKey = null; editingIdx = null;
+  renderTable(key);
+}
+
+// ════════════════════════════════════════════════
+// AJOUT
+// ════════════════════════════════════════════════
+function ajouterLigne(key) {
+  const cfg = CONFIGS[key];
+  // Génère un id unique
+  const existingIds = STORE[key].map(x => x.id);
+  let newId, attempt = 0;
+  do {
+    attempt++;
+    newId = cfg.prefix + 'NEW' + attempt;
+  } while (existingIds.includes(newId));
+
+  const newItem = { id: newId, value: '' };
+  if (cfg.hasLabel) newItem.label = '';
+  STORE[key].push(newItem);
+  renderTable(key);
+  // Ouvre immédiatement en édition
+  editerLigne(key, STORE[key].length - 1);
+  marquerDirty(key);
+}
+
+// ════════════════════════════════════════════════
+// SUPPRESSION
+// ════════════════════════════════════════════════
+let pendingDelete = null;
+
+function confirmerSuppression(key, i) {
+  pendingDelete = { key, i };
+  document.getElementById('dlgMsg').textContent =
+    `Supprimer "${STORE[key][i].value}" (${STORE[key][i].id}) ?`;
+  document.getElementById('dlgConfirm').onclick = executerSuppression;
+  document.getElementById('overlay').classList.add('open');
+}
+
+function executerSuppression() {
+  fermerDialog();
+  if (!pendingDelete) return;
+  const { key, i } = pendingDelete;
+  STORE[key].splice(i, 1);
+  pendingDelete = null;
+  marquerDirty(key);
+  renderTable(key);
+  toast('🗑 Entrée supprimée');
+}
+
+function fermerDialog() {
+  document.getElementById('overlay').classList.remove('open');
+}
+
+// ════════════════════════════════════════════════
+// DIRTY / DOWNLOAD BAR
+// ════════════════════════════════════════════════
+function marquerDirty(key) {
+  DIRTY[key] = true;
+  document.getElementById('bar-' + key).classList.add('visible');
+}
+
+// ════════════════════════════════════════════════
+// GÉNÉRATION FICHIERS REF
+// ════════════════════════════════════════════════
+function esc(v) { return (v||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"'); }
+
+function genRefFile(key) {
+  const cfg = CONFIGS[key];
+  const items = STORE[key];
+  const lines = items.map(item => {
+    if (cfg.hasLabel) {
+      return `  { id: "${esc(item.id)}", value: "${esc(item.value)}", label: "${esc(item.label || item.value)}" },`;
+    }
+    return `  { id: "${esc(item.id)}", value: "${esc(item.value)}" },`;
+  }).join('\n');
+
+  const comments = {
+    fac:  '* Référentiel : Facilitateurs\n * Chaque entrée : { id, value }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : nom exact tel qu\'il apparaît dans AGENDA (champs fac1, fac2)',
+    hlp:  '* Référentiel : Helpers\n * Chaque entrée : { id, value }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : nom exact tel qu\'il apparaît dans AGENDA (champs helper1, helper2, helper3)\n * Note : une même personne peut être à la fois facilitateur et helper selon l\'atelier.',
+    ang:  '* Référentiel : Angels\n * Chaque entrée : { id, value }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : nom exact tel qu\'il apparaît dans AGENDA (champ "angel")',
+    trad: '* Référentiel : Traducteurs\n * Chaque entrée : { id, value }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : nom exact tel qu\'il apparaît dans AGENDA (champ "traduction")',
+    lieu: '* Référentiel : Lieux / Salles\n * Chaque entrée : { id, value, label }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : valeur stockée dans AGENDA (champ "lieu")\n *   label : texte affiché dans les listes déroulantes',
+    type: '* Référentiel : Types d\'ateliers\n * Chaque entrée : { id, value, label }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : valeur stockée dans AGENDA (champ "type")\n *   label : texte affiché dans les listes déroulantes',
+    note: '* Référentiel : Notes\n * Chaque entrée : { id, value }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : texte exact tel qu\'il apparaît dans AGENDA (champ "note")',
+  };
+
+  return `/**\n * TANTRAMOUR 2026 — ${comments[key]}\n */\nconst ${cfg.varName} = [\n${lines}\n];\n`;
+}
+
+// ════════════════════════════════════════════════
+// MISE À JOUR data.js AVEC RENOMMAGES
+// ════════════════════════════════════════════════
+function appliquerRenommagesDansAgenda(key) {
+  const fields = CONFIGS[key].dataField;
+  // Construit map : ancienneValeur → nouvelleValeur
+  const renameMap = {};
+  Object.entries(RENAMES[key]).forEach(([i, oldVal]) => {
+    const newVal = STORE[key][parseInt(i)]?.value;
+    if (newVal && newVal !== oldVal) renameMap[oldVal] = newVal;
+  });
+  if (Object.keys(renameMap).length === 0) return false;
+
+  SESSION_AGENDA = SESSION_AGENDA.map(entry => {
+    const updated = {...entry};
+    fields.forEach(f => {
+      if (updated[f] && renameMap[updated[f]]) updated[f] = renameMap[updated[f]];
+    });
+    return updated;
+  });
+  return true;
+}
+
+function genDataJs() {
+  const header =
+`/**
+ * TANTRAMOUR 2026 — Référentiel de données commun
+ * ================================================
+ * Source unique pour les 3 rapports HTML.
+ */
+
+const AGENDA = [`;
+
+  const lines = SESSION_AGENDA.map((e, i) => {
+    const prev = SESSION_AGENDA[i - 1];
+    let section = '';
+    if (!prev || prev.jour !== e.jour) {
+      const ref = REF_JOURS.find(j => j.value === e.jour);
+      const dateLabel = ref ? ref.date : e.date;
+      section = `\n  // ─── ${e.jour} — ${dateLabel} ${'─'.repeat(Math.max(0, 60 - e.jour.length - dateLabel.length))}\n`;
+    }
+    const line = `  {jour:"${esc(e.jour)}",date:"${esc(e.date)}",heure:"${esc(e.heure)}",type:"${esc(e.type)}",atelier:"${esc(e.atelier)}",lieu:"${esc(e.lieu)}",fac1:"${esc(e.fac1)}",fac2:"${esc(e.fac2)}",traduction:"${esc(e.traduction)}",helper1:"${esc(e.helper1)}",helper2:"${esc(e.helper2)}",helper3:"${esc(e.helper3)}",angel:"${esc(e.angel)}",note:"${esc(e.note)}",logistic:"${esc(e.logistic)}"},`;
+    return section + line;
+  }).join('\n');
+
+  return header + '\n' + lines + `
+];
+
+/**
+ * Convertit un objet AGENDA en tableau positionnel [15 colonnes]
+ * Indice : [0]jour [1]date [2]heure [3]type [4]atelier [5]lieu
+ *          [6]fac1 [7]fac2 [8]traduction [9]helper1 [10]helper2
+ *          [11]helper3 [12]angel [13]note [14]logistic
+ */
+function agendaToRaw(entries) {
+  return entries.map(e => [
+    e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,
+    e.fac1, e.fac2, e.traduction,
+    e.helper1, e.helper2, e.helper3,
+    e.angel, e.note, e.logistic
+  ]);
+}`;
+}
+
+// ════════════════════════════════════════════════
+// SAUVEGARDE VIA SERVEUR LOCAL
+// ════════════════════════════════════════════════
+async function sauverFichier(filename, content) {
+  try {
+    const r = await fetch('http://localhost:3000/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename, content })
+    });
+    const json = await r.json();
+    if (!json.ok) throw new Error(json.error);
+    return true;
+  } catch(e) {
+    toast(`❌ Serveur inaccessible — lance start.bat puis réessaie.\n(${e.message})`, true);
+    return false;
+  }
+}
+
+async function telecharger(key, avecDataJs = false) {
+  const refFile = CONFIGS[key].fileName;
+  const refContent = genRefFile(key);
+
+  if (avecDataJs) {
+    appliquerRenommagesDansAgenda(key);
+    const dataContent = genDataJs();
+    const [ok1, ok2] = await Promise.all([
+      sauverFichier(refFile, refContent),
+      sauverFichier('data.js', dataContent)
+    ]);
+    if (ok1 && ok2) toast(`✅ ${refFile} + data.js mis à jour — rechargez les rapports.`);
+  } else {
+    const ok = await sauverFichier(refFile, refContent);
+    if (ok) toast(`✅ ${refFile} mis à jour — rechargez les rapports.`);
+  }
+
+  if (true) { // toujours nettoyer l'état
+    DIRTY[key] = false;
+    document.getElementById('bar-' + key).classList.remove('visible');
+    RENAMES[key] = {};
+  }
+}
+
+// ════════════════════════════════════════════════
+// TOAST + MODE NUIT
+// ════════════════════════════════════════════════
+function toast(msg, warn = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = warn ? 'var(--warn-bg)' : 'var(--success-bg)';
+  t.style.color = warn ? 'var(--warn)' : 'var(--success)';
+  t.style.borderColor = warn ? 'var(--warn-border)' : 'var(--success-border)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 5000);
+}
+
+function toggleMode() {
+  const isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+
+document.getElementById('overlay').addEventListener('click', function(e) {
+  if (e.target === this) fermerDialog();
+});
+</script>
+</body>
+</html>

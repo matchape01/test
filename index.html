@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Rapports</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 15px; line-height: 1.6;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 60px; }
+
+  /* ── EN-TÊTE ── */
+  .logo { margin-bottom: 40px; }
+  .logo h1 { font-size: 26px; font-weight: 700; letter-spacing: .2px; }
+  .logo p  { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  /* ── GROUPE ── */
+  .group { margin-bottom: 32px; }
+  .group-label {
+    font-size: 15px; font-weight: 700;
+    color: var(--text);
+    padding-bottom: 10px; margin-bottom: 2px;
+    border-bottom: 2px solid var(--border);
+  }
+  .group-label span {
+    display: inline-block; margin-right: 8px; font-size: 17px; vertical-align: middle;
+  }
+
+  /* ── GRILLE 2 colonnes ── */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  @media (max-width: 540px) { .grid { grid-template-columns: 1fr; } }
+
+  /* ── CARTE ── */
+  .card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--surface);
+    text-decoration: none; color: inherit;
+    transition: border-color .15s, background .15s;
+    cursor: pointer;
+  }
+  .card:hover { border-color: var(--accent); background: #fff; }
+  .card-icon {
+    font-size: 22px; flex-shrink: 0;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; border: 1px solid var(--border); border-radius: 8px;
+  }
+  .card-body { flex: 1; min-width: 0; }
+  .card-title { font-size: 14px; font-weight: 700; margin-bottom: 1px; }
+  .card-desc  { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .card-arrow { font-size: 16px; color: var(--muted); flex-shrink: 0; }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 48px; padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+    font-size: 12px; color: var(--muted);
+  }
+  .footer-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    font-size: 12px; font-weight: 600; color: var(--text);
+    text-decoration: none; cursor: pointer; font-family: inherit;
+  }
+  .footer-btn:hover { background: var(--border); }
+</style>
+</head>
+<body>
+
+<!-- ── MODALE MOT DE PASSE ── -->
+<div id="pwOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;padding:36px 32px;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);font-family:-apple-system,'Segoe UI',system-ui,sans-serif;">
+    <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#57606a;margin-bottom:6px;" id="pwTarget"></p>
+    <p style="font-size:17px;font-weight:700;color:#1f2328;margin-bottom:20px;">🔒 Accès restreint</p>
+    <input id="pwInput" type="password" placeholder="Mot de passe" autocomplete="off"
+      style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:15px;outline:none;margin-bottom:8px;"
+      onkeydown="if(event.key==='Enter')checkPw()" />
+    <p id="pwError" style="font-size:12px;color:#dc2626;min-height:18px;margin-bottom:12px;"></p>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closePw()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#f7f8fa;font-size:14px;cursor:pointer;">Annuler</button>
+      <button onclick="checkPw()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#3b82d4;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Ouvrir</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <div class="logo">
+    <h1>Tantramour 2026</h1>
+    <p>Portail des rapports — 29 août › 4 septembre 2026</p>
+  </div>
+
+  <!-- ══════════════════════════════════
+       GROUPE 1 — GÉNÉRAL
+  ══════════════════════════════════ -->
+  <div class="group">
+    <div class="group-label"><span>📆</span>Général</div>
+    <div class="grid">
+
+      <a class="card" href="Rapport1_Agenda_par_Jour.html" target="_blank" rel="noopener">
+        <div class="card-icon">📅</div>
+        <div class="card-body">
+          <div class="card-title">Agenda par Jour (Per day)</div>
+          <div class="card-desc">Tous les ateliers — filtres jour, lieu, rôle</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="Rapport2_Agenda_par_Personne.html" target="_blank" rel="noopener">
+        <div class="card-icon">👤</div>
+        <div class="card-body">
+          <div class="card-title">Agenda par Personne (Per Person)
+          </div>
+          <div class="card-desc">Planning individuel par facilitateur, helper ou angel</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       GROUPE 2 — HELPERS · TRADUCTEURS · ANGELS
+  ══════════════════════════════════ -->
+  <div class="group">
+    <div class="group-label"><span>🤝</span>Helpers · Traducteurs · Angels</div>
+    <div class="grid">
+
+      <a class="card" href="Rapport6_Helpers.html" target="_blank" rel="noopener">
+        <div class="card-icon">🤝</div>
+        <div class="card-body">
+          <div class="card-title">Planning Helpers</div>
+          <div class="card-desc">Shifts, ateliers assignés, heure de début &amp; fin</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="Rapport7_Traducteurs.html" target="_blank" rel="noopener">
+        <div class="card-icon">🌐</div>
+        <div class="card-body">
+          <div class="card-title">Planning Traducteurs</div>
+          <div class="card-desc">Shifts des traducteurs — ateliers à couvrir</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="Rapport5_Angels.html" target="_blank" rel="noopener">
+        <div class="card-icon">👼</div>
+        <div class="card-body">
+          <div class="card-title">Planning Angels</div>
+          <div class="card-desc">Shifts des angels — ateliers à superviser</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="Rapport4_Conflits.html" target="_blank" rel="noopener">
+        <div class="card-icon">⚠️</div>
+        <div class="card-body">
+          <div class="card-title">Conflits de planning</div>
+          <div class="card-desc">Personnes assignées à plusieurs rôles simultanément</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       GROUPE 3 — BESOINS LOGISTIQUES
+  ══════════════════════════════════ -->
+  <div class="group">
+    <div class="group-label"><span>📦</span>Besoins Logistiques</div>
+    <div class="grid">
+
+      <a class="card" href="Rapport3_Logistique_par_Atelier.html" target="_blank" rel="noopener">
+        <div class="card-icon">📋</div>
+        <div class="card-body">
+          <div class="card-title">Logistique par Atelier</div>
+          <div class="card-desc">Vue détaillée atelier — lieux, équipes &amp; notes</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="Rapport8_Logistique_Helpers.html" target="_blank" rel="noopener">
+        <div class="card-icon">🔧</div>
+        <div class="card-body">
+          <div class="card-title">Infos Logistiques Helpers</div>
+          <div class="card-desc">Par helper : ateliers, facilitateurs, notes &amp; préparations</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+      <a class="card" href="Rapport9_Logistics_Input.html" target="_blank" rel="noopener" style="border-color:#86efac;">
+        <div class="card-icon">✏️</div>
+        <div class="card-body">
+          <div class="card-title">Saisie des besoins logistiques (Logistic needs)</div>
+          <div class="card-desc">Facilitateurs : saisissez vos besoins atelier par atelier</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </a>
+
+    </div>
+  </div>
+
+  <footer>
+    <span>Made with IBM Bob</span>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <a href="user-manual.html" target="_blank" rel="noopener" class="footer-btn">📖 Manuel</a>
+      <button onclick="openPw('Admin.html','⚙️ Admin')" class="footer-btn">⚙️ Admin</button>
+      <button onclick="openPw('MasterData.html','🗂 Master Data')" class="footer-btn">🗂 Master Data</button>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+const PW = '007';
+let _dest = '';
+
+function openPw(url, label) {
+  _dest = url;
+  document.getElementById('pwTarget').textContent = label;
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').textContent = '';
+  const ov = document.getElementById('pwOverlay');
+  ov.style.display = 'flex';
+  setTimeout(() => document.getElementById('pwInput').focus(), 50);
+}
+
+function closePw() {
+  document.getElementById('pwOverlay').style.display = 'none';
+}
+
+function checkPw() {
+  if (document.getElementById('pwInput').value === PW) {
+    closePw();
+    window.open(_dest, '_blank', 'noopener');
+  } else {
+    document.getElementById('pwError').textContent = 'Mot de passe incorrect.';
+    document.getElementById('pwInput').select();
+  }
+}
+
+document.getElementById('pwOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closePw();
+});
+</script>
+</body>
+</html>

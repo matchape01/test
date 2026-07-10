@@ -1,0 +1,12 @@
+{
+  "name": "tantramour-2026",
+  "version": "1.0.0",
+  "description": "Serveur local pour les rapports Tantramour 2026",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
