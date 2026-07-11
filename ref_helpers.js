@@ -32,7 +32,7 @@ const REF_HELPERS = [
   { id: "H_VERONIQUE", value: "Veronique Santini Bottemer" },
   { id: "H_VIRGINIE", value: "Virginie Bertrand" },
   { id: "H_YANNICK", value: "Yannick Bohrer" },
-  { id: "H_NEW1", value: "Matthieu Chapeleau (Atman)" },
-  { id: "H_NEW2", value: "Echo Clem (Clement Marchal)" },
-  { id: "H_NEW3", value: "RESOURCE TEST" },
+  { id: "H_MATTHIEU", value: "Matthieu Chapeleau (Atman)" },
+  { id: "H_ECHOCLEM", value: "Echo Clem (Clement Marchal)" },
+  { id: "H_TEST", value: "TEST" },
 ];

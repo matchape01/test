@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -11,6 +11,7 @@
     --header-bg: #f0f4fb;
     --helper-bg: #e0f2fe; --helper-border: #7dd3fc; --helper-text: #0369a1;
     --angel-bg:  #fce7f3; --angel-border:  #f9a8d4; --angel-text:  #9d174d;
+    --trad-bg:   #fefce8; --trad-border:   #fde047; --trad-text:   #854d0e;
     --green: #166534; --green-bg: #dcfce7; --green-border: #86efac;
     --orange: #c2410c; --orange-bg: #fff7ed; --orange-border: #fdba74;
     --red: #dc2626; --red-bg: #fef2f2; --red-border: #fca5a5;
@@ -22,6 +23,7 @@
     --header-bg: #1c2333;
     --helper-bg: #0c2d48; --helper-border: #1e4a8a; --helper-text: #7dd3fc;
     --angel-bg:  #3b1030; --angel-border:  #9d174d; --angel-text:  #f9a8d4;
+    --trad-bg:   #1c1500; --trad-border:   #854d0e; --trad-text:   #fde047;
     --green-bg: #052e16; --green-border: #166534;
     --orange-bg: #1c1000; --orange-border: #92400e;
     --red-bg: #2d0a0a; --red-border: #991b1b;
@@ -51,6 +53,7 @@
   .tab:hover { border-color: var(--accent); color: var(--accent); }
   .tab.active-h { border-color: var(--helper-text); background: var(--helper-bg); color: var(--helper-text); }
   .tab.active-a { border-color: var(--angel-text);  background: var(--angel-bg);  color: var(--angel-text); }
+  .tab.active-t { border-color: var(--trad-text);   background: var(--trad-bg);   color: var(--trad-text); }
   .tab.active-s { border-color: var(--purple-text); background: var(--purple-bg); color: var(--purple-text); }
 
   /* ── CARTES PERSONNE ── */
@@ -69,6 +72,7 @@
   }
   .badge-h { background: var(--helper-bg); border-color: var(--helper-border); color: var(--helper-text); }
   .badge-a { background: var(--angel-bg);  border-color: var(--angel-border);  color: var(--angel-text); }
+  .badge-t { background: var(--trad-bg);   border-color: var(--trad-border);   color: var(--trad-text); }
   .badge-b { background: var(--purple-bg); border-color: var(--purple-border); color: var(--purple-text); }
 
   .person-stats { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; margin-left: auto; }
@@ -77,6 +81,7 @@
   .stat-lbl   { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; }
   .stat-num.h { color: var(--helper-text); }
   .stat-num.a { color: var(--angel-text); }
+  .stat-num.t { color: var(--trad-text); }
 
   /* Barre de charge */
   .load-bar-wrap { height: 6px; background: var(--border); border-radius: 3px; margin-top: 6px; min-width: 80px; }
@@ -95,7 +100,9 @@
   .detail-heure { font-size: 11px; color: var(--muted); min-width: 110px; white-space: nowrap; }
   .detail-atelier { font-size: 13px; flex: 1; }
   .detail-role { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 99px; border: 1px solid; white-space: nowrap; }
+  .detail-dur { font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; }
   .detail-dedupe { font-size: 10px; color: var(--muted); font-style: italic; }
+  .day-dur-badge { margin-left: 10px; font-size: 11px; font-weight: 700; background: var(--accent); color: #fff; border-radius: 99px; padding: 1px 9px; vertical-align: middle; letter-spacing: .2px; }
 
   /* ── SECTION HARMONISATION ── */
   .section-title { font-size: 16px; font-weight: 700; margin: 36px 0 16px; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 8px; }
@@ -124,7 +131,7 @@
   <header>
     <div class="logo">
       <h1>Tantramour 2026</h1>
-      <p>Charge de travail — Helpers &amp; Angels</p>
+      <p>Charge de travail — Helpers, Angels &amp; Traducteurs</p>
       <small>Workload Analysis Report</small>
     </div>
     <div class="header-actions">
@@ -148,6 +155,7 @@
   <div class="tabs">
     <button class="tab active-h" id="tab-h" onclick="setTab('h')">🤝 Helpers</button>
     <button class="tab"          id="tab-a" onclick="setTab('a')">👼 Angels</button>
+    <button class="tab"          id="tab-t" onclick="setTab('t')">🌐 Traducteurs</button>
     <button class="tab"          id="tab-s" onclick="setTab('s')">📊 Vue combinée</button>
   </div>
 
@@ -171,8 +179,9 @@
 <footer><p>Made with IBM Bob</p></footer>
 
 <script src="ref_jours.js"></script>
-<script src="data.js"></script>
+<script src="loader.js"></script>
 <script>
+loadData(['data.js'], function() {
 
 // ════════════════════════════════════════════════
 // CONFIGURATION
@@ -190,7 +199,7 @@ const TYPES_ACTIFS = new Set([
 
 const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
 
-let currentTab = 'h'; // 'h' = helpers, 'a' = angels, 's' = combined
+let currentTab = 'h'; // 'h' = helpers, 'a' = angels, 't' = trad, 's' = combined
 
 // ════════════════════════════════════════════════
 // PARSING HEURE → minutes depuis minuit
@@ -214,6 +223,19 @@ function parseDuration(heure) {
   return end - start;
 }
 
+// Convertit une heure "11:15 - 13:00" en intervalle {s, e} en minutes
+// Déclarée au niveau global pour être accessible depuis renderPersonCard
+function parseInterval(heure) {
+  if (!heure) return null;
+  const parts = String(heure).replace(/\./g, ':').split(/[-–—â€"]/);
+  if (parts.length < 2) return null;
+  let s = parseMinutes(parts[0]);
+  let e = parseMinutes(parts[1]);
+  if (s === null || e === null) return null;
+  if (e < s) e += 24 * 60;
+  return { s, e };
+}
+
 // ════════════════════════════════════════════════
 // CALCUL DES STATS PAR PERSONNE
 // ════════════════════════════════════════════════
@@ -226,43 +248,107 @@ function buildStats(jourFilter) {
   // Map nom → { assignments: [{atelier, jour, heure, type, role}], ... }
   const helpers = {};
   const angels  = {};
+  const trads   = {};
 
-  function addHelper(nom, entry) {
+  function addTo(map, nom, entry) {
     if (!nom) return;
-    if (!helpers[nom]) helpers[nom] = [];
-    helpers[nom].push(entry);
-  }
-  function addAngel(nom, entry) {
-    if (!nom) return;
-    if (!angels[nom]) angels[nom] = [];
-    angels[nom].push(entry);
+    if (!map[nom]) map[nom] = [];
+    map[nom].push(entry);
   }
 
   filtered.forEach(e => {
     const base = { atelier: e.atelier, jour: e.jour, heure: e.heure, type: e.type, date: e.date };
-    addHelper(e.helper1, { ...base, role: 'Helper' });
-    addHelper(e.helper2, { ...base, role: 'Helper' });
-    addHelper(e.helper3, { ...base, role: 'Helper' });
-    addAngel(e.angel,    { ...base, role: 'Angel'  });
+    addTo(helpers, e.helper1,    { ...base, role: 'Helper' });
+    addTo(helpers, e.helper2,    { ...base, role: 'Helper' });
+    addTo(helpers, e.helper3,    { ...base, role: 'Helper' });
+    addTo(angels,  e.angel,      { ...base, role: 'Angel'  });
+    addTo(trads,   e.traduction, { ...base, role: 'Traducteur' });
   });
 
-  // Pour les angels : dédupliquer les ateliers même jour + même heure
-  // (un angel peut couvrir plusieurs salles simultanément → compte 1 seul)
-  function computeAngelStats(assignments) {
-    const seen = new Set();
-    let unique = 0;
-    let totalMin = 0;
-    const deduped = assignments.map(a => {
-      const key = `${a.jour}||${a.heure}`;
-      const isDupe = seen.has(key);
-      if (!isDupe) {
-        seen.add(key);
-        unique++;
-        totalMin += parseDuration(a.heure);
+  // Pour les angels : fusion des intervalles qui se chevauchent (interval merging)
+  // Règle : si deux créneaux se chevauchent ou sont consécutifs sur le même jour,
+  //         on ne compte que l'union (durée la plus longue / plage couverte).
+  // Exemple : 11:15-13:00 + 11:15-13:30 + 12:00-13:30 → 1 seul créneau 11:15-13:30
+
+  // Fusionne une liste d'intervalles {s,e} et retourne la somme des durées nettes
+  function mergeIntervals(intervals) {
+    if (!intervals.length) return 0;
+    const sorted = intervals.slice().sort((a, b) => a.s - b.s);
+    const merged = [{ ...sorted[0] }];
+    for (let i = 1; i < sorted.length; i++) {
+      const last = merged[merged.length - 1];
+      if (sorted[i].s <= last.e) {
+        // Chevauchement ou contigu → étendre si nécessaire
+        last.e = Math.max(last.e, sorted[i].e);
+      } else {
+        merged.push({ ...sorted[i] });
       }
-      return { ...a, isDupe };
+    }
+    return merged.reduce((sum, iv) => sum + (iv.e - iv.s), 0);
+  }
+
+  function computeAngelStats(assignments) {
+    // Grouper par jour
+    const byDay = {};
+    assignments.forEach(a => {
+      if (!byDay[a.jour]) byDay[a.jour] = [];
+      byDay[a.jour].push(a);
     });
-    return { assignments: deduped, count: unique, minutes: totalMin };
+
+    let totalMin    = 0;
+    let uniqueSlots = 0;
+
+    // Pour chaque jour : calculer les intervalles fusionnés (interval merging)
+    // et construire un Set des clés "s|e" déjà vus pour marquer les doublons
+    const seenPerDay = {}; // jour → Set de clés "s|e" déjà comptées
+
+    const deduped = assignments.map(a => {
+      const iv = parseInterval(a.heure);
+      if (!iv) return { ...a, isDupe: false };
+
+      const key = `${a.jour}||${iv.s}|${iv.e}`;
+      if (!seenPerDay[a.jour]) seenPerDay[a.jour] = new Set();
+
+      // Premier passage sur ce créneau exact → pas un doublon d'affichage
+      // Mais la durée réelle sera calculée via merging plus bas
+      const isDupe = seenPerDay[a.jour].has(`${iv.s}|${iv.e}`);
+      seenPerDay[a.jour].add(`${iv.s}|${iv.e}`);
+
+      // Marquer aussi si ce créneau est contenu dans un plus long du même jour
+      if (!isDupe) {
+        const siblings = byDay[a.jour]
+          .map(b => parseInterval(b.heure))
+          .filter(Boolean);
+        const isCoveredByLarger = siblings.some(other =>
+          other.s <= iv.s && other.e >= iv.e &&
+          (other.e - other.s) > (iv.e - iv.s)
+        );
+        return { ...a, isDupe: isCoveredByLarger };
+      }
+
+      return { ...a, isDupe: true };
+    });
+
+    // Durée nette par jour via interval merging (gère doublons et chevauchements)
+    Object.entries(byDay).forEach(([jour, dayAssignments]) => {
+      const intervals = dayAssignments.map(a => parseInterval(a.heure)).filter(Boolean);
+      if (!intervals.length) return;
+
+      const sorted = intervals.slice().sort((a, b) => a.s - b.s);
+      const merged = [{ ...sorted[0] }];
+      for (let i = 1; i < sorted.length; i++) {
+        const last = merged[merged.length - 1];
+        if (sorted[i].s <= last.e) {
+          last.e = Math.max(last.e, sorted[i].e); // fusion
+        } else {
+          merged.push({ ...sorted[i] });
+        }
+      }
+      totalMin    += merged.reduce((sum, iv) => sum + (iv.e - iv.s), 0);
+      uniqueSlots += merged.length;
+    });
+
+    return { assignments: deduped, count: uniqueSlots, minutes: totalMin };
   }
 
   function computeHelperStats(assignments) {
@@ -281,7 +367,13 @@ function buildStats(jourFilter) {
     nom, role: 'Angel', ...computeAngelStats(list)
   })).sort((a, b) => b.count - a.count || b.minutes - a.minutes);
 
-  return { helperStats, angelStats };
+  // Les traducteurs utilisent la même règle de déduplication que les angels
+  // (même créneau simultané = compté une seule fois)
+  const tradStats = Object.entries(trads).map(([nom, list]) => ({
+    nom, role: 'Traducteur', ...computeAngelStats(list)
+  })).sort((a, b) => b.count - a.count || b.minutes - a.minutes);
+
+  return { helperStats, angelStats, tradStats };
 }
 
 // ════════════════════════════════════════════════
@@ -302,8 +394,8 @@ function loadBar(count, max) {
 
 function renderPersonCard(person, rank, max, roleOverride) {
   const role = roleOverride || person.role;
-  const badgeCls = role === 'Helper' ? 'badge-h' : role === 'Angel' ? 'badge-a' : 'badge-b';
-  const statCls  = role === 'Helper' ? 'h' : 'a';
+  const badgeCls = role === 'Helper' ? 'badge-h' : role === 'Angel' ? 'badge-a' : role === 'Traducteur' ? 'badge-t' : 'badge-b';
+  const statCls  = role === 'Helper' ? 'h' : role === 'Traducteur' ? 't' : 'a';
   const id = 'card-' + person.nom.replace(/\W/g, '_');
 
   // Grouper les ateliers par jour
@@ -316,15 +408,35 @@ function renderPersonCard(person, rank, max, roleOverride) {
   const detailHtml = JOUR_ORDER
     .filter(j => byDay[j])
     .map(j => {
-      const rows = byDay[j].map(a => `
+      // Calculer la durée nette du jour (interval merging) pour l'afficher
+      const dayIntervals = byDay[j]
+        .map(a => parseInterval(a.heure)).filter(Boolean)
+        .sort((a, b) => a.s - b.s);
+      const merged = [];
+      dayIntervals.forEach(iv => {
+        const last = merged[merged.length - 1];
+        if (last && iv.s <= last.e) { last.e = Math.max(last.e, iv.e); }
+        else merged.push({ ...iv });
+      });
+      const dayMin = merged.reduce((s, iv) => s + (iv.e - iv.s), 0);
+
+      const rows = byDay[j].map(a => {
+        const dur = parseDuration(a.heure);
+        return `
         <div class="detail-row">
           <span class="detail-heure">${a.heure || '—'}</span>
           <span class="detail-atelier">${a.atelier}</span>
+          ${dur && !a.isDupe ? `<span class="detail-dur">${fmtMin(dur)}</span>` : ''}
           <span class="detail-role ${badgeCls}">${a.role}</span>
-          ${a.isDupe ? '<span class="detail-dedupe">⟳ dédupliqué (même heure)</span>' : ''}
-        </div>`).join('');
+          ${a.isDupe ? '<span class="detail-dedupe">⟳ dédupliqué</span>' : ''}
+        </div>`;
+      }).join('');
+
       return `<div class="detail-day">
-        <div class="detail-day-label">${j} — ${byDay[j][0].date}</div>
+        <div class="detail-day-label">
+          ${j} — ${byDay[j][0].date}
+          ${dayMin ? `<span class="day-dur-badge">${fmtMin(dayMin)} comptabilisé${role === 'Angel' ? ' (net)' : ''}</span>` : ''}
+        </div>
         ${rows}
       </div>`;
     }).join('');
@@ -362,14 +474,17 @@ function toggleDetail(id) {
 // ════════════════════════════════════════════════
 // HARMONISATION
 // ════════════════════════════════════════════════
-function buildHarmony(helperStats, angelStats) {
+function buildHarmony(helperStats, angelStats, tradStats) {
   const cards = [];
   const AVG_H = helperStats.reduce((s, p) => s + p.count, 0) / (helperStats.length || 1);
   const AVG_A = angelStats.reduce((s,  p) => s + p.count, 0) / (angelStats.length || 1);
+  const AVG_T = tradStats.reduce((s,   p) => s + p.count, 0) / (tradStats.length  || 1);
   const MAX_H = helperStats.length ? helperStats[0].count : 0;
   const MIN_H = helperStats.length ? helperStats[helperStats.length - 1].count : 0;
   const MAX_A = angelStats.length  ? angelStats[0].count  : 0;
   const MIN_A = angelStats.length  ? angelStats[angelStats.length - 1].count  : 0;
+  const MAX_T = tradStats.length   ? tradStats[0].count   : 0;
+  const MIN_T = tradStats.length   ? tradStats[tradStats.length - 1].count    : 0;
 
   // Helpers surchargés
   const overH = helperStats.filter(p => p.count > AVG_H * 1.4);
@@ -443,6 +558,41 @@ function buildHarmony(helperStats, angelStats) {
     });
   }
 
+  // Traducteurs surchargés
+  const overT = tradStats.filter(p => p.count > AVG_T * 1.4);
+  if (overT.length) {
+    cards.push({
+      cls: 'tag-overload',
+      icon: '🔴',
+      title: 'Traducteurs avec charge élevée',
+      body: `<p>Les traducteurs suivants ont une charge supérieure à la moyenne (${AVG_T.toFixed(1)}) :</p>
+             <ul>${overT.map(p => `<li><strong>${p.nom}</strong> — ${p.count} atelier${p.count > 1 ? 's' : ''} (${fmtMin(p.minutes)})</li>`).join('')}</ul>
+             <p style="margin-top:8px;">💡 Vérifier si un autre traducteur peut prendre le relais sur certains créneaux.</p>`
+    });
+  }
+
+  // Traducteurs peu chargés
+  const lightT = tradStats.filter(p => p.count < AVG_T * 0.6 && p.count > 0);
+  if (lightT.length) {
+    cards.push({
+      cls: 'tag-light',
+      icon: '🟢',
+      title: 'Traducteurs avec disponibilité',
+      body: `<p>Ces traducteurs ont une charge légère et pourraient couvrir des créneaux supplémentaires :</p>
+             <ul>${lightT.map(p => `<li><strong>${p.nom}</strong> — ${p.count} atelier${p.count > 1 ? 's' : ''} (${fmtMin(p.minutes)})</li>`).join('')}</ul>`
+    });
+  }
+
+  if (MAX_T - MIN_T > 3) {
+    cards.push({
+      cls: 'tag-suggest',
+      icon: '⚠️',
+      title: 'Déséquilibre global traducteurs',
+      body: `<p>L'écart entre le traducteur le plus chargé (<strong>${tradStats[0]?.nom}</strong> — ${MAX_T} ateliers) et le moins chargé (<strong>${tradStats[tradStats.length-1]?.nom}</strong> — ${MIN_T} ateliers) est de <strong>${MAX_T - MIN_T} ateliers</strong>.</p>
+             <p style="margin-top:8px;">💡 Cible recommandée : maximum ${Math.ceil(AVG_T * 1.3)} ateliers uniques par traducteur.</p>`
+    });
+  }
+
   // Rappel important
   cards.push({
     cls: '',
@@ -465,13 +615,15 @@ function buildHarmony(helperStats, angelStats) {
 // ════════════════════════════════════════════════
 function render() {
   const jourFilter = document.getElementById('filterJour').value;
-  const { helperStats, angelStats } = buildStats(jourFilter);
+  const { helperStats, angelStats, tradStats } = buildStats(jourFilter);
 
   // Summary bar
   const totalH = helperStats.reduce((s, p) => s + p.count, 0);
   const totalA = angelStats.reduce((s, p) => s + p.count, 0);
+  const totalT = tradStats.reduce((s, p) => s + p.count, 0);
   const avgH   = helperStats.length ? (totalH / helperStats.length).toFixed(1) : 0;
   const avgA   = angelStats.length  ? (totalA / angelStats.length).toFixed(1)  : 0;
+  const avgT   = tradStats.length   ? (totalT / tradStats.length).toFixed(1)   : 0;
 
   document.getElementById('summaryBar').innerHTML = `
     <div class="sum-pill"><div class="num" style="color:var(--helper-text)">${helperStats.length}</div><div class="lbl">Helpers actifs</div></div>
@@ -480,6 +632,9 @@ function render() {
     <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${angelStats.length}</div><div class="lbl">Angels actifs</div></div>
     <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${totalA}</div><div class="lbl">Missions angels</div></div>
     <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${avgA}</div><div class="lbl">Moy. / angel</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--trad-text)">${tradStats.length}</div><div class="lbl">Traducteurs actifs</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--trad-text)">${totalT}</div><div class="lbl">Missions trad.</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--trad-text)">${avgT}</div><div class="lbl">Moy. / trad.</div></div>
   `;
 
   // Person grid
@@ -495,35 +650,34 @@ function render() {
     grid.innerHTML = angelStats.length
       ? angelStats.map((p, i) => renderPersonCard(p, i + 1, max, 'Angel')).join('')
       : '<p style="color:var(--muted);padding:20px 0;">Aucun angel trouvé.</p>';
+  } else if (currentTab === 't') {
+    const max = tradStats.length ? tradStats[0].count : 1;
+    grid.innerHTML = tradStats.length
+      ? tradStats.map((p, i) => renderPersonCard(p, i + 1, max, 'Traducteur')).join('')
+      : '<p style="color:var(--muted);padding:20px 0;">Aucun traducteur trouvé.</p>';
   } else {
-    // Vue combinée : merge + tri par count
-    const combined = [
-      ...helperStats.map(p => ({ ...p, role: 'Helper' })),
-      ...angelStats.map(p => {
-        // Vérifier si déjà helper
-        const isAlsoHelper = helperStats.find(h => h.nom === p.nom);
-        return { ...p, role: isAlsoHelper ? 'Les deux' : 'Angel' };
-      }).filter(p => !helperStats.find(h => h.nom === p.nom))
-    ];
-    // Gérer les personnes qui sont à la fois helper ET angel
-    const bothMap = {};
-    helperStats.forEach(h => {
-      const a = angelStats.find(x => x.nom === h.nom);
-      if (a) bothMap[h.nom] = { ...h, role: 'Les deux', count: h.count + a.count, minutes: h.minutes + a.minutes,
-        assignments: [...h.assignments, ...a.assignments] };
+    // Vue combinée — fusionne les rôles multiples par personne
+    const allByNom = {};
+    const addToMap = (list, role) => list.forEach(p => {
+      if (!allByNom[p.nom]) allByNom[p.nom] = { nom: p.nom, roles: [], count: 0, minutes: 0, assignments: [] };
+      allByNom[p.nom].roles.push(role);
+      allByNom[p.nom].count     += p.count;
+      allByNom[p.nom].minutes   += p.minutes;
+      allByNom[p.nom].assignments = [...allByNom[p.nom].assignments, ...p.assignments];
     });
-    const finalList = [
-      ...Object.values(bothMap),
-      ...helperStats.filter(h => !bothMap[h.nom]).map(p => ({ ...p, role: 'Helper' })),
-      ...angelStats.filter(a => !bothMap[a.nom]).map(p => ({ ...p, role: 'Angel' }))
-    ].sort((a, b) => b.count - a.count || b.minutes - a.minutes);
+    addToMap(helperStats, 'Helper');
+    addToMap(angelStats,  'Angel');
+    addToMap(tradStats,   'Traducteur');
+    const finalList = Object.values(allByNom).map(p => ({
+      ...p, role: p.roles.length > 1 ? p.roles.join(' + ') : p.roles[0]
+    })).sort((a, b) => b.count - a.count || b.minutes - a.minutes);
 
     const max = finalList.length ? finalList[0].count : 1;
     grid.innerHTML = finalList.map((p, i) => renderPersonCard(p, i + 1, max, p.role)).join('');
   }
 
   // Harmonisation
-  const harmonyCards = buildHarmony(helperStats, angelStats);
+  const harmonyCards = buildHarmony(helperStats, angelStats, tradStats);
   document.getElementById('harmonyGrid').innerHTML = harmonyCards.map(c => `
     <div class="harmony-card ${c.cls}">
       <div class="harmony-card-title">${c.icon} ${c.title}</div>
@@ -538,6 +692,7 @@ function setTab(t) {
   currentTab = t;
   document.getElementById('tab-h').className = 'tab' + (t === 'h' ? ' active-h' : '');
   document.getElementById('tab-a').className = 'tab' + (t === 'a' ? ' active-a' : '');
+  document.getElementById('tab-t').className = 'tab' + (t === 't' ? ' active-t' : '');
   document.getElementById('tab-s').className = 'tab' + (t === 's' ? ' active-s' : '');
   render();
 }
@@ -580,6 +735,8 @@ if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + lo
 }
 
 render();
+
+}); // fin loadData
 </script>
 </body>
 </html>

@@ -186,8 +186,9 @@
   <div class="card-list" id="cardView"></div>
 </div>
 <footer><p>Made with IBM Bob</p></footer>
-<script src="data.js"></script>
+<script src="loader.js"></script>
 <script>
+loadData(['data.js'], function() {
 const RAW = agendaToRaw(AGENDA);
 const DATA = RAW.map(r => { while(r.length<14) r.push(""); return r; });
 
@@ -511,6 +512,7 @@ if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + lo
   sessionStorage.setItem('_refreshed_' + location.pathname, '1');
   hardReload();
 }
+}); // fin loadData
 </script>
 </body>
 </html>

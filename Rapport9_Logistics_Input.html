@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -225,9 +225,9 @@
 <script src="github-api.js"></script>
 <script src="ref_facilitateurs.js"></script>
 <script src="ref_lieux.js"></script>
-<script src="data.js"></script>
-<script src="logistics.js"></script>
+<script src="loader.js"></script>
 <script>
+loadData(['data.js','logistics.js'], function() {
 // ─── Constantes ─────────────────────────────────────────────────────────────
 const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
 
@@ -536,6 +536,8 @@ function showToast(msg, type = '') {
 
 // ─── Init ────────────────────────────────────────────────────────────────────
 show('step1');
+
+}); // fin loadData
 </script>
 </body>
 </html>

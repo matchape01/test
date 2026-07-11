@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -189,9 +189,9 @@
 <footer><p>Made with IBM Bob</p></footer>
 
 <script src="ref_helpers.js"></script>
-<script src="logistics.js"></script>
-<script src="data.js"></script>
+<script src="loader.js"></script>
 <script>
+loadData(['logistics.js','data.js'], function() {
 
 // ════════════════════════════════════════════════
 // UTILITAIRES
@@ -403,6 +403,8 @@ if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + lo
   sessionStorage.setItem('_refreshed_' + location.pathname, '1');
   hardReload();
 }
+
+}); // fin loadData
 </script>
 </body>
 </html>

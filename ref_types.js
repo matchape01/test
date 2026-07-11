@@ -20,4 +20,5 @@ const REF_TYPES = [
   { id: "T_REUNION", value: "REUNION D'EQUIPE", label: "REUNION D'EQUIPE" },
   { id: "T_SUPPORT", value: "SUPPORT EMOTIONNEL", label: "SUPPORT EMOTIONNEL" },
   { id: "T_TANTRA_CAFE", value: "TANTRA CAFE & CONFERENCE", label: "TANTRA CAFE & CONFERENCE" },
+  { id: "T_TEST", value: "TEST", label: "TEST" },
 ];

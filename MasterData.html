@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -302,19 +302,16 @@
 
 <footer><p>Made with IBM Bob</p></footer>
 
-<!-- ── RÉFÉRENTIELS ── -->
+<!-- ── RÉFÉRENTIELS + DONNÉES (via loader pour bypass cache GitHub Pages) ── -->
 <script src="github-api.js"></script>
-<script src="ref_jours.js"></script>
-<script src="ref_lieux.js"></script>
-<script src="ref_types.js"></script>
-<script src="ref_facilitateurs.js"></script>
-<script src="ref_helpers.js"></script>
-<script src="ref_angels.js"></script>
-<script src="ref_traducteurs.js"></script>
-<script src="ref_notes.js"></script>
-<script src="data.js"></script>
-
+<script src="loader.js"></script>
 <script>
+loadData([
+  'ref_jours.js','ref_lieux.js','ref_types.js',
+  'ref_facilitateurs.js','ref_helpers.js','ref_angels.js',
+  'ref_traducteurs.js','ref_notes.js',
+  'data.js'
+], function() {
 // ════════════════════════════════════════════════
 // CONFIG DES MASTER DATA
 // ════════════════════════════════════════════════
@@ -649,6 +646,8 @@ function toggleMode() {
 document.getElementById('overlay').addEventListener('click', function(e) {
   if (e.target === this) fermerDialog();
 });
+
+}); // fin loadData
 </script>
 </body>
 </html>

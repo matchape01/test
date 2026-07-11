@@ -47,5 +47,7 @@ const REF_FACILITATEURS = [
   { id: "F_STEPHANE", value: "Stephane Ahmed" },
   { id: "F_VIRGINIE", value: "Virginie Bertrand" },
   { id: "F_YANNICK", value: "Yannick Bohrer" },
-  { id: "F_NEW1", value: "TEST" },
+   { id: "F_TEST", value: "TEST" },
+
+
 ];

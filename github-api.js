@@ -105,18 +105,71 @@ async function githubSaveFile(filename, content) {
     });
   }
 
-  // 1er essai sans SHA
-  let res = await doPut(null);
+  // Stratégie en 3 passes :
+  // 1. GET /contents pour avoir le SHA frais
+  // 2. PUT avec ce SHA
+  // 3. Si 409/422 avec SHA dans le message → on réessaie avec le bon SHA
 
-  // Si 409 → GitHub nous donne le SHA dans le corps de l'erreur
+  // Passe 1 — récupérer le SHA actuel via GET simple
+  let sha = null;
+  try {
+    const getRes = await fetch(apiBase + '?ref=' + GITHUB_BRANCH, {
+      method: 'GET',
+      headers
+    });
+    if (getRes.status === 401) {
+      localStorage.removeItem('tm_gh_token');
+      _ensureConfigBanner();
+      throw new Error('Token invalide ou expiré — saisis-en un nouveau.');
+    }
+    if (getRes.ok) {
+      const data = await getRes.json();
+      sha = data.sha || null;
+      console.log(`[github-api] SHA GET pour ${filename}: ${sha}`);
+    }
+    // 404 = fichier nouveau → sha reste null
+  } catch(err) {
+    if (err.message.includes('Token')) throw err;
+    // Erreur réseau sur le GET → on tente quand même le PUT sans SHA
+    console.warn(`[github-api] GET échoué pour ${filename}: ${err.message}`);
+  }
+
+  // Passe 2 — PUT avec le SHA récupéré (ou null si nouveau fichier)
+  let res = await doPut(sha);
+
+  // Passe 3 — Si conflit de SHA (409/422), refaire un GET frais pour obtenir
+  // le vrai SHA actuel, puis réessayer le PUT avec ce SHA garanti frais.
   if (res.status === 409 || res.status === 422) {
     const errData = await res.json().catch(() => ({}));
-    // Le message ressemble à : "... is at <SHA> but expected ..."
-    const match = (errData.message || '').match(/\bis at ([0-9a-f]{40})\b/);
-    if (match) {
-      const freshSha = match[1];
-      console.log(`[github-api] SHA récupéré depuis erreur 409 pour ${filename}: ${freshSha}`);
+    const msg = errData.message || '';
+    console.log(`[github-api] Conflit ${res.status} pour ${filename}: ${msg}`);
+
+    // GET frais sans aucun cache possible
+    let freshSha = null;
+    try {
+      const retryGet = await fetch(
+        `${apiBase}?ref=${GITHUB_BRANCH}&_nocache=${Date.now()}`,
+        { method: 'GET', headers, cache: 'no-store' }
+      );
+      if (retryGet.ok) {
+        const retryData = await retryGet.json();
+        freshSha = retryData.sha || null;
+        console.log(`[github-api] SHA frais après conflit: ${freshSha}`);
+      }
+    } catch(e) {
+      console.warn(`[github-api] GET de récupération échoué: ${e.message}`);
+    }
+
+    // Fallback : extraire le SHA depuis le message d'erreur si GET échoue
+    if (!freshSha) {
+      const match = msg.match(/([0-9a-f]{40})/);
+      if (match) freshSha = match[1];
+    }
+
+    if (freshSha) {
       res = await doPut(freshSha);
+    } else {
+      throw new Error(`GitHub ${res.status} : ${msg || 'Conflit de version'}`);
     }
   }
 
@@ -128,7 +181,7 @@ async function githubSaveFile(filename, content) {
 
   if (!res.ok) {
     const errData = await res.json().catch(() => ({}));
-    throw new Error(errData.message || `Erreur GitHub ${res.status}`);
+    throw new Error(`GitHub ${res.status} : ${errData.message || 'Erreur inconnue'}`);
   }
 
   return true;

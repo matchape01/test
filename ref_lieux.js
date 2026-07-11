@@ -14,4 +14,5 @@ const REF_LIEUX = [
   { id: "L_PISCINE", value: "PISCINE", label: "PISCINE" },
   { id: "L_EXTERIEUR", value: "EXTERIEUR", label: "EXTERIEUR" },
   { id: "L_DREAM", value: "SALLE DREAM TEAM", label: "SALLE DREAM TEAM" },
+   { id: "L_TEST", value: "TEST", label: "TEST" },
 ];

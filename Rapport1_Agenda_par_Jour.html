@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -206,7 +206,7 @@
 <script src="ref_traducteurs.js"></script>
 <script src="ref_helpers.js"></script>
 <script src="ref_angels.js"></script>
-<script src="data.js"></script>
+<script src="loader.js"></script>
 <script>
 // RAW : chaque entrée est augmentée d'une propriété _idx = index dans AGENDA
 const RAW = AGENDA.map((e, i) => {
@@ -574,14 +574,16 @@ function toggleMode() {
   document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
 }
 
-// Auto-detect mobile on load
-setView(window.innerWidth < 768);
+loadData(['data.js'], function() {
+  // Auto-detect mobile on load
+  setView(window.innerWidth < 768);
 
-// Auto-refresh si ouvert depuis Home (paramètre ?v= présent)
-if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
-  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
-  hardReload();
-}
+  // Auto-refresh si ouvert depuis Home (paramètre ?v= présent)
+  if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
+    sessionStorage.setItem('_refreshed_' + location.pathname, '1');
+    hardReload();
+  }
+});
 </script>
 </body>
 </html>
