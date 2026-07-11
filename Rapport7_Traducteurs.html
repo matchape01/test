@@ -206,7 +206,8 @@ function construireShiftsTraducteurs() {
     if (!parTraducteur.has(e.traduction)) parTraducteur.set(e.traduction, []);
     parTraducteur.get(e.traduction).push({
       atelier: e.atelier, jour: e.jour, date: e.date,
-      heure: e.heure, lieu: e.lieu || '', type: e.type, iv
+      heure: e.heure, lieu: e.lieu || '', type: e.type, iv,
+      fac1: e.fac1 || '', fac2: e.fac2 || ''
     });
   });
 
@@ -299,14 +300,20 @@ function renderCards(data) {
     const rows = a.shifts.flatMap(sh =>
       sh.ateliers
         .sort((x,y) => x.iv.debut - y.iv.debut)
-        .map(at => `<div class="shift-row">
+        .map(at => {
+          const facs = [at.fac1, at.fac2].filter(Boolean).join(' & ');
+          return `<div class="shift-row">
           <span class="shift-jour">${sh.jour}</span>
           <span class="shift-date">${sh.date}</span>
           <span class="shift-heure">${at.heure}</span>
-          <span class="shift-atelier">${at.atelier}</span>
+          <span class="shift-atelier">
+            ${at.atelier}
+            ${facs ? `<br><span style="font-size:11px;color:var(--muted);font-style:italic">👤 ${facs}</span>` : ''}
+          </span>
           <span class="shift-lieu">${at.lieu ? `<span class="tag-lieu">${at.lieu}</span>` : '<span style="color:var(--muted);font-size:11px">—</span>'}</span>
           <span><span class="tag">${at.type}</span></span>
-        </div>`)
+        </div>`;
+        })
     ).join('');
     return `<div class="role-block">
       <div class="role-header">
