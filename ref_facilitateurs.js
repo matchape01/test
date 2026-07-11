@@ -4,7 +4,7 @@
  *   id    : clé unique (stable, ne jamais changer)
  *   value : nom exact tel qu'il apparaît dans AGENDA (champs fac1, fac2)
  */
-const REF_FACILITATEURS = [
+var REF_FACILITATEURS = [
   { id: "F_ALICE", value: "Alice" },
   { id: "F_AMANA", value: "Amana (William Duplain)" },
   { id: "F_AUDREY", value: "Audrey Barthelemy" },

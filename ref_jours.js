@@ -7,7 +7,7 @@
  *   label : texte affiché dans les listes déroulantes
  *   date  : valeur correspondante du champ "date" dans AGENDA
  */
-const REF_JOURS = [
+var REF_JOURS = [
   { id: "J1", value: "Jour 1", label: "Jour 1 — Samedi 29 août",       date: "Samedi 29 aout" },
   { id: "J2", value: "Jour 2", label: "Jour 2 — Dimanche 30 août",     date: "Dimanche 30 aout" },
   { id: "J3", value: "Jour 3", label: "Jour 3 — Lundi 31 août",        date: "Lundi 31 aout" },

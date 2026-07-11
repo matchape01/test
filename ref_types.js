@@ -5,7 +5,7 @@
  *   value : valeur stockée dans AGENDA (champ "type")
  *   label : texte affiché dans les listes déroulantes
  */
-const REF_TYPES = [
+var REF_TYPES = [
   { id: "T_TANTRA_AM", value: "ATELIERS TANTRA (AM)", label: "ATELIERS TANTRA (AM)" },
   { id: "T_TANTRA_PM", value: "ATELIERS TANTRA (PM)", label: "ATELIERS TANTRA (PM)" },
   { id: "T_ART_AM", value: "ATELIER ARTISTIQUE (AM)", label: "ATELIER ARTISTIQUE (AM)" },

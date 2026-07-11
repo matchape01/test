@@ -69,26 +69,19 @@
   .role-stats { margin-left: auto; font-size: 12px; color: var(--muted); text-align: right; }
   .role-stats strong { color: var(--role-accent); font-size: 15px; }
 
-  /* ── SHIFT ── */
-  .shift { border-bottom: 1px solid var(--border); }
-  .shift:last-child { border-bottom: none; }
-  .shift-header {
-    padding: 12px 20px; background: var(--header-bg);
-    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
-    border-bottom: 1px solid var(--border);
+  /* ── LIGNE D'ATELIER (1 ligne = 1 atelier) ── */
+  .shift-row {
+    display: flex; align-items: center; gap: 14px; flex-wrap: nowrap;
+    padding: 10px 20px; border-bottom: 1px solid var(--border);
+    background: var(--bg);
   }
-  .shift-jour { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); min-width: 56px; }
-  .shift-date { font-size: 13px; color: var(--muted); }
-  .shift-heure { font-size: 15px; font-weight: 800; color: var(--role-accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .shift-count { margin-left: auto; font-size: 11px; background: var(--tag-bg); color: var(--tag-text); border-radius: 999px; padding: 2px 9px; font-weight: 600; white-space: nowrap; }
-
-  /* ── TABLE ATELIERS ── */
-  .shift-table { width: 100%; border-collapse: collapse; }
-  .shift-table td { padding: 9px 20px; font-size: 13px; vertical-align: middle; border-bottom: 1px solid var(--border); }
-  .shift-table tr:last-child td { border-bottom: none; }
-  .shift-table tr:nth-child(even) { background: var(--row-alt); }
-  .shift-table .td-heure { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; width: 160px; }
-  .shift-table .td-lieu  { white-space: nowrap; }
+  .shift-row:last-child { border-bottom: none; }
+  .shift-row:nth-child(even) { background: var(--row-alt); }
+  .shift-jour  { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); white-space: nowrap; min-width: 46px; }
+  .shift-date  { font-size: 12px; color: var(--muted); white-space: nowrap; min-width: 140px; }
+  .shift-heure { font-size: 13px; font-weight: 800; color: var(--role-accent); font-variant-numeric: tabular-nums; white-space: nowrap; min-width: 110px; }
+  .shift-atelier { font-size: 13px; flex: 1; min-width: 0; }
+  .shift-lieu  { white-space: nowrap; }
   .tag  { display: inline-block; background: var(--tag-bg); color: var(--tag-text); border-radius: 4px; padding: 1px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
   .tag-lieu { background: var(--surface); color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 1px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
 
@@ -296,29 +289,20 @@ function initiales(nom) {
 function renderCards(data) {
   if (!data.length) return `<div class="empty">Aucun résultat pour cette sélection.</div>`;
   return `<div class="role-section">${data.map(a => {
-    const nbShifts   = a.shifts.length;
     const nbAteliers = a.shifts.reduce((s,sh) => s + sh.ateliers.length, 0);
-    const shiftsHtml = a.shifts.map(sh => {
-      const rows = sh.ateliers
+    // Aplatir tous les ateliers triés par jour puis heure
+    const rows = a.shifts.flatMap(sh =>
+      sh.ateliers
         .sort((x,y) => x.iv.debut - y.iv.debut)
-        .map(at => `<tr>
-          <td class="td-heure">${at.heure}</td>
-          <td>${at.atelier}</td>
-          <td class="td-lieu">${at.lieu ? `<span class="tag-lieu">${at.lieu}</span>` : '<span style="color:var(--muted);font-size:12px">—</span>'}</td>
-          <td><span class="tag">${at.type}</span></td>
-        </tr>`).join('');
-      return `<div class="shift">
-        <div class="shift-header">
+        .map(at => `<div class="shift-row">
           <span class="shift-jour">${sh.jour}</span>
           <span class="shift-date">${sh.date}</span>
-          <span class="shift-heure">⏱ ${fmtMin(sh.debut)} — ${fmtMin(sh.fin % 1440)}</span>
-          <span class="shift-count">${sh.ateliers.length} atelier${sh.ateliers.length>1?'s':''}</span>
-        </div>
-        <table class="shift-table">
-          <tbody>${rows}</tbody>
-        </table>
-      </div>`;
-    }).join('');
+          <span class="shift-heure">${at.heure}</span>
+          <span class="shift-atelier">${at.atelier}</span>
+          <span class="shift-lieu">${at.lieu ? `<span class="tag-lieu">${at.lieu}</span>` : '<span style="color:var(--muted);font-size:11px">—</span>'}</span>
+          <span><span class="tag">${at.type}</span></span>
+        </div>`)
+    ).join('');
     return `<div class="role-block">
       <div class="role-header">
         <div class="role-avatar">${initiales(a.nom)}</div>
@@ -327,11 +311,10 @@ function renderCards(data) {
           <span class="role-badge">🤝 Helper</span>
         </div>
         <div class="role-stats">
-          <strong>${nbShifts}</strong> shift${nbShifts>1?'s':''}<br>
-          <span>${nbAteliers} atelier${nbAteliers>1?'s':''} couverts</span>
+          <strong>${nbAteliers}</strong> atelier${nbAteliers>1?'s':''} couverts
         </div>
       </div>
-      ${shiftsHtml}
+      ${rows}
     </div>`;
   }).join('')}</div>`;
 }
@@ -407,6 +390,12 @@ if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + lo
   sessionStorage.setItem('_refreshed_' + location.pathname, '1');
   hardReload();
 }
+
+// Exposer dans window les fonctions appelées depuis les onclick HTML
+window.hardReload  = hardReload;
+window.toggleMode  = toggleMode;
+window.setView     = setView;
+window.render      = render;
 
 }); // fin loadData
 </script>

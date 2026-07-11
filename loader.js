@@ -1,46 +1,32 @@
 /**
  * TANTRAMOUR 2026 — Loader de données dynamique
  * ================================================
- * Charge data.js (et optionnellement logistics.js) via fetch avec cache:no-store,
- * garantissant que la dernière version est toujours utilisée — même sur GitHub Pages.
- *
- * Usage dans un rapport :
- *   <script src="loader.js"></script>
- *   <script>
- *     loadData(['data.js'], function() {
- *       // AGENDA est disponible ici
- *       init();
- *     });
- *   </script>
- *
- * Pour data + logistics :
- *   loadData(['data.js', 'logistics.js'], function() { init(); });
+ * Charge les fichiers JS séquentiellement via injection de <script>.
+ * Timestamp sur chaque URL pour contourner le cache GitHub Pages.
+ * Compatible CSP strict (pas d'eval, pas de blob).
  */
 
 function loadData(files, callback) {
-  // Charge les fichiers en séquence (l'ordre est important)
-  function loadNext(index) {
+  var index = 0;
+
+  function loadNext() {
     if (index >= files.length) {
       callback();
       return;
     }
-    const url = files[index] + '?_=' + Date.now();
-    fetch(url, { cache: 'no-store' })
-      .then(function(r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status + ' pour ' + files[index]);
-        return r.text();
-      })
-      .then(function(code) {
-        // Évaluer le code JS dans le contexte global
-        // eslint-disable-next-line no-eval
-        (0, eval)(code);
-        loadNext(index + 1);
-      })
-      .catch(function(err) {
-        console.error('[loader] Erreur chargement ' + files[index] + ' :', err);
-        // En cas d'erreur réseau, on essaie quand même de continuer
-        loadNext(index + 1);
-      });
+    var file = files[index++];
+    var url  = file + '?_=' + Date.now();
+
+    var script = document.createElement('script');
+    script.src     = url;
+    script.onload  = loadNext;
+    script.onerror = function() {
+      console.error('[loader] Echec : ' + file);
+      loadNext();
+    };
+    (document.head || document.documentElement).appendChild(script);
   }
-  loadNext(0);
+
+  // Lancer au prochain tick pour laisser le DOM finir de se construire
+  setTimeout(loadNext, 0);
 }

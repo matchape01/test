@@ -512,6 +512,15 @@ if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + lo
   sessionStorage.setItem('_refreshed_' + location.pathname, '1');
   hardReload();
 }
+
+// Exposer dans window les fonctions appelées depuis les onclick HTML
+window.hardReload    = hardReload;
+window.toggleMode    = toggleMode;
+window.toggleView    = toggleView;
+window.setView       = setView;
+window.sortBy        = sortBy;
+window.render        = render;
+
 }); // fin loadData
 </script>
 </body>

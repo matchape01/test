@@ -208,6 +208,7 @@
 <script src="ref_angels.js"></script>
 <script src="loader.js"></script>
 <script>
+loadData(['data.js'], function() {
 // RAW : chaque entrée est augmentée d'une propriété _idx = index dans AGENDA
 const RAW = AGENDA.map((e, i) => {
   const r = [
@@ -574,16 +575,27 @@ function toggleMode() {
   document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
 }
 
-loadData(['data.js'], function() {
-  // Auto-detect mobile on load
-  setView(window.innerWidth < 768);
+// Auto-detect mobile on load
+setView(window.innerWidth < 768);
 
-  // Auto-refresh si ouvert depuis Home (paramètre ?v= présent)
-  if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
-    sessionStorage.setItem('_refreshed_' + location.pathname, '1');
-    hardReload();
-  }
-});
+// Auto-refresh si ouvert depuis Home (paramètre ?v= présent)
+if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
+  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
+  hardReload();
+}
+
+// Exposer dans window les fonctions appelées depuis les onclick HTML
+window.hardReload    = hardReload;
+window.toggleMode    = toggleMode;
+window.toggleView    = toggleView;
+window.setView       = setView;
+window.sortBy        = sortBy;
+window.render        = render;
+window.openEditPw    = openEditPw;
+window.closeEditPw   = closeEditPw;
+window.checkEditPw   = checkEditPw;
+
+}); // fin loadData
 </script>
 </body>
 </html>

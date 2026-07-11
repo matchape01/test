@@ -647,6 +647,18 @@ document.getElementById('overlay').addEventListener('click', function(e) {
   if (e.target === this) fermerDialog();
 });
 
+// Exposer dans window les fonctions appelées depuis les onclick/onkeydown HTML
+window.toggleMode           = toggleMode;
+window.fermerDialog         = fermerDialog;
+window.ajouterLigne         = ajouterLigne;
+window.editerLigne          = editerLigne;
+window.annulerEdition       = annulerEdition;
+window.sauverEdition        = sauverEdition;
+window.confirmerSuppression = confirmerSuppression;
+window.selectTab            = selectTab;
+window.telecharger          = telecharger;
+window.keyEdit              = keyEdit;
+
 }); // fin loadData
 </script>
 </body>

@@ -19,7 +19,7 @@
  * Une entrée AGENDA sans logisticId (ou logisticId vide) n'a pas d'info logistique.
  */
 
-const LOGISTICS = {
+var LOGISTICS = {
 
   "J1_TEST_MATT": {
     html: "<p><strong>Besoins logistiques</strong></p><ul><li>Besoin logistique TEST avec</li><li>khdzlkhzesd</li><li>khzdlokfghzsd</li><li>khdlkhsdlkfg</li><li>khsdlkghsdlkhg</li><li>khdslokghsdlkhg</li><li>khsdkjoghlskdh</li><li>khsdolkghsdlkh</li><li>kjhsdlkghsdlkgh</li></ul>",

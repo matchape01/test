@@ -5,7 +5,7 @@
  *   id    : clé unique (stable, ne jamais changer)
  *   value : nom exact tel qu'il apparaît dans AGENDA (champ "angel")
  */
-const REF_ANGELS = [
+var REF_ANGELS = [
   { id: "A_AURELIE", value: "Aurelie Lechardeur" },
   { id: "A_BORIS",   value: "Boris Desvignes" },
   { id: "A_DANIEL",  value: "Daniel Latapie" },

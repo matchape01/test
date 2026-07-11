@@ -537,6 +537,17 @@ function showToast(msg, type = '') {
 // ─── Init ────────────────────────────────────────────────────────────────────
 show('step1');
 
+// Exposer dans window les fonctions appelées depuis les onclick/onchange HTML
+window.goStep1            = goStep1;
+window.askConfirm         = askConfirm;
+window.closeConfirm       = closeConfirm;
+window.doSave             = doSave;
+window.resetWorkshopPanel = resetWorkshopPanel;
+window.fmt                = fmt;
+window.show               = show;
+window.onFacSelect        = onFacSelect;
+window.onWorkshopSelect   = onWorkshopSelect;
+
 }); // fin loadData
 </script>
 </body>

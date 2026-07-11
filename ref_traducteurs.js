@@ -5,7 +5,7 @@
  *   id    : clé unique (stable, ne jamais changer)
  *   value : nom exact tel qu'il apparaît dans AGENDA (champ "traduction")
  */
-const REF_TRADUCTEURS = [
+var REF_TRADUCTEURS = [
   { id: "TR_ALEXANDRE_F",  value: "Alexandre Fourcault" },
   { id: "TR_ALEXANDRE_R",  value: "Alexandre Roque - Bhaskar" },
   { id: "TR_ALEXANDRE_S",  value: "Alexandre Sattler" },

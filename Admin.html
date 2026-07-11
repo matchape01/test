@@ -733,6 +733,20 @@ document.getElementById('overlay').addEventListener('click', function(e) {
   if (e.target === this) fermerDialog();
 });
 
+// Exposer dans window les fonctions appelées depuis les onclick/onchange HTML
+window.hardReload          = hardReload;
+window.toggleMode          = toggleMode;
+window.fermerDialog        = fermerDialog;
+window.annulerChangements  = annulerChangements;
+window.confirmerValidation = confirmerValidation;
+window.demanderValidation  = demanderValidation;
+window.hideEdit            = hideEdit;
+window.ouvrirNouvelAtelier = ouvrirNouvelAtelier;
+window.fmt                 = fmt;
+window.fmtH                = fmtH;
+window.onJourChange        = onJourChange;
+window.onAtelierChange     = onAtelierChange;
+
 }); // fin loadData
 </script>
 </body>

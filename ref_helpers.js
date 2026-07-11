@@ -5,7 +5,7 @@
  *   value : nom exact tel qu'il apparaît dans AGENDA (champs helper1, helper2, helper3)
  * Note : une même personne peut être à la fois facilitateur et helper selon l'atelier.
  */
-const REF_HELPERS = [
+var REF_HELPERS = [
   { id: "H_ALEXANDRE_F", value: "Alexandre Fourcault" },
   { id: "H_ALEXANDRE_R", value: "Alexandre Roque - Bhaskar" },
   { id: "H_ALEXANDRE_S", value: "Alexandre Sattler" },

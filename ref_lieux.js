@@ -5,7 +5,7 @@
  *   value : valeur stockée dans AGENDA (champ "lieu")
  *   label : texte affiché dans les listes déroulantes
  */
-const REF_LIEUX = [
+var REF_LIEUX = [
   { id: "L_SHIVA", value: "SHIVA", label: "SHIVA — Chapiteau principal" },
   { id: "L_CHENREZIG", value: "CHENREZIG", label: "CHENREZIG" },
   { id: "L_SHAKTI", value: "SHAKTI", label: "SHAKTI" },
