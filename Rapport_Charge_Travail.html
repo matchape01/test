@@ -1,0 +1,1510 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Charge de travail</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --header-bg: #f0f4fb;
+    --helper-bg: #e0f2fe; --helper-border: #7dd3fc; --helper-text: #0369a1;
+    --angel-bg:  #fce7f3; --angel-border:  #f9a8d4; --angel-text:  #9d174d;
+    --trad-bg:   #fefce8; --trad-border:   #fde047; --trad-text:   #854d0e;
+    --green: #166534; --green-bg: #dcfce7; --green-border: #86efac;
+    --orange: #c2410c; --orange-bg: #fff7ed; --orange-border: #fdba74;
+    --red: #dc2626; --red-bg: #fef2f2; --red-border: #fca5a5;
+    --purple-bg: #f5f3ff; --purple-border: #c4b5fd; --purple-text: #6d28d9;
+  }
+  .dark {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --header-bg: #1c2333;
+    --helper-bg: #0c2d48; --helper-border: #1e4a8a; --helper-text: #7dd3fc;
+    --angel-bg:  #3b1030; --angel-border:  #9d174d; --angel-text:  #f9a8d4;
+    --trad-bg:   #1c1500; --trad-border:   #854d0e; --trad-text:   #fde047;
+    --green-bg: #052e16; --green-border: #166534;
+    --orange-bg: #1c1000; --orange-border: #92400e;
+    --red-bg: #2d0a0a; --red-border: #991b1b;
+    --purple-bg: #1e1b4b; --purple-border: #5b21b6; --purple-text: #c4b5fd;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+  .logo h1 { font-size: 20px; font-weight: 700; }
+  .logo p  { font-size: 26px; font-weight: 800; color: var(--accent); line-height: 1.2; margin-top: 2px; }
+  .logo small { font-size: 12px; color: var(--muted); display: block; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .btn-ghost { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* ── FILTRES ── */
+  .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; align-items: flex-end; }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; }
+  .filter-group label { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 600; }
+  select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 13px; color: var(--text); font-family: inherit; min-width: 160px; cursor: pointer; }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 6px; margin-bottom: 24px; flex-wrap: wrap; }
+  .tab { cursor: pointer; padding: 8px 18px; border-radius: 8px; font-size: 13px; font-weight: 600; border: 2px solid var(--border); background: var(--surface); color: var(--muted); font-family: inherit; transition: all .15s; }
+  .tab:hover { border-color: var(--accent); color: var(--accent); }
+  .tab.active-h { border-color: var(--helper-text); background: var(--helper-bg); color: var(--helper-text); }
+  .tab.active-a { border-color: var(--angel-text);  background: var(--angel-bg);  color: var(--angel-text); }
+  .tab.active-t { border-color: var(--trad-text);   background: var(--trad-bg);   color: var(--trad-text); }
+  .tab.active-s { border-color: var(--purple-text); background: var(--purple-bg); color: var(--purple-text); }
+  .tab.active-eq { border-color: #d97706; background: #fff7ed; color: #92400e; }
+  .dark .tab.active-eq { border-color: #92400e; background: #1c1000; color: #fbbf24; }
+
+  /* ── CARTES PERSONNE ── */
+  .person-grid { display: flex; flex-direction: column; gap: 14px; }
+  .person-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .person-header {
+    display: flex; align-items: center; gap: 14px; padding: 14px 18px;
+    background: var(--surface); flex-wrap: wrap; cursor: pointer;
+  }
+  .person-header:hover { background: var(--border); }
+  .person-rank { font-size: 18px; font-weight: 800; color: var(--muted); min-width: 28px; }
+  .person-name { font-size: 15px; font-weight: 700; flex: 1; }
+  .person-role-badge {
+    font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px;
+    border: 1px solid; white-space: nowrap;
+  }
+  .badge-h { background: var(--helper-bg); border-color: var(--helper-border); color: var(--helper-text); }
+  .badge-a { background: var(--angel-bg);  border-color: var(--angel-border);  color: var(--angel-text); }
+  .badge-t { background: var(--trad-bg);   border-color: var(--trad-border);   color: var(--trad-text); }
+  .badge-b { background: var(--purple-bg); border-color: var(--purple-border); color: var(--purple-text); }
+
+  .person-stats { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; margin-left: auto; }
+  .stat-block { text-align: center; }
+  .stat-num   { font-size: 20px; font-weight: 800; line-height: 1; }
+  .stat-lbl   { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; }
+  .stat-num.h { color: var(--helper-text); }
+  .stat-num.a { color: var(--angel-text); }
+  .stat-num.t { color: var(--trad-text); }
+
+  /* Barre de charge */
+  .load-bar-wrap { height: 6px; background: var(--border); border-radius: 3px; margin-top: 6px; min-width: 80px; }
+  .load-bar { height: 6px; border-radius: 3px; transition: width .4s; }
+  .load-bar.low    { background: #16a34a; }
+  .load-bar.medium { background: #f59e0b; }
+  .load-bar.high   { background: #dc2626; }
+
+  /* Détail ateliers (collapsible) */
+  .person-detail { display: none; padding: 0 18px 16px; }
+  .person-detail.open { display: block; }
+  .detail-day { margin-top: 12px; }
+  .detail-day-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom: 6px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+  .detail-row { display: flex; gap: 10px; align-items: flex-start; padding: 5px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-heure { font-size: 11px; color: var(--muted); min-width: 110px; white-space: nowrap; }
+  .detail-atelier { font-size: 13px; flex: 1; }
+  .detail-role { font-size: 10px; font-weight: 700; padding: 1px 7px; border-radius: 99px; border: 1px solid; white-space: nowrap; }
+  .detail-dur { font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; }
+  .detail-dedupe { font-size: 10px; color: var(--muted); font-style: italic; }
+  .day-dur-badge { margin-left: 10px; font-size: 11px; font-weight: 700; background: var(--accent); color: #fff; border-radius: 99px; padding: 1px 9px; vertical-align: middle; letter-spacing: .2px; }
+
+  /* ── SECTION HARMONISATION ── */
+  .section-title { font-size: 16px; font-weight: 700; margin: 36px 0 16px; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .harmony-intro { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; }
+  .harmony-grid { display: flex; flex-direction: column; gap: 12px; }
+  .harmony-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; background: var(--bg); }
+  .harmony-card-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .harmony-card p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+  .harmony-card ul { font-size: 13px; color: var(--muted); padding-left: 20px; line-height: 1.8; }
+  .tag-overload { background: var(--red-bg); border-color: var(--red-border); }
+  .tag-light    { background: var(--green-bg); border-color: var(--green-border); }
+  .tag-suggest  { background: var(--orange-bg); border-color: var(--orange-border); }
+
+  /* ── TABLEAU REDISTRIBUTION ── */
+  .redist-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+  .redist-table th { text-align: left; padding: 6px 10px; background: var(--surface); border-bottom: 2px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 700; }
+  .redist-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--text); }
+  .redist-table tr:last-child td { border-bottom: none; }
+  .redist-table .col-atelier { max-width: 200px; font-weight: 600; }
+  .redist-table .col-actuel  { color: var(--red); font-weight: 600; }
+  .redist-table .col-rempl   { color: #16a34a; font-weight: 600; }
+  .redist-table .col-heures  { white-space: nowrap; }
+
+  /* ── STATS MOYENNES ── */
+  .avg-bar { display: flex; gap: 10px; flex-wrap: wrap; margin: 12px 0 4px; }
+  .avg-pill { border-radius: 6px; padding: 8px 14px; border: 1px solid var(--border); background: var(--surface); font-size: 12px; }
+  .avg-pill strong { display: block; font-size: 17px; font-weight: 800; }
+
+  /* ── SUMMARY PILLS ── */
+  .summary-bar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+  .sum-pill { flex: 1; min-width: 100px; border-radius: 8px; padding: 12px 16px; border: 1px solid var(--border); background: var(--surface); text-align: center; }
+  .sum-pill .num { font-size: 26px; font-weight: 800; line-height: 1; color: var(--accent); }
+  .sum-pill .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+
+  footer { margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Charge de travail — Helpers, Angels &amp; Traducteurs</p>
+      <small>Workload Analysis Report</small>
+    </div>
+    <div class="header-actions">
+      <a class="btn-ghost" href="index.html">🏠 Home</a>
+      <button class="btn-ghost" onclick="hardReload()">🔄 Refresh</button>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+
+  <!-- FILTRES -->
+  <div class="filters">
+    <div class="filter-group">
+      <label>Jour</label>
+      <select id="filterJour" onchange="render()">
+        <option value="">Tous les jours</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ONGLETS -->
+  <div class="tabs">
+    <button class="tab"          id="tab-h"  onclick="setTab('h')">🤝 Helpers</button>
+    <button class="tab"          id="tab-a"  onclick="setTab('a')">👼 Angels</button>
+    <button class="tab"          id="tab-t"  onclick="setTab('t')">🌐 Traducteurs</button>
+    <button class="tab active-s" id="tab-s"  onclick="setTab('s')">📊 Vue combinée</button>
+    <button class="tab"          id="tab-eq" onclick="openHarmony()">⚖️ Harmonisation</button>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-bar" id="summaryBar"></div>
+
+  <!-- LISTE PERSONNES -->
+  <div class="person-grid" id="personGrid"></div>
+
+  <!-- HARMONISATION — grille cachée, alimentée pour openHarmony() -->
+  <div id="harmonyGrid" style="display:none"></div>
+
+</div>
+
+<footer><p>Made with IBM Bob</p></footer>
+
+<script src="ref_jours.js"></script>
+<script src="loader.js"></script>
+<script>
+loadData(['data.js'], function() {
+
+// ════════════════════════════════════════════════
+// CONFIGURATION
+// ════════════════════════════════════════════════
+// Types d'ateliers pris en compte (exclut repas, prep, réunions internes)
+const TYPES_ACTIFS = new Set([
+  'ATELIERS TANTRA (AM)', 'ATELIERS TANTRA (PM)',
+  'ATELIER ARTISTIQUE (AM)', 'ATELIER ARTISTIQUE (PM)',
+  'MEDITATION / YOGA', 'RASSEMBLEMENT',
+  'CEREMONIE & CONCERT', "REUNION D'EQUIPE",
+  'LOVE TEMPLE', 'SUPPORT EMOTIONNEL',
+  'POOL PARTY', 'PREPA & LOGITICS',
+  'TANTRA CAFÉ & CONFERENCE',
+  'TANTRA CAFE & CONFERENCE',       // variante sans accent
+  'TANTRA CAF\u00C9 & CONFERENCE',  // É en unicode
+  'TEST',                            // entrées de test visibles dans data.js
+]);
+
+// Fonction utilitaire : normalise un type avant comparaison
+// (gère les problèmes d'encodage UTF-8 de data.js)
+function typeActif(type) {
+  if (!type) return false;
+  if (TYPES_ACTIFS.has(type)) return true;
+  // Normalise les caractères mal encodés (â€" → —, Ã‰ → É, etc.)
+  const norm = type.replace(/Ã‰/g, 'É').replace(/Ã©/g, 'é')
+                   .replace(/â€œ/g, '"').replace(/â€/g, '"')
+                   .replace(/Ã /g, 'à').replace(/Ã¨/g, 'è');
+  return TYPES_ACTIFS.has(norm);
+}
+
+const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+let currentTab = 's'; // 'h' = helpers, 'a' = angels, 't' = trad, 's' = combined
+
+// ════════════════════════════════════════════════
+// PARSING HEURE → minutes depuis minuit
+// ════════════════════════════════════════════════
+function parseMinutes(str) {
+  if (!str) return null;
+  const s = String(str).replace(/\./g, ':').trim();
+  const m = s.match(/(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  return parseInt(m[1]) * 60 + parseInt(m[2]);
+}
+
+function parseDuration(heure) {
+  if (!heure) return 0;
+  const norm = String(heure).replace(/\./g, ':');
+  const parts = norm.split(/\s*[-–—]\s*/);
+  if (parts.length < 2) return 0;
+  let start = parseMinutes(parts[0]);
+  let end   = parseMinutes(parts[1]);
+  if (start === null || end === null) return 0;
+  if (end < start) end += 24 * 60; // passe minuit
+  return end - start;
+}
+
+// Convertit une heure "11:15 - 13:00" en intervalle {s, e} en minutes
+function parseInterval(heure) {
+  if (!heure) return null;
+  const norm = String(heure).replace(/\./g, ':');
+  const parts = norm.split(/\s*[-–—]\s*/);
+  if (parts.length < 2) return null;
+  let s = parseMinutes(parts[0]);
+  let e = parseMinutes(parts[1]);
+  if (s === null || e === null) return null;
+  if (e < s) e += 24 * 60;
+  return { s, e };
+}
+
+// ════════════════════════════════════════════════
+// CALCUL DES STATS PAR PERSONNE
+// ════════════════════════════════════════════════
+function buildStats(jourFilter) {
+  const filtered = AGENDA.filter(e =>
+    typeActif(e.type) &&
+    (jourFilter === '' || e.jour === jourFilter)
+  );
+
+  // Map nom → { assignments: [{atelier, jour, heure, type, role}], ... }
+  const helpers = {};
+  const angels  = {};
+  const trads   = {};
+
+  function addTo(map, nom, entry) {
+    if (!nom) return;
+    if (!map[nom]) map[nom] = [];
+    map[nom].push(entry);
+  }
+
+  filtered.forEach(e => {
+    const base = { atelier: e.atelier, jour: e.jour, heure: e.heure, type: e.type, date: e.date };
+    addTo(helpers, e.helper1,    { ...base, role: 'Helper' });
+    addTo(helpers, e.helper2,    { ...base, role: 'Helper' });
+    addTo(helpers, e.helper3,    { ...base, role: 'Helper' });
+    addTo(angels,  e.angel,      { ...base, role: 'Angel'  });
+    addTo(trads,   e.traduction, { ...base, role: 'Traducteur' });
+  });
+
+  // Pour les angels : fusion des intervalles qui se chevauchent (interval merging)
+  // Règle : si deux créneaux se chevauchent ou sont consécutifs sur le même jour,
+  //         on ne compte que l'union (durée la plus longue / plage couverte).
+  // Exemple : 11:15-13:00 + 11:15-13:30 + 12:00-13:30 → 1 seul créneau 11:15-13:30
+
+  // Fusionne une liste d'intervalles {s,e} et retourne la somme des durées nettes
+  function mergeIntervals(intervals) {
+    if (!intervals.length) return 0;
+    const sorted = intervals.slice().sort((a, b) => a.s - b.s);
+    const merged = [{ ...sorted[0] }];
+    for (let i = 1; i < sorted.length; i++) {
+      const last = merged[merged.length - 1];
+      if (sorted[i].s <= last.e) {
+        // Chevauchement ou contigu → étendre si nécessaire
+        last.e = Math.max(last.e, sorted[i].e);
+      } else {
+        merged.push({ ...sorted[i] });
+      }
+    }
+    return merged.reduce((sum, iv) => sum + (iv.e - iv.s), 0);
+  }
+
+  function computeAngelStats(assignments) {
+    // Grouper par jour
+    const byDay = {};
+    assignments.forEach(a => {
+      if (!byDay[a.jour]) byDay[a.jour] = [];
+      byDay[a.jour].push(a);
+    });
+
+    let totalMin    = 0;
+    let uniqueSlots = 0;
+
+    // Pour chaque jour : calculer les intervalles fusionnés (interval merging)
+    // et construire un Set des clés "s|e" déjà vus pour marquer les doublons
+    const seenPerDay = {}; // jour → Set de clés "s|e" déjà comptées
+
+    const deduped = assignments.map(a => {
+      const iv = parseInterval(a.heure);
+      if (!iv) return { ...a, isDupe: false };
+
+      const key = `${a.jour}||${iv.s}|${iv.e}`;
+      if (!seenPerDay[a.jour]) seenPerDay[a.jour] = new Set();
+
+      // Premier passage sur ce créneau exact → pas un doublon d'affichage
+      // Mais la durée réelle sera calculée via merging plus bas
+      const isDupe = seenPerDay[a.jour].has(`${iv.s}|${iv.e}`);
+      seenPerDay[a.jour].add(`${iv.s}|${iv.e}`);
+
+      // Marquer aussi si ce créneau est contenu dans un plus long du même jour
+      if (!isDupe) {
+        const siblings = byDay[a.jour]
+          .map(b => parseInterval(b.heure))
+          .filter(Boolean);
+        const isCoveredByLarger = siblings.some(other =>
+          other.s <= iv.s && other.e >= iv.e &&
+          (other.e - other.s) > (iv.e - iv.s)
+        );
+        return { ...a, isDupe: isCoveredByLarger };
+      }
+
+      return { ...a, isDupe: true };
+    });
+
+    // Durée nette par jour via interval merging (gère doublons et chevauchements)
+    Object.entries(byDay).forEach(([jour, dayAssignments]) => {
+      const intervals = dayAssignments.map(a => parseInterval(a.heure)).filter(Boolean);
+      if (!intervals.length) return;
+
+      const sorted = intervals.slice().sort((a, b) => a.s - b.s);
+      const merged = [{ ...sorted[0] }];
+      for (let i = 1; i < sorted.length; i++) {
+        const last = merged[merged.length - 1];
+        if (sorted[i].s <= last.e) {
+          last.e = Math.max(last.e, sorted[i].e); // fusion
+        } else {
+          merged.push({ ...sorted[i] });
+        }
+      }
+      totalMin    += merged.reduce((sum, iv) => sum + (iv.e - iv.s), 0);
+      uniqueSlots += merged.length;
+    });
+
+    return { assignments: deduped, count: uniqueSlots, minutes: totalMin };
+  }
+
+  function computeHelperStats(assignments) {
+    return {
+      assignments,
+      count:   assignments.length,
+      minutes: assignments.reduce((s, a) => s + parseDuration(a.heure), 0)
+    };
+  }
+
+  const helperStats = Object.entries(helpers).map(([nom, list]) => ({
+    nom, role: 'Helper', ...computeHelperStats(list)
+  })).sort((a, b) => b.minutes - a.minutes || b.count - a.count);
+
+  const angelStats = Object.entries(angels).map(([nom, list]) => ({
+    nom, role: 'Angel', ...computeAngelStats(list)
+  })).sort((a, b) => b.minutes - a.minutes || b.count - a.count);
+
+  // Les traducteurs utilisent la même règle de déduplication que les angels
+  // (même créneau simultané = compté une seule fois)
+  const tradStats = Object.entries(trads).map(([nom, list]) => ({
+    nom, role: 'Traducteur', ...computeAngelStats(list)
+  })).sort((a, b) => b.minutes - a.minutes || b.count - a.count);
+
+  return { helperStats, angelStats, tradStats };
+}
+
+// ════════════════════════════════════════════════
+// AFFICHAGE
+// ════════════════════════════════════════════════
+function fmtMin(min) {
+  if (!min) return '—';
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return h + 'h' + (m ? String(m).padStart(2, '0') : '');
+}
+
+function loadBar(count, max) {
+  const pct = max ? Math.round((count / max) * 100) : 0;
+  const cls = pct < 40 ? 'low' : pct < 70 ? 'medium' : 'high';
+  return `<div class="load-bar-wrap"><div class="load-bar ${cls}" style="width:${pct}%"></div></div>`;
+}
+
+function renderPersonCard(person, rank, max, roleOverride) {
+  const role = roleOverride || person.role;
+  const badgeCls = role === 'Helper' ? 'badge-h' : role === 'Angel' ? 'badge-a' : role === 'Traducteur' ? 'badge-t' : 'badge-b';
+  const statCls  = role === 'Helper' ? 'h' : role === 'Traducteur' ? 't' : 'a';
+  const id = 'card-' + person.nom.replace(/\W/g, '_');
+
+  // Grouper les ateliers par jour
+  const byDay = {};
+  person.assignments.forEach(a => {
+    if (!byDay[a.jour]) byDay[a.jour] = [];
+    byDay[a.jour].push(a);
+  });
+
+  const detailHtml = JOUR_ORDER
+    .filter(j => byDay[j])
+    .map(j => {
+      // Calculer la durée nette du jour (interval merging) pour l'afficher
+      const dayIntervals = byDay[j]
+        .map(a => parseInterval(a.heure)).filter(Boolean)
+        .sort((a, b) => a.s - b.s);
+      const merged = [];
+      dayIntervals.forEach(iv => {
+        const last = merged[merged.length - 1];
+        if (last && iv.s <= last.e) { last.e = Math.max(last.e, iv.e); }
+        else merged.push({ ...iv });
+      });
+      const dayMin = merged.reduce((s, iv) => s + (iv.e - iv.s), 0);
+
+      const rows = byDay[j].map(a => {
+        const dur = parseDuration(a.heure);
+        return `
+        <div class="detail-row">
+          <span class="detail-heure">${a.heure || '—'}</span>
+          <span class="detail-atelier">${a.atelier}</span>
+          ${dur && !a.isDupe ? `<span class="detail-dur">${fmtMin(dur)}</span>` : ''}
+          <span class="detail-role ${badgeCls}">${a.role}</span>
+          ${a.isDupe ? '<span class="detail-dedupe">⟳ dédupliqué</span>' : ''}
+        </div>`;
+      }).join('');
+
+      return `<div class="detail-day">
+        <div class="detail-day-label">
+          ${j} — ${byDay[j][0].date}
+          ${dayMin ? `<span class="day-dur-badge">${fmtMin(dayMin)} comptabilisé${role === 'Angel' ? ' (net)' : ''}</span>` : ''}
+        </div>
+        ${rows}
+      </div>`;
+    }).join('');
+
+  return `
+    <div class="person-card" id="${id}">
+      <div class="person-header" onclick="toggleDetail('${id}')">
+        <div class="person-rank">#${rank}</div>
+        <div class="person-name">${person.nom}</div>
+        <span class="person-role-badge ${badgeCls}">${role}</span>
+        <div class="person-stats">
+          <div class="stat-block">
+            <div class="stat-num ${statCls}">${person.count}</div>
+            <div class="stat-lbl">ateliers</div>
+            ${loadBar(person.count, max)}
+          </div>
+          <div class="stat-block">
+            <div class="stat-num ${statCls}">${fmtMin(person.minutes)}</div>
+            <div class="stat-lbl">durée totale</div>
+          </div>
+        </div>
+        <span style="color:var(--muted);font-size:16px;margin-left:8px;">▾</span>
+      </div>
+      <div class="person-detail" id="detail-${id}">
+        ${detailHtml}
+      </div>
+    </div>`;
+}
+
+function toggleDetail(id) {
+  const d = document.getElementById('detail-' + id);
+  if (d) d.classList.toggle('open');
+}
+
+// ════════════════════════════════════════════════
+// HARMONISATION
+// ════════════════════════════════════════════════
+function buildHarmony(helperStats, angelStats, tradStats) {
+  const cards = [];
+
+  // Personnes exclues des suggestions de redistribution (facilitateurs, personnes non substituables)
+  const EXCLUDED_FROM_SUGGESTIONS = new Set([
+    'Amana (William Duplain)',
+    'Paul Raj Amar',
+    'David Llorca',
+    "Sophie O'Heix",
+    'Sevda Duroy',
+    'TEST',
+  ]);
+
+  // Helpers actifs (non exclus, ayant au moins une affectation)
+  const helperActifs = helperStats.filter(p => !EXCLUDED_FROM_SUGGESTIONS.has(p.nom) && p.minutes > 0);
+  const angelActifs  = angelStats.filter(p  => !EXCLUDED_FROM_SUGGESTIONS.has(p.nom) && p.minutes > 0);
+  const tradActifs   = tradStats.filter(p   => !EXCLUDED_FROM_SUGGESTIONS.has(p.nom) && p.minutes > 0);
+
+  const AVG_H_min = helperActifs.reduce((s, p) => s + p.minutes, 0) / (helperActifs.length || 1);
+  const AVG_A_min = angelActifs.reduce((s,  p) => s + p.minutes, 0) / (angelActifs.length  || 1);
+  const AVG_T_min = tradActifs.reduce((s,   p) => s + p.minutes, 0) / (tradActifs.length   || 1);
+  const AVG_H = helperActifs.reduce((s, p) => s + p.count, 0) / (helperActifs.length || 1);
+  const AVG_A = angelActifs.reduce((s,  p) => s + p.count, 0) / (angelActifs.length || 1);
+  const AVG_T = tradActifs.reduce((s,   p) => s + p.count, 0) / (tradActifs.length  || 1);
+  const MAX_H = helperActifs.length ? helperActifs[0].count : 0;
+  const MIN_H = helperActifs.length ? helperActifs[helperActifs.length - 1].count : 0;
+  const MAX_A = angelActifs.length  ? angelActifs[0].count  : 0;
+  const MIN_A = angelActifs.length  ? angelActifs[angelActifs.length - 1].count  : 0;
+  const MAX_T = tradActifs.length   ? tradActifs[0].count   : 0;
+  const MIN_T = tradActifs.length   ? tradActifs[tradActifs.length - 1].count    : 0;
+
+  // ── Charge globale par personne (toutes catégories confondues) ──────────────
+  const globalLoad = {}; // nom → { count: total, minutes: total, roles: [] }
+  const addGlobal = (list, role) => list.forEach(p => {
+    if (!globalLoad[p.nom]) globalLoad[p.nom] = { nom: p.nom, count: 0, minutes: 0, roles: [] };
+    globalLoad[p.nom].count   += p.count;
+    globalLoad[p.nom].minutes += p.minutes;
+    globalLoad[p.nom].roles.push(role);
+  });
+  addGlobal(helperStats,  'Helper');
+  addGlobal(angelStats,   'Angel');
+  addGlobal(tradStats,    'Traducteur');
+
+  const allGlobal = Object.values(globalLoad);
+  // Pour la moyenne, exclure les personnes non substituables (même liste que EXCLUDED_FROM_SUGGESTIONS)
+  const allGlobalForAvg = allGlobal.filter(p => !EXCLUDED_FROM_SUGGESTIONS.has(p.nom));
+  const AVG_GLOBAL = allGlobalForAvg.reduce((s, p) => s + p.count, 0) / (allGlobalForAvg.length || 1);
+  const AVG_GLOBAL_min = allGlobalForAvg.reduce((s, p) => s + p.minutes, 0) / (allGlobalForAvg.length || 1);
+
+  function globalNote(nom) {
+    const g = globalLoad[nom];
+    if (!g || g.roles.length <= 1) return '';
+    return ` <em style="font-size:11px;color:var(--muted);">(charge globale : ${g.count} ateliers — ${g.roles.join(' + ')})</em>`;
+  }
+
+  // ════════════════════════════════════════════════
+  // CARTE −1 : Objectif d'équilibre par catégorie
+  // tag: 'global' → visible dans la vue globale ET dans chaque vue par rôle
+  // ════════════════════════════════════════════════
+  {
+    function buildCatRow(label, statList, avg_min, colorVar) {
+      if (!statList.length) return '';
+      const actifs = statList.filter(p => !EXCLUDED_FROM_SUGGESTIONS.has(p.nom) && p.minutes > 0);
+      if (!actifs.length) return '';
+      const sorted = actifs.slice().sort((a, b) => b.minutes - a.minutes);
+      const rows = sorted.map(p => {
+        const diff = p.minutes - avg_min;
+        const pct  = avg_min > 0 ? Math.round(p.minutes / avg_min * 100) : 0;
+        const barW = Math.min(Math.round(p.minutes / avg_min * 80), 160);
+        let barColor = '#16a34a';
+        if (pct > 140) barColor = '#dc2626';
+        else if (pct > 115) barColor = '#f59e0b';
+        else if (pct < 50)  barColor = '#9333ea';
+        else if (pct < 75)  barColor = '#3b82f6';
+        const diffStr = diff >= 0
+          ? `<span style="color:#dc2626;font-size:11px">+${fmtMin(Math.round(Math.abs(diff)))}</span>`
+          : `<span style="color:#16a34a;font-size:11px">−${fmtMin(Math.round(Math.abs(diff)))}</span>`;
+        return `<tr>
+          <td style="font-weight:600">${p.nom}</td>
+          <td style="text-align:center"><strong style="color:${colorVar}">${fmtMin(p.minutes)}</strong></td>
+          <td style="text-align:center">${pct}%</td>
+          <td>${diffStr}</td>
+          <td><div style="background:${barColor};height:7px;border-radius:3px;width:${barW}px;max-width:160px"></div></td>
+        </tr>`;
+      }).join('');
+      const lo = fmtMin(Math.round(avg_min * 0.8));
+      const hi = fmtMin(Math.round(avg_min * 1.2));
+      return `
+        <tr style="background:var(--surface)">
+          <td colspan="5" style="font-size:12px;font-weight:700;padding:10px 8px 4px;color:${colorVar}">
+            ${label} &nbsp;·&nbsp; Moyenne : <strong>${fmtMin(Math.round(avg_min))}</strong>
+            &nbsp;<span style="font-size:11px;font-weight:400;color:var(--muted)">Fourchette cible : ${lo} – ${hi}</span>
+          </td>
+        </tr>
+        ${rows}`;
+    }
+
+    const hRows = buildCatRow('🤝 Helpers',     helperStats, AVG_H_min, 'var(--helper-text)');
+    const aRows = buildCatRow('👼 Angels',      angelStats,  AVG_A_min, 'var(--angel-text)');
+    const tRows = buildCatRow('🌐 Traducteurs', tradStats,   AVG_T_min, 'var(--trad-text)');
+
+    if (hRows || aRows || tRows) {
+      cards.push({
+        cat: 'global',
+        cls: '',
+        icon: '🎯',
+        title: 'Objectif d\'équilibre — Heures moyennes par catégorie',
+        body: `
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
+            Ce tableau montre, pour chaque personne, son total d'heures par rapport à la moyenne de sa catégorie.
+            L'objectif est que chacun se trouve dans la <strong>fourchette ±20%</strong> autour de la moyenne.
+          </p>
+          <table class="redist-table" style="margin-top:6px">
+            <thead><tr><th>Nom</th><th style="text-align:center">Heures</th><th style="text-align:center">% moy.</th><th>Écart</th><th>Charge</th></tr></thead>
+            <tbody>${hRows}${aRows}${tRows}</tbody>
+          </table>
+          <p style="margin-top:10px;font-size:11px;color:var(--muted);">
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc2626;margin-right:4px"></span>Surchargé (&gt;140%)&nbsp;&nbsp;
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f59e0b;margin-right:4px"></span>Au-dessus (&gt;115%)&nbsp;&nbsp;
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#16a34a;margin-right:4px"></span>Dans la cible (80–115%)&nbsp;&nbsp;
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#3b82f6;margin-right:4px"></span>Sous la moy. (&lt;75%)&nbsp;&nbsp;
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#9333ea;margin-right:4px"></span>Très peu chargé (&lt;50%)
+          </p>`
+      });
+    }
+  }
+
+  // ════════════════════════════════════════════════
+  // CARTE 0 : Classement global — tag 'global'
+  // ════════════════════════════════════════════════
+  {
+    // Un seul tableau : toutes les personnes (tous rôles), triées par total décroissant
+    const allSorted = allGlobal
+      .filter(g => g.minutes > 0)
+      .sort((a, b) => b.minutes - a.minutes);
+
+    // Barre de couleur selon écart à la moyenne globale
+    function barColor(minutes, avg) {
+      const ratio = avg > 0 ? minutes / avg : 0;
+      if (ratio > 1.4)  return '#dc2626';
+      if (ratio > 1.15) return '#f59e0b';
+      if (ratio < 0.5)  return '#9333ea';
+      if (ratio < 0.75) return '#3b82f6';
+      return '#16a34a';
+    }
+
+    // Badges colorés par rôle
+    function roleBadge(role) {
+      if (role === 'Helper')      return `<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--helper-bg);color:var(--helper-text);border:1px solid var(--helper-border)">Helper</span>`;
+      if (role === 'Angel')       return `<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--angel-bg);color:var(--angel-text);border:1px solid var(--angel-border)">Angel</span>`;
+      if (role === 'Traducteur')  return `<span style="font-size:9px;font-weight:700;padding:1px 6px;border-radius:99px;background:var(--trad-bg);color:var(--trad-text);border:1px solid var(--trad-border)">Trad.</span>`;
+      return '';
+    }
+
+    const rows = allSorted.map((g, i) => {
+      const ratio   = AVG_GLOBAL_min > 0 ? g.minutes / AVG_GLOBAL_min : 0;
+      const diff    = g.minutes - AVG_GLOBAL_min;
+      const diffStr = diff >= 0
+        ? `<span style="color:#dc2626">+${fmtMin(Math.round(Math.abs(diff)))}</span>`
+        : `<span style="color:#16a34a">-${fmtMin(Math.round(Math.abs(diff)))}</span>`;
+      const barW = Math.min(Math.round(ratio * 60), 120);
+      const col  = barColor(g.minutes, AVG_GLOBAL_min);
+
+      // Détail par rôle (ateliers + durée)
+      const hP = helperStats.find(x => x.nom === g.nom);
+      const aP = angelStats.find(x => x.nom === g.nom);
+      const tP = tradStats.find(x => x.nom === g.nom);
+      const parts = [];
+      if (hP) parts.push(`${hP.count} atelier${hP.count > 1 ? 's' : ''} · ${fmtMin(hP.minutes)} helper`);
+      if (aP) parts.push(`${aP.count} bloc${aP.count > 1 ? 's' : ''} · ${fmtMin(aP.minutes)} angel`);
+      if (tP) parts.push(`${tP.count} atelier${tP.count > 1 ? 's' : ''} · ${fmtMin(tP.minutes)} trad.`);
+      const detail = parts.length > 1
+        ? `<br><span style="font-size:10px;color:var(--muted)">${parts.join(' + ')}</span>`
+        : `<br><span style="font-size:10px;color:var(--muted)">${parts[0] || ''}</span>`;
+
+      const badges = g.roles.map(roleBadge).join(' ');
+
+      return `<tr>
+        <td style="font-weight:700">#${i+1} ${g.nom}</td>
+        <td>${badges}</td>
+        <td>${g.count}</td>
+        <td><strong>${fmtMin(g.minutes)}</strong>${detail}</td>
+        <td class="col-heures">${diffStr}</td>
+        <td style="min-width:90px;"><div style="background:${col};height:8px;border-radius:4px;width:${barW}px;max-width:120px"></div></td>
+      </tr>`;
+    }).join('');
+
+    cards.push({
+      cat: 'global',
+      cls: '',
+      icon: '📊',
+      title: 'Classement global — Heures totales (Helper + Angel + Traducteur)',
+      body: `
+        <div class="avg-bar">
+          <div class="avg-pill"><strong style="color:var(--helper-text)">${fmtMin(Math.round(AVG_H_min))}</strong>Moy. helpers</div>
+          <div class="avg-pill"><strong style="color:var(--angel-text)">${fmtMin(Math.round(AVG_A_min))}</strong>Moy. angels</div>
+          ${AVG_T_min > 0 ? `<div class="avg-pill"><strong style="color:var(--trad-text)">${fmtMin(Math.round(AVG_T_min))}</strong>Moy. traducteurs</div>` : ''}
+          <div class="avg-pill"><strong style="color:var(--accent)">${fmtMin(Math.round(AVG_GLOBAL_min))}</strong>Moy. globale</div>
+        </div>
+        <table class="redist-table" style="margin-top:10px">
+          <thead><tr><th>Nom</th><th>Rôles</th><th>Ateliers</th><th>Durée totale</th><th>Écart moy. globale</th><th>Charge</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <p style="margin-top:10px;font-size:11px;color:var(--muted);">
+          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc2626;margin-right:4px"></span>Surchargé (&gt;140% moy.)&nbsp;&nbsp;
+          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f59e0b;margin-right:4px"></span>Au-dessus (&gt;115%)&nbsp;&nbsp;
+          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#16a34a;margin-right:4px"></span>Dans la cible&nbsp;&nbsp;
+          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#3b82f6;margin-right:4px"></span>Sous la moy. (&lt;75%)&nbsp;&nbsp;
+          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#9333ea;margin-right:4px"></span>Très peu chargé (&lt;50%)
+        </p>`
+    });
+  }
+
+  // ════════════════════════════════════════════════
+  // CARTE : Redistribution helpers — suggestions détaillées
+  // ════════════════════════════════════════════════
+  {
+    // Helpers surchargés (> 120% de la moyenne en heures)
+    const overloaded = helperActifs.filter(p => p.minutes > AVG_H_min * 1.2 && p.count > 0);
+    // Helpers disponibles (< 85% de la moyenne en heures et charge globale raisonnable)
+    const available  = helperActifs.filter(p => {
+      if (p.minutes >= AVG_H_min * 0.85) return false;
+      const g = globalLoad[p.nom];
+      return !g || g.minutes <= AVG_GLOBAL_min * 1.3;
+    });
+
+    if (overloaded.length) {
+      // Construire un index des intervalles par personne
+      const intervalsByPerson = {};
+      helperStats.forEach(p => {
+        intervalsByPerson[p.nom] = p.assignments.map(a => parseInterval(a.heure)).filter(Boolean)
+          .map(iv => ({ ...iv, jour: p.assignments.find(a => parseInterval(a.heure)?.s === iv.s)?.jour }));
+      });
+
+      // Vérifie si une personne a un conflit horaire sur un créneau donné
+      function hasConflict(nom, jour, iv) {
+        const p = helperStats.find(x => x.nom === nom);
+        if (!p) return false;
+        return p.assignments.some(a => {
+          if (a.jour !== jour) return false;
+          const aiv = parseInterval(a.heure);
+          if (!aiv) return false;
+          return aiv.s < iv.e && aiv.e > iv.s; // chevauchement
+        });
+      }
+
+      // Également vérifier les angels
+      function hasConflictAngel(nom, jour, iv) {
+        const p = angelStats.find(x => x.nom === nom);
+        if (!p) return false;
+        return p.assignments.some(a => {
+          if (a.jour !== jour) return false;
+          const aiv = parseInterval(a.heure);
+          if (!aiv) return false;
+          return aiv.s < iv.e && aiv.e > iv.s;
+        });
+      }
+
+      const rows = [];
+      overloaded.forEach(overP => {
+        // Prendre les ateliers les plus longues de cette personne (top 3 redistribuables)
+        const ateliersSorted = overP.assignments
+          .filter(a => parseDuration(a.heure) >= 60) // ateliers significatifs seulement
+          .sort((a, b) => parseDuration(b.heure) - parseDuration(a.heure));
+
+        let transfertCount = 0;
+        ateliersSorted.forEach(atelier => {
+          if (transfertCount >= 3) return; // max 3 suggestions par personne
+
+          const iv = parseInterval(atelier.heure);
+          if (!iv) return;
+
+          // Chercher des remplaçants potentiels parmi TOUS les helpers (pas seulement les available)
+          // priorité : ceux en dessous de la moyenne d'abord
+          const candidatesAll = helperActifs
+            .filter(avP => {
+              if (avP.nom === overP.nom) return false;
+              if (hasConflict(avP.nom, atelier.jour, iv)) return false;
+              if (hasConflictAngel(avP.nom, atelier.jour, iv)) return false;
+              return true;
+            })
+            .sort((a, b) => a.minutes - b.minutes) // les moins chargés en premier
+            .slice(0, 4); // max 4 candidats
+
+          if (candidatesAll.length === 0) return;
+
+          transfertCount++;
+          const dur = parseDuration(atelier.heure);
+          const ecartOver = fmtMin(Math.round(overP.minutes - AVG_H_min));
+
+          // Séparer candidats disponibles (sous la moy.) des autres
+          const candUnder = candidatesAll.filter(c => c.minutes < AVG_H_min);
+          const candOther = candidatesAll.filter(c => c.minutes >= AVG_H_min);
+
+          const candHtml = [
+            ...candUnder.map(c => {
+              const gain = fmtMin(Math.round(AVG_H_min - c.minutes));
+              return `<span style="color:#16a34a;font-weight:600">${c.nom}</span> <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)} — sous la moy. de ${gain}</span>`;
+            }),
+            ...candOther.slice(0, 2).map(c => {
+              return `${c.nom} <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)}</span>`;
+            })
+          ].join('<br>');
+
+          rows.push(`<tr>
+            <td class="col-atelier">${atelier.jour}<br><span style="font-weight:400;color:var(--muted);font-size:11px">${atelier.heure}</span></td>
+            <td style="font-weight:600">${atelier.atelier}</td>
+            <td class="col-actuel">${overP.nom}<br>
+              <span style="font-size:10px;font-weight:400;color:var(--muted)">${fmtMin(overP.minutes)} total</span><br>
+              <span style="font-size:10px;color:#dc2626">+${ecartOver} vs moy.</span>
+            </td>
+            <td>${candHtml}</td>
+            <td class="col-heures">${fmtMin(dur)}</td>
+          </tr>`);
+        });
+      });
+
+      if (rows.length) {
+        cards.push({
+          cat: 'h',
+          cls: 'tag-suggest',
+          icon: '🔄',
+          title: `Suggestions de redistribution — Helpers (moy. : ${fmtMin(Math.round(AVG_H_min))} · cible : ${fmtMin(Math.round(AVG_H_min * 0.8))}–${fmtMin(Math.round(AVG_H_min * 1.2))})`,
+          body: `<p>Les ateliers ci-dessous sont portés par des helpers au-dessus de 120% de la moyenne (<strong>${fmtMin(Math.round(AVG_H_min))}</strong>).
+                 Les remplaçants potentiels sont triés par ordre de charge croissante — les personnes en <span style="color:#16a34a;font-weight:600">vert</span> sont en dessous de la moyenne.
+                 <strong>Vérifier avant toute modification.</strong></p>
+                 <table class="redist-table" style="margin-top:10px">
+                   <thead><tr><th>Jour / Horaire</th><th>Atelier</th><th>Actuellement assigné</th><th>Remplaçants potentiels (du moins au plus chargé)</th><th>Durée</th></tr></thead>
+                   <tbody>${rows.join('')}</tbody>
+                 </table>
+                 <p style="margin-top:10px;font-size:11px;color:var(--muted);">💡 Les remplaçants en vert sont sous la moyenne — les choisir en priorité pour maximiser l'équilibre. Vérifier le Rapport 4 pour confirmation.</p>`
+        });
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════════
+  // CARTE : Redistribution angels — suggestions détaillées
+  // ════════════════════════════════════════════════
+  {
+    const overloadedA = angelActifs.filter(p => p.minutes > AVG_A_min * 1.2);
+    const availableA  = angelActifs.filter(p => p.minutes < AVG_A_min * 0.85);
+
+    if (overloadedA.length) {
+      function hasConflictA(nom, jour, iv) {
+        const p = angelStats.find(x => x.nom === nom);
+        if (!p) return false;
+        return p.assignments.some(a => {
+          if (a.jour !== jour) return false;
+          const aiv = parseInterval(a.heure);
+          if (!aiv) return false;
+          return aiv.s < iv.e && aiv.e > iv.s;
+        });
+      }
+      function hasConflictH(nom, jour, iv) {
+        const p = helperStats.find(x => x.nom === nom);
+        if (!p) return false;
+        return p.assignments.some(a => {
+          if (a.jour !== jour) return false;
+          const aiv = parseInterval(a.heure);
+          if (!aiv) return false;
+          return aiv.s < iv.e && aiv.e > iv.s;
+        });
+      }
+
+      // Récupérer dans AGENDA les ateliers couverts par chaque angel
+      const angelBlocks = {};
+      AGENDA.forEach(e => {
+        if (!e.angel || !typeActif(e.type)) return;
+        const key = `${e.angel}||${e.jour}||${e.heure}`;
+        if (!angelBlocks[key]) angelBlocks[key] = { angel: e.angel, jour: e.jour, heure: e.heure, ateliers: [] };
+        angelBlocks[key].ateliers.push(e.atelier);
+      });
+
+      const rows = [];
+      overloadedA.forEach(overP => {
+        const byDay = {};
+        overP.assignments.forEach(a => {
+          if (!byDay[a.jour]) byDay[a.jour] = [];
+          byDay[a.jour].push(a);
+        });
+
+        Object.entries(byDay).forEach(([jour, dayList]) => {
+          const seen = new Set();
+          dayList.forEach(a => {
+            const iv = parseInterval(a.heure);
+            if (!iv) return;
+            const key = `${iv.s}|${iv.e}`;
+            if (seen.has(key)) return;
+            seen.add(key);
+
+            // Candidats : tous les angels actifs, triés par charge croissante
+            const candidatesAll = angelActifs
+              .filter(avP => {
+                if (avP.nom === overP.nom) return false;
+                if (hasConflictA(avP.nom, jour, iv)) return false;
+                if (hasConflictH(avP.nom, jour, iv)) return false;
+                return true;
+              })
+              .sort((a, b) => a.minutes - b.minutes)
+              .slice(0, 4);
+
+            if (candidatesAll.length === 0) return;
+
+            const dur = iv.e - iv.s;
+            const ateliersCoverts = Object.values(angelBlocks)
+              .filter(b => b.angel === overP.nom && b.jour === jour)
+              .filter(b => {
+                const biv = parseInterval(b.heure);
+                return biv && biv.s >= iv.s && biv.e <= iv.e;
+              })
+              .flatMap(b => b.ateliers)
+              .filter(n => !n.startsWith('Angel -'));
+
+            const ecartOver = fmtMin(Math.round(overP.minutes - AVG_A_min));
+
+            const candUnder = candidatesAll.filter(c => c.minutes < AVG_A_min);
+            const candOther = candidatesAll.filter(c => c.minutes >= AVG_A_min);
+            const candHtml = [
+              ...candUnder.map(c => {
+                const gain = fmtMin(Math.round(AVG_A_min - c.minutes));
+                return `<span style="color:#16a34a;font-weight:600">${c.nom}</span> <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)} — sous la moy. de ${gain}</span>`;
+              }),
+              ...candOther.slice(0, 2).map(c => `${c.nom} <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)}</span>`)
+            ].join('<br>');
+
+            rows.push(`<tr>
+              <td class="col-atelier">${jour}<br><span style="font-size:11px;color:var(--muted)">${a.heure}</span></td>
+              <td>${ateliersCoverts.length ? ateliersCoverts.join('<br>') : a.atelier}</td>
+              <td class="col-actuel">${overP.nom}<br>
+                <span style="font-size:10px;font-weight:400;color:var(--muted)">${fmtMin(overP.minutes)} total</span><br>
+                <span style="font-size:10px;color:#dc2626">+${ecartOver} vs moy.</span>
+              </td>
+              <td>${candHtml}</td>
+              <td class="col-heures">${fmtMin(dur)}</td>
+            </tr>`);
+          });
+        });
+      });
+
+      if (rows.length) {
+        cards.push({
+          cat: 'a',
+          cls: 'tag-suggest',
+          icon: '🔄',
+          title: `Suggestions de redistribution — Angels (moy. : ${fmtMin(Math.round(AVG_A_min))} · cible : ${fmtMin(Math.round(AVG_A_min * 0.8))}–${fmtMin(Math.round(AVG_A_min * 1.2))})`,
+          body: `<p>Les blocs ci-dessous sont couverts par des angels au-dessus de 120% de la moyenne (<strong>${fmtMin(Math.round(AVG_A_min))}</strong>).
+                 Les remplaçants sont triés par charge croissante — les personnes en <span style="color:#16a34a;font-weight:600">vert</span> sont sous la moyenne.</p>
+                 <table class="redist-table" style="margin-top:10px">
+                   <thead><tr><th>Jour / Horaire</th><th>Ateliers couverts</th><th>Actuellement assigné</th><th>Remplaçants potentiels (du moins au plus chargé)</th><th>Durée</th></tr></thead>
+                   <tbody>${rows.join('')}</tbody>
+                 </table>
+                 <p style="margin-top:10px;font-size:11px;color:var(--muted);">💡 Les angels disponibles peuvent couvrir simultanément plusieurs salles — vérifier leur capacité réelle avant réaffectation.</p>`
+        });
+      }
+    }
+  }
+
+  // ── Helpers surchargés (résumé simple) ─────────────────────────────────────
+  const overH = helperActifs.filter(p => p.minutes > AVG_H_min * 1.4);
+  if (overH.length) {
+    cards.push({
+      cat: 'h',
+      cls: 'tag-overload',
+      icon: '🔴',
+      title: 'Helpers avec charge élevée (résumé)',
+      body: `<p>Les helpers suivants ont une durée totale significativement supérieure à la moyenne (${fmtMin(Math.round(AVG_H_min))}) :</p>
+             <ul>${overH.map(p => `<li><strong>${p.nom}</strong> — ${p.count} ateliers · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('')}</ul>
+             <p style="margin-top:8px;">💡 Voir le tableau de redistribution ci-dessus pour les suggestions détaillées.</p>`
+    });
+  }
+
+  // ── Helpers peu chargés ─────────────────────────────────────────────────────
+  const lightH = helperActifs.filter(p => {
+    if (p.minutes >= AVG_H_min * 0.6 || p.minutes === 0) return false;
+    const g = globalLoad[p.nom];
+    return !g || g.minutes <= AVG_GLOBAL_min * 1.3;
+  });
+  const lightHHidden = helperActifs.filter(p =>
+    p.minutes < AVG_H_min * 0.6 && p.minutes > 0 &&
+    globalLoad[p.nom] && globalLoad[p.nom].minutes > AVG_GLOBAL_min * 1.3
+  );
+  if (lightH.length || lightHHidden.length) {
+    const listAvail = lightH.map(p => `<li><strong>${p.nom}</strong> — ${p.count} atelier${p.count > 1 ? 's' : ''} · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('');
+    const listBusy  = lightHHidden.map(p => `<li><strong>${p.nom}</strong> — charge helper légère (${fmtMin(p.minutes)}) mais charge globale : ${fmtMin(globalLoad[p.nom].minutes)} (${globalLoad[p.nom].roles.join(' + ')})</li>`).join('');
+    cards.push({
+      cat: 'h',
+      cls: 'tag-light',
+      icon: '🟢',
+      title: 'Helpers avec disponibilité',
+      body: (lightH.length ? `<p>Ces helpers ont une durée totale inférieure à la moyenne et une charge globale raisonnable :</p><ul>${listAvail}</ul><p style="margin-top:8px;">💡 Ces personnes peuvent absorber des ateliers supplémentaires.</p>` : '')
+          + (lightHHidden.length ? `<p style="margin-top:10px;"><strong>⚠️ Durée légère en helper, mais déjà chargés sur d'autres rôles :</strong></p><ul>${listBusy}</ul><p style="margin-top:6px;color:var(--muted);font-size:12px;">À ne pas surcharger davantage.</p>` : '')
+    });
+  }
+
+  // ── Angels surchargés (résumé) ──────────────────────────────────────────────
+  const overA = angelActifs.filter(p => p.minutes > AVG_A_min * 1.4);
+  if (overA.length) {
+    cards.push({
+      cat: 'a',
+      cls: 'tag-overload',
+      icon: '🔴',
+      title: 'Angels avec charge élevée (résumé)',
+      body: `<p>Les angels suivants couvrent une durée nette supérieure à la moyenne (${fmtMin(Math.round(AVG_A_min))}) :</p>
+             <ul>${overA.map(p => `<li><strong>${p.nom}</strong> — ${p.count} blocs uniques · ${fmtMin(p.minutes)} net${globalNote(p.nom)}</li>`).join('')}</ul>
+             <p style="margin-top:8px;">💡 Voir le tableau de redistribution angels ci-dessus.</p>`
+    });
+  }
+
+  // ── Angels peu chargés ──────────────────────────────────────────────────────
+  const lightA = angelActifs.filter(p => {
+    if (p.minutes >= AVG_A_min * 0.6 || p.minutes === 0) return false;
+    const g = globalLoad[p.nom];
+    return !g || g.minutes <= AVG_GLOBAL_min * 1.3;
+  });
+  if (lightA.length) {
+    cards.push({
+      cat: 'a',
+      cls: 'tag-light',
+      icon: '🟢',
+      title: 'Angels avec disponibilité',
+      body: `<p>Ces angels ont une durée nette inférieure à la moyenne et une charge globale raisonnable :</p>
+             <ul>${lightA.map(p => `<li><strong>${p.nom}</strong> — ${p.count} blocs · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('')}</ul>`
+    });
+  }
+
+  // ── Déséquilibre global helpers ─────────────────────────────────────────────
+  const maxHmin = helperActifs.reduce((m, p) => Math.max(m, p.minutes), 0);
+  const minHmin = helperActifs.filter(p => p.minutes > 0).reduce((m, p) => Math.min(m, p.minutes), Infinity);
+  if (maxHmin - minHmin > 120) { // > 2h d'écart
+    const topH = helperActifs.find(p => p.minutes === maxHmin);
+    const botH = helperActifs.filter(p => p.minutes > 0).find(p => p.minutes === minHmin);
+    cards.push({
+      cat: 'h',
+      cls: 'tag-suggest',
+      icon: '⚠️',
+      title: 'Déséquilibre global helpers (en heures)',
+      body: `<p>L'écart entre le helper le plus chargé (<strong>${topH?.nom}</strong> — ${fmtMin(topH?.minutes)}) et le moins chargé (<strong>${botH?.nom}</strong> — ${fmtMin(botH?.minutes)}) est de <strong>${fmtMin(maxHmin - minHmin)}</strong>.</p>
+             <p style="margin-top:8px;">💡 La cible idéale serait de ramener tous les helpers dans la fourchette ${fmtMin(Math.round(AVG_H_min * 0.8))} – ${fmtMin(Math.round(AVG_H_min * 1.2))}.</p>`
+    });
+  }
+
+  if (MAX_A - MIN_A > 3) {
+    cards.push({
+      cat: 'a',
+      cls: 'tag-suggest',
+      icon: '⚠️',
+      title: 'Déséquilibre global angels (en blocs)',
+      body: `<p>L'écart entre l'angel le plus chargé (<strong>${angelActifs[0]?.nom}</strong> — ${MAX_A} blocs) et le moins chargé (<strong>${angelActifs[angelActifs.length-1]?.nom}</strong> — ${MIN_A} blocs) est de <strong>${MAX_A - MIN_A} blocs</strong>.</p>
+             <p style="margin-top:8px;">💡 Cible recommandée : maximum ${Math.ceil(AVG_A * 1.3)} blocs uniques par angel.</p>`
+    });
+  }
+
+  // ── Traducteurs surchargés ──────────────────────────────────────────────────
+  const overT = tradActifs.filter(p => p.minutes > AVG_T_min * 1.4);
+  if (overT.length) {
+    cards.push({
+      cat: 't',
+      cls: 'tag-overload',
+      icon: '🔴',
+      title: 'Traducteurs avec charge élevée',
+      body: `<p>Les traducteurs suivants ont une durée supérieure à la moyenne (${fmtMin(Math.round(AVG_T_min))}) :</p>
+             <ul>${overT.map(p => `<li><strong>${p.nom}</strong> — ${p.count} atelier${p.count > 1 ? 's' : ''} · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('')}</ul>
+             <p style="margin-top:8px;">💡 Vérifier si un autre traducteur peut prendre le relais sur certains créneaux.</p>`
+    });
+  }
+
+  const lightT = tradActifs.filter(p => {
+    if (p.minutes >= AVG_T_min * 0.6 || p.minutes === 0) return false;
+    const g = globalLoad[p.nom];
+    return !g || g.minutes <= AVG_GLOBAL_min * 1.3;
+  });
+  if (lightT.length) {
+    cards.push({
+      cat: 't',
+      cls: 'tag-light',
+      icon: '🟢',
+      title: 'Traducteurs avec disponibilité',
+      body: `<p>Ces traducteurs ont une durée légère et une charge globale raisonnable :</p>
+             <ul>${lightT.map(p => `<li><strong>${p.nom}</strong> — ${p.count} atelier${p.count > 1 ? 's' : ''} · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('')}</ul>`
+    });
+  }
+
+  if (MAX_T - MIN_T > 3) {
+    cards.push({
+      cat: 't',
+      cls: 'tag-suggest',
+      icon: '⚠️',
+      title: 'Déséquilibre global traducteurs',
+      body: `<p>L'écart entre le traducteur le plus chargé (<strong>${tradActifs[0]?.nom}</strong> — ${MAX_T} ateliers) et le moins chargé (<strong>${tradActifs[tradActifs.length-1]?.nom}</strong> — ${MIN_T} ateliers) est de <strong>${MAX_T - MIN_T} ateliers</strong>.</p>
+             <p style="margin-top:8px;">💡 Cible : maximum ${Math.ceil(AVG_T * 1.3)} ateliers par traducteur.</p>`
+    });
+  }
+
+  // ── Redistribution traducteurs — suggestions ───────────────────────────────
+  {
+    const overloadedT = tradActifs.filter(p => p.minutes > AVG_T_min * 1.2);
+
+    if (overloadedT.length && tradActifs.length > 1) {
+      function hasConflictT(nom, jour, iv) {
+        const p = tradStats.find(x => x.nom === nom);
+        if (!p) return false;
+        return p.assignments.some(a => {
+          if (a.jour !== jour) return false;
+          const aiv = parseInterval(a.heure);
+          if (!aiv) return false;
+          return aiv.s < iv.e && aiv.e > iv.s;
+        });
+      }
+
+      const rows = [];
+      overloadedT.forEach(overP => {
+        const ateliersSorted = overP.assignments
+          .filter(a => parseDuration(a.heure) >= 60)
+          .sort((a, b) => parseDuration(b.heure) - parseDuration(a.heure));
+
+        let transfertCount = 0;
+        ateliersSorted.forEach(atelier => {
+          if (transfertCount >= 3) return;
+          const iv = parseInterval(atelier.heure);
+          if (!iv) return;
+
+          const candidatesAll = tradActifs
+            .filter(avP => {
+              if (avP.nom === overP.nom) return false;
+              if (hasConflictT(avP.nom, atelier.jour, iv)) return false;
+              return true;
+            })
+            .sort((a, b) => a.minutes - b.minutes)
+            .slice(0, 4);
+
+          if (candidatesAll.length === 0) return;
+
+          transfertCount++;
+          const dur = parseDuration(atelier.heure);
+          const ecartOver = fmtMin(Math.round(overP.minutes - AVG_T_min));
+
+          const candUnder = candidatesAll.filter(c => c.minutes < AVG_T_min);
+          const candOther = candidatesAll.filter(c => c.minutes >= AVG_T_min);
+          const candHtml = [
+            ...candUnder.map(c => {
+              const gain = fmtMin(Math.round(AVG_T_min - c.minutes));
+              return `<span style="color:#16a34a;font-weight:600">${c.nom}</span> <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)} — sous la moy. de ${gain}</span>`;
+            }),
+            ...candOther.slice(0, 2).map(c => `${c.nom} <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)}</span>`)
+          ].join('<br>');
+
+          rows.push(`<tr>
+            <td class="col-atelier">${atelier.jour}<br><span style="font-weight:400;color:var(--muted);font-size:11px">${atelier.heure}</span></td>
+            <td style="font-weight:600">${atelier.atelier}</td>
+            <td class="col-actuel">${overP.nom}<br>
+              <span style="font-size:10px;font-weight:400;color:var(--muted)">${fmtMin(overP.minutes)} total</span><br>
+              <span style="font-size:10px;color:#dc2626">+${ecartOver} vs moy.</span>
+            </td>
+            <td>${candHtml}</td>
+            <td class="col-heures">${fmtMin(dur)}</td>
+          </tr>`);
+        });
+      });
+
+      if (rows.length) {
+        cards.push({
+          cat: 't',
+          cls: 'tag-suggest',
+          icon: '🔄',
+          title: `Suggestions de redistribution — Traducteurs (moy. : ${fmtMin(Math.round(AVG_T_min))} · cible : ${fmtMin(Math.round(AVG_T_min * 0.8))}–${fmtMin(Math.round(AVG_T_min * 1.2))})`,
+          body: `<p>Les ateliers ci-dessous sont pris en charge par des traducteurs au-dessus de 120% de la moyenne (<strong>${fmtMin(Math.round(AVG_T_min))}</strong>).
+                 Les remplaçants sont triés par charge croissante — les personnes en <span style="color:#16a34a;font-weight:600">vert</span> sont sous la moyenne.</p>
+                 <table class="redist-table" style="margin-top:10px">
+                   <thead><tr><th>Jour / Horaire</th><th>Atelier</th><th>Actuellement assigné</th><th>Remplaçants potentiels (du moins au plus chargé)</th><th>Durée</th></tr></thead>
+                   <tbody>${rows.join('')}</tbody>
+                 </table>
+                 <p style="margin-top:10px;font-size:11px;color:var(--muted);">💡 Vérifier que le remplaçant maîtrise la langue de traduction requise avant toute réaffectation.</p>`
+        });
+      }
+    }
+  }
+
+  // ── Personnes multi-rôles avec charge globale élevée ───────────────────────
+  const multiOverload = allGlobal.filter(p => p.roles.length > 1 && p.minutes > AVG_GLOBAL_min * 1.5);
+  if (multiOverload.length) {
+    multiOverload.sort((a, b) => b.minutes - a.minutes);
+    cards.push({
+      cat: 'global',
+      cls: 'tag-overload',
+      icon: '🔴',
+      title: 'Multi-rôles avec charge globale élevée',
+      body: `<p>Ces personnes cumulent plusieurs rôles et ont une durée totale très supérieure à la moyenne globale (${fmtMin(Math.round(AVG_GLOBAL_min))}) :</p>
+             <ul>${multiOverload.map(p => `<li><strong>${p.nom}</strong> — ${fmtMin(p.minutes)} au total (${p.roles.join(' + ')}) · ${p.count} ateliers</li>`).join('')}</ul>
+             <p style="margin-top:8px;">💡 Priorité absolue : ne pas leur assigner d'ateliers supplémentaires et envisager un allègement sur leur rôle secondaire.</p>`
+    });
+  }
+
+  // ── Rappel important ────────────────────────────────────────────────────────
+  cards.push({
+    cat: 'global',
+    cls: '',
+    icon: '⚠️',
+    title: 'Important — Vérification des conflits',
+    body: `<p>Ces suggestions tiennent compte de la <strong>durée totale</strong> et de la <strong>charge globale</strong> de chaque personne. Avant toute modification :</p>
+           <ul>
+             <li>Vérifier l'absence de conflit horaire via le <strong>Rapport 4 — Conflits de planning</strong></li>
+             <li>Confirmer la disponibilité de la personne pour le créneau concerné</li>
+             <li>Obtenir l'accord de l'intéressé(e)</li>
+             <li>Mettre à jour <code>data.js</code> via la page <strong>Admin</strong></li>
+           </ul>`
+  });
+
+  return cards;
+}
+
+// ════════════════════════════════════════════════
+// RENDER PRINCIPAL
+// ════════════════════════════════════════════════
+function render() {
+  const jourFilter = document.getElementById('filterJour').value;
+  const { helperStats, angelStats, tradStats } = buildStats(jourFilter);
+
+  // Summary bar
+  const totalH = helperStats.reduce((s, p) => s + p.count, 0);
+  const totalA = angelStats.reduce((s, p) => s + p.count, 0);
+  const totalT = tradStats.reduce((s, p) => s + p.count, 0);
+  const avgH   = helperStats.length ? (totalH / helperStats.length).toFixed(1) : 0;
+  const avgA   = angelStats.length  ? (totalA / angelStats.length).toFixed(1)  : 0;
+  const avgT   = tradStats.length   ? (totalT / tradStats.length).toFixed(1)   : 0;
+
+  document.getElementById('summaryBar').innerHTML = `
+    <div class="sum-pill"><div class="num" style="color:var(--helper-text)">${helperStats.length}</div><div class="lbl">Helpers actifs</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--helper-text)">${totalH}</div><div class="lbl">Missions helpers</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--helper-text)">${avgH}</div><div class="lbl">Moy. / helper</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${angelStats.length}</div><div class="lbl">Angels actifs</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${totalA}</div><div class="lbl">Missions angels</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${avgA}</div><div class="lbl">Moy. / angel</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--trad-text)">${tradStats.length}</div><div class="lbl">Traducteurs actifs</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--trad-text)">${totalT}</div><div class="lbl">Missions trad.</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--trad-text)">${avgT}</div><div class="lbl">Moy. / trad.</div></div>
+  `;
+
+  // Person grid
+  const grid = document.getElementById('personGrid');
+
+  if (currentTab === 'h') {
+    const max = helperStats.length ? helperStats[0].minutes : 1;
+    grid.innerHTML = helperStats.length
+      ? helperStats.map((p, i) => renderPersonCard(p, i + 1, max, 'Helper')).join('')
+      : '<p style="color:var(--muted);padding:20px 0;">Aucun helper trouvé.</p>';
+  } else if (currentTab === 'a') {
+    const max = angelStats.length ? angelStats[0].minutes : 1;
+    grid.innerHTML = angelStats.length
+      ? angelStats.map((p, i) => renderPersonCard(p, i + 1, max, 'Angel')).join('')
+      : '<p style="color:var(--muted);padding:20px 0;">Aucun angel trouvé.</p>';
+  } else if (currentTab === 't') {
+    const max = tradStats.length ? tradStats[0].minutes : 1;
+    grid.innerHTML = tradStats.length
+      ? tradStats.map((p, i) => renderPersonCard(p, i + 1, max, 'Traducteur')).join('')
+      : '<p style="color:var(--muted);padding:20px 0;">Aucun traducteur trouvé.</p>';
+  } else {
+    // Vue combinée — fusionne les rôles multiples par personne
+    const allByNom = {};
+    const addToMap = (list, role) => list.forEach(p => {
+      if (!allByNom[p.nom]) allByNom[p.nom] = { nom: p.nom, roles: [], count: 0, minutes: 0, assignments: [] };
+      allByNom[p.nom].roles.push(role);
+      allByNom[p.nom].count     += p.count;
+      allByNom[p.nom].minutes   += p.minutes;
+      allByNom[p.nom].assignments = [...allByNom[p.nom].assignments, ...p.assignments];
+    });
+    addToMap(helperStats, 'Helper');
+    addToMap(angelStats,  'Angel');
+    addToMap(tradStats,   'Traducteur');
+    const finalList = Object.values(allByNom).map(p => ({
+      ...p, role: p.roles.length > 1 ? p.roles.join(' + ') : p.roles[0]
+    })).sort((a, b) => b.minutes - a.minutes || b.count - a.count);
+
+    const max = finalList.length ? finalList[0].minutes : 1;
+    grid.innerHTML = finalList.map((p, i) => renderPersonCard(p, i + 1, max, p.role)).join('');
+  }
+
+  // Harmonisation — calculée et mise en cache pour openHarmony()
+  const harmonyCards = buildHarmony(helperStats, angelStats, tradStats);
+  window._lastHarmonyCards = harmonyCards;
+}
+
+// ════════════════════════════════════════════════
+// ONGLETS
+// ════════════════════════════════════════════════
+function setTab(t) {
+  currentTab = t;
+  document.getElementById('tab-h').className  = 'tab' + (t === 'h' ? ' active-h' : '');
+  document.getElementById('tab-a').className  = 'tab' + (t === 'a' ? ' active-a' : '');
+  document.getElementById('tab-t').className  = 'tab' + (t === 't' ? ' active-t' : '');
+  document.getElementById('tab-s').className  = 'tab' + (t === 's' ? ' active-s' : '');
+  render();
+}
+
+// ════════════════════════════════════════════════
+// OUVRIR L'HARMONISATION DANS UNE NOUVELLE FENÊTRE
+// Vue par défaut : global (classement + suggestions globales)
+// Boutons : 🤝 Helpers | 👼 Angels | 🌐 Traducteurs
+// ════════════════════════════════════════════════
+function openHarmony() {
+  const cards = window._lastHarmonyCards || [];
+  const isDark = document.body.classList.contains('dark');
+
+  // Sérialiser les cards en JSON pour les passer à la popup
+  const cardsJson = JSON.stringify(cards.map(c => ({
+    cat:   c.cat || 'global',
+    cls:   c.cls || '',
+    icon:  c.icon || '',
+    title: c.title || '',
+    body:  c.body || ''
+  })));
+
+  const html = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Harmonisation</title>
+<style>
+  :root{
+    --bg:#ffffff;--surface:#f7f8fa;--border:#e5e7eb;--text:#1f2328;--muted:#57606a;--accent:#3b82d4;
+    --red:#dc2626;--red-bg:#fef2f2;--red-border:#fca5a5;
+    --green:#166534;--green-bg:#dcfce7;--green-border:#86efac;
+    --orange:#c2410c;--orange-bg:#fff7ed;--orange-border:#fdba74;
+    --helper-bg:#e0f2fe;--helper-border:#7dd3fc;--helper-text:#0369a1;
+    --angel-bg:#fce7f3;--angel-border:#f9a8d4;--angel-text:#9d174d;
+    --trad-bg:#fefce8;--trad-border:#92400e;--trad-text:#854d0e;
+  }
+  .dark{
+    --bg:#0d1117;--surface:#161b22;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;
+    --red-bg:#2d0a0a;--red-border:#991b1b;
+    --green-bg:#052e16;--green-border:#166534;
+    --orange-bg:#1c1000;--orange-border:#92400e;
+    --helper-bg:#0c2d48;--helper-border:#1e4a8a;--helper-text:#7dd3fc;
+    --angel-bg:#3b1030;--angel-border:#9d174d;--angel-text:#f9a8d4;
+    --trad-bg:#1c1500;--trad-border:#854d0e;--trad-text:#fde047;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;line-height:1.6;background:var(--bg);color:var(--text);padding:28px 20px 60px}
+  .wrap{max-width:1020px;margin:0 auto}
+  header{margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)}
+  header h1{font-size:20px;font-weight:700}
+  header p{font-size:26px;font-weight:800;color:var(--accent);line-height:1.2;margin-top:2px}
+  header small{font-size:12px;color:var(--muted);display:block;margin-top:2px}
+
+  /* ── BARRE DE VUE ── */
+  .view-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+  .view-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-right:4px}
+  .vbtn{cursor:pointer;padding:7px 18px;border-radius:999px;border:2px solid var(--border);background:var(--surface);font-size:13px;font-weight:600;font-family:inherit;color:var(--muted);transition:all .15s}
+  .vbtn:hover{border-color:var(--accent);color:var(--text)}
+  .vbtn.active-g{border-color:var(--accent);background:#eff6ff;color:var(--accent)}
+  .vbtn.active-h{border-color:var(--helper-text);background:var(--helper-bg);color:var(--helper-text)}
+  .vbtn.active-a{border-color:var(--angel-text);background:var(--angel-bg);color:var(--angel-text)}
+  .vbtn.active-t{border-color:var(--trad-text);background:var(--trad-bg);color:var(--trad-text)}
+
+  .intro{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px}
+  .harmony-grid{display:flex;flex-direction:column;gap:12px}
+  .harmony-card{border:1px solid var(--border);border-radius:8px;padding:14px 18px;background:var(--bg)}
+  .harmony-card-title{font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+  .harmony-card p{font-size:13px;color:var(--muted);line-height:1.6}
+  .harmony-card ul{font-size:13px;color:var(--muted);padding-left:20px;line-height:1.8}
+  .tag-overload{background:var(--red-bg);border-color:var(--red-border)}
+  .tag-light   {background:var(--green-bg);border-color:var(--green-border)}
+  .tag-suggest {background:var(--orange-bg);border-color:var(--orange-border)}
+  .redist-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
+  .redist-table th{text-align:left;padding:6px 10px;background:var(--surface);border-bottom:2px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700}
+  .redist-table td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text)}
+  .redist-table tr:last-child td{border-bottom:none}
+  .col-actuel{color:#dc2626;font-weight:600}
+  .col-rempl{color:#16a34a;font-weight:600}
+  .col-heures{white-space:nowrap}
+  .col-atelier{max-width:200px;font-weight:600}
+  .avg-bar{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 4px}
+  .avg-pill{border-radius:6px;padding:8px 14px;border:1px solid var(--border);background:var(--surface);font-size:12px}
+  .avg-pill strong{display:block;font-size:17px;font-weight:800}
+  .empty-view{text-align:center;padding:48px;color:var(--muted);font-style:italic;border:2px dashed var(--border);border-radius:10px}
+  footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--border);text-align:center;font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body${isDark ? ' class="dark"' : ''}>
+<div class="wrap">
+  <header>
+    <h1>Tantramour 2026</h1>
+    <p>⚖️ Propositions d'harmonisation</p>
+    <small>Workload Balancing Suggestions — généré le ${new Date().toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'})}</small>
+  </header>
+
+  <!-- Barre de vue -->
+  <div class="view-bar">
+    <span class="view-label">Vue :</span>
+    <button class="vbtn active-g" id="vbtn-g" onclick="setView('global')">📊 Vue globale</button>
+    <button class="vbtn"          id="vbtn-h" onclick="setView('h')">🤝 Helpers</button>
+    <button class="vbtn"          id="vbtn-a" onclick="setView('a')">👼 Angels</button>
+    <button class="vbtn"          id="vbtn-t" onclick="setView('t')">🌐 Traducteurs</button>
+  </div>
+
+  <div class="intro" id="viewIntro"></div>
+  <div class="harmony-grid" id="harmonyGrid"></div>
+</div>
+<footer><p>Made with IBM Bob</p></footer>
+
+<script>
+var CARDS = ${cardsJson};
+var currentView = 'global';
+
+var INTROS = {
+  global: 'Vue globale — Classement de toutes les personnes par heures totales (Helper + Angel + Traducteur) et suggestions de redistribution multi-rôles. Les propositions sont générées automatiquement et doivent être vérifiées manuellement.',
+  h: 'Vue Helpers — Analyse de la charge des helpers, personnes surchargées, personnes disponibles et suggestions de transfert d\\'ateliers.',
+  a: 'Vue Angels — Analyse de la charge nette des angels (intervalles fusionnés), personnes surchargées et suggestions de redistribution.',
+  t: 'Vue Traducteurs — Analyse de la charge des traducteurs, déséquilibres et suggestions de transfert.'
+};
+
+var BTN_ACTIVE = { global:'active-g', h:'active-h', a:'active-a', t:'active-t' };
+
+function setView(v) {
+  currentView = v;
+  // Boutons
+  ['g','h','a','t'].forEach(function(k) {
+    var btn = document.getElementById('vbtn-' + k);
+    var vkey = k === 'g' ? 'global' : k;
+    btn.className = 'vbtn' + (vkey === v ? ' ' + BTN_ACTIVE[vkey] : '');
+  });
+  // Intro
+  document.getElementById('viewIntro').innerHTML = INTROS[v] || '';
+  // Cards
+  var grid = document.getElementById('harmonyGrid');
+  var visible = CARDS.filter(function(c) {
+    if (v === 'global') return c.cat === 'global';
+    return c.cat === v || c.cat === 'global';
+  });
+  if (!visible.length) {
+    grid.innerHTML = "<div class='empty-view'>Aucune proposition pour cette vue.</div>";
+    return;
+  }
+  grid.innerHTML = visible.map(function(c) {
+    return "<div class='harmony-card " + c.cls + "'>" +
+      "<div class='harmony-card-title'>" + c.icon + " " + c.title + "</div>" +
+      c.body +
+    "</div>";
+  }).join('');
+}
+
+setView('global');
+<\\/script>
+</body>
+</html>`;
+
+  const win = window.open('', '_blank', 'width=1100,height=850,scrollbars=yes,resizable=yes');
+  if (win) {
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+  }
+}
+
+// Exposer dans window les fonctions appelées depuis les onclick HTML
+window.setTab        = setTab;
+window.openHarmony   = openHarmony;
+window.toggleDetail  = toggleDetail;
+window.render        = render;
+window.hardReload    = hardReload;
+window.toggleMode    = toggleMode;
+
+// ════════════════════════════════════════════════
+// INIT FILTRES
+// ════════════════════════════════════════════════
+(function initFilters() {
+  const sel = document.getElementById('filterJour');
+  JOUR_ORDER.forEach(j => {
+    if (AGENDA.some(e => e.jour === j)) {
+      const o = document.createElement('option');
+      o.value = j; o.textContent = j;
+      sel.appendChild(o);
+    }
+  });
+})();
+
+// ════════════════════════════════════════════════
+// DARK MODE + HARD RELOAD
+// ════════════════════════════════════════════════
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
+      .finally(() => location.reload(true));
+  } else {
+    location.reload(true);
+  }
+}
+
+function toggleMode() {
+  const isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+
+// Auto-refresh si ouvert depuis Home (paramètre ?v= présent)
+if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
+  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
+  hardReload();
+}
+
+render();
+
+}); // fin loadData
+</script>
+</body>
+</html>

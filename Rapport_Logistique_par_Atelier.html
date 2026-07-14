@@ -1,0 +1,266 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Logistique par Atelier</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --header-bg: #f0f4fb; --card-bg: #ffffff;
+    --tag-bg: #eef2ff; --tag-text: #3b5bdb;
+    --badge-h: #e0f2fe; --badge-ht: #0369a1;
+    --badge-a: #fce7f3; --badge-at: #9d174d;
+    --badge-f: #dcfce7; --badge-ft: #166534;
+    --logistics-bg: #f7f8fa; --logistics-border: #e5e7eb;
+  }
+  .dark {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --header-bg: #1c2333; --card-bg: #161b22;
+    --tag-bg: #1c2a4a; --tag-text: #79a8ff;
+    --badge-h: #0c2d48; --badge-ht: #58a6ff;
+    --badge-a: #3b1030; --badge-at: #f0abca;
+    --badge-f: #0a2e1a; --badge-ft: #4ade80;
+    --logistics-bg: #0d1117; --logistics-border: #30363d;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 20px; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .logo h1 { font-size: 20px; font-weight: 700; }
+  .logo p { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: .3px; line-height: 1.2; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .mode-btn { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; }
+  .mode-btn:hover { background: var(--border); }
+  .steps { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; align-items: flex-end; }
+  .step-group { display: flex; flex-direction: column; gap: 4px; }
+  .step-group label { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 600; }
+  select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; font-size: 13px; color: var(--text); font-family: inherit; min-width: 280px; cursor: pointer; }
+  select:disabled { opacity: .45; cursor: not-allowed; }
+  .recap-section { display: none; }
+  .recap-section.visible { display: block; }
+  .recap-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  .atelier-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .atelier-meta { font-size: 13px; color: var(--muted); margin-bottom: 16px; flex-wrap: wrap; }
+  .recap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 16px; margin-top: 12px; }
+  .recap-item { display: flex; flex-direction: column; gap: 4px; }
+  .recap-item .ri-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; }
+  .recap-item .ri-value { display: flex; flex-wrap: wrap; gap: 4px; min-height: 24px; }
+  .pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .pill-h { background: var(--badge-h); color: var(--badge-ht); }
+  .pill-a { background: var(--badge-a); color: var(--badge-at); }
+  .pill-f { background: var(--badge-f); color: var(--badge-ft); }
+  .pill-t { background: var(--tag-bg); color: var(--tag-text); }
+  .pill-lieu { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
+  .tag { display: inline-block; background: var(--tag-bg); color: var(--tag-text); border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 600; }
+  .divider { border: none; border-top: 1px solid var(--border); margin: 20px 0; }
+  .logistics-label { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 600; margin-bottom: 10px; }
+  .logistics-box { width: 100%; background: var(--logistics-bg); border: 2px solid var(--logistics-border); border-radius: 8px; padding: 16px 20px; font-size: 14px; line-height: 1.7; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+  .logistics-box.empty-log { color: var(--muted); font-style: italic; }
+  .logistic-box { width: 100%; min-height: 240px; }
+  .placeholder { text-align: center; padding: 64px 20px; color: var(--muted); border: 2px dashed var(--border); border-radius: 10px; }
+  .placeholder p { font-size: 15px; margin-bottom: 6px; }
+  .placeholder small { font-size: 12px; }
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+  /* ── RESPONSIVE MOBILE ── */
+  @media (max-width: 767px) {
+    .wrap { padding: 16px 12px; }
+    select { min-width: 100%; width: 100%; }
+    .steps { flex-direction: column; gap: 12px; }
+    .step-group { width: 100%; }
+    .recap-card { padding: 14px 16px; }
+    .atelier-name { font-size: 17px; }
+    .recap-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .logistics-box { min-height: 200px; padding: 14px; font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Logistique par Atelier</p>
+    </div>
+    <div class="header-actions">
+      <a class="mode-btn" href="index.html">🏠 Home</a>
+      <button class="mode-btn" onclick="hardReload()">🔄 Refresh</button>
+      <button class="mode-btn" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+  <div class="steps">
+    <div class="step-group">
+      <label>1. Choisir le jour</label>
+      <select id="selDate" onchange="onDateChange()">
+        <option value="">-- Sélectionner un jour --</option>
+        <option value="Jour 1">Jour 1 — Samedi 29 août</option>
+        <option value="Jour 2">Jour 2 — Dimanche 30 août</option>
+        <option value="Jour 3">Jour 3 — Lundi 31 août</option>
+        <option value="Jour 4">Jour 4 — Mardi 1 septembre</option>
+        <option value="Jour 5">Jour 5 — Mercredi 2 septembre</option>
+        <option value="Jour 6">Jour 6 — Jeudi 3 septembre</option>
+        <option value="Jour 7">Jour 7 — Vendredi 4 septembre</option>
+      </select>
+    </div>
+    <div class="step-group">
+      <label>2. Choisir l'atelier</label>
+      <select id="selAtelier" onchange="onAtelierChange()" disabled>
+        <option value="">-- Choisir d'abord un jour --</option>
+      </select>
+    </div>
+  </div>
+  <div id="placeholder" class="placeholder">
+    <p>Sélectionnez un jour et un atelier</p>
+    <small>La fiche logistique complète s'affichera ici</small>
+  </div>
+  <div id="recapSection" class="recap-section">
+    <div class="recap-card">
+      <div class="atelier-name" id="rAtelier"></div>
+      <div class="atelier-meta" id="rMeta"></div>
+      <div class="recap-grid">
+        <div class="recap-item"><div class="ri-label">Facilitateur(s)</div><div class="ri-value" id="rFac"></div></div>
+        <div class="recap-item"><div class="ri-label">Helper(s)</div><div class="ri-value" id="rHelpers"></div></div>
+        <div class="recap-item"><div class="ri-label">Angel</div><div class="ri-value" id="rAngel"></div></div>
+        <div class="recap-item"><div class="ri-label">Traducteur</div><div class="ri-value" id="rTraduction"></div></div>
+      </div>
+    </div>
+    <hr class="divider">
+    <div class="logistics-label">Informations Logistiques</div>
+    <div class="logistics-box logistic-box" id="rLogistics"></div>
+  </div>
+</div>
+<footer><p>Made with IBM Bob</p></footer>
+<script src="ref_notes.js"></script>
+<script src="loader.js"></script>
+<script>
+loadData(['logistics.js','data.js'], function() {
+const DATA = agendaToRaw(AGENDA);
+const ROWS = DATA.map(r => { while(r.length<15) r.push(""); return r; });
+
+function heureEnMinutes(h) {
+  if (!h) return 9999;
+  const norm = h.replace(/\./g, ':');
+  const m = norm.match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : 9999;
+}
+
+function onDateChange() {
+  const jour = document.getElementById('selDate').value;
+  const sa = document.getElementById('selAtelier');
+  sa.innerHTML = '<option value="">-- Sélectionner un atelier --</option>';
+  if (!jour) { sa.disabled=true; hideRecap(); return; }
+  const ateliers = ROWS.filter(r=>r[0]===jour)
+    .map(r=>({key: r[2]+'|||'+r[4], label: r[2]?`[${r[2]}] ${r[4]}`:r[4], mins: heureEnMinutes(r[2])}))
+    .filter((v,i,a)=>a.findIndex(x=>x.key===v.key)===i)
+    .sort((a,b) => a.mins - b.mins);
+  ateliers.forEach(a=>{
+    const o=document.createElement('option'); o.value=a.key; o.text=a.label; sa.appendChild(o);
+  });
+  sa.disabled=false;
+  hideRecap();
+}
+
+function onAtelierChange() {
+  const key = document.getElementById('selAtelier').value;
+  if (!key) { hideRecap(); return; }
+  const [heure, atelier] = key.split('|||');
+  const jour = document.getElementById('selDate').value;
+  const row = ROWS.find(r=>r[0]===jour && r[2]===heure && r[4]===atelier);
+  if (!row) { hideRecap(); return; }
+  showRecap(row);
+}
+
+function hideRecap() {
+  document.getElementById('recapSection').classList.remove('visible');
+  document.getElementById('placeholder').style.display='';
+}
+
+function pill(text, cls) { return text ? `<span class="pill ${cls}">${text}</span>` : ''; }
+function pillList(vals, cls) { return vals.filter(Boolean).map(v=>pill(v,cls)).join(''); }
+
+function showRecap(r) {
+  document.getElementById('placeholder').style.display='none';
+  document.getElementById('recapSection').classList.add('visible');
+  document.getElementById('rAtelier').innerHTML = r[2] ? `<span style="font-weight:700">${r[2]}</span> &nbsp;—&nbsp; ${r[4]}` : r[4];
+  const type = r[3]?`<span class="tag">${r[3]}</span> `:'';
+  const lieu = r[5]?`<span class="pill pill-lieu">${r[5]}</span>`:'';
+  const noteVal2 = r[13] ? r[13].trim() : '';
+  const noteRef2 = noteVal2 ? REF_NOTES.find(n => n.value === noteVal2) : null;
+  const noteLabel2 = noteRef2 ? noteRef2.value : noteVal2;
+  const notePill = noteLabel2 ? `<span class="pill pill-lieu" style="background:#fff8e1;color:#78350f;border-color:#fde68a">${noteLabel2}</span>` : '';
+  document.getElementById('rMeta').innerHTML = `${r[0]} — ${r[1]} &nbsp;·&nbsp; ${r[2]} &nbsp; ${type} ${lieu}${notePill ? ' &nbsp;' + notePill : ''}`;
+  document.getElementById('rFac').innerHTML = pillList([r[6],r[7]],'pill-f') || '<span style="color:var(--muted)">—</span>';
+  document.getElementById('rHelpers').innerHTML = pillList([r[9],r[10],r[11]],'pill-h') || '<span style="color:var(--muted)">—</span>';
+  document.getElementById('rAngel').innerHTML = pill(r[12],'pill-a') || '<span style="color:var(--muted)">—</span>';
+  document.getElementById('rTraduction').innerHTML = pill(r[8],'pill-t') || '<span style="color:var(--muted)">—</span>';
+  // Informations Logistiques — lecture depuis LOGISTICS via logisticId (r[14])
+  const logBox = document.getElementById('rLogistics');
+  const logId  = r[14] && r[14].trim();
+  const logEntry = logId && typeof LOGISTICS !== 'undefined' ? LOGISTICS[logId] : null;
+  if (logEntry) {
+    logBox.innerHTML  = logEntry.html || logEntry.text.replace(/\n/g,'<br>');
+    logBox.className  = 'logistics-box logistic-box';
+  } else {
+    logBox.textContent = 'Aucune information logistique renseignée pour cet atelier.';
+    logBox.className   = 'logistics-box logistic-box empty-log';
+  }
+}
+
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
+      .finally(() => location.reload(true));
+  } else {
+    location.reload(true);
+  }
+}
+
+function toggleMode() {
+  const isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+
+// Apply mobile layout automatically on narrow screens
+if (window.innerWidth < 768) {
+  document.documentElement.classList.add('mobile');
+}
+
+// Auto-refresh si ouvert depuis Home (paramètre ?v= présent)
+if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
+  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
+  hardReload();
+}
+
+// ── Lecture des paramètres URL pour pré-sélection depuis Mon Planning ──
+(function() {
+  var params = new URLSearchParams(location.search);
+  var pJour     = params.get('jour');
+  var pAtelier  = params.get('atelier');  // format "heure|||nom"
+  if (!pJour || !pAtelier) return;
+
+  var selDate = document.getElementById('selDate');
+  // Sélectionner le jour
+  for (var i = 0; i < selDate.options.length; i++) {
+    if (selDate.options[i].value === pJour) { selDate.selectedIndex = i; break; }
+  }
+  // Peupler le select atelier puis sélectionner
+  onDateChange();
+  var selAt = document.getElementById('selAtelier');
+  for (var j = 0; j < selAt.options.length; j++) {
+    if (selAt.options[j].value === pAtelier) { selAt.selectedIndex = j; break; }
+  }
+  onAtelierChange();
+})();
+
+// Exposer dans window les fonctions appelées depuis les onclick/onchange HTML
+window.hardReload      = hardReload;
+window.toggleMode      = toggleMode;
+window.onDateChange    = onDateChange;
+window.onAtelierChange = onAtelierChange;
+
+}); // fin loadData
+</script>
+</body>
+</html>

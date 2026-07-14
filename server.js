@@ -32,9 +32,9 @@ const MIME = {
 const ALLOWED = new Set([
   'data.js',
   'logistics.js',
-  'ref_facilitateurs.js',
-  'ref_helpers.js',
-  'ref_angels.js',
+  'ref_ressources.js',
+  'ref_resource_types.js',
+  'ref_ressources.js',
   'ref_lieux.js',
   'ref_types.js',
   'ref_jours.js',

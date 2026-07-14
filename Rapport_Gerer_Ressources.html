@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Gérer les Ressources</title>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --header-bg:#f0f4fb; --row-alt:#f7f8fa;
+    --green:#16a34a; --green-bg:#dcfce7; --green-border:#86efac;
+    /* Badges rôles */
+    --badge-f-bg:#dcfce7;  --badge-f-tx:#166534;
+    --badge-h-bg:#e0f2fe;  --badge-h-tx:#0369a1;
+    --badge-t-bg:#fef9c3;  --badge-t-tx:#854d0e;
+    --badge-a-bg:#fce7f3;  --badge-a-tx:#9d174d;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --header-bg:#1c2333; --row-alt:#161b22;
+    --green-bg:#052e16; --green-border:#166534;
+    --badge-f-bg:#0a2e1a;  --badge-f-tx:#4ade80;
+    --badge-h-bg:#0c2d48;  --badge-h-tx:#58a6ff;
+    --badge-t-bg:#2d2006;  --badge-t-tx:#fbbf24;
+    --badge-a-bg:#3b1030;  --badge-a-tx:#f0abca;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
+  .wrap { max-width:1100px; margin:0 auto; padding:24px 20px 60px; }
+
+  /* ── HEADER ── */
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:20px; font-weight:700; }
+  .logo p  { font-size:24px; font-weight:800; color:var(--accent); line-height:1.2; margin-top:2px; }
+  .header-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:6px 14px; font-size:13px; color:var(--text); font-family:inherit; display:inline-flex; align-items:center; gap:6px; }
+  .btn:hover { background:var(--border); }
+  .btn-add { background:var(--green-bg); border-color:var(--green-border); color:var(--green); font-weight:700; }
+  .dark .btn-add { color:#4ade80; }
+
+  /* ── TOOLBAR ── */
+  .toolbar { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; align-items:flex-end; }
+  .filter-group { display:flex; flex-direction:column; gap:4px; }
+  .filter-group label { font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); font-weight:600; }
+  select, input[type="text"] { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:13px; color:var(--text); font-family:inherit; cursor:pointer; }
+  input[type="text"] { min-width:200px; }
+  select { min-width:140px; }
+  .stats { font-size:12px; color:var(--muted); margin-bottom:12px; }
+  .stats span { color:var(--accent); font-weight:600; }
+
+  /* ── TABLE ── */
+  .table-wrap { border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:28px; }
+  table { width:100%; border-collapse:collapse; }
+  thead th {
+    background:var(--header-bg); text-align:left;
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted);
+    padding:9px 12px; border-bottom:1px solid var(--border);
+    white-space:nowrap; cursor:pointer; user-select:none;
+  }
+  thead th:hover { color:var(--accent); }
+  thead th .sort-icon { margin-left:4px; opacity:.4; }
+  thead th.sorted .sort-icon { opacity:1; color:var(--accent); }
+  tbody tr { border-bottom:1px solid var(--border); cursor:pointer; transition:background .1s; }
+  tbody tr:last-child { border-bottom:none; }
+  tbody tr:hover { background:var(--row-alt); }
+  tbody tr.selected { background:#eff6ff; }
+  .dark tbody tr.selected { background:#0c2d48; }
+  td { padding:9px 12px; font-size:13px; vertical-align:middle; }
+  .td-name { font-weight:600; }
+  .td-roles { display:flex; gap:4px; flex-wrap:wrap; }
+  .role-badge {
+    font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px;
+    white-space:nowrap; letter-spacing:.3px;
+  }
+  .role-f { background:var(--badge-f-bg); color:var(--badge-f-tx); }
+  .role-h { background:var(--badge-h-bg); color:var(--badge-h-tx); }
+  .role-t { background:var(--badge-t-bg); color:var(--badge-t-tx); }
+  .role-a { background:var(--badge-a-bg); color:var(--badge-a-tx); }
+  .td-id { font-size:11px; color:var(--muted); font-family:monospace; }
+  .td-actions { text-align:right; white-space:nowrap; }
+  .btn-icon { cursor:pointer; background:transparent; border:none; font-size:15px; padding:3px 5px; border-radius:4px; color:var(--muted); }
+  .btn-icon:hover { background:var(--border); color:var(--text); }
+  .empty-row td { padding:40px; text-align:center; color:var(--muted); font-style:italic; }
+
+  /* ── PANNEAU ÉDITEUR ── */
+  .editor-panel {
+    background:var(--surface); border:2px solid var(--accent);
+    border-radius:10px; padding:24px 28px; margin-bottom:32px;
+  }
+  .editor-title { font-size:16px; font-weight:700; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+  .editor-badge { font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; background:var(--accent); color:#fff; }
+  .editor-badge.new { background:var(--green); }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px 24px; }
+  @media(max-width:640px) { .form-grid { grid-template-columns:1fr; } }
+  .form-group { display:flex; flex-direction:column; gap:5px; }
+  .form-group.full { grid-column:1/-1; }
+  .form-group label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); }
+  .form-group input {
+    background:var(--bg); border:1px solid var(--border); border-radius:6px;
+    padding:8px 10px; font-size:13px; color:var(--text); font-family:inherit; width:100%;
+  }
+  .form-group input:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(59,130,212,.12); }
+  .hint { font-size:11px; color:var(--muted); }
+
+  /* ── CHECKBOXES RÔLES ── */
+  .roles-check { display:flex; gap:14px; flex-wrap:wrap; margin-top:4px; }
+  .role-chk { display:flex; align-items:center; gap:6px; cursor:pointer; padding:6px 12px; border-radius:6px; border:2px solid var(--border); background:var(--bg); transition:all .15s; user-select:none; }
+  .role-chk:hover { border-color:var(--accent); }
+  .role-chk input { width:15px; height:15px; cursor:pointer; accent-color:var(--accent); }
+  .role-chk .rc-label { font-size:13px; font-weight:600; }
+  .role-chk.checked-f { border-color:var(--badge-f-tx); background:var(--badge-f-bg); }
+  .role-chk.checked-h { border-color:var(--badge-h-tx); background:var(--badge-h-bg); }
+  .role-chk.checked-t { border-color:var(--badge-t-tx); background:var(--badge-t-bg); }
+  .role-chk.checked-a { border-color:var(--badge-a-tx); background:var(--badge-a-bg); }
+
+  /* ── ACTIONS ÉDITEUR ── */
+  .editor-actions { display:flex; gap:10px; margin-top:22px; flex-wrap:wrap; align-items:center; }
+  .btn-primary { cursor:pointer; background:var(--accent); color:#fff; border:none; border-radius:6px; padding:9px 22px; font-size:14px; font-weight:700; font-family:inherit; display:inline-flex; align-items:center; gap:7px; }
+  .btn-primary:hover { filter:brightness(1.1); }
+  .btn-primary:disabled { opacity:.55; cursor:not-allowed; filter:none; }
+  .btn-danger { cursor:pointer; background:#fee2e2; color:#dc2626; border:1px solid #fca5a5; border-radius:6px; padding:9px 18px; font-size:14px; font-family:inherit; font-weight:600; }
+  .btn-danger:hover { background:#fca5a5; }
+  .btn-secondary { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:9px 20px; font-size:14px; color:var(--text); font-family:inherit; }
+  .btn-secondary:hover { background:var(--border); }
+  .saving-indicator { font-size:13px; color:var(--muted); display:none; align-items:center; gap:6px; }
+  .saving-indicator.show { display:flex; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .spinner { width:15px; height:15px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
+
+  /* ── CONFIRM MODAL ── */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9999; align-items:center; justify-content:center; }
+  .modal-overlay.show { display:flex; }
+  .modal-box { background:var(--bg); border-radius:12px; padding:28px 32px; max-width:380px; width:90%; border:1px solid var(--border); }
+  .modal-box h3 { font-size:16px; font-weight:700; margin-bottom:10px; }
+  .modal-box p { font-size:13px; color:var(--muted); margin-bottom:20px; }
+  .modal-actions { display:flex; gap:10px; }
+
+  /* ── TOAST ── */
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1f2328; color:#fff; border-radius:8px; padding:12px 20px; font-size:13px; font-weight:600; z-index:9998; display:none; align-items:center; gap:8px; box-shadow:0 4px 16px rgba(0,0,0,.25); }
+  .toast.show { display:flex; animation:fadeUp .25s ease; }
+  @keyframes fadeUp { from{opacity:0;transform:translateX(-50%) translateY(8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+  footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
+
+  /* ── LÉGENDE ── */
+  .legend { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+  .legend-item { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--muted); }
+  .legend-dot { width:10px; height:10px; border-radius:3px; }
+</style>
+</head>
+<body>
+
+<!-- ── CONFIRM DELETE ── -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <h3>🗑️ Supprimer cette ressource ?</h3>
+    <p id="confirmMsg">Cette action supprimera la ressource du référentiel.</p>
+    <div class="modal-actions">
+      <button class="btn-secondary" style="flex:1" onclick="closeConfirm()">Annuler</button>
+      <button class="btn-danger" style="flex:1" onclick="confirmDelete()">Supprimer</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Gérer les Ressources</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-add" onclick="openAdd()">＋ Ajouter une ressource</button>
+      <a class="btn" href="index.html">🏠 Home</a>
+      <button class="btn" onclick="hardReload()">🔄 Refresh</button>
+      <button class="btn" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+
+  <!-- LÉGENDE -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#166534"></div>Facilitateur</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#0369a1"></div>Helper</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#854d0e"></div>Traducteur</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9d174d"></div>Angel</div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="filter-group">
+      <label>Rôle</label>
+      <select id="filterRole" onchange="renderTable()">
+        <option value="">Tous les rôles</option>
+        <option value="facilitateur">Facilitateur</option>
+        <option value="helper">Helper</option>
+        <option value="traducteur">Traducteur</option>
+        <option value="angel">Angel</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Recherche</label>
+      <input type="text" id="filterSearch" placeholder="Nom ou ID…" oninput="renderTable()">
+    </div>
+  </div>
+  <div class="stats" id="stats"></div>
+
+  <!-- ÉDITEUR (masqué par défaut) -->
+  <div class="editor-panel" id="editorPanel" style="display:none"></div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th onclick="sortBy('value')" id="th-value">Nom <span class="sort-icon">↕</span></th>
+          <th>Rôles</th>
+          <th onclick="sortBy('id')" id="th-id">ID <span class="sort-icon">↕</span></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<footer><p>Made with IBM Bob</p></footer>
+
+<!-- ── RÉFÉRENTIELS ── -->
+<script src="ref_resource_types.js"></script>
+<script src="ref_ressources.js"></script>
+<script src="github-api.js"></script>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// ÉTAT
+// ══════════════════════════════════════════════════════════
+let data        = [];   // copie de travail de REF_RESSOURCES
+let editingIdx  = null; // index dans data (null = nouveau)
+let pendingDel  = null; // index à supprimer
+let sortCol     = 'value';
+let sortAsc     = true;
+
+// Init : cloner le référentiel chargé
+function initData() {
+  data = REF_RESSOURCES.map(function(r) {
+    return { id: r.id, value: r.value, roles: r.roles.slice() };
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// RENDU TABLE
+// ══════════════════════════════════════════════════════════
+var ROLE_META = {
+  facilitateur: { label:'Facilitateur', cls:'role-f' },
+  helper:       { label:'Helper',       cls:'role-h' },
+  traducteur:   { label:'Traducteur',   cls:'role-t' },
+  angel:        { label:'Angel',        cls:'role-a' },
+};
+
+function renderTable() {
+  var role   = document.getElementById('filterRole').value;
+  var search = document.getElementById('filterSearch').value.trim().toLowerCase();
+
+  var filtered = data.filter(function(r) {
+    if (role && r.roles.indexOf(role) === -1) return false;
+    if (search && r.value.toLowerCase().indexOf(search) === -1 && r.id.toLowerCase().indexOf(search) === -1) return false;
+    return true;
+  });
+
+  // Tri
+  filtered.sort(function(a, b) {
+    var va = sortCol === 'id' ? a.id : a.value;
+    var vb = sortCol === 'id' ? b.id : b.value;
+    return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+
+  document.getElementById('stats').innerHTML =
+    '<span>' + filtered.length + '</span> ressource(s) sur ' + data.length + ' — cliquez sur une ligne pour l\'éditer';
+
+  // Icônes de tri
+  ['value','id'].forEach(function(col) {
+    var th = document.getElementById('th-' + col);
+    if (!th) return;
+    th.classList.toggle('sorted', sortCol === col);
+    th.querySelector('.sort-icon').textContent = sortCol === col ? (sortAsc ? '↑' : '↓') : '↕';
+  });
+
+  var tbody = document.getElementById('tableBody');
+  if (!filtered.length) {
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="4">Aucune ressource correspondante.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(function(r) {
+    var realIdx = data.indexOf(r);
+    var sel = (editingIdx === realIdx) ? ' selected' : '';
+    var badges = r.roles.map(function(rl) {
+      var m = ROLE_META[rl];
+      return m ? '<span class="role-badge ' + m.cls + '">' + m.label + '</span>' : '';
+    }).join('');
+    return '<tr' + sel + ' onclick="selectRow(' + realIdx + ')" id="row-' + realIdx + '">' +
+      '<td class="td-name">' + esc(r.value) + '</td>' +
+      '<td><div class="td-roles">' + badges + '</div></td>' +
+      '<td class="td-id">' + esc(r.id) + '</td>' +
+      '<td class="td-actions">' +
+        '<button class="btn-icon" title="Éditer" onclick="event.stopPropagation();selectRow(' + realIdx + ')">✏️</button>' +
+        '<button class="btn-icon" title="Supprimer" onclick="event.stopPropagation();askDelete(' + realIdx + ')">🗑️</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+window.renderTable = renderTable;
+
+function sortBy(col) {
+  if (sortCol === col) sortAsc = !sortAsc;
+  else { sortCol = col; sortAsc = true; }
+  renderTable();
+}
+window.sortBy = sortBy;
+
+// ══════════════════════════════════════════════════════════
+// SÉLECTION / ÉDITEUR
+// ══════════════════════════════════════════════════════════
+function selectRow(idx) {
+  editingIdx = idx;
+  renderTable();
+  renderEditor(false);
+  var panel = document.getElementById('editorPanel');
+  panel.style.display = '';
+  panel.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+window.selectRow = selectRow;
+
+function openAdd() {
+  editingIdx = null;
+  renderEditor(true);
+  var panel = document.getElementById('editorPanel');
+  panel.style.display = '';
+  panel.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+window.openAdd = openAdd;
+
+function closeEditor() {
+  editingIdx = null;
+  document.getElementById('editorPanel').style.display = 'none';
+  renderTable();
+}
+window.closeEditor = closeEditor;
+
+// ══════════════════════════════════════════════════════════
+// RENDU FORMULAIRE
+// ══════════════════════════════════════════════════════════
+var ALL_ROLES = ['facilitateur','helper','traducteur','angel'];
+var ROLE_ICONS = { facilitateur:'🎓', helper:'🤝', traducteur:'🌐', angel:'👼' };
+
+function renderEditor(isNew) {
+  var r = isNew ? { id:'', value:'', roles:[] } : data[editingIdx];
+  var panel = document.getElementById('editorPanel');
+
+  var chkboxes = ALL_ROLES.map(function(rl) {
+    var checked = r.roles.indexOf(rl) !== -1;
+    var m = ROLE_META[rl];
+    var chkSuffix = rl[0]; // f, h, t, a
+    return '<label class="role-chk' + (checked ? ' checked-' + chkSuffix : '') + '" id="lbl-' + rl + '">' +
+      '<input type="checkbox" id="chk-' + rl + '" ' + (checked ? 'checked' : '') + ' onchange="onRoleChange(\'' + rl + '\')">' +
+      '<span class="rc-label">' + ROLE_ICONS[rl] + ' ' + m.label + '</span>' +
+    '</label>';
+  }).join('');
+
+  var badgeHtml = isNew
+    ? '<span class="editor-badge new">+ Nouvelle ressource</span>'
+    : '<span class="editor-badge">' + esc(r.id) + '</span>';
+
+  panel.innerHTML =
+    '<div class="editor-title">' +
+      (isNew ? '➕' : '✏️') + ' ' + (isNew ? 'Ajouter une ressource' : 'Éditer : ' + esc(r.value)) +
+      badgeHtml +
+    '</div>' +
+
+    '<div class="form-grid">' +
+
+      '<div class="form-group">' +
+        '<label>Nom complet</label>' +
+        '<input type="text" id="f-value" value="' + esc(r.value) + '" placeholder="Ex : Matthieu Chapeleau (Atman)">' +
+        '<span class="hint">Nom exact tel qu\'il apparaît dans l\'agenda</span>' +
+      '</div>' +
+
+      '<div class="form-group">' +
+        '<label>ID unique</label>' +
+        '<input type="text" id="f-id" value="' + esc(r.id) + '" placeholder="Ex : R_MATTHIEU"' + (isNew ? '' : ' readonly style="opacity:.6"') + '>' +
+        '<span class="hint">Préfixe R_ requis — ne jamais changer après création</span>' +
+      '</div>' +
+
+      '<div class="form-group full">' +
+        '<label>Rôles</label>' +
+        '<div class="roles-check" id="roles-check">' + chkboxes + '</div>' +
+      '</div>' +
+
+    '</div>' +
+
+    '<div class="editor-actions">' +
+      '<button class="btn-primary" id="btnSave" onclick="saveResource()">✅ Enregistrer</button>' +
+      (isNew ? '' : '<button class="btn-danger" onclick="askDelete(' + editingIdx + ')">🗑️ Supprimer</button>') +
+      '<button class="btn-secondary" onclick="closeEditor()">✕ Annuler</button>' +
+      '<div class="saving-indicator" id="savingIndicator"><div class="spinner"></div> Sauvegarde en cours…</div>' +
+    '</div>';
+}
+
+function onRoleChange(rl) {
+  var chk = document.getElementById('chk-' + rl);
+  var lbl = document.getElementById('lbl-' + rl);
+  var sfx = rl[0];
+  if (chk.checked) lbl.classList.add('checked-' + sfx);
+  else lbl.classList.remove('checked-' + sfx);
+}
+window.onRoleChange = onRoleChange;
+
+// ══════════════════════════════════════════════════════════
+// SAUVEGARDE RESSOURCE
+// ══════════════════════════════════════════════════════════
+function collectForm() {
+  var val   = document.getElementById('f-value').value.trim();
+  var id    = document.getElementById('f-id').value.trim().toUpperCase();
+  var roles = ALL_ROLES.filter(function(rl) {
+    return document.getElementById('chk-' + rl).checked;
+  });
+  return { val: val, id: id, roles: roles };
+}
+
+function validateForm(form, isNew) {
+  if (!form.val) { showToast('❌ Le nom est obligatoire.', true); return false; }
+  if (!form.id)  { showToast('❌ L\'ID est obligatoire.', true); return false; }
+  if (!form.id.startsWith('R_')) { showToast('❌ L\'ID doit commencer par "R_".', true); return false; }
+  if (!/^R_[A-Z0-9_]+$/.test(form.id)) { showToast('❌ L\'ID ne doit contenir que des lettres majuscules, chiffres et _.', true); return false; }
+  if (!form.roles.length) { showToast('❌ Sélectionnez au moins un rôle.', true); return false; }
+  if (isNew && data.find(function(r) { return r.id === form.id; })) {
+    showToast('❌ Cet ID existe déjà.', true); return false;
+  }
+  return true;
+}
+
+async function saveResource() {
+  var isNew = editingIdx === null;
+  var form  = collectForm();
+  if (!validateForm(form, isNew)) return;
+
+  var btn = document.getElementById('btnSave');
+  var ind = document.getElementById('savingIndicator');
+  if (btn) btn.disabled = true;
+  if (ind) ind.classList.add('show');
+
+  // Appliquer en mémoire
+  if (isNew) {
+    data.push({ id: form.id, value: form.val, roles: form.roles });
+    editingIdx = data.length - 1;
+  } else {
+    data[editingIdx].value = form.val;
+    data[editingIdx].roles = form.roles;
+    // id = readonly, pas modifiable
+  }
+
+  try {
+    await sauvegarder('ref_ressources.js', genererRefRessources());
+    showToast(isNew ? '✅ Ressource ajoutée !' : '✅ Ressource mise à jour !');
+    closeEditor();
+    renderTable();
+  } catch(err) {
+    // Rollback
+    if (isNew) { data.pop(); editingIdx = null; }
+    else { /* la copie en mémoire est déjà dans data — on la relit depuis form original */ }
+    showToast('❌ Sauvegarde impossible : ' + err.message, true);
+    console.error('[Rapport12] saveResource:', err);
+  } finally {
+    if (btn) btn.disabled = false;
+    if (ind) ind.classList.remove('show');
+  }
+}
+window.saveResource = saveResource;
+
+// ══════════════════════════════════════════════════════════
+// SUPPRESSION
+// ══════════════════════════════════════════════════════════
+function askDelete(idx) {
+  pendingDel = idx;
+  document.getElementById('confirmMsg').textContent =
+    'Supprimer "' + data[idx].value + '" du référentiel ?';
+  document.getElementById('confirmModal').classList.add('show');
+}
+window.askDelete = askDelete;
+
+function closeConfirm() {
+  pendingDel = null;
+  document.getElementById('confirmModal').classList.remove('show');
+}
+window.closeConfirm = closeConfirm;
+
+async function confirmDelete() {
+  if (pendingDel === null) return;
+  var idx = pendingDel;
+  closeConfirm();
+
+  var removed = data.splice(idx, 1)[0];
+  if (editingIdx === idx) { editingIdx = null; document.getElementById('editorPanel').style.display = 'none'; }
+  else if (editingIdx > idx) editingIdx--;
+
+  try {
+    await sauvegarder('ref_ressources.js', genererRefRessources());
+    showToast('🗑️ "' + removed.value + '" supprimé.');
+    renderTable();
+  } catch(err) {
+    // Rollback
+    data.splice(idx, 0, removed);
+    showToast('❌ Suppression impossible : ' + err.message, true);
+    console.error('[Rapport12] confirmDelete:', err);
+  }
+}
+window.confirmDelete = confirmDelete;
+
+// ══════════════════════════════════════════════════════════
+// SAUVEGARDE → ref_ressources.js
+// ══════════════════════════════════════════════════════════
+async function sauvegarder(filename, content) {
+  if (location.protocol === 'file:') {
+    throw new Error('Ouvrez via http://localhost:3000 (lancez start.bat) pour sauvegarder.');
+  }
+  var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (isLocal) {
+    var res = await fetch('http://localhost:3000/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: filename, content: content })
+    });
+    if (!res.ok) {
+      var err = await res.json().catch(function() { return {}; });
+      throw new Error(err.error || 'Serveur local : erreur ' + res.status);
+    }
+    return;
+  }
+  await githubSaveFile(filename, content);
+}
+
+// ── Génération du fichier ref_ressources.js ──────────────────────────────────
+function escJs(v) {
+  return String(v || '').replace(/\\/g,'\\\\').replace(/"/g,'\\"');
+}
+
+function genererRefRessources() {
+  // Trier alphabétiquement par value avant de sérialiser
+  var sorted = data.slice().sort(function(a, b) { return a.value.localeCompare(b.value); });
+
+  var lines = sorted.map(function(r) {
+    var rolesStr = '["' + r.roles.join('", "') + '"]';
+    var pad = Math.max(0, 16 - r.id.length);
+    return '  { id: "' + escJs(r.id) + '",  ' + ' '.repeat(pad) +
+           'value: "' + escJs(r.value) + '",  ' +
+           ' '.repeat(Math.max(0, 40 - r.value.length)) +
+           'roles: ' + rolesStr + ' },';
+  }).join('\n');
+
+  return (
+'/**\n' +
+' * TANTRAMOUR 2026 \u2014 R\u00e9f\u00e9rentiel Unifi\u00e9 : Ressources\n' +
+' *\n' +
+' * \u26a0\ufe0f  Ce fichier doit \u00eatre charg\u00e9 APR\u00c8S ref_resource_types.js\n' +
+' *\n' +
+' * Chaque entr\u00e9e : { id, value, roles }\n' +
+' *   id    : cl\u00e9 unique (stable, ne jamais changer) \u2014 pr\u00e9fixe "R_"\n' +
+' *   value : nom exact tel qu\'il appara\u00eet dans AGENDA\n' +
+' *   roles : tableau des r\u00f4les possibles pour cette personne\n' +
+' *           Valeurs accept\u00e9es : "facilitateur" | "helper" | "traducteur" | "angel"\n' +
+' *\n' +
+' * \u26a0\ufe0f  Pour les rapports existants, les alias de compatibilit\u00e9 en bas de fichier\n' +
+' *     reconstituent automatiquement REF_FACILITATEURS, REF_HELPERS,\n' +
+' *     REF_TRADUCTEURS et REF_ANGELS depuis cette liste.\n' +
+' */\n' +
+'var REF_RESSOURCES = [\n' +
+lines + '\n' +
+'];\n' +
+'\n' +
+'\n' +
+'// \u2500\u2500\u2500 Alias de compatibilit\u00e9 \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n' +
+'// Ces 4 variables reconstituent les anciens r\u00e9f\u00e9rentiels depuis REF_RESSOURCES.\n' +
+'// Les rapports existants continuent de fonctionner sans modification.\n' +
+'var REF_FACILITATEURS = REF_RESSOURCES\n' +
+'  .filter(function(r){ return r.roles.indexOf("facilitateur") !== -1; })\n' +
+'  .map(function(r){ return { id: "F_" + r.id.slice(2), value: r.value }; });\n' +
+'\n' +
+'var REF_HELPERS = REF_RESSOURCES\n' +
+'  .filter(function(r){ return r.roles.indexOf("helper") !== -1; })\n' +
+'  .map(function(r){ return { id: "H_" + r.id.slice(2), value: r.value }; });\n' +
+'\n' +
+'var REF_TRADUCTEURS = REF_RESSOURCES\n' +
+'  .filter(function(r){ return r.roles.indexOf("traducteur") !== -1; })\n' +
+'  .map(function(r){ return { id: "TR_" + r.id.slice(2), value: r.value }; });\n' +
+'\n' +
+'var REF_ANGELS = REF_RESSOURCES\n' +
+'  .filter(function(r){ return r.roles.indexOf("angel") !== -1; })\n' +
+'  .map(function(r){ return { id: "A_" + r.id.slice(2), value: r.value }; });\n'
+  );
+}
+
+// ══════════════════════════════════════════════════════════
+// UTILITAIRES
+// ══════════════════════════════════════════════════════════
+function esc(v) {
+  return String(v || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg, isError) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = isError ? '#fef2f2' : '#1f2328';
+  t.style.color      = isError ? '#dc2626' : '#fff';
+  t.style.border     = isError ? '1px solid #fca5a5' : 'none';
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, isError ? 6000 : 3500);
+}
+
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.map(function(k) { return caches.delete(k); }));
+    }).finally(function() { location.reload(true); });
+  } else { location.reload(true); }
+}
+window.hardReload = hardReload;
+
+function toggleMode() {
+  var isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+window.toggleMode = toggleMode;
+
+// ── Démarrage ─────────────────────────────────────────────
+initData();
+renderTable();
+
+if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
+  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
+  hardReload();
+}
+</script>
+</body>
+</html>

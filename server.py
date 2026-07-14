@@ -18,14 +18,15 @@ ROOT  = Path(__file__).parent.resolve()
 # Seuls ces fichiers peuvent être écrits via /save
 ALLOWED = {
     'data.js',
-    'ref_facilitateurs.js',
-    'ref_helpers.js',
-    'ref_angels.js',
+    'logistics.js',
+    'ref_ressources.js',
+    'ref_resource_types.js',
     'ref_lieux.js',
     'ref_types.js',
     'ref_jours.js',
-    'ref_traducteurs.js',
     'ref_notes.js',
+    'ref_piment.js',
+    'ref_heures.js',
 }
 
 MIME = {

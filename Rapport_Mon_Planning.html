@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Mon Planning (My Planning)</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --header-bg: #f0f4fb;
+    --tag-bg: #eef2ff; --tag-text: #3b5bdb;
+    --row-alt: #f7f8fa;
+
+    /* Badges rôles */
+    --badge-f-bg: #dcfce7; --badge-f-tx: #166534;
+    --badge-h-bg: #e0f2fe; --badge-h-tx: #0369a1;
+    --badge-t-bg: #fef9c3; --badge-t-tx: #854d0e;
+    --badge-a-bg: #fce7f3; --badge-a-tx: #9d174d;
+
+    /* Couleurs par rôle actif */
+    --role-bg: #f0f9ff;   --role-border: #7dd3fc; --role-text: #0c4a6e; --role-accent: #0369a1;
+  }
+  .dark {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --header-bg: #1c2333;
+    --tag-bg: #1c2a4a; --tag-text: #79a8ff;
+    --row-alt: #161b22;
+    --badge-f-bg: #0a2e1a; --badge-f-tx: #4ade80;
+    --badge-h-bg: #0c2d48; --badge-h-tx: #58a6ff;
+    --badge-t-bg: #2d2006; --badge-t-tx: #fbbf24;
+    --badge-a-bg: #3b1030; --badge-a-tx: #f0abca;
+    --role-bg: #0a1e35; --role-border: #1e4e7a; --role-text: #7dd3fc; --role-accent: #38bdf8;
+  }
+
+  /* Thèmes par rôle sélectionné */
+  body.role-f { --role-bg: #dcfce7; --role-border: #86efac; --role-text: #166534; --role-accent: #16a34a; }
+  body.dark.role-f { --role-bg: #0a2e1a; --role-border: #166534; --role-text: #4ade80; --role-accent: #22c55e; }
+  body.role-h { --role-bg: #e0f2fe; --role-border: #7dd3fc; --role-text: #0c4a6e; --role-accent: #0369a1; }
+  body.dark.role-h { --role-bg: #0c2d48; --role-border: #1e4e7a; --role-text: #7dd3fc; --role-accent: #38bdf8; }
+  body.role-t { --role-bg: #fef9c3; --role-border: #fde68a; --role-text: #713f12; --role-accent: #d97706; }
+  body.dark.role-t { --role-bg: #2d2006; --role-border: #78350f; --role-text: #fbbf24; --role-accent: #f59e0b; }
+  body.role-a { --role-bg: #fce7f3; --role-border: #f9a8d4; --role-text: #831843; --role-accent: #be185d; }
+  body.dark.role-a { --role-bg: #3b1030; --role-border: #831843; --role-text: #f0abca; --role-accent: #ec4899; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  /* ── HEADER ── */
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+  .logo h1 { font-size: 20px; font-weight: 700; }
+  .logo p  { font-size: 26px; font-weight: 800; color: var(--role-accent); letter-spacing: .3px; line-height: 1.2; margin-top: 2px; transition: color .2s; }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn-ghost { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* ── STATS CARDS ── */
+  .summary { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+  .sum-card { flex: 1; min-width: 120px; border-radius: 10px; padding: 14px 18px; border: 1px solid var(--role-border); background: var(--role-bg); transition: background .2s, border-color .2s; }
+  .sum-num   { font-size: 28px; font-weight: 800; line-height: 1; margin-bottom: 4px; color: var(--role-accent); transition: color .2s; }
+  .sum-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+
+  /* ── FILTRES RÔLE (boutons onglets) ── */
+  .role-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .role-tab {
+    cursor: pointer; padding: 7px 18px; border-radius: 999px; border: 2px solid var(--border);
+    background: var(--surface); font-size: 13px; font-weight: 600; font-family: inherit;
+    color: var(--muted); display: inline-flex; align-items: center; gap: 6px;
+    transition: all .15s;
+  }
+  .role-tab:hover { border-color: var(--accent); color: var(--text); }
+  .role-tab.active-all  { border-color: var(--accent); background: #eff6ff; color: var(--accent); }
+  .role-tab.active-f    { border-color: var(--badge-f-tx); background: var(--badge-f-bg); color: var(--badge-f-tx); }
+  .role-tab.active-h    { border-color: var(--badge-h-tx); background: var(--badge-h-bg); color: var(--badge-h-tx); }
+  .role-tab.active-t    { border-color: var(--badge-t-tx); background: var(--badge-t-bg); color: var(--badge-t-tx); }
+  .role-tab.active-a    { border-color: var(--badge-a-tx); background: var(--badge-a-bg); color: var(--badge-a-tx); }
+  .dark .role-tab.active-all { background: #0c2d48; }
+
+  /* ── FILTRES ── */
+  .filters { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end; }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; }
+  .filter-group label { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 600; }
+  select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 13px; color: var(--text); font-family: inherit; min-width: 200px; cursor: pointer; }
+  .search-wrap { position: relative; }
+  .search-wrap input[type="text"] { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px 7px 32px; font-size: 13px; color: var(--text); font-family: inherit; min-width: 220px; outline: none; }
+  .search-wrap input[type="text"]:focus { border-color: var(--role-accent); box-shadow: 0 0 0 3px rgba(59,130,212,.12); }
+  .search-wrap .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; pointer-events: none; color: var(--muted); }
+  .search-wrap .search-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); cursor: pointer; background: none; border: none; font-size: 13px; color: var(--muted); padding: 0; line-height: 1; display: none; }
+  .search-wrap .search-clear.visible { display: block; }
+
+  .stats { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .stats span { color: var(--role-accent); font-weight: 600; transition: color .2s; }
+
+  /* ── CARTES PAR PERSONNE ── */
+  .role-section { display: flex; flex-direction: column; gap: 24px; }
+  .role-block { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  .role-header {
+    background: var(--role-bg); border-bottom: 1px solid var(--role-border);
+    padding: 14px 20px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    transition: background .2s, border-color .2s;
+  }
+  .role-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--role-accent); color: #fff;
+    font-size: 16px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; letter-spacing: .5px; transition: background .2s;
+  }
+  .role-name  { font-size: 18px; font-weight: 800; }
+  .role-badge { display: inline-flex; align-items: center; gap: 4px; border-radius: 999px; padding: 2px 10px; font-size: 11px; font-weight: 700; letter-spacing: .4px; white-space: nowrap; }
+  .rbadge-all { background: var(--accent); color: #fff; }
+  .rbadge-f   { background: var(--badge-f-bg); color: var(--badge-f-tx); }
+  .rbadge-h   { background: var(--badge-h-bg); color: var(--badge-h-tx); }
+  .rbadge-t   { background: var(--badge-t-bg); color: var(--badge-t-tx); }
+  .rbadge-a   { background: var(--badge-a-bg); color: var(--badge-a-tx); }
+  .role-stats { margin-left: auto; font-size: 12px; color: var(--muted); text-align: right; }
+  .role-stats strong { color: var(--role-accent); font-size: 15px; transition: color .2s; }
+
+  /* ── LIGNE ATELIER ── */
+  .shift-row {
+    display: flex; align-items: center; gap: 14px; flex-wrap: nowrap;
+    padding: 10px 20px; border-bottom: 1px solid var(--border); background: var(--bg);
+  }
+  .shift-row:last-child { border-bottom: none; }
+  .shift-row:nth-child(even) { background: var(--row-alt); }
+  .shift-jour   { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); white-space: nowrap; min-width: 46px; }
+  .shift-date   { font-size: 12px; color: var(--muted); white-space: nowrap; min-width: 130px; }
+  .shift-heure  { font-size: 13px; font-weight: 800; color: var(--role-accent); font-variant-numeric: tabular-nums; white-space: nowrap; min-width: 110px; transition: color .2s; }
+  .shift-role   { flex-shrink: 0; }
+  .shift-atelier { font-size: 13px; flex: 1; min-width: 0; }
+  .shift-lieu   { white-space: nowrap; }
+  .tag     { display: inline-block; background: var(--tag-bg); color: var(--tag-text); border-radius: 4px; padding: 1px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .tag-lieu { background: var(--surface); color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 1px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .log-link { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); font-size: 13px; text-decoration: none; flex-shrink: 0; transition: background .15s, border-color .15s, color .15s; }
+  .log-link:hover { background: #eff6ff; border-color: var(--accent); color: var(--accent); }
+
+  /* ── VUE TABLEAU ── */
+  .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 10px; }
+  table.global { width: 100%; border-collapse: collapse; min-width: 700px; }
+  table.global thead th { background: var(--header-bg); padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
+  table.global tbody td { padding: 9px 14px; font-size: 13px; vertical-align: top; border-bottom: 1px solid var(--border); }
+  table.global tbody tr:last-child td { border-bottom: none; }
+  table.global tbody tr:hover { background: var(--row-alt); }
+
+  /* ── BASCULE VUE ── */
+  .view-toggle { display: flex; gap: 8px; margin-bottom: 18px; flex-wrap: wrap; }
+  .vbtn { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--muted); font-family: inherit; transition: all .15s; }
+  .vbtn.active { background: var(--role-bg); border-color: var(--role-border); color: var(--role-accent); font-weight: 600; }
+
+  .empty { text-align: center; padding: 48px; color: var(--muted); font-size: 14px; border: 2px dashed var(--border); border-radius: 10px; }
+
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+
+  @media (max-width: 600px) {
+    select { min-width: 100%; }
+    .shift-date { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p id="pageTitle">Mon Planning (My Planning)</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn-ghost" href="index.html">🏠 Home</a>
+      <button class="btn-ghost" onclick="hardReload()">🔄 Refresh</button>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+
+  <!-- ── STATS ── -->
+  <div class="summary">
+    <div class="sum-card"><div class="sum-num" id="sumPersonnes">—</div><div class="sum-label">Personnes</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumAteliers">—</div><div class="sum-label">Interventions</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumFacs">—</div><div class="sum-label">Facilitateurs</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumHelpers">—</div><div class="sum-label">Helpers</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumTrads">—</div><div class="sum-label">Traducteurs</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumAngels">—</div><div class="sum-label">Angels</div></div>
+  </div>
+
+  <!-- ── ONGLETS RÔLE ── -->
+  <div class="role-tabs" id="roleTabs">
+    <button class="role-tab active-all" id="tab-all"   onclick="setRole('')"             >🌐 Combiné (tous rôles)</button>
+    <button class="role-tab"            id="tab-f"     onclick="setRole('F')"            >🎓 Facilitateurs</button>
+    <button class="role-tab"            id="tab-h"     onclick="setRole('H')"            >🤝 Helpers</button>
+    <button class="role-tab"            id="tab-t"     onclick="setRole('T')"            >🌐 Traducteurs</button>
+    <button class="role-tab"            id="tab-a"     onclick="setRole('A')"            >👼 Angels</button>
+  </div>
+
+  <!-- ── FILTRES ── -->
+  <div class="filters">
+    <div class="filter-group">
+      <label>Recherche</label>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="filterSearch" placeholder="Nom de la personne…" oninput="onSearch()">
+        <button class="search-clear" id="searchClear" onclick="clearSearch()" title="Effacer">✕</button>
+      </div>
+    </div>
+    <div class="filter-group">
+      <label>Personne</label>
+      <select id="filterPerson" onchange="render()">
+        <option value="">Toutes les personnes</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Jour</label>
+      <select id="filterJour" onchange="render()">
+        <option value="">Tous les jours</option>
+        <option value="Jour 1">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7">Jour 7 — Ven. 4 sept.</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ── BASCULE VUE ── -->
+  <div class="view-toggle">
+    <button class="vbtn active" id="vbtnCards" onclick="setView('cards')">👤 Vue par Personne</button>
+    <button class="vbtn"        id="vbtnTable" onclick="setView('table')">📋 Vue Tableau</button>
+  </div>
+
+  <div class="stats" id="stats"></div>
+  <div id="results"></div>
+
+</div>
+<footer><p>Made with IBM Bob</p></footer>
+
+<script src="loader.js"></script>
+<script>
+loadData(['data.js'], function() {
+
+// ════════════════════════════════════════════════════════
+// CONFIGURATION
+// ════════════════════════════════════════════════════════
+const ROLE_META = {
+  'F': { label: 'Facilitateur', icon: '🎓', cls: 'rbadge-f', tabCls: 'active-f', bodyCls: 'role-f' },
+  'H': { label: 'Helper',       icon: '🤝', cls: 'rbadge-h', tabCls: 'active-h', bodyCls: 'role-h' },
+  'T': { label: 'Traducteur',   icon: '🌐', cls: 'rbadge-t', tabCls: 'active-t', bodyCls: 'role-t' },
+  'A': { label: 'Angel',        icon: '👼', cls: 'rbadge-a', tabCls: 'active-a', bodyCls: 'role-a' },
+};
+const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+let currentView = 'cards';
+let currentRole = ''; // '' = tous rôles combinés
+
+// ════════════════════════════════════════════════════════
+// CONSTRUCTION DES DONNÉES PAR PERSONNE
+// Extrait toutes les interventions de AGENDA
+// Retourne une Map : nom → [{ atelier, jour, date, heure, lieu, type, fac1, fac2, piment, roles[] }]
+// ════════════════════════════════════════════════════════
+function heureMin(h) {
+  if (!h) return 9999;
+  const m = String(h).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1])*60+parseInt(m[2]) : 9999;
+}
+
+function construireData() {
+  const byPerson = new Map(); // nom → entrées[]
+
+  function addEntry(nom, role, entry) {
+    if (!nom || !nom.trim()) return;
+    const n = nom.trim();
+    if (!byPerson.has(n)) byPerson.set(n, []);
+    byPerson.get(n).push(Object.assign({}, entry, { role }));
+  }
+
+  AGENDA.forEach(function(e) {
+    const base = {
+      atelier: e.atelier, jour: e.jour, date: e.date,
+      heure: e.heure, lieu: e.lieu||'', type: e.type,
+      fac1: e.fac1||'', fac2: e.fac2||'', piment: e.piment||0
+    };
+    // Facilitateurs
+    if (e.fac1) addEntry(e.fac1, 'F', base);
+    if (e.fac2) addEntry(e.fac2, 'F', base);
+    // Traducteur
+    if (e.traduction) addEntry(e.traduction, 'T', base);
+    // Helpers
+    if (e.helper1) addEntry(e.helper1, 'H', base);
+    if (e.helper2) addEntry(e.helper2, 'H', base);
+    if (e.helper3) addEntry(e.helper3, 'H', base);
+    // Angel
+    if (e.angel) addEntry(e.angel, 'A', base);
+  });
+
+  // Trier chaque personne par jour puis heure
+  const result = [];
+  byPerson.forEach(function(entries, nom) {
+    entries.sort(function(a,b) {
+      const dj = JOUR_ORDER.indexOf(a.jour) - JOUR_ORDER.indexOf(b.jour);
+      return dj !== 0 ? dj : heureMin(a.heure) - heureMin(b.heure);
+    });
+    result.push({ nom: nom, entries: entries });
+  });
+  result.sort(function(a,b) { return a.nom.localeCompare(b.nom,'fr'); });
+  return result;
+}
+
+const ALL_DATA = construireData();
+
+// ════════════════════════════════════════════════════════
+// STATS GLOBALES
+// ════════════════════════════════════════════════════════
+function updateGlobalStats() {
+  var nF=0, nH=0, nT=0, nA=0;
+  var pF=new Set(), pH=new Set(), pT=new Set(), pA=new Set();
+  ALL_DATA.forEach(function(p) {
+    p.entries.forEach(function(e) {
+      if (e.role==='F') { nF++; pF.add(p.nom); }
+      if (e.role==='H') { nH++; pH.add(p.nom); }
+      if (e.role==='T') { nT++; pT.add(p.nom); }
+      if (e.role==='A') { nA++; pA.add(p.nom); }
+    });
+  });
+  document.getElementById('sumPersonnes').textContent = ALL_DATA.length;
+  document.getElementById('sumAteliers').textContent  = ALL_DATA.reduce(function(s,p){return s+p.entries.length;},0);
+  document.getElementById('sumFacs').textContent      = pF.size;
+  document.getElementById('sumHelpers').textContent   = pH.size;
+  document.getElementById('sumTrads').textContent     = pT.size;
+  document.getElementById('sumAngels').textContent    = pA.size;
+}
+updateGlobalStats();
+
+// ════════════════════════════════════════════════════════
+// BARRE DE RECHERCHE + SELECT PERSONNE
+// ════════════════════════════════════════════════════════
+
+// Alimenter le select Personne dynamiquement
+var selP = document.getElementById('filterPerson');
+ALL_DATA.forEach(function(p) {
+  var o = document.createElement('option');
+  o.value = p.nom; o.text = p.nom;
+  selP.appendChild(o);
+});
+
+// Quand on tape dans la recherche : synchronise le select + re-render
+function onSearch() {
+  var val = document.getElementById('filterSearch').value;
+  document.getElementById('searchClear').classList.toggle('visible', val.length > 0);
+  // Si la saisie correspond exactement à une option, sélectionner dans le select
+  var lower = val.trim().toLowerCase();
+  var match = ALL_DATA.find(function(p) { return p.nom.toLowerCase() === lower; });
+  if (match) {
+    document.getElementById('filterPerson').value = match.nom;
+  } else {
+    document.getElementById('filterPerson').value = '';
+  }
+  render();
+}
+window.onSearch = onSearch;
+
+function clearSearch() {
+  document.getElementById('filterSearch').value = '';
+  document.getElementById('filterPerson').value = '';
+  document.getElementById('searchClear').classList.remove('visible');
+  render();
+}
+window.clearSearch = clearSearch;
+
+// ════════════════════════════════════════════════════════
+// FILTRAGE
+// Recherche + select sont complémentaires :
+//   - select : filtre exact sur la personne choisie
+//   - recherche texte : filtre partiel si aucune sélection exacte dans le select
+// ════════════════════════════════════════════════════════
+function getFiltered() {
+  var fs = document.getElementById('filterSearch').value.trim().toLowerCase();
+  var fp = document.getElementById('filterPerson').value;
+  var fj = document.getElementById('filterJour').value;
+
+  return ALL_DATA
+    .filter(function(p) {
+      if (fp) return p.nom === fp;                              // sélection exacte dans le select
+      if (fs) return p.nom.toLowerCase().indexOf(fs) !== -1;   // saisie libre partielle
+      return true;
+    })
+    .map(function(p) {
+      var entries = p.entries.filter(function(e) {
+        if (currentRole && e.role !== currentRole) return false;
+        if (fj && e.jour !== fj) return false;
+        return true;
+      });
+      return { nom: p.nom, entries: entries };
+    })
+    .filter(function(p) { return p.entries.length > 0; });
+}
+
+// ════════════════════════════════════════════════════════
+// UTILITAIRES HTML
+// ════════════════════════════════════════════════════════
+function initiales(nom) {
+  return nom.split(' ').filter(Boolean).slice(0,2).map(function(w){return w[0].toUpperCase();}).join('');
+}
+
+function roleBadgeHtml(role) {
+  var m = ROLE_META[role];
+  if (!m) return '';
+  return '<span class="role-badge ' + m.cls + '">' + m.icon + ' ' + m.label + '</span>';
+}
+
+function rolesBadgesHtml(entry) {
+  if (currentRole) return roleBadgeHtml(currentRole);
+  return roleBadgeHtml(entry.role);
+}
+
+// ════════════════════════════════════════════════════════
+// RENDU CARTES (vue par personne)
+// ════════════════════════════════════════════════════════
+function renderCards(data) {
+  if (!data.length) return '<div class="empty">Aucun résultat pour cette sélection.</div>';
+
+  return '<div class="role-section">' + data.map(function(p) {
+    var n = p.entries.length;
+
+    // Calculer les rôles distincts de cette personne dans le filtre courant
+    var rolesSet = {};
+    p.entries.forEach(function(e) { rolesSet[e.role] = true; });
+    var rolesHtml = Object.keys(rolesSet).map(roleBadgeHtml).join(' ');
+
+    var rows = p.entries.map(function(e) {
+      var facs = [e.fac1, e.fac2].filter(Boolean);
+      var facsHtml = facs.length && e.role !== 'F'
+        ? '<br><span style="font-size:11px;color:var(--muted);font-style:italic">🎓 ' + facs.join(' & ') + '</span>'
+        : '';
+      var pimentHtml = e.piment > 0
+        ? '<span style="letter-spacing:-1px;font-size:11px;margin-left:4px">' + '🌶️'.repeat(e.piment) + '</span>'
+        : '';
+      var logUrl = 'Rapport_Logistique_par_Atelier.html?jour=' + encodeURIComponent(e.jour) + '&atelier=' + encodeURIComponent(e.heure + '|||' + e.atelier);
+      return '<div class="shift-row">' +
+        '<span class="shift-jour">' + e.jour + '</span>' +
+        '<span class="shift-date">' + e.date + '</span>' +
+        '<span class="shift-heure">' + (e.heure||'—') + '</span>' +
+        '<span class="shift-role">' + rolesBadgesHtml(e) + '</span>' +
+        '<span class="shift-atelier">' + (e.atelier||'—') + pimentHtml + facsHtml + '</span>' +
+        '<span class="shift-lieu">' + (e.lieu ? '<span class="tag-lieu">' + e.lieu + '</span>' : '<span style="color:var(--muted);font-size:11px">—</span>') + '</span>' +
+        '<span><span class="tag">' + (e.type||'') + '</span></span>' +
+        '<span><a class="log-link" href="' + logUrl + '" target="_blank" rel="noopener" title="Voir la fiche logistique">📋</a></span>' +
+      '</div>';
+    }).join('');
+
+    return '<div class="role-block">' +
+      '<div class="role-header">' +
+        '<div class="role-avatar">' + initiales(p.nom) + '</div>' +
+        '<div>' +
+          '<div class="role-name">' + p.nom + '</div>' +
+          '<div style="margin-top:4px;display:flex;gap:4px;flex-wrap:wrap">' + rolesHtml + '</div>' +
+        '</div>' +
+        '<div class="role-stats"><strong>' + n + '</strong> intervention' + (n>1?'s':'') + '</div>' +
+      '</div>' +
+      rows +
+    '</div>';
+  }).join('') + '</div>';
+}
+
+// ════════════════════════════════════════════════════════
+// RENDU TABLEAU
+// ════════════════════════════════════════════════════════
+function renderTable(data) {
+  if (!data.length) return '<div class="empty">Aucun résultat pour cette sélection.</div>';
+
+  var trs = '';
+  data.forEach(function(p) {
+    p.entries.forEach(function(e) {
+      var facs = [e.fac1, e.fac2].filter(Boolean).join(' & ');
+      var logUrl = 'Rapport_Logistique_par_Atelier.html?jour=' + encodeURIComponent(e.jour) + '&atelier=' + encodeURIComponent(e.heure + '|||' + e.atelier);
+      trs += '<tr>' +
+        '<td style="font-weight:700">' + p.nom + '</td>' +
+        '<td>' + e.jour + '</td>' +
+        '<td>' + e.date + '</td>' +
+        '<td style="white-space:nowrap;color:var(--role-accent);font-weight:700;font-variant-numeric:tabular-nums">' + (e.heure||'—') + '</td>' +
+        '<td>' + rolesBadgesHtml(e) + '</td>' +
+        '<td>' + (e.atelier||'—') + '</td>' +
+        '<td>' + (e.lieu ? '<span class="tag-lieu">' + e.lieu + '</span>' : '') + '</td>' +
+        '<td><span class="tag">' + (e.type||'') + '</span></td>' +
+        '<td style="color:var(--muted);font-size:12px">' + (facs||'—') + '</td>' +
+        '<td><a class="log-link" href="' + logUrl + '" target="_blank" rel="noopener" title="Voir la fiche logistique">📋</a></td>' +
+      '</tr>';
+    });
+  });
+
+  return '<div class="table-wrap"><table class="global">' +
+    '<thead><tr>' +
+      '<th>Personne</th><th>Jour</th><th>Date</th><th>Heure</th>' +
+      '<th>Rôle</th><th>Atelier</th><th>Lieu</th><th>Type</th><th>Facilitateur(s)</th><th></th>' +
+    '</tr></thead>' +
+    '<tbody>' + trs + '</tbody>' +
+  '</table></div>';
+}
+
+// ════════════════════════════════════════════════════════
+// RENDU PRINCIPAL
+// ════════════════════════════════════════════════════════
+function render() {
+  var data = getFiltered();
+  var nbInterventions = data.reduce(function(s,p){return s+p.entries.length;},0);
+
+  var roleLabel = currentRole ? (ROLE_META[currentRole].icon + ' ' + ROLE_META[currentRole].label + 's') : 'Toutes interventions';
+  document.getElementById('stats').innerHTML =
+    '<span>' + data.length + '</span> personne' + (data.length>1?'s':'') +
+    ' · <span>' + nbInterventions + '</span> intervention' + (nbInterventions>1?'s':'') +
+    ' · ' + roleLabel;
+
+  document.getElementById('results').innerHTML =
+    currentView === 'cards' ? renderCards(data) : renderTable(data);
+}
+window.render = render;
+
+// ════════════════════════════════════════════════════════
+// GESTION ONGLETS RÔLE
+// ════════════════════════════════════════════════════════
+function setRole(role) {
+  currentRole = role;
+
+  // Réinitialiser tous les onglets
+  var tabIds = { '': 'tab-all', 'F': 'tab-f', 'H': 'tab-h', 'T': 'tab-t', 'A': 'tab-a' };
+  var tabActive = { '': 'active-all', 'F': 'active-f', 'H': 'active-h', 'T': 'active-t', 'A': 'active-a' };
+
+  Object.keys(tabIds).forEach(function(r) {
+    var tab = document.getElementById(tabIds[r]);
+    tab.className = 'role-tab' + (r === role ? ' ' + tabActive[r] : '');
+  });
+
+  // Thème corps de page
+  document.body.classList.remove('role-f','role-h','role-t','role-a');
+  if (role) document.body.classList.add('role-' + role.toLowerCase());
+
+  // Mise à jour des boutons vue (couleur thème)
+  document.getElementById('vbtnCards').className = 'vbtn' + (currentView==='cards' ? ' active' : '');
+  document.getElementById('vbtnTable').className = 'vbtn' + (currentView==='table' ? ' active' : '');
+
+  render();
+}
+window.setRole = setRole;
+
+// ════════════════════════════════════════════════════════
+// GESTION VUE
+// ════════════════════════════════════════════════════════
+function setView(v) {
+  currentView = v;
+  document.getElementById('vbtnCards').classList.toggle('active', v === 'cards');
+  document.getElementById('vbtnTable').classList.toggle('active', v === 'table');
+  render();
+}
+window.setView = setView;
+
+// ════════════════════════════════════════════════════════
+// UTILITAIRES GLOBAUX
+// ════════════════════════════════════════════════════════
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+    }).finally(function() { location.reload(true); });
+  } else { location.reload(true); }
+}
+window.hardReload = hardReload;
+
+function toggleMode() {
+  var isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+window.toggleMode = toggleMode;
+
+// Auto-refresh depuis Home
+if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
+  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
+  hardReload();
+}
+
+// Démarrage : vue combinée par défaut
+render();
+
+}); // fin loadData
+</script>
+</body>
+</html>

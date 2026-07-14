@@ -374,10 +374,10 @@
         <tr><td>Lieu / Salle</td><td>Liste déroulante</td><td><code>ref_lieux.js</code></td></tr>
         <tr><td>Type d'atelier</td><td>Liste déroulante</td><td><code>ref_types.js</code></td></tr>
         <tr><td>Nom de l'atelier</td><td>Texte libre</td><td>Saisie manuelle</td></tr>
-        <tr><td>Facilitateur 1 &amp; 2</td><td>Listes déroulantes</td><td><code>ref_facilitateurs.js</code></td></tr>
-        <tr><td>Traducteur</td><td>Liste déroulante</td><td><code>ref_traducteurs.js</code></td></tr>
-        <tr><td>Helper 1, 2 &amp; 3</td><td>Listes déroulantes</td><td><code>ref_helpers.js</code></td></tr>
-        <tr><td>Angel</td><td>Liste déroulante</td><td><code>ref_angels.js</code></td></tr>
+        <tr><td>Facilitateur 1 &amp; 2</td><td>Listes déroulantes</td><td><code>ref_ressources.js</code></td></tr>
+        <tr><td>Traducteur</td><td>Liste déroulante</td><td><code>ref_ressources.js</code></td></tr>
+        <tr><td>Helper 1, 2 &amp; 3</td><td>Listes déroulantes</td><td><code>ref_ressources.js</code></td></tr>
+        <tr><td>Angel</td><td>Liste déroulante</td><td><code>ref_ressources.js</code></td></tr>
         <tr><td>Note</td><td>Liste déroulante</td><td><code>ref_notes.js</code></td></tr>
         <tr><td>Informations Logistiques</td><td>Zone de texte libre</td><td>Saisie manuelle</td></tr>
       </tbody>
@@ -420,14 +420,11 @@
 
     <p>Master Data est la page de gestion des <strong>listes de référence</strong> utilisées dans Admin et dans les rapports. Chaque modification est sauvegardée dans le fichier <code>ref_*.js</code> correspondant, avec option de mise à jour simultanée de <code>data.js</code>.</p>
 
-    <h3 class="purple">Les 7 référentiels disponibles</h3>
+    <h3 class="purple">Les 4 référentiels disponibles dans Master Data</h3>
+    <p>Les ressources (Facilitateurs, Helpers, Angels, Traducteurs) sont désormais gérées dans le <strong>Rapport 12 — Gérer les Ressources</strong>.</p>
     <table class="data-table">
       <thead><tr><th>Onglet</th><th>Fichier</th><th>Utilisé dans</th></tr></thead>
       <tbody>
-        <tr><td>🎓 Facilitateurs</td><td><code>ref_facilitateurs.js</code></td><td>Champs Fac1 / Fac2 dans Admin</td></tr>
-        <tr><td>🤝 Helpers</td><td><code>ref_helpers.js</code></td><td>Champs Helper 1/2/3 dans Admin</td></tr>
-        <tr><td>👼 Angels</td><td><code>ref_angels.js</code></td><td>Champ Angel dans Admin</td></tr>
-        <tr><td>🌐 Traducteurs</td><td><code>ref_traducteurs.js</code></td><td>Champ Traducteur dans Admin</td></tr>
         <tr><td>📍 Lieux</td><td><code>ref_lieux.js</code></td><td>Champ Lieu / Salle dans Admin</td></tr>
         <tr><td>🏷️ Types d'atelier</td><td><code>ref_types.js</code></td><td>Champ Type d'atelier dans Admin</td></tr>
         <tr><td>📝 Notes</td><td><code>ref_notes.js</code></td><td>Champ Note dans Admin &amp; Rapport 3</td></tr>
@@ -527,10 +524,8 @@
       <thead><tr><th>Fichier</th><th>Rôle</th><th>Modifié par</th></tr></thead>
       <tbody>
         <tr><td><code>data.js</code></td><td>Source de vérité — tous les ateliers (AGENDA)</td><td>Admin, Master Data (bouton + data.js)</td></tr>
-        <tr><td><code>ref_facilitateurs.js</code></td><td>Liste des facilitateurs</td><td>Master Data → onglet Facilitateurs</td></tr>
-        <tr><td><code>ref_helpers.js</code></td><td>Liste des helpers</td><td>Master Data → onglet Helpers</td></tr>
-        <tr><td><code>ref_angels.js</code></td><td>Liste des angels</td><td>Master Data → onglet Angels</td></tr>
-        <tr><td><code>ref_traducteurs.js</code></td><td>Liste des traducteurs</td><td>Master Data → onglet Traducteurs</td></tr>
+        <tr><td><code>ref_resource_types.js</code></td><td>Types de ressources valides (Facilitateur, Helper…)</td><td>Chargé avant ref_ressources.js</td></tr>
+        <tr><td><code>ref_ressources.js</code></td><td>Référentiel unifié de toutes les ressources</td><td>Rapport 12 — Gérer les Ressources</td></tr>
         <tr><td><code>ref_lieux.js</code></td><td>Liste des lieux / salles</td><td>Master Data → onglet Lieux</td></tr>
         <tr><td><code>ref_types.js</code></td><td>Liste des types d'atelier</td><td>Master Data → onglet Types</td></tr>
         <tr><td><code>ref_notes.js</code></td><td>Liste des notes normalisées</td><td>Master Data → onglet Notes</td></tr>

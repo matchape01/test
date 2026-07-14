@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Saisie Logistique</title>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --green:#166534; --green-bg:#dcfce7; --green-border:#86efac;
+    --red:#dc2626;   --red-bg:#fef2f2;   --red-border:#fca5a5;
+    --orange:#c2410c; --orange-bg:#fff7ed; --orange-border:#fdba74;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); }
+  .wrap { max-width:860px; margin:0 auto; padding:28px 20px 80px; }
+
+  /* ── HEADER ── */
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:19px; font-weight:700; }
+  .logo p  { font-size:22px; font-weight:800; color:var(--accent); line-height:1.2; margin-top:2px; }
+  .logo small { font-size:12px; color:var(--muted); display:block; margin-top:2px; }
+
+  /* ── BOUTONS ── */
+  .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 14px; font-size:13px; color:var(--text); font-family:inherit; transition:background .15s; text-decoration:none; display:inline-block; }
+  .btn:hover { background:var(--border); }
+  .btn-primary { background:var(--accent); color:#fff; border-color:var(--accent); font-weight:600; }
+  .btn-primary:hover { background:#2563eb; border-color:#2563eb; }
+  .btn-danger  { background:var(--red); color:#fff; border-color:var(--red); font-weight:600; }
+  .btn-danger:hover  { background:#b91c1c; }
+
+  /* ── BREADCRUMB ── */
+  .breadcrumb { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--muted); margin-bottom:24px; flex-wrap:wrap; }
+  .breadcrumb .bc-step { color:var(--muted); }
+  .breadcrumb .bc-sep { color:var(--border); }
+  .breadcrumb .bc-step.active { color:var(--text); font-weight:700; }
+  .breadcrumb .bc-step.link { color:var(--accent); cursor:pointer; }
+  .breadcrumb .bc-step.link:hover { text-decoration:underline; }
+
+  /* ── ÉTAPE 1 ── */
+  .step-title { font-size:16px; font-weight:700; margin-bottom:6px; }
+  .step-sub   { font-size:13px; color:var(--muted); margin-bottom:20px; }
+  select.big  { width:100%; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:11px 14px; font-size:15px; color:var(--text); font-family:inherit; cursor:pointer; }
+  select.big:focus { outline:2px solid var(--accent); outline-offset:1px; }
+  .btn-confirm-step { margin-top:14px; }
+
+  /* ── ÉTAPE 2 : liste ateliers ── */
+  .fac-banner { display:flex; align-items:center; gap:14px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 20px; margin-bottom:24px; }
+  .fac-avatar { width:46px; height:46px; border-radius:50%; background:var(--accent); color:#fff; font-size:17px; font-weight:800; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .fac-info-name { font-size:16px; font-weight:800; }
+  .fac-info-sub  { font-size:12px; color:var(--muted); margin-top:1px; }
+  .ws-list { display:flex; flex-direction:column; gap:10px; }
+  .ws-card {
+    border:1px solid var(--border); border-radius:10px; padding:14px 18px;
+    cursor:pointer; transition:border-color .15s, background .15s;
+    display:flex; align-items:center; gap:14px;
+  }
+  .ws-card:hover { border-color:var(--accent); background:#f0f7ff; }
+  .ws-card-left { flex:1; min-width:0; }
+  .ws-card-jour { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:2px; }
+  .ws-card-name { font-size:15px; font-weight:700; color:var(--text); margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ws-card-meta { font-size:12px; color:var(--muted); }
+  .ws-card-right { flex-shrink:0; display:flex; align-items:center; gap:8px; }
+  .ws-pill { font-size:11px; font-weight:700; padding:3px 10px; border-radius:99px; white-space:nowrap; }
+  .ws-pill.filled { background:var(--green-bg); color:var(--green); border:1px solid var(--green-border); }
+  .ws-pill.empty  { background:var(--orange-bg); color:var(--orange); border:1px solid var(--orange-border); }
+  .ws-card-arrow  { font-size:18px; color:var(--muted); }
+  .empty-ws { text-align:center; padding:40px; color:var(--muted); font-style:italic; border:2px dashed var(--border); border-radius:10px; }
+
+  /* ── ÉTAPE 3 : fiche atelier ── */
+  .ws-header-box { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px 22px; margin-bottom:24px; }
+  .ws-header-jour  { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:4px; }
+  .ws-header-title { font-size:20px; font-weight:800; color:var(--text); margin-bottom:6px; }
+  .ws-header-meta  { font-size:13px; color:var(--muted); display:flex; gap:14px; flex-wrap:wrap; }
+
+  /* Bandeau admin */
+  .admin-notice {
+    background:#fffbeb; border:1px solid #fde68a; border-radius:8px;
+    padding:12px 16px; font-size:13px; color:#92400e;
+    margin-bottom:24px; display:flex; align-items:flex-start; gap:10px;
+  }
+  .admin-notice-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+
+  /* Grille lecture seule */
+  .section-label { font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); font-weight:700; margin-bottom:8px; }
+  .readonly-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px 24px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 18px; margin-bottom:28px; }
+  @media(max-width:540px) { .readonly-grid { grid-template-columns:1fr; } }
+  .ro-label { font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); font-weight:600; }
+  .ro-value { font-size:13px; color:var(--text); }
+
+  /* Séparateur section éditable */
+  .edit-section-sep { border:none; border-top:2px solid var(--border); margin:28px 0 24px; }
+
+  /* Champ Nom atelier */
+  .field-wrap { margin-bottom:22px; }
+  .field-wrap label { display:block; font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); font-weight:700; margin-bottom:6px; }
+  .field-wrap input[type="text"] {
+    width:100%; background:var(--bg); border:1px solid var(--border);
+    border-radius:8px; padding:10px 13px; font-size:14px; color:var(--text);
+    font-family:inherit;
+  }
+  .field-wrap input[type="text"]:focus { outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+
+  /* Boutons piment */
+  .piment-btns { display:flex; gap:8px; flex-wrap:wrap; }
+  .piment-btn {
+    cursor:pointer; padding:7px 16px; border-radius:8px; border:2px solid var(--border);
+    background:var(--bg); font-size:14px; font-family:inherit; color:var(--text);
+    transition:all .15s;
+  }
+  .piment-btn.active { border-color:var(--accent); background:#eff6ff; font-weight:700; }
+
+  /* Éditeur logistique */
+  .toolbar { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:6px; }
+  .tb-btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:4px 9px; font-size:12px; font-family:inherit; color:var(--text); }
+  .tb-btn:hover { background:var(--border); }
+  #logisticEditor {
+    min-height:180px; max-height:420px; overflow-y:auto;
+    border:1px solid var(--border); border-radius:8px;
+    padding:12px 14px; font-size:14px; line-height:1.6;
+    background:var(--bg); color:var(--text); outline:none;
+  }
+  #logisticEditor:focus { border-color:var(--accent); outline:2px solid rgba(59,130,212,.15); }
+  #logisticEditor p, #logisticEditor ul, #logisticEditor ol { margin-bottom:4px; }
+  #logisticEditor ul, #logisticEditor ol { padding-left:20px; }
+  .editor-hint { font-size:12px; color:var(--muted); margin-top:6px; }
+
+  .editor-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:24px; }
+
+  /* ── MODALE CONFIRMATION ── */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9999; align-items:center; justify-content:center; }
+  .modal-box { background:#fff; border-radius:12px; padding:32px 28px; max-width:400px; width:92%; }
+  .modal-box h2 { font-size:17px; font-weight:700; margin-bottom:8px; }
+  .modal-box p  { font-size:13px; color:var(--muted); margin-bottom:16px; line-height:1.5; }
+  .modal-warning { background:var(--red-bg); border:1px solid var(--red-border); border-radius:8px; padding:12px 14px; font-size:13px; color:var(--red); font-weight:600; margin-bottom:20px; }
+  .modal-actions { display:flex; gap:10px; }
+
+  /* ── TOAST ── */
+  #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:#1f2328; color:#fff; border-radius:8px; padding:12px 22px; font-size:13px; font-weight:600; z-index:10000; transition:transform .3s, opacity .3s; opacity:0; white-space:nowrap; }
+  #toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+  #toast.ok   { background:#166534; }
+  #toast.err  { background:#dc2626; }
+
+  footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Saisie des besoins logistiques</p>
+      <small>Logistics Needs Input</small>
+    </div>
+    <a class="btn" href="index.html">🏠 Home</a>
+  </header>
+
+  <!-- ══════════════════════════════════
+       ÉTAPE 1 — Qui êtes-vous ?
+  ══════════════════════════════════ -->
+  <div id="step1">
+    <p class="step-title">Étape 1 — Qui êtes-vous ?</p>
+    <p class="step-sub">Sélectionnez votre nom pour accéder à la liste de vos ateliers.</p>
+    <select class="big" id="selFac" onchange="onFacChange()">
+      <option value="">— Choisissez votre nom —</option>
+    </select>
+    <div style="margin-top:14px;">
+      <button class="btn btn-primary" id="btnStep1Next" onclick="onFacSelect()" disabled
+              style="padding:10px 28px;font-size:14px;">
+        Suivant →
+      </button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       ÉTAPE 2 — Choisir un atelier
+  ══════════════════════════════════ -->
+  <div id="step2" style="display:none">
+    <div class="breadcrumb">
+      <span class="bc-step link" onclick="goStep1()">Étape 1 — Identité</span>
+      <span class="bc-sep">›</span>
+      <span class="bc-step active">Étape 2 — Choisir un atelier</span>
+    </div>
+
+    <div class="fac-banner">
+      <div class="fac-avatar" id="facAvatar"></div>
+      <div>
+        <div class="fac-info-name" id="facName"></div>
+        <div class="fac-info-sub" id="facSub"></div>
+      </div>
+    </div>
+
+    <p class="step-title" style="margin-bottom:14px;">Vos ateliers</p>
+    <div class="ws-list" id="wsList"></div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       ÉTAPE 3 — Fiche atelier + édition
+  ══════════════════════════════════ -->
+  <div id="step3" style="display:none">
+    <div class="breadcrumb">
+      <span class="bc-step link" onclick="goStep1()">Étape 1 — Identité</span>
+      <span class="bc-sep">›</span>
+      <span class="bc-step link" onclick="goStep2()">Étape 2 — Mes ateliers</span>
+      <span class="bc-sep">›</span>
+      <span class="bc-step active">Étape 3 — Fiche atelier</span>
+    </div>
+
+    <!-- En-tête lecture seule -->
+    <div class="ws-header-box">
+      <div class="ws-header-jour" id="s3Jour"></div>
+      <div class="ws-header-title" id="s3Title"></div>
+      <div class="ws-header-meta" id="s3Meta"></div>
+    </div>
+
+    <!-- Bandeau admin -->
+    <div class="admin-notice">
+      <span class="admin-notice-icon">ℹ️</span>
+      <div>
+        <strong>Informations gérées par l'Administrateur</strong><br>
+        Le jour, les horaires, le lieu, le type, les facilitateurs, les helpers, le traducteur et l'angel ne peuvent pas être modifiés ici.
+        Pour toute correction, contactez un <strong>Administrateur</strong>.
+      </div>
+    </div>
+
+    <!-- Grille infos lecture seule -->
+    <p class="section-label">Informations de l'atelier <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(lecture seule)</span></p>
+    <div class="readonly-grid" id="s3ReadGrid"></div>
+
+    <hr class="edit-section-sep">
+    <p class="section-label" style="margin-bottom:16px;">✏️ Informations modifiables</p>
+
+    <!-- Nom de l'atelier -->
+    <div class="field-wrap">
+      <label for="s3Nom">Nom de l'atelier</label>
+      <input type="text" id="s3Nom" placeholder="Nom de l'atelier">
+    </div>
+
+    <!-- Piment -->
+    <div class="field-wrap">
+      <label>Niveau Piment</label>
+      <div class="piment-btns" id="s3PimentBtns"></div>
+    </div>
+
+    <!-- Informations logistiques -->
+    <div class="field-wrap" style="margin-bottom:6px;">
+      <label>📝 Informations logistiques</label>
+      <div class="toolbar">
+        <button class="tb-btn" onclick="fmt('bold')"><strong>G</strong></button>
+        <button class="tb-btn" onclick="fmt('italic')"><em>I</em></button>
+        <button class="tb-btn" onclick="fmt('underline')"><u>S</u></button>
+        <button class="tb-btn" onclick="fmt('insertUnorderedList')">• Liste</button>
+        <button class="tb-btn" onclick="fmt('insertOrderedList')">1. Liste</button>
+        <button class="tb-btn" onclick="fmt('removeFormat')">✖ Format</button>
+      </div>
+      <div id="logisticEditor" contenteditable="true" spellcheck="true"></div>
+      <p class="editor-hint">Décrivez vos besoins matériels, de salle, techniques ou autres. Utilisez la liste à puces pour plus de clarté.</p>
+    </div>
+
+    <div class="editor-actions">
+      <button class="btn btn-primary" onclick="askConfirm()">💾 Enregistrer</button>
+      <button class="btn" onclick="goStep2()">← Retour à mes ateliers</button>
+      <span id="edSavedAt" style="font-size:12px;color:var(--muted);margin-left:8px;"></span>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<!-- ── MODALE CONFIRMATION ── -->
+<div class="modal-overlay" id="confirmOverlay">
+  <div class="modal-box">
+    <h2>⚠️ Confirmer l'enregistrement</h2>
+    <p>Vous êtes sur le point de sauvegarder les modifications pour :</p>
+    <p style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;" id="confirmAtelier"></p>
+    <div class="modal-warning">
+      Ce changement sera immédiatement visible par toute l'équipe. Vérifiez bien votre saisie avant de confirmer.
+    </div>
+    <div class="modal-actions">
+      <button class="btn" style="flex:1" onclick="closeConfirm()">Annuler</button>
+      <button class="btn btn-danger" style="flex:1" onclick="doSave()">✔ Confirmer et enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<footer><p>Made with IBM Bob</p></footer>
+
+<script src="github-api.js"></script>
+<script src="ref_resource_types.js"></script>
+<script src="ref_ressources.js"></script>
+<script src="ref_piment.js"></script>
+<script src="ref_lieux.js"></script>
+<script src="loader.js"></script>
+<script>
+loadData(['data.js','logistics.js'], function() {
+
+const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+// ─── Peupler step 1 ─────────────────────────────────────────────────────────
+(function populateFac() {
+  var present = new Set();
+  AGENDA.forEach(function(e) {
+    if (e.fac1) present.add(e.fac1);
+    if (e.fac2) present.add(e.fac2);
+  });
+  var sel = document.getElementById('selFac');
+  REF_FACILITATEURS
+    .filter(function(f) { return present.has(f.value); })
+    .forEach(function(f) {
+      var o = document.createElement('option');
+      o.value = f.value; o.textContent = f.value;
+      sel.appendChild(o);
+    });
+})();
+
+// ─── État ────────────────────────────────────────────────────────────────────
+var currentFac      = '';
+var currentWsIdx    = -1;   // index dans AGENDA
+var currentLogId    = '';
+var currentPiment   = 0;
+
+// ─── Navigation ──────────────────────────────────────────────────────────────
+function showStep(n) {
+  ['step1','step2','step3'].forEach(function(id, i) {
+    document.getElementById(id).style.display = (i + 1 === n) ? '' : 'none';
+  });
+}
+
+function goStep1() {
+  document.getElementById('selFac').value = '';
+  document.getElementById('btnStep1Next').disabled = true;
+  currentFac = '';
+  showStep(1);
+}
+window.goStep1 = goStep1;
+
+function goStep2() {
+  showStep(2);
+}
+window.goStep2 = goStep2;
+
+// ─── Étape 1 ─────────────────────────────────────────────────────────────────
+function onFacChange() {
+  var val = document.getElementById('selFac').value;
+  document.getElementById('btnStep1Next').disabled = !val;
+}
+window.onFacChange = onFacChange;
+
+function onFacSelect() {
+  var val = document.getElementById('selFac').value;
+  if (!val) return;
+  currentFac = val;
+  buildStep2(val);
+  showStep(2);
+}
+window.onFacSelect = onFacSelect;
+
+// ─── Étape 2 ─────────────────────────────────────────────────────────────────
+function initiales(nom) {
+  return nom.split(' ').filter(Boolean).slice(0,2).map(function(w){ return w[0].toUpperCase(); }).join('');
+}
+
+function heureMin(h) {
+  if (!h) return 9999;
+  var m = String(h).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1])*60+parseInt(m[2]) : 9999;
+}
+
+function getWorkshops(fac) {
+  return AGENDA
+    .map(function(e, i) { return { e: e, i: i }; })
+    .filter(function(x) { return x.e.fac1 === fac || x.e.fac2 === fac; })
+    .sort(function(a, b) {
+      var dj = JOUR_ORDER.indexOf(a.e.jour) - JOUR_ORDER.indexOf(b.e.jour);
+      return dj !== 0 ? dj : heureMin(a.e.heure) - heureMin(b.e.heure);
+    });
+}
+
+function buildStep2(fac) {
+  var ws = getWorkshops(fac);
+
+  document.getElementById('facAvatar').textContent = initiales(fac);
+  document.getElementById('facName').textContent   = fac;
+  document.getElementById('facSub').textContent    =
+    ws.length === 0 ? 'Aucun atelier trouvé.'
+    : ws.length + ' atelier' + (ws.length > 1 ? 's' : '') + ' assigné' + (ws.length > 1 ? 's' : '') + ' en tant que facilitateur';
+
+  var list = document.getElementById('wsList');
+  if (!ws.length) {
+    list.innerHTML = '<div class="empty-ws">Aucun atelier trouvé pour ce facilitateur.</div>';
+    return;
+  }
+
+  list.innerHTML = ws.map(function(x) {
+    var e = x.e;
+    var hasLog = e.logisticId && LOGISTICS[e.logisticId];
+    var pillHtml = hasLog
+      ? '<span class="ws-pill filled">✔ Rempli</span>'
+      : '<span class="ws-pill empty">⚠ À remplir</span>';
+    var facs = [e.fac1, e.fac2].filter(Boolean).join(' & ');
+    return '<div class="ws-card" onclick="selectWorkshop(' + x.i + ')">' +
+      '<div class="ws-card-left">' +
+        '<div class="ws-card-jour">' + e.jour + (e.date ? ' — ' + e.date : '') + '</div>' +
+        '<div class="ws-card-name">' + (e.atelier || '—') + '</div>' +
+        '<div class="ws-card-meta">' +
+          (e.heure ? '🕐 ' + e.heure + '&nbsp;&nbsp;' : '') +
+          (e.lieu  ? '📍 ' + e.lieu  + '&nbsp;&nbsp;' : '') +
+          (facs    ? '🎓 ' + facs    : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="ws-card-right">' + pillHtml + '<span class="ws-card-arrow">›</span></div>' +
+    '</div>';
+  }).join('');
+}
+
+// ─── Étape 3 ─────────────────────────────────────────────────────────────────
+function selectWorkshop(agendaIdx) {
+  var e = AGENDA[agendaIdx];
+  currentWsIdx  = agendaIdx;
+  currentLogId  = e.logisticId || '';
+  currentPiment = e.piment || 0;
+
+  // En-tête
+  document.getElementById('s3Jour').textContent = e.jour + (e.date ? ' — ' + e.date : '');
+  document.getElementById('s3Title').textContent = e.atelier || '—';
+  document.getElementById('s3Meta').innerHTML = [
+    e.heure && '🕐 ' + e.heure,
+    e.lieu  && '📍 ' + e.lieu,
+    e.type  && '🏷 ' + e.type,
+  ].filter(Boolean).join('&nbsp;&nbsp;&nbsp;');
+
+  // Grille lecture seule
+  var facs    = [e.fac1, e.fac2].filter(Boolean).join(' / ') || '—';
+  var helpers = [e.helper1, e.helper2, e.helper3].filter(Boolean).join(', ') || '—';
+  document.getElementById('s3ReadGrid').innerHTML = [
+    ['Jour',            e.jour         || '—'],
+    ['Date',            e.date         || '—'],
+    ['Heure',           e.heure        || '—'],
+    ['Lieu',            e.lieu         || '—'],
+    ['Type',            e.type         || '—'],
+    ['Facilitateur(s)', facs               ],
+    ['Traducteur',      e.traduction   || '—'],
+    ['Helper(s)',       helpers            ],
+    ['Angel',           e.angel        || '—'],
+    ['Note',            e.note         || '—'],
+  ].map(function(pair) {
+    return '<div><div class="ro-label">' + pair[0] + '</div><div class="ro-value">' + esc(pair[1]) + '</div></div>';
+  }).join('');
+
+  // Champ nom
+  document.getElementById('s3Nom').value = e.atelier || '';
+
+  // Boutons piment
+  buildPimentBtns(currentPiment);
+
+  // Éditeur logistique
+  var hasLog   = currentLogId && LOGISTICS[currentLogId];
+  var existing = hasLog ? LOGISTICS[currentLogId].html : '';
+  document.getElementById('logisticEditor').innerHTML = existing || '<p></p>';
+
+  var updatedAt = hasLog ? LOGISTICS[currentLogId].updatedAt : '';
+  document.getElementById('edSavedAt').textContent = updatedAt ? 'Dernière mise à jour : ' + updatedAt : '';
+
+  showStep(3);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window.selectWorkshop = selectWorkshop;
+
+// Boutons piment
+function buildPimentBtns(selected) {
+  var btns = document.getElementById('s3PimentBtns');
+  btns.innerHTML = REF_PIMENT.map(function(p) {
+    var active = (p.value === selected) ? ' active' : '';
+    return '<button class="piment-btn' + active + '" onclick="setPiment(' + p.value + ')">' + p.label + '</button>';
+  }).join('');
+}
+
+function setPiment(val) {
+  currentPiment = val;
+  buildPimentBtns(val);
+}
+window.setPiment = setPiment;
+
+// RTE
+function fmt(cmd) {
+  document.getElementById('logisticEditor').focus();
+  document.execCommand(cmd, false, null);
+}
+window.fmt = fmt;
+
+// ─── Confirmation ────────────────────────────────────────────────────────────
+function askConfirm() {
+  var e = AGENDA[currentWsIdx];
+  document.getElementById('confirmAtelier').textContent = (document.getElementById('s3Nom').value || e.atelier) + ' (' + e.jour + ')';
+  document.getElementById('confirmOverlay').style.display = 'flex';
+}
+window.askConfirm = askConfirm;
+
+function closeConfirm() {
+  document.getElementById('confirmOverlay').style.display = 'none';
+}
+window.closeConfirm = closeConfirm;
+
+// ─── Sauvegarde ──────────────────────────────────────────────────────────────
+async function doSave() {
+  closeConfirm();
+
+  var e      = AGENDA[currentWsIdx];
+  var today  = new Date().toISOString().slice(0, 10);
+  var newNom = document.getElementById('s3Nom').value.trim() || e.atelier;
+
+  // Appliquer les modifications en mémoire
+  e.atelier = newNom;
+  e.piment  = currentPiment;
+
+  // Générer un logisticId si nécessaire
+  if (!e.logisticId) {
+    var safeName = newNom.replace(/[^a-zA-Z0-9]/g, '_').slice(0, 30).toUpperCase();
+    var jourKey  = e.jour.replace(/\s+/g, '').toUpperCase();
+    e.logisticId = jourKey + '_' + safeName;
+    currentLogId = e.logisticId;
+  }
+
+  // Contenu logistique
+  var edEl  = document.getElementById('logisticEditor');
+  var html  = edEl.innerHTML.trim();
+  var text  = edEl.innerText.trim();
+  LOGISTICS[currentLogId] = { html: html, text: text, updatedAt: today };
+
+  try {
+    await saveFile('logistics.js', buildLogisticsJs());
+    await saveFile('data.js',      buildDataJs());
+
+    // Mettre à jour l'UI
+    document.getElementById('edSavedAt').textContent = 'Dernière mise à jour : ' + today;
+    document.getElementById('s3Title').textContent   = newNom;
+    showToast('✔ Sauvegardé avec succès', 'ok');
+
+    // Rafraîchir la liste étape 2
+    buildStep2(currentFac);
+  } catch(err) {
+    showToast('❌ Erreur lors de la sauvegarde : ' + err.message, 'err');
+  }
+}
+window.doSave = doSave;
+
+// ─── Sérialisation ───────────────────────────────────────────────────────────
+function esc(s) {
+  if (s === null || s === undefined) return '';
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function escJs(s) {
+  if (s === null || s === undefined) return '';
+  return String(s)
+    .replace(/\\/g,'\\\\').replace(/"/g,'\\"')
+    .replace(/\r?\n/g,'\\n').replace(/\t/g,'\\t');
+}
+
+function buildLogisticsJs() {
+  var entries = Object.entries(LOGISTICS).map(function(pair) {
+    var id = pair[0], v = pair[1];
+    return '  "' + escJs(id) + '": {\n' +
+      '    html: "' + escJs(v.html || '') + '",\n' +
+      '    text: "' + escJs(v.text || '') + '",\n' +
+      '    updatedAt: "' + escJs(v.updatedAt || '') + '"\n' +
+      '  }';
+  }).join(',\n\n');
+
+  return '/**\n * TANTRAMOUR 2026 — Informations Logistiques\n */\n\nvar LOGISTICS = {\n\n' +
+    entries + (entries ? '\n\n' : '') + '};\n';
+}
+
+function buildDataJs() {
+  var header = '/**\n * TANTRAMOUR 2026 — Référentiel de données commun\n' +
+    ' * ================================================\n' +
+    ' * Structure : jour, date, heure, type, atelier, lieu,\n' +
+    ' *   fac1, fac2, traduction, helper1, helper2, helper3,\n' +
+    ' *   angel, note, piment, logisticId\n */\n\nvar AGENDA = [\n';
+
+  var lines = AGENDA.map(function(e) {
+    return '  {jour:"' + escJs(e.jour) + '",date:"' + escJs(e.date) +
+      '",heure:"' + escJs(e.heure) + '",type:"' + escJs(e.type) +
+      '",atelier:"' + escJs(e.atelier) + '",lieu:"' + escJs(e.lieu) +
+      '",fac1:"' + escJs(e.fac1) + '",fac2:"' + escJs(e.fac2) +
+      '",traduction:"' + escJs(e.traduction) + '",helper1:"' + escJs(e.helper1) +
+      '",helper2:"' + escJs(e.helper2) + '",helper3:"' + escJs(e.helper3) +
+      '",angel:"' + escJs(e.angel) + '",note:"' + escJs(e.note) +
+      '",piment:' + (e.piment || 0) +
+      ',logisticId:"' + escJs(e.logisticId) + '"}';
+  }).join(',\n');
+
+  var footer = '\n];\n\n' +
+    'function agendaToRaw(entries) {\n' +
+    '  return entries.map(function(e) { return [\n' +
+    '    e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,\n' +
+    '    e.fac1, e.fac2, e.traduction,\n' +
+    '    e.helper1, e.helper2, e.helper3,\n' +
+    '    e.angel, e.note, e.logisticId, e.piment || 0\n' +
+    '  ]; });\n}\n';
+
+  return header + lines + footer;
+}
+
+// ─── API save ────────────────────────────────────────────────────────────────
+async function saveFile(filename, content) {
+  if (location.protocol === 'file:') {
+    throw new Error('Ouvrez via http://localhost:3000 (lancez start.bat) pour sauvegarder.');
+  }
+  var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (isLocal) {
+    var res = await fetch('http://localhost:3000/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: filename, content: content })
+    });
+    if (!res.ok) {
+      var err = await res.json().catch(function() { return {}; });
+      throw new Error(err.error || 'Erreur serveur ' + res.status);
+    }
+    return;
+  }
+  await githubSaveFile(filename, content);
+}
+
+// ─── Toast ───────────────────────────────────────────────────────────────────
+var toastTimer;
+function showToast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { el.className = ''; }, 3500);
+}
+
+// ─── Init ────────────────────────────────────────────────────────────────────
+showStep(1);
+
+if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
+  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
+  if ('caches' in window) {
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+    }).finally(function() { location.reload(true); });
+  } else { location.reload(true); }
+}
+
+}); // fin loadData
+</script>
+</body>
+</html>

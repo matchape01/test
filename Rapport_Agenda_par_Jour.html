@@ -1,0 +1,867 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Agenda par Jour</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --header-bg: #f0f4fb; --row-alt: #f7f8fa; --tag-bg: #eef2ff; --tag-text: #3b5bdb;
+    --badge-h: #e0f2fe; --badge-ht: #0369a1;
+    --badge-a: #fce7f3; --badge-at: #9d174d;
+    --badge-f: #dcfce7; --badge-ft: #166534;
+  }
+  .dark {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --header-bg: #1c2333; --row-alt: #161b22; --tag-bg: #1c2a4a; --tag-text: #79a8ff;
+    --badge-h: #0c2d48; --badge-ht: #58a6ff;
+    --badge-a: #3b1030; --badge-at: #f0abca;
+    --badge-f: #0a2e1a; --badge-ft: #4ade80;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
+  .wrap { max-width: 1400px; margin: 0 auto; padding: 24px 20px; }
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .logo { display: flex; flex-direction: column; }
+  .logo h1 { font-size: 20px; font-weight: 700; letter-spacing: .3px; }
+  .logo p { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: .3px; line-height: 1.2; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .mode-btn { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; transition: background .15s; }
+  .mode-btn:hover { background: var(--border); }
+  .filters { display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 18px; align-items: flex-end; }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; }
+  .filter-group label { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); font-weight: 600; }
+  select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 13px; color: var(--text); font-family: inherit; min-width: 200px; cursor: pointer; }
+  .stats { font-size: 12px; color: var(--muted); margin-bottom: 12px; }
+  .stats span { color: var(--accent); font-weight: 600; }
+  /* ── TABLE VIEW ── */
+  .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  /* Largeurs fixes pour tenir dans la fenêtre */
+  col.c-jour   { width: 52px; }
+  col.c-date   { width: 108px; }
+  col.c-heure  { width: 110px; }
+  col.c-type   { width: 130px; }
+  col.c-atelier{ width: 202px; }
+  col.c-piment { width: 72px; }
+  col.c-lieu   { width: 82px; }
+  col.c-fac    { width: 130px; }
+  col.c-trad   { width: 80px; }
+  col.c-helper { width: 150px; }
+  col.c-angel  { width: 100px; }
+  col.c-edit   { width: 34px; }
+  thead th { background: var(--header-bg); padding: 7px 8px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; position: sticky; top: 0; z-index: 1; overflow: hidden; text-overflow: ellipsis; }
+  thead th:hover { color: var(--accent); }
+  thead th .sort-icon { display: inline-block; margin-left: 3px; opacity: .5; font-size: 9px; }
+  thead th.sorted .sort-icon { opacity: 1; color: var(--accent); }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: var(--row-alt); }
+  tbody tr:nth-child(even) { background: var(--row-alt); }
+  tbody tr:nth-child(even):hover { filter: brightness(.97); }
+  tbody tr.conflict-row { background: #fff0f3 !important; }
+  tbody tr.conflict-row:hover { background: #ffe0e8 !important; }
+  td { padding: 6px 8px; font-size: 12px; vertical-align: top; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  td.td-wrap { white-space: normal; }
+  /* Colonne Piment — centrée */
+  td.td-piment, th.th-piment { text-align: center; }
+  td.conflict-cell { background: #fef08a !important; }
+  td.conflict-cell .pill, td.conflict-cell span.pill { background: #fef08a !important; color: #b91c1c !important; font-weight: 700 !important; border: 1px solid #f59e0b; }
+  td.conflict-cell-text { background: #fef08a !important; color: #b91c1c !important; font-weight: 700 !important; }
+  /* ── CARD VIEW ── */
+  .card-list { display: none; flex-direction: column; gap: 20px; }
+  /* Groupe jour */
+  .card-day-group { display: flex; flex-direction: column; gap: 0; }
+  .card-day-header { font-size: 15px; font-weight: 700; color: var(--text); padding: 10px 14px; background: var(--header-bg); border: 1px solid var(--border); border-radius: 10px 10px 0 0; border-bottom: none; }
+  .card-day-sub { font-size: 15px; font-weight: 700; color: var(--muted); margin-left: 6px; }
+  .card-day-body { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); border-radius: 0 0 10px 10px; overflow: hidden; }
+  /* Carte individuelle */
+  .card { background: var(--bg); padding: 12px 14px; border-bottom: 1px solid var(--border); }
+  .card:last-child { border-bottom: none; }
+  .card-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .card-heure { font-size: 12px; color: var(--accent); white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 700; min-width: 80px; padding-top: 2px; }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; }
+  .card-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; padding-left: 90px; }
+  .card-rows { display: flex; flex-direction: column; gap: 5px; padding-left: 90px; }
+  .card-row { display: flex; gap: 8px; align-items: flex-start; }
+  .card-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; min-width: 80px; padding-top: 2px; }
+  .card-value { font-size: 13px; color: var(--text); flex: 1; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  /* ── SHARED ── */
+  .tag { display: inline-block; background: var(--tag-bg); color: var(--tag-text); border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .pill { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600; margin: 1px 2px; white-space: nowrap; }
+  .pill-h { background: var(--badge-h); color: var(--badge-ht); }
+  .pill-a { background: var(--badge-a); color: var(--badge-at); }
+  .pill-f { background: var(--badge-f); color: var(--badge-ft); }
+  .pill-t { background: var(--tag-bg); color: var(--tag-text); }
+  .heure { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .empty { text-align: center; padding: 48px; color: var(--muted); font-size: 14px; }
+  footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+  /* ── RESPONSIVE AUTO-SWITCH ── */
+  @media (max-width: 767px) {
+    .wrap { padding: 16px 12px; }
+    select { min-width: 100%; }
+    .filters { gap: 10px; }
+  }
+</style>
+</head>
+<body>
+<!-- ── MODALE MOT DE PASSE ADMIN ── -->
+<div id="editPwOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;padding:36px 32px;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);font-family:-apple-system,'Segoe UI',system-ui,sans-serif;">
+    <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#57606a;margin-bottom:6px;">⚙️ Admin — Édition</p>
+    <p style="font-size:17px;font-weight:700;color:#1f2328;margin-bottom:6px;">🔒 Accès restreint</p>
+    <p style="font-size:13px;color:#57606a;margin-bottom:16px;" id="editPwAtelier"></p>
+    <input id="editPwInput" type="password" placeholder="Mot de passe" autocomplete="off"
+      style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:15px;outline:none;margin-bottom:8px;"
+      onkeydown="if(event.key==='Enter')checkEditPw()" />
+    <p id="editPwError" style="font-size:12px;color:#dc2626;min-height:18px;margin-bottom:12px;"></p>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closeEditPw()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#f7f8fa;font-size:14px;cursor:pointer;">Annuler</button>
+      <button onclick="checkEditPw()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#3b82d4;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Ouvrir</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Agenda par Jour</p>
+    </div>
+    <div class="header-actions">
+      <a class="mode-btn" href="index.html">🏠 Home</a>
+      <button class="mode-btn" onclick="hardReload()">🔄 Refresh</button>
+      <button class="mode-btn" id="viewBtn" onclick="toggleView()">📱 Vue Mobile</button>
+      <button class="mode-btn" onclick="exportXlsx()">📥 Export Excel</button>
+      <button class="mode-btn" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+
+  <div class="filters">
+    <div class="filter-group">
+      <label>Jour / Date</label>
+      <select id="filterJour" onchange="render()">
+        <option value="">Tous les jours</option>
+        <option value="Jour 1">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7">Jour 7 — Ven. 4 sept.</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Type d'atelier</label>
+      <select id="filterType" onchange="render()">
+        <option value="">Tous les types</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Lieu</label>
+      <select id="filterLieu" onchange="render()">
+        <option value="">Tous les lieux</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Facilitateur</label>
+      <select id="filterFac" onchange="render()">
+        <option value="">Tous les facilitateurs</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Traducteur</label>
+      <select id="filterTrad" onchange="render()">
+        <option value="">Tous les traducteurs</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Helper</label>
+      <select id="filterHelper" onchange="render()">
+        <option value="">Tous les helpers</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Angel</label>
+      <select id="filterAngel" onchange="render()">
+        <option value="">Tous les angels</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="table-wrap" id="tableView">
+    <table id="mainTable">
+      <colgroup>
+        <col class="c-jour"><col class="c-date"><col class="c-heure">
+        <col class="c-type"><col class="c-atelier"><col class="c-piment">
+        <col class="c-lieu"><col class="c-fac"><col class="c-trad">
+        <col class="c-helper"><col class="c-angel"><col class="c-edit">
+      </colgroup>
+      <thead>
+        <tr>
+          <th onclick="sortBy(0)">Jour<span class="sort-icon" id="si0">⇅</span></th>
+          <th onclick="sortBy(1)">Date<span class="sort-icon" id="si1">⇅</span></th>
+          <th onclick="sortBy(2)">Heure<span class="sort-icon" id="si2">⇅</span></th>
+          <th onclick="sortBy(3)">Type<span class="sort-icon" id="si3">⇅</span></th>
+          <th onclick="sortBy(4)">Atelier<span class="sort-icon" id="si4">⇅</span></th>
+          <th class="th-piment" onclick="sortBy(10)" title="Niveau Piment">🌶️<span class="sort-icon" id="si10">⇅</span></th>
+          <th onclick="sortBy(5)">Lieu<span class="sort-icon" id="si5">⇅</span></th>
+          <th onclick="sortBy(6)">Facilitateur(s)<span class="sort-icon" id="si6">⇅</span></th>
+          <th onclick="sortBy(7)">Trad.<span class="sort-icon" id="si7">⇅</span></th>
+          <th onclick="sortBy(8)">Helper(s)<span class="sort-icon" id="si8">⇅</span></th>
+          <th onclick="sortBy(9)">Angel<span class="sort-icon" id="si9">⇅</span></th>
+          <th style="cursor:default;"></th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <div class="card-list" id="cardView"></div>
+</div>
+<footer><p>Made with IBM Bob</p></footer>
+
+<script src="ref_lieux.js"></script>
+<script src="ref_resource_types.js"></script>
+<script src="ref_ressources.js"></script>
+<script src="loader.js"></script>
+<script>
+loadData(['data.js'], function() {
+// RAW : chaque entrée est augmentée d'une propriété _idx = index dans AGENDA
+const RAW = AGENDA.map((e, i) => {
+  const r = [
+    e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,
+    e.fac1, e.fac2, e.traduction,
+    e.helper1, e.helper2, e.helper3,
+    e.angel, e.note, e.logisticId || '', e.piment || 0
+  ];
+  r._idx = i; // index stable dans AGENDA
+  return r;
+});
+
+// ─── Détection des conflits (même logique que Rapport4) ──────────────────────
+function parseIntervalle(h) {
+  if (!h) return null;
+  const norm = h.replace(/\./g, ':').replace(/â€"|–|—/g, '-');
+  const m = norm.match(/(\d{1,2}):(\d{2})\s*[-–—]+\s*(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  const debut = parseInt(m[1]) * 60 + parseInt(m[2]);
+  let fin     = parseInt(m[3]) * 60 + parseInt(m[4]);
+  if (fin <= debut) fin += 24 * 60;
+  return [debut, fin];
+}
+function chevauche(a, b) { return a && b && a[0] < b[1] && b[0] < a[1]; }
+
+// Retourne une Map : "atelier||jour" → Set de noms en conflit + leurs rôles
+// et un Set de clés "atelier||jour" ayant au moins un conflit
+function buildConflictIndex() {
+  // parPersonne : nom → [{atelier, jour, heure, iv, role, field}]
+  const parPersonne = new Map();
+  AGENDA.forEach(e => {
+    const iv = parseIntervalle(e.heure);
+    if (!iv) return;
+    const add = (nom, role, field) => {
+      if (!nom) return;
+      if (!parPersonne.has(nom)) parPersonne.set(nom, []);
+      parPersonne.get(nom).push({ atelier: e.atelier, jour: e.jour, heure: e.heure, iv, role, field });
+    };
+    add(e.fac1,       'Facilitateur', 'fac1');
+    add(e.fac2,       'Facilitateur', 'fac2');
+    add(e.traduction, 'Traducteur',   'traduction');
+    add(e.helper1,    'Helper',       'helper1');
+    add(e.helper2,    'Helper',       'helper2');
+    add(e.helper3,    'Helper',       'helper3');
+    add(e.angel,      'Angel',        'angel');
+  });
+
+  // conflictFields : "atelier||jour" → Set de champs (fac1, helper2...) en conflit
+  const conflictFields = new Map(); // clé → Set<field>
+
+  parPersonne.forEach((slots, nom) => {
+    const parJour = new Map();
+    slots.forEach(s => {
+      if (!parJour.has(s.jour)) parJour.set(s.jour, []);
+      parJour.get(s.jour).push(s);
+    });
+    parJour.forEach(daySlots => {
+      for (let i = 0; i < daySlots.length; i++) {
+        for (let j = i + 1; j < daySlots.length; j++) {
+          const a = daySlots[i], b = daySlots[j];
+          if (a.role === 'Angel' && b.role === 'Angel') continue;
+          if (chevauche(a.iv, b.iv)) {
+            // Marquer les deux ateliers impliqués
+            [[a.atelier, a.jour, a.field], [b.atelier, b.jour, b.field]].forEach(([at, jr, fld]) => {
+              const k = `${at}||${jr}`;
+              if (!conflictFields.has(k)) conflictFields.set(k, new Set());
+              conflictFields.get(k).add(fld);
+            });
+          }
+        }
+      }
+    });
+  });
+
+  return conflictFields;
+}
+
+const CONFLICT_INDEX = buildConflictIndex();
+
+// Retourne le Set de champs en conflit pour une ligne RAW (ou null)
+function getConflictFields(r) {
+  const k = `${r[4]}||${r[0]}`; // atelier||jour
+  return CONFLICT_INDEX.get(k) || null;
+}
+
+// Peupler le filtre Type
+const types = [...new Set(RAW.map(r=>r[3]).filter(Boolean))].sort();
+const selType = document.getElementById('filterType');
+types.forEach(t => { const o=document.createElement('option'); o.value=t; o.text=t; selType.appendChild(o); });
+
+// Peupler le filtre Lieu depuis REF_LIEUX (seulement les lieux présents dans les données)
+const lieuxPresents = new Set(RAW.map(r=>r[5]).filter(Boolean));
+const selLieu = document.getElementById('filterLieu');
+REF_LIEUX.filter(l => lieuxPresents.has(l.value)).forEach(l => {
+  const o=document.createElement('option'); o.value=l.value; o.text=l.label||l.value; selLieu.appendChild(o);
+});
+
+// Peupler le filtre Facilitateur depuis REF_FACILITATEURS (seulement ceux présents dans les données)
+const facsPresents = new Set(RAW.flatMap(r=>[r[6],r[7]]).filter(Boolean));
+const selFac = document.getElementById('filterFac');
+REF_FACILITATEURS.filter(f => facsPresents.has(f.value)).forEach(f => {
+  const o=document.createElement('option'); o.value=f.value; o.text=f.value; selFac.appendChild(o);
+});
+
+// Peupler le filtre Traducteur depuis REF_TRADUCTEURS (seulement ceux présents dans les données)
+const tradsPresents = new Set(RAW.map(r=>r[8]).filter(Boolean));
+const selTrad = document.getElementById('filterTrad');
+REF_TRADUCTEURS.filter(t => tradsPresents.has(t.value)).forEach(t => {
+  const o=document.createElement('option'); o.value=t.value; o.text=t.value; selTrad.appendChild(o);
+});
+
+// Peupler le filtre Helper depuis REF_HELPERS (seulement ceux présents dans les données)
+const helpersPresents = new Set(RAW.flatMap(r=>[r[9],r[10],r[11]]).filter(Boolean));
+const selHelper = document.getElementById('filterHelper');
+REF_HELPERS.filter(h => helpersPresents.has(h.value)).forEach(h => {
+  const o=document.createElement('option'); o.value=h.value; o.text=h.value; selHelper.appendChild(o);
+});
+
+// Peupler le filtre Angel depuis REF_ANGELS (seulement ceux présents dans les données)
+const angelsPresents = new Set(RAW.map(r=>r[12]).filter(Boolean));
+const selAngel = document.getElementById('filterAngel');
+REF_ANGELS.filter(a => angelsPresents.has(a.value)).forEach(a => {
+  const o=document.createElement('option'); o.value=a.value; o.text=a.value; selAngel.appendChild(o);
+});
+
+let sortCol = -1, sortAsc = true;
+
+function getFiltered() {
+  const j = document.getElementById('filterJour').value;
+  const t = document.getElementById('filterType').value;
+  const l = document.getElementById('filterLieu').value;
+  const f = document.getElementById('filterFac').value;
+  const tr = document.getElementById('filterTrad').value;
+  const h = document.getElementById('filterHelper').value;
+  const a = document.getElementById('filterAngel').value;
+  return RAW.filter(r =>
+    (!j  || r[0]===j) &&
+    (!t  || r[3]===t) &&
+    (!l  || r[5]===l) &&
+    (!f  || r[6]===f || r[7]===f) &&
+    (!tr || r[8]===tr) &&
+    (!h  || r[9]===h || r[10]===h || r[11]===h) &&
+    (!a  || r[12]===a)
+  );
+}
+
+function sortBy(col) {
+  if(sortCol===col) sortAsc=!sortAsc; else { sortCol=col; sortAsc=true; }
+  for(let i=0;i<10;i++){
+    const si=document.getElementById('si'+i);
+    si.textContent='⇅'; si.parentElement.classList.remove('sorted');
+  }
+  const si=document.getElementById('si'+col);
+  si.textContent=sortAsc?'↑':'↓'; si.parentElement.classList.add('sorted');
+  render();
+}
+
+function getVal(row, col) {
+  switch(col){
+    case 0: return row[0]; case 1: return row[1]; case 2: return row[2]; case 3: return row[3];
+    case 4: return row[4]; case 5: return row[5];
+    case 6: return [row[6],row[7]].filter(Boolean).join(' / ');
+    case 7: return row[8];
+    case 8: return [row[9],row[10],row[11]].filter(Boolean).join(' / ');
+    case 9: return row[12];
+    case 10: return String(row[15] || 0);
+  }
+  return '';
+}
+
+function pills(vals, cls) {
+  return vals.filter(Boolean).map(v=>`<span class="pill ${cls}">${v}</span>`).join('');
+}
+
+let isMobileView = window.innerWidth < 768;
+
+// Convertit une heure texte en minutes pour le tri (ex: "11:15 - 13:00" → 675)
+// Les heures floues ("Matin", "APRES MIDI") sont renvoyées en fin de liste
+function heureEnMinutes(h) {
+  if (!h) return 9999;
+  const norm = h.replace(/\./g, ':');
+  const m = norm.match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : 9999;
+}
+
+function render() {
+  let data = getFiltered();
+  if(sortCol>=0) {
+    data = [...data].sort((a,b)=>{
+      const av=getVal(a,sortCol)||'', bv=getVal(b,sortCol)||'';
+      return sortAsc ? av.localeCompare(bv,'fr') : bv.localeCompare(av,'fr');
+    });
+  } else {
+    // Tri par défaut : jour (ordre naturel) puis heure de début
+    const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+    data = [...data].sort((a,b) => {
+      const dj = JOUR_ORDER.indexOf(a[0]) - JOUR_ORDER.indexOf(b[0]);
+      return dj !== 0 ? dj : heureEnMinutes(a[2]) - heureEnMinutes(b[2]);
+    });
+  }
+  document.getElementById('stats').innerHTML = `<span>${data.length}</span> atelier(s) affiché(s)`;
+  if (isMobileView) {
+    renderCards(data);
+  } else {
+    renderTable(data);
+  }
+}
+
+// Champs RAW → colonne tableau (index colonne → champ(s) de l'entrée AGENDA)
+const COL_FIELDS = {
+  6: ['fac1','fac2'],
+  7: ['traduction'],
+  8: ['helper1','helper2','helper3'],
+  9: ['angel'],
+};
+
+function renderTable(data) {
+  const tb = document.getElementById('tbody');
+  if(!data.length) { tb.innerHTML=`<tr><td colspan="12" class="empty">Aucun résultat</td></tr>`; return; }
+  tb.innerHTML = data.map(r => {
+    const cf = getConflictFields(r);
+    const rowCls = cf ? ' class="conflict-row"' : '';
+
+    const cc = (colIdx) => {
+      if (!cf) return '';
+      const fields = COL_FIELDS[colIdx] || [];
+      return fields.some(f => cf.has(f)) ? ' class="conflict-cell"' : '';
+    };
+    const pillsConflict = (vals, fields, cls) => vals.map((v, i) => {
+      if (!v) return '';
+      const inConflict = cf && cf.has(fields[i]);
+      return inConflict
+        ? `<span class="pill ${cls}" style="background:#fef08a;color:#b91c1c;font-weight:700;border:1px solid #f59e0b">${v}</span>`
+        : `<span class="pill ${cls}">${v}</span>`;
+    }).join('');
+
+    const piment = parseInt(r[15]) || 0;
+    const pimentHtml = piment > 0 ? '🌶️'.repeat(piment) : '';
+
+    const realIdx = r._idx !== undefined ? r._idx : 0;
+    return `<tr${rowCls}>
+      <td>${r[0]||''}</td>
+      <td>${r[1]||''}</td>
+      <td class="heure">${r[2]||''}</td>
+      <td><span class="tag" style="font-size:10px">${r[3]||''}</span></td>
+      <td class="td-wrap">${r[4]||''}${r[13]?'<span style="color:#e53e3e;font-weight:700;margin-left:3px">*</span>':''}</td>
+      <td class="td-piment">${pimentHtml}</td>
+      <td>${r[5]||''}</td>
+      <td${cc(6)}>${pillsConflict([r[6],r[7]],['fac1','fac2'],'pill-f')}</td>
+      <td${cc(7)}>${r[8]?`<span class="pill pill-t"${cf&&cf.has('traduction')?' style="background:#fef08a;color:#b91c1c;font-weight:700;border:1px solid #f59e0b"':''}>${r[8]}</span>`:''}</td>
+      <td${cc(8)}>${pillsConflict([r[9],r[10],r[11]],['helper1','helper2','helper3'],'pill-h')}</td>
+      <td${cc(9)}>${r[12]?`<span class="pill pill-a"${cf&&cf.has('angel')?' style="background:#fef08a;color:#b91c1c;font-weight:700;border:1px solid #f59e0b"':''}>${r[12]}</span>`:''}</td>
+      <td class="td-edit"><button class="btn-edit" title="Éditer dans Admin" onclick="openEditPw(${JSON.stringify(r[0])},${JSON.stringify(r[4])},${realIdx})">✏️</button></td>
+    </tr>`;
+  }).join('');
+}
+
+// Extrait l'heure de début pour trier (ex: "9:45 - 11:00" → 9*60+45=585)
+function parseHeure(h) {
+  if (!h) return 9999;
+  const m = h.match(/(\d+)[:.h](\d+)/);
+  return m ? parseInt(m[1])*60 + parseInt(m[2]) : 9999;
+}
+
+function renderCards(data) {
+  const cv = document.getElementById('cardView');
+  if (!data.length) { cv.innerHTML=`<div class="empty">Aucun résultat</div>`; return; }
+
+  // Grouper par jour dans l'ordre chronologique
+  const DAY_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+  const dayMap = new Map();
+  data.forEach(r => {
+    const k = r[0];
+    if (!dayMap.has(k)) dayMap.set(k, { jour: r[0], date: r[1], items: [] });
+    dayMap.get(k).items.push(r);
+  });
+
+  // Trier les ateliers de chaque jour du plus tôt au plus tard
+  dayMap.forEach(g => g.items.sort((a,b) => parseHeure(a[2]) - parseHeure(b[2])));
+
+  const groups = DAY_ORDER.filter(j => dayMap.has(j)).map(j => dayMap.get(j));
+
+  cv.innerHTML = groups.map(g => {
+    const cards = g.items.map(r => {
+      const facs = pills([r[6],r[7]],'pill-f');
+      const helpers = pills([r[9],r[10],r[11]],'pill-h');
+      const angel = r[12] ? `<span class="pill pill-a">${r[12]}</span>` : '';
+      const trad = r[8] ? `<span class="pill pill-t">${r[8]}</span>` : '';
+      const lieu = r[5] ? `<span class="tag">${r[5]}</span>` : '';
+      return `<div class="card">
+        <div class="card-header">
+          <div class="card-heure">${r[2]||''}</div>
+          <div class="card-title">${r[4]||'—'}</div>
+        </div>
+        <div class="card-meta">
+          <span class="tag">${r[3]||''}</span>${lieu ? ' '+lieu : ''}
+        </div>
+        <div class="card-rows">
+          ${facs ? `<div class="card-row"><span class="card-label">Facilitateur</span><span class="card-value">${facs}</span></div>` : ''}
+          ${trad ? `<div class="card-row"><span class="card-label">Traducteur</span><span class="card-value">${trad}</span></div>` : ''}
+          ${helpers||r[13] ? `<div class="card-row"><span class="card-label">Helper(s)</span><span class="card-value">${helpers}${r[13]?`<span style="color:#e53e3e;font-weight:600;font-size:11px;margin-left:6px;border:1px solid #e53e3e;border-radius:4px;padding:1px 6px">${r[13]}</span>`:''}</span></div>` : ''}
+          ${angel ? `<div class="card-row"><span class="card-label">Angel</span><span class="card-value">${angel}</span></div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="card-day-group">
+      <div class="card-day-header">${g.jour}<span class="card-day-sub">${g.date}</span><span class="card-day-sub">(${g.items.length} atelier${g.items.length>1?'s':''})</span></div>
+      <div class="card-day-body">${cards}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── Modale mot de passe Admin ───────────────────────────────────────────────
+const ADMIN_PW = '007';
+let _editTarget = '';
+
+function openEditPw(jour, atelierName, agendaIdx) {
+  _editTarget = `Admin.html?jour=${encodeURIComponent(jour)}&idx=${agendaIdx}`;
+  document.getElementById('editPwAtelier').textContent = `${jour} — ${atelierName}`;
+  document.getElementById('editPwInput').value = '';
+  document.getElementById('editPwError').textContent = '';
+  document.getElementById('editPwOverlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('editPwInput').focus(), 50);
+}
+
+function closeEditPw() {
+  document.getElementById('editPwOverlay').style.display = 'none';
+}
+
+function checkEditPw() {
+  if (document.getElementById('editPwInput').value === ADMIN_PW) {
+    sessionStorage.setItem('tm_admin_auth', ADMIN_PW);
+    closeEditPw();
+    window.open(_editTarget, '_blank', 'noopener');
+  } else {
+    document.getElementById('editPwError').textContent = 'Mot de passe incorrect.';
+    document.getElementById('editPwInput').select();
+  }
+}
+
+document.getElementById('editPwOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeEditPw();
+});
+
+function setView(mobile) {
+  isMobileView = mobile;
+  document.getElementById('tableView').style.display = mobile ? 'none' : '';
+  document.getElementById('cardView').style.display = mobile ? 'flex' : 'none';
+  document.getElementById('viewBtn').textContent = mobile ? '🖥 Vue Tableau' : '📱 Vue Mobile';
+  render();
+}
+
+function toggleView() { setView(!isMobileView); }
+
+function hardReload() {
+  // Vide tous les caches service worker puis force un rechargement sans cache
+  if ('caches' in window) {
+    caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k))))
+      .finally(() => location.reload(true));
+  } else {
+    location.reload(true);
+  }
+}
+
+function toggleMode() {
+  const isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+
+// Auto-detect mobile on load
+setView(window.innerWidth < 768);
+
+// Auto-refresh si ouvert depuis Home (paramètre ?v= présent)
+if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
+  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
+  hardReload();
+}
+
+// ════════════════════════════════════════════════
+// EXPORT XLSX (SpreadsheetML — pur navigateur)
+// ════════════════════════════════════════════════
+function exportXlsx() {
+  // ── Données filtrées triées comme à l'écran ──────────────────────────────
+  let data = getFiltered();
+  const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+  data = [...data].sort((a, b) => {
+    const dj = JOUR_ORDER.indexOf(a[0]) - JOUR_ORDER.indexOf(b[0]);
+    return dj !== 0 ? dj : heureEnMinutes(a[2]) - heureEnMinutes(b[2]);
+  });
+
+  // ── Colonnes ────────────────────────────────────────────────────────────
+  const HEADERS = ['Jour','Date','Heure','Type','Atelier','Piment','Lieu',
+                   'Facilitateur 1','Facilitateur 2','Traducteur',
+                   'Helper 1','Helper 2','Helper 3','Angel','Note'];
+
+  // ── Helpers XML ─────────────────────────────────────────────────────────
+  function esc(v) {
+    return String(v == null ? '' : v)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+  }
+
+  // Convertit un numéro de colonne (0-based) en lettre(s) Excel : 0→A, 25→Z, 26→AA
+  function colLetter(n) {
+    let s = '';
+    n++;
+    while (n > 0) { n--; s = String.fromCharCode(65 + (n % 26)) + s; n = Math.floor(n / 26); }
+    return s;
+  }
+
+  function cellRef(col, row) { return colLetter(col) + row; }
+
+  // Cellule texte
+  function cellS(col, row, val) {
+    return `<c r="${cellRef(col, row)}" t="inlineStr"><is><t>${esc(val)}</t></is></c>`;
+  }
+
+  // ── Construction des lignes XML ──────────────────────────────────────────
+  let rowsXml = '';
+
+  // En-tête (ligne 1)
+  rowsXml += `<row r="1">`;
+  HEADERS.forEach((h, ci) => { rowsXml += cellS(ci, 1, h); });
+  rowsXml += `</row>`;
+
+  // Données (à partir de la ligne 2)
+  data.forEach((r, ri) => {
+    const rowNum = ri + 2;
+    // r = [jour, date, heure, type, atelier, lieu, fac1, fac2, trad, h1, h2, h3, angel, note, logisticId, piment]
+    const vals = [r[0],r[1],r[2],r[3],r[4], r[15]||0, r[5],r[6],r[7],r[8],r[9],r[10],r[11],r[12],r[13]];
+    rowsXml += `<row r="${rowNum}">`;
+    vals.forEach((v, ci) => { rowsXml += cellS(ci, rowNum, v == null ? '' : v); });
+    rowsXml += `</row>`;
+  });
+
+  // ── Calcul des largeurs de colonnes ─────────────────────────────────────
+  const colWidths = HEADERS.map((h, ci) => {
+    const maxLen = data.reduce((m, r) => {
+      const vals = [r[0],r[1],r[2],r[3],r[4], r[15]||0, r[5],r[6],r[7],r[8],r[9],r[10],r[11],r[12],r[13]];
+      return Math.max(m, String(vals[ci] == null ? '' : vals[ci]).length);
+    }, h.length);
+    return Math.min(Math.max(maxLen + 2, 10), 60);
+  });
+  const colsXml = colWidths.map((w, ci) =>
+    `<col min="${ci+1}" max="${ci+1}" width="${w}" customWidth="1"/>`
+  ).join('');
+
+  // ── Assemblage du fichier XLSX (ZIP SpreadsheetML minimal) ───────────────
+  // Nom de fichier reflétant les filtres actifs
+  const fj  = document.getElementById('filterJour').value;
+  const ft  = document.getElementById('filterType').value;
+  const fileName = ['TantramourAgenda', fj||'TousJours', ft||''].filter(Boolean).join('_') + '.xlsx';
+
+  // Contenu des fichiers internes du ZIP XLSX
+  const sheetXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>
+  <cols>${colsXml}</cols>
+  <sheetData>${rowsXml}</sheetData>
+  <autoFilter ref="A1:${colLetter(HEADERS.length - 1)}1"/>
+</worksheet>`;
+
+  const workbookXml = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
+          xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets><sheet name="Agenda" sheetId="1" r:id="rId1"/></sheets>
+</workbook>`;
+
+  const relsWorkbook = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>
+</Relationships>`;
+
+  const relsRoot = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>`;
+
+  const contentTypes = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml"  ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>
+</Types>`;
+
+  // ── Construction du ZIP en JavaScript pur ────────────────────────────────
+  // Implémentation minimale du format ZIP (Local File Header + Central Directory)
+  function strToBytes(str) {
+    const enc = new TextEncoder();
+    return enc.encode(str);
+  }
+
+  function crc32(bytes) {
+    const table = (() => {
+      const t = new Uint32Array(256);
+      for (let i = 0; i < 256; i++) {
+        let c = i;
+        for (let j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        t[i] = c;
+      }
+      return t;
+    })();
+    let crc = 0xFFFFFFFF;
+    for (const b of bytes) crc = table[(crc ^ b) & 0xFF] ^ (crc >>> 8);
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  function uint16LE(n) { return [n & 0xFF, (n >> 8) & 0xFF]; }
+  function uint32LE(n) { return [n & 0xFF, (n >> 8) & 0xFF, (n >> 16) & 0xFF, (n >> 24) & 0xFF]; }
+
+  function makeZipEntry(name, content) {
+    const nameBytes    = strToBytes(name);
+    const contentBytes = strToBytes(content);
+    const crc          = crc32(contentBytes);
+    const size         = contentBytes.length;
+    const date = 0x5765; // 2026-xx-xx (valeur arbitraire)
+    const time = 0x0000;
+
+    // Local file header
+    const localHeader = [
+      0x50, 0x4B, 0x03, 0x04,   // signature
+      ...uint16LE(20),           // version needed
+      ...uint16LE(0),            // flags
+      ...uint16LE(0),            // compression (stored)
+      ...uint16LE(time),
+      ...uint16LE(date),
+      ...uint32LE(crc),
+      ...uint32LE(size),
+      ...uint32LE(size),
+      ...uint16LE(nameBytes.length),
+      ...uint16LE(0),            // extra length
+      ...nameBytes,
+    ];
+
+    return {
+      name, nameBytes, crc, size, date, time,
+      localOffset: 0, // sera rempli lors de l'assemblage
+      localHeader: new Uint8Array(localHeader),
+      content: contentBytes,
+    };
+  }
+
+  function buildZip(entries) {
+    // Calculer les offsets
+    let offset = 0;
+    entries.forEach(e => {
+      e.localOffset = offset;
+      offset += e.localHeader.length + e.content.length;
+    });
+
+    const centralDirOffset = offset;
+
+    // Central directory entries
+    const centralParts = entries.map(e => {
+      const cd = [
+        0x50, 0x4B, 0x01, 0x02,
+        ...uint16LE(20), ...uint16LE(20),
+        ...uint16LE(0), ...uint16LE(0),
+        ...uint16LE(e.time), ...uint16LE(e.date),
+        ...uint32LE(e.crc),
+        ...uint32LE(e.size), ...uint32LE(e.size),
+        ...uint16LE(e.nameBytes.length),
+        ...uint16LE(0), ...uint16LE(0),
+        ...uint16LE(0), ...uint16LE(0),
+        ...uint32LE(0),
+        ...uint32LE(e.localOffset),
+        ...e.nameBytes,
+      ];
+      return new Uint8Array(cd);
+    });
+
+    const centralDirSize = centralParts.reduce((s, p) => s + p.length, 0);
+
+    // End of central directory
+    const eocd = new Uint8Array([
+      0x50, 0x4B, 0x05, 0x06,
+      ...uint16LE(0), ...uint16LE(0),
+      ...uint16LE(entries.length), ...uint16LE(entries.length),
+      ...uint32LE(centralDirSize),
+      ...uint32LE(centralDirOffset),
+      ...uint16LE(0),
+    ]);
+
+    // Assembler tout
+    const totalSize = offset + centralDirSize + eocd.length;
+    const buf = new Uint8Array(totalSize);
+    let pos = 0;
+    entries.forEach(e => {
+      buf.set(e.localHeader, pos); pos += e.localHeader.length;
+      buf.set(e.content, pos);     pos += e.content.length;
+    });
+    centralParts.forEach(p => { buf.set(p, pos); pos += p.length; });
+    buf.set(eocd, pos);
+    return buf;
+  }
+
+  // ── Assembler les fichiers du XLSX ───────────────────────────────────────
+  const entries = [
+    makeZipEntry('[Content_Types].xml',          contentTypes),
+    makeZipEntry('_rels/.rels',                   relsRoot),
+    makeZipEntry('xl/workbook.xml',               workbookXml),
+    makeZipEntry('xl/_rels/workbook.xml.rels',    relsWorkbook),
+    makeZipEntry('xl/worksheets/sheet1.xml',      sheetXml),
+  ];
+
+  const zipBytes = buildZip(entries);
+
+  // ── Téléchargement ───────────────────────────────────────────────────────
+  const blob = new Blob([zipBytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = fileName;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Exposer dans window les fonctions appelées depuis les onclick HTML
+window.hardReload    = hardReload;
+window.toggleMode    = toggleMode;
+window.toggleView    = toggleView;
+window.setView       = setView;
+window.sortBy        = sortBy;
+window.render        = render;
+window.exportXlsx    = exportXlsx;
+window.openEditPw    = openEditPw;
+window.closeEditPw   = closeEditPw;
+window.checkEditPw   = checkEditPw;
+
+}); // fin loadData
+</script>
+</body>
+</html>

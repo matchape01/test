@@ -1,663 +1,730 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tantramour 2026 — Master Data Management</title>
+<title>Tantramour 2026 — Master Data</title>
 <style>
   :root {
-    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
-    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
-    --header-bg: #f0f4fb;
-    --badge-f: #dcfce7; --badge-ft: #166534;
-    --badge-h: #e0f2fe; --badge-ht: #0369a1;
-    --badge-a: #fce7f3; --badge-at: #9d174d;
-    --warn: #b45309; --warn-bg: #fffbeb; --warn-border: #fcd34d;
-    --success: #166534; --success-bg: #dcfce7; --success-border: #86efac;
-    --danger: #dc2626; --danger-bg: #fef2f2; --danger-border: #fca5a5;
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --th-bg:#f0f4fb;
+    --warn:#b45309; --warn-bg:#fffbeb; --warn-border:#fcd34d;
+    --ok:#166534;   --ok-bg:#dcfce7;   --ok-border:#86efac;
+    --err:#dc2626;  --err-bg:#fef2f2;  --err-border:#fca5a5;
   }
   .dark {
-    --bg: #0d1117; --surface: #161b22; --border: #30363d;
-    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
-    --header-bg: #1c2333;
-    --badge-f: #0a2e1a; --badge-ft: #4ade80;
-    --badge-h: #0c2d48; --badge-ht: #58a6ff;
-    --badge-a: #3b1030; --badge-at: #f0abca;
-    --warn-bg: #1c1500; --warn-border: #92400e;
-    --success-bg: #052e16; --success-border: #166534;
-    --danger-bg: #2d0a0a; --danger-border: #991b1b;
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff; --th-bg:#1c2333;
+    --warn-bg:#1c1500; --warn-border:#92400e;
+    --ok-bg:#052e16;  --ok-border:#166534;
+    --err-bg:#2d0a0a; --err-border:#991b1b;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
-  .wrap { max-width: 860px; margin: 0 auto; padding: 24px 20px; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
+  .wrap { max-width:900px; margin:0 auto; padding:24px 20px 60px; }
 
-  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
-  .logo h1 { font-size: 20px; font-weight: 700; }
-  .logo p { font-size: 28px; font-weight: 800; color: var(--accent); letter-spacing: .3px; line-height: 1.2; margin-top: 2px; }
-  .header-actions { display: flex; gap: 8px; align-items: center; }
-  .btn-ghost { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
-  .btn-ghost:hover { background: var(--border); }
+  /* HEADER */
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:20px; font-weight:700; }
+  .logo p  { font-size:26px; font-weight:800; color:var(--accent); line-height:1.2; margin-top:2px; }
+  .hdr-btns { display:flex; gap:8px; align-items:center; }
+  .btn-ghost { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:6px 14px; font-size:13px; color:var(--text); font-family:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+  .btn-ghost:hover { background:var(--border); }
 
-  /* ── SÉLECTEUR MASTER DATA ── */
-  .md-selector { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px; }
-  .md-tab {
-    cursor: pointer; padding: 9px 18px; border-radius: 8px; font-size: 13px; font-weight: 600;
-    border: 2px solid var(--border); background: var(--surface); color: var(--muted);
-    font-family: inherit; transition: all .15s;
-  }
-  .md-tab:hover { border-color: var(--accent); color: var(--accent); }
-  .md-tab.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+  /* BANNIÈRE RESSOURCES */
+  .res-banner { background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px 18px; margin-bottom:22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+  .dark .res-banner { background:#0c2d48; border-color:#1d4ed8; }
+  .res-banner strong { font-size:13px; font-weight:700; color:#1e40af; }
+  .dark .res-banner strong { color:#93c5fd; }
+  .res-banner span { font-size:12px; color:#3b82d4; display:block; margin-top:1px; }
+  .res-banner a { background:#3b82d4; color:#fff; border-radius:6px; padding:7px 16px; font-size:13px; font-weight:700; text-decoration:none; white-space:nowrap; }
 
-  /* ── SECTION LISTE ── */
-  .md-section { display: none; }
-  .md-section.visible { display: block; }
-  .md-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
-  .md-title { font-size: 16px; font-weight: 700; }
-  .md-count { font-size: 12px; color: var(--muted); margin-left: 8px; }
+  /* ONGLETS */
+  .tabs { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:22px; }
+  .tab { cursor:pointer; padding:8px 16px; border-radius:8px; font-size:13px; font-weight:600; border:2px solid var(--border); background:var(--surface); color:var(--muted); font-family:inherit; transition:all .15s; }
+  .tab:hover { border-color:var(--accent); color:var(--accent); }
+  .tab.active { border-color:var(--accent); background:var(--accent); color:#fff; }
 
-  .md-table-wrap { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
-  .md-table { width: 100%; border-collapse: collapse; }
-  .md-table thead th { background: var(--header-bg); padding: 9px 14px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); border-bottom: 1px solid var(--border); }
-  .md-table tbody tr { border-bottom: 1px solid var(--border); }
-  .md-table tbody tr:last-child { border-bottom: none; }
-  .md-table tbody tr:hover { background: var(--surface); }
-  .md-table td { padding: 8px 14px; font-size: 13px; vertical-align: middle; }
-  .td-id { font-family: 'Courier New', monospace; font-size: 11px; color: var(--muted); white-space: nowrap; width: 160px; }
-  .td-value { flex: 1; }
-  .td-actions { width: 100px; text-align: right; white-space: nowrap; }
+  /* SECTIONS */
+  .section { display:none; }
+  .section.visible { display:block; }
+  .sec-title { font-size:16px; font-weight:700; margin-bottom:4px; }
+  .sec-meta  { font-size:11px; color:var(--muted); font-family:monospace; margin-bottom:16px; }
 
-  /* ── INLINE EDIT ── */
-  .inline-input { background: var(--bg); border: 1px solid var(--accent); border-radius: 5px; padding: 5px 8px; font-size: 13px; color: var(--text); font-family: inherit; width: 100%; outline: none; box-shadow: 0 0 0 3px rgba(59,130,212,.1); }
+  /* TABLE */
+  .tbl-wrap { border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:16px; }
+  table { width:100%; border-collapse:collapse; }
+  thead th { background:var(--th-bg); padding:9px 14px; text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); border-bottom:1px solid var(--border); }
+  tbody tr { border-bottom:1px solid var(--border); }
+  tbody tr:last-child { border-bottom:none; }
+  tbody tr:hover { background:var(--surface); }
+  td { padding:8px 14px; font-size:13px; vertical-align:middle; }
+  .td-id { font-family:monospace; font-size:11px; color:var(--muted); width:150px; white-space:nowrap; }
+  .td-val { }
+  .td-lbl { font-size:12px; color:var(--muted); font-style:italic; }
+  .td-act { width:90px; text-align:right; white-space:nowrap; }
+  .empty { padding:28px; text-align:center; color:var(--muted); font-style:italic; }
 
-  /* ── BOUTONS ── */
-  .btn { cursor: pointer; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 600; font-family: inherit; border: none; transition: filter .15s; }
-  .btn:hover { filter: brightness(.9); }
-  .btn-edit   { background: var(--surface); color: var(--text); border: 1px solid var(--border); }
-  .btn-save   { background: #16a34a; color: #fff; }
-  .btn-cancel-sm { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
-  .btn-delete { background: var(--danger-bg); color: var(--danger); border: 1px solid var(--danger-border); }
-  .btn-add-row { cursor: pointer; width: 100%; padding: 9px; background: var(--surface); border: 2px dashed var(--border); border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--muted); font-family: inherit; transition: all .15s; }
-  .btn-add-row:hover { border-color: var(--accent); color: var(--accent); background: var(--bg); }
-  .btn-download { background: var(--accent); color: #fff; cursor: pointer; border-radius: 6px; padding: 8px 18px; font-size: 13px; font-weight: 700; font-family: inherit; border: none; display: inline-flex; align-items: center; gap: 6px; }
-  .btn-download:hover { filter: brightness(.92); }
+  /* BOUTONS */
+  .btn { cursor:pointer; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:600; font-family:inherit; border:1px solid var(--border); background:var(--surface); color:var(--text); transition:filter .15s; }
+  .btn:hover { filter:brightness(.92); }
+  .btn-ok  { background:var(--ok-bg);  color:var(--ok);  border-color:var(--ok-border); }
+  .btn-del { background:var(--err-bg); color:var(--err); border-color:var(--err-border); }
+  .btn-add { cursor:pointer; width:100%; padding:9px; background:var(--surface); border:2px dashed var(--border); border-radius:8px; font-size:13px; font-weight:600; color:var(--muted); font-family:inherit; transition:all .15s; }
+  .btn-add:hover { border-color:var(--accent); color:var(--accent); background:var(--bg); }
+  .btn-save { background:var(--accent); color:#fff; border:none; cursor:pointer; border-radius:6px; padding:9px 20px; font-size:13px; font-weight:700; font-family:inherit; display:inline-flex; align-items:center; gap:6px; }
+  .btn-save:hover { filter:brightness(.92); }
+  .btn-save2 { background:#7c3aed; color:#fff; border:none; cursor:pointer; border-radius:6px; padding:9px 20px; font-size:13px; font-weight:700; font-family:inherit; display:inline-flex; align-items:center; gap:6px; }
+  .btn-save2:hover { filter:brightness(.92); }
 
-  /* ── DOWNLOAD BAR ── */
-  .download-bar { background: var(--warn-bg); border: 1px solid var(--warn-border); border-radius: 8px; padding: 14px 18px; margin-top: 24px; display: none; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-  .download-bar.visible { display: flex; }
-  .download-bar-msg { font-size: 13px; font-weight: 600; color: var(--warn); }
+  /* INLINE INPUT */
+  .inp { background:var(--bg); border:1px solid var(--accent); border-radius:5px; padding:5px 8px; font-size:13px; color:var(--text); font-family:inherit; width:100%; outline:none; box-shadow:0 0 0 3px rgba(59,130,212,.1); }
 
-  /* ── TOAST ── */
-  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); border-radius: 8px; padding: 12px 18px; font-size: 13px; font-weight: 600; z-index: 200; display: none; box-shadow: 0 4px 16px rgba(0,0,0,.12); max-width: 420px; }
-  .toast.show { display: block; animation: slideIn .25s ease; }
-  @keyframes slideIn { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  /* BARRE DE SAUVEGARDE */
+  .save-bar { background:var(--warn-bg); border:1px solid var(--warn-border); border-radius:8px; padding:14px 18px; margin-top:20px; display:none; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+  .save-bar.on { display:flex; }
+  .save-bar-msg { font-size:13px; font-weight:600; color:var(--warn); }
 
-  /* ── OVERLAY CONFIRM ── */
-  .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100; align-items: center; justify-content: center; }
-  .overlay.open { display: flex; }
-  .dialog { background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 28px 32px; max-width: 400px; width: 90%; }
-  .dialog h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
-  .dialog p { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
-  .dialog-actions { display: flex; gap: 10px; justify-content: flex-end; }
+  /* CONFIRM */
+  .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:100; align-items:center; justify-content:center; }
+  .overlay.open { display:flex; }
+  .dlg { background:var(--bg); border:1px solid var(--border); border-radius:12px; padding:28px 32px; max-width:380px; width:90%; }
+  .dlg h3 { font-size:16px; font-weight:700; margin-bottom:8px; }
+  .dlg p  { font-size:13px; color:var(--muted); margin-bottom:20px; }
+  .dlg-btns { display:flex; gap:10px; justify-content:flex-end; }
 
-  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+  /* TOAST */
+  .toast { position:fixed; bottom:24px; right:24px; border-radius:8px; padding:12px 18px; font-size:13px; font-weight:600; z-index:200; display:none; max-width:420px; }
+  .toast.on { display:block; animation:slideIn .25s ease; }
+  @keyframes slideIn { from{transform:translateY(10px);opacity:0} to{transform:translateY(0);opacity:1} }
+
+  footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
 </style>
 </head>
 <body>
 <script>
 (function(){
   var pw = sessionStorage.getItem('tm_admin_auth');
-  if(pw !== '007') {
+  if (pw !== '007') {
     var entered = prompt('🔒 Accès restreint — Mot de passe :');
-    if(entered !== '007') { document.write('<div style="font-family:system-ui;padding:60px;text-align:center;"><h2>Accès refusé</h2><p style=\"margin-top:12px;color:#57606a\">Mot de passe incorrect.</p><br><a href=\"index.html\">← Retour</a></div>'); document.close(); throw 'access denied'; }
-    sessionStorage.setItem('tm_admin_auth','007');
+    if (entered !== '007') {
+      document.write('<div style="font-family:system-ui;padding:60px;text-align:center"><h2>Accès refusé</h2><p style="margin-top:12px;color:#57606a">Mot de passe incorrect.</p><br><a href="index.html">← Retour</a></div>');
+      document.close(); throw 'access denied';
+    }
+    sessionStorage.setItem('tm_admin_auth', '007');
   }
 })();
 </script>
+
 <div class="wrap">
 
   <header>
     <div class="logo">
       <h1>Tantramour 2026</h1>
-      <p>Master Data Management</p>
+      <p>Master Data</p>
     </div>
-    <div class="header-actions">
+    <div class="hdr-btns">
       <a class="btn-ghost" href="index.html">🏠 Home</a>
-      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+      <button class="btn-ghost" onclick="toggleMode()" id="modeBtn">🌙 Mode Nuit</button>
     </div>
   </header>
 
-  <!-- ── ONGLETS ── -->
-  <div class="md-selector">
-    <button class="md-tab active" onclick="selectTab('fac')">🎓 Facilitateurs</button>
-    <button class="md-tab" onclick="selectTab('hlp')">🤝 Helpers</button>
-    <button class="md-tab" onclick="selectTab('ang')">👼 Angels</button>
-    <button class="md-tab" onclick="selectTab('trad')">🌐 Traducteurs</button>
-    <button class="md-tab" onclick="selectTab('lieu')">📍 Lieux</button>
-    <button class="md-tab" onclick="selectTab('type')">🏷️ Types d'atelier</button>
-    <button class="md-tab" onclick="selectTab('note')">📝 Notes</button>
+  <!-- BANNIÈRE RESSOURCES -->
+  <div class="res-banner">
+    <div>
+      <strong>👥 Facilitateurs · Helpers · Traducteurs · Angels</strong>
+      <span>Gérées dans le référentiel unifié — Rapport 12</span>
+    </div>
+    <a href="Rapport_Gerer_Ressources.html" target="_blank">Gérer les Ressources →</a>
   </div>
 
-  <!-- ── SECTION FACILITATEURS ── -->
-  <div class="md-section visible" id="sec-fac">
-    <div class="md-header">
-      <div><span class="md-title">Facilitateurs</span><span class="md-count" id="cnt-fac"></span></div>
-    </div>
-    <div class="md-table-wrap">
-      <table class="md-table">
-        <thead><tr><th>ID</th><th>Nom (value)</th><th></th></tr></thead>
-        <tbody id="tbody-fac"></tbody>
+  <!-- ONGLETS -->
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('lieux')">📍 Lieux</button>
+    <button class="tab"        onclick="showTab('types')">🏷️ Types</button>
+    <button class="tab"        onclick="showTab('notes')">📝 Notes</button>
+    <button class="tab"        onclick="showTab('jours')">📆 Jours</button>
+    <button class="tab"        onclick="showTab('piment')">🌶️ Piment</button>
+    <button class="tab"        onclick="showTab('resource_types')">🎭 Types de ressource</button>
+    <button class="tab"        onclick="showTab('heures')">🕐 Heures</button>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       SECTION : LIEUX
+       Fichier : ref_lieux.js  |  { id, value, label }
+  ════════════════════════════════════════════════ -->
+  <div class="section visible" id="sec-lieux">
+    <div class="sec-title">📍 Lieux / Salles</div>
+    <div class="sec-meta">ref_lieux.js — REF_LIEUX — colonnes : id, value, label</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Value</th><th>Label affiché</th><th></th></tr></thead>
+        <tbody id="tbody-lieux"></tbody>
       </table>
     </div>
-    <button class="btn-add-row" onclick="ajouterLigne('fac')">+ Ajouter un facilitateur</button>
-    <div class="download-bar" id="bar-fac">
-      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn-download" onclick="telecharger('fac')">💾 Télécharger ref_facilitateurs.js</button>
-        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('fac', true)">💾 + data.js mis à jour</button>
+    <button class="btn-add" onclick="addRow('lieux')">+ Ajouter un lieu</button>
+    <div class="save-bar" id="bar-lieux">
+      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-save"  onclick="save('lieux')">💾 Sauvegarder ref_lieux.js</button>
+        <button class="btn-save2" onclick="save('lieux', true)">💾 + data.js mis à jour</button>
       </div>
     </div>
   </div>
 
-  <!-- ── SECTION HELPERS ── -->
-  <div class="md-section" id="sec-hlp">
-    <div class="md-header">
-      <div><span class="md-title">Helpers</span><span class="md-count" id="cnt-hlp"></span></div>
-    </div>
-    <div class="md-table-wrap">
-      <table class="md-table">
-        <thead><tr><th>ID</th><th>Nom (value)</th><th></th></tr></thead>
-        <tbody id="tbody-hlp"></tbody>
+  <!-- ════════════════════════════════════════════════
+       SECTION : TYPES
+       Fichier : ref_types.js  |  { id, value, label }
+  ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-types">
+    <div class="sec-title">🏷️ Types d'ateliers</div>
+    <div class="sec-meta">ref_types.js — REF_TYPES — colonnes : id, value, label</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Value</th><th>Label affiché</th><th></th></tr></thead>
+        <tbody id="tbody-types"></tbody>
       </table>
     </div>
-    <button class="btn-add-row" onclick="ajouterLigne('hlp')">+ Ajouter un helper</button>
-    <div class="download-bar" id="bar-hlp">
-      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn-download" onclick="telecharger('hlp')">💾 Télécharger ref_helpers.js</button>
-        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('hlp', true)">💾 + data.js mis à jour</button>
+    <button class="btn-add" onclick="addRow('types')">+ Ajouter un type</button>
+    <div class="save-bar" id="bar-types">
+      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-save"  onclick="save('types')">💾 Sauvegarder ref_types.js</button>
+        <button class="btn-save2" onclick="save('types', true)">💾 + data.js mis à jour</button>
       </div>
     </div>
   </div>
 
-  <!-- ── SECTION ANGELS ── -->
-  <div class="md-section" id="sec-ang">
-    <div class="md-header">
-      <div><span class="md-title">Angels</span><span class="md-count" id="cnt-ang"></span></div>
-    </div>
-    <div class="md-table-wrap">
-      <table class="md-table">
-        <thead><tr><th>ID</th><th>Nom (value)</th><th></th></tr></thead>
-        <tbody id="tbody-ang"></tbody>
+  <!-- ════════════════════════════════════════════════
+       SECTION : NOTES
+       Fichier : ref_notes.js  |  { id, value }
+  ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-notes">
+    <div class="sec-title">📝 Notes</div>
+    <div class="sec-meta">ref_notes.js — REF_NOTES — colonnes : id, value</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Value</th><th></th></tr></thead>
+        <tbody id="tbody-notes"></tbody>
       </table>
     </div>
-    <button class="btn-add-row" onclick="ajouterLigne('ang')">+ Ajouter un angel</button>
-    <div class="download-bar" id="bar-ang">
-      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn-download" onclick="telecharger('ang')">💾 Télécharger ref_angels.js</button>
-        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('ang', true)">💾 + data.js mis à jour</button>
+    <button class="btn-add" onclick="addRow('notes')">+ Ajouter une note</button>
+    <div class="save-bar" id="bar-notes">
+      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-save"  onclick="save('notes')">💾 Sauvegarder ref_notes.js</button>
+        <button class="btn-save2" onclick="save('notes', true)">💾 + data.js mis à jour</button>
       </div>
     </div>
   </div>
 
-  <!-- ── SECTION LIEUX ── -->
-  <div class="md-section" id="sec-lieu">
-    <div class="md-header">
-      <div><span class="md-title">Lieux / Salles</span><span class="md-count" id="cnt-lieu"></span></div>
-    </div>
-    <div class="md-table-wrap">
-      <table class="md-table">
-        <thead><tr><th>ID</th><th>Valeur (value)</th><th></th></tr></thead>
-        <tbody id="tbody-lieu"></tbody>
+  <!-- ════════════════════════════════════════════════
+       SECTION : JOURS
+       Fichier : ref_jours.js  |  { id, value, label, date }
+  ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-jours">
+    <div class="sec-title">📆 Jours</div>
+    <div class="sec-meta">ref_jours.js — REF_JOURS — colonnes : id, value, label, date</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Value</th><th>Label affiché</th><th>Date (agenda)</th><th></th></tr></thead>
+        <tbody id="tbody-jours"></tbody>
       </table>
     </div>
-    <button class="btn-add-row" onclick="ajouterLigne('lieu')">+ Ajouter un lieu</button>
-    <div class="download-bar" id="bar-lieu">
-      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn-download" onclick="telecharger('lieu')">💾 Télécharger ref_lieux.js</button>
-        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('lieu', true)">💾 + data.js mis à jour</button>
+    <button class="btn-add" onclick="addRow('jours')">+ Ajouter un jour</button>
+    <div class="save-bar" id="bar-jours">
+      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-save"  onclick="save('jours')">💾 Sauvegarder ref_jours.js</button>
+        <button class="btn-save2" onclick="save('jours', true)">💾 + data.js mis à jour</button>
       </div>
     </div>
   </div>
 
-  <!-- ── SECTION TYPES ── -->
-  <div class="md-section" id="sec-type">
-    <div class="md-header">
-      <div><span class="md-title">Types d'atelier</span><span class="md-count" id="cnt-type"></span></div>
-    </div>
-    <div class="md-table-wrap">
-      <table class="md-table">
-        <thead><tr><th>ID</th><th>Valeur (value)</th><th></th></tr></thead>
-        <tbody id="tbody-type"></tbody>
+  <!-- ════════════════════════════════════════════════
+       SECTION : PIMENT
+       Fichier : ref_piment.js  |  { id, value (number), label }
+  ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-piment">
+    <div class="sec-title">🌶️ Niveaux Piment</div>
+    <div class="sec-meta">ref_piment.js — REF_PIMENT — colonnes : id, value (numérique), label</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Value (0–9)</th><th>Label affiché</th><th></th></tr></thead>
+        <tbody id="tbody-piment"></tbody>
       </table>
     </div>
-    <button class="btn-add-row" onclick="ajouterLigne('type')">+ Ajouter un type</button>
-    <div class="download-bar" id="bar-type">
-      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn-download" onclick="telecharger('type')">💾 Télécharger ref_types.js</button>
-        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('type', true)">💾 + data.js mis à jour</button>
+    <button class="btn-add" onclick="addRow('piment')">+ Ajouter un niveau</button>
+    <div class="save-bar" id="bar-piment">
+      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-save" onclick="save('piment')">💾 Sauvegarder ref_piment.js</button>
       </div>
     </div>
   </div>
 
-  <!-- ── SECTION TRADUCTEURS ── -->
-  <div class="md-section" id="sec-note">
-    <div class="md-header">
-      <div><span class="md-title">Notes</span><span class="md-count" id="cnt-note"></span></div>
-    </div>
-    <div class="md-table-wrap">
-      <table class="md-table">
-        <thead><tr><th>ID</th><th>Valeur (value)</th><th></th></tr></thead>
-        <tbody id="tbody-note"></tbody>
+  <!-- ════════════════════════════════════════════════
+       SECTION : TYPES DE RESSOURCE
+       Fichier : ref_resource_types.js  |  { id, value, label, icon }
+  ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-resource_types">
+    <div class="sec-title">🎭 Types de ressource</div>
+    <div class="sec-meta">ref_resource_types.js — REF_RESOURCE_TYPES — colonnes : id, value, label, icon</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>ID</th><th>Value</th><th>Label</th><th>Icon</th><th></th></tr></thead>
+        <tbody id="tbody-resource_types"></tbody>
       </table>
     </div>
-    <button class="btn-add-row" onclick="ajouterLigne('note')">+ Ajouter une note</button>
-    <div class="download-bar" id="bar-note">
-      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn-download" onclick="telecharger('note')">💾 Télécharger ref_notes.js</button>
-        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('note', true)">💾 + data.js mis à jour</button>
+    <button class="btn-add" onclick="addRow('resource_types')">+ Ajouter un type de ressource</button>
+    <div class="save-bar" id="bar-resource_types">
+      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-save" onclick="save('resource_types')">💾 Sauvegarder ref_resource_types.js</button>
       </div>
     </div>
   </div>
 
-  <div class="md-section" id="sec-trad">
-    <div class="md-header">
-      <div><span class="md-title">Traducteurs</span><span class="md-count" id="cnt-trad"></span></div>
-    </div>
-    <div class="md-table-wrap">
-      <table class="md-table">
-        <thead><tr><th>ID</th><th>Nom (value)</th><th></th></tr></thead>
-        <tbody id="tbody-trad"></tbody>
+  <!-- ════════════════════════════════════════════════
+       SECTION : HEURES
+       Fichier : ref_heures.js  |  { id, value }
+       Note : liste de créneaux — ajout/suppression rarement nécessaire
+  ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-heures">
+    <div class="sec-title">🕐 Heures</div>
+    <div class="sec-meta">ref_heures.js — REF_HEURES — colonnes : id, value (HH:MM)</div>
+    <div class="tbl-wrap" style="max-height:420px;overflow-y:auto">
+      <table>
+        <thead><tr><th>ID</th><th>Value (HH:MM)</th><th></th></tr></thead>
+        <tbody id="tbody-heures"></tbody>
       </table>
     </div>
-    <button class="btn-add-row" onclick="ajouterLigne('trad')">+ Ajouter un traducteur</button>
-    <div class="download-bar" id="bar-trad">
-      <div class="download-bar-msg">⚠️ Modifications non sauvegardées</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="btn-download" onclick="telecharger('trad')">💾 Télécharger ref_traducteurs.js</button>
-        <button class="btn-download" style="background:#7c3aed" onclick="telecharger('trad', true)">💾 + data.js mis à jour</button>
+    <button class="btn-add" onclick="addRow('heures')">+ Ajouter un créneau</button>
+    <div class="save-bar" id="bar-heures">
+      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-save" onclick="save('heures')">💾 Sauvegarder ref_heures.js</button>
       </div>
     </div>
   </div>
 
-</div>
+</div><!-- /wrap -->
 
-<!-- ── CONFIRM DIALOG ── -->
+<!-- CONFIRM -->
 <div class="overlay" id="overlay">
-  <div class="dialog">
-    <h3 id="dlgTitle">Confirmer la suppression</h3>
-    <p id="dlgMsg"></p>
-    <div class="dialog-actions">
-      <button class="btn btn-cancel-sm btn-ghost" onclick="fermerDialog()">Annuler</button>
-      <button class="btn btn-delete" id="dlgConfirm">Supprimer</button>
+  <div class="dlg">
+    <h3>Confirmer la suppression</h3>
+    <p id="dlg-msg"></p>
+    <div class="dlg-btns">
+      <button class="btn" onclick="closeConfirm()">Annuler</button>
+      <button class="btn btn-del" id="dlg-ok">Supprimer</button>
     </div>
   </div>
 </div>
 
-<!-- ── TOAST ── -->
 <div class="toast" id="toast"></div>
-
 <footer><p>Made with IBM Bob</p></footer>
 
-<!-- ── RÉFÉRENTIELS + DONNÉES (via loader pour bypass cache GitHub Pages) ── -->
+<!-- ── RÉFÉRENTIELS ── -->
+<script src="ref_jours.js"></script>
+<script src="ref_lieux.js"></script>
+<script src="ref_types.js"></script>
+<script src="ref_heures.js"></script>
+<script src="ref_piment.js"></script>
+<script src="ref_notes.js"></script>
+<script src="ref_resource_types.js"></script>
+<script src="ref_ressources.js"></script>
 <script src="github-api.js"></script>
 <script src="loader.js"></script>
 <script>
-loadData([
-  'ref_jours.js','ref_lieux.js','ref_types.js',
-  'ref_facilitateurs.js','ref_helpers.js','ref_angels.js',
-  'ref_traducteurs.js','ref_notes.js',
-  'data.js'
-], function() {
-// ════════════════════════════════════════════════
-// CONFIG DES MASTER DATA
-// ════════════════════════════════════════════════
-const CONFIGS = {
-  fac:  { ref: 'REF_FACILITATEURS', varName: 'REF_FACILITATEURS', fileName: 'ref_facilitateurs.js', prefix: 'F_',  dataField: ['fac1','fac2'],                      label: 'Facilitateurs' },
-  hlp:  { ref: 'REF_HELPERS',       varName: 'REF_HELPERS',       fileName: 'ref_helpers.js',       prefix: 'H_',  dataField: ['helper1','helper2','helper3'],      label: 'Helpers' },
-  ang:  { ref: 'REF_ANGELS',        varName: 'REF_ANGELS',        fileName: 'ref_angels.js',        prefix: 'A_',  dataField: ['angel'],                            label: 'Angels' },
-  trad: { ref: 'REF_TRADUCTEURS',   varName: 'REF_TRADUCTEURS',   fileName: 'ref_traducteurs.js',   prefix: 'TR_', dataField: ['traduction'],                       label: 'Traducteurs' },
-  lieu: { ref: 'REF_LIEUX',         varName: 'REF_LIEUX',         fileName: 'ref_lieux.js',         prefix: 'L_',  dataField: ['lieu'],                             label: 'Lieux', hasLabel: true },
-  type: { ref: 'REF_TYPES',         varName: 'REF_TYPES',         fileName: 'ref_types.js',         prefix: 'T_',  dataField: ['type'],                             label: 'Types', hasLabel: true },
-  note: { ref: 'REF_NOTES',         varName: 'REF_NOTES',         fileName: 'ref_notes.js',         prefix: 'N_',  dataField: ['note'],                             label: 'Notes' },
+loadData(['data.js'], function() {
+
+// ════════════════════════════════════════════════════════════
+// CONFIGURATION DES RÉFÉRENTIELS
+// Chaque entrée décrit un fichier ref_*.js de façon explicite.
+// ════════════════════════════════════════════════════════════
+var CFG = {
+  lieux: {
+    varName:  'REF_LIEUX',
+    fileName: 'ref_lieux.js',
+    prefix:   'L_',
+    cols:     ['id','value','label'],
+    dataField: ['lieu'],
+  },
+  types: {
+    varName:  'REF_TYPES',
+    fileName: 'ref_types.js',
+    prefix:   'T_',
+    cols:     ['id','value','label'],
+    dataField: ['type'],
+  },
+  notes: {
+    varName:  'REF_NOTES',
+    fileName: 'ref_notes.js',
+    prefix:   'N_',
+    cols:     ['id','value'],
+    dataField: ['note'],
+  },
+  jours: {
+    varName:  'REF_JOURS',
+    fileName: 'ref_jours.js',
+    prefix:   'J_NEW_',
+    cols:     ['id','value','label','date'],
+    dataField: ['jour'],
+  },
+  piment: {
+    varName:  'REF_PIMENT',
+    fileName: 'ref_piment.js',
+    prefix:   'P_',
+    cols:     ['id','value','label'],
+    dataField: [],
+    numericValue: true,
+  },
+  resource_types: {
+    varName:  'REF_RESOURCE_TYPES',
+    fileName: 'ref_resource_types.js',
+    prefix:   'RT_',
+    cols:     ['id','value','label','icon'],
+    dataField: [],
+  },
+  heures: {
+    varName:  'REF_HEURES',
+    fileName: 'ref_heures.js',
+    prefix:   'H_NEW_',
+    cols:     ['id','value'],
+    dataField: [],
+  },
 };
 
-// Copies de travail (deep copy)
-const STORE = {
-  fac:  REF_FACILITATEURS.map(x=>({...x})),
-  hlp:  REF_HELPERS.map(x=>({...x})),
-  ang:  REF_ANGELS.map(x=>({...x})),
-  trad: REF_TRADUCTEURS.map(x=>({...x})),
-  lieu: REF_LIEUX.map(x=>({...x})),
-  type: REF_TYPES.map(x=>({...x})),
-  note: REF_NOTES.map(x=>({...x})),
-};
+// ── Copies de travail
+var STORE = {};
+Object.keys(CFG).forEach(function(k) {
+  STORE[k] = window[CFG[k].varName].map(function(x) { return Object.assign({}, x); });
+});
 
-// Copie de travail de l'agenda
-let SESSION_AGENDA = AGENDA.map(e=>({...e}));
+// ── Renommages (pour propagation dans data.js)
+var RENAMES = {};
+Object.keys(CFG).forEach(function(k) { RENAMES[k] = {}; });
 
-// Suivi des renommages : { key: { oldValue, newValue }[] }
-const RENAMES = { fac:{}, hlp:{}, ang:{}, trad:{}, lieu:{}, type:{}, note:{} };
+// ── Dirty flags
+var DIRTY = {};
+Object.keys(CFG).forEach(function(k) { DIRTY[k] = false; });
 
-// Dirty flags
-const DIRTY = { fac:false, hlp:false, ang:false, trad:false, lieu:false, type:false, note:false };
+// ── Agenda de travail
+var SESSION_AGENDA = AGENDA.map(function(e) { return Object.assign({}, e); });
 
-let currentTab = 'fac';
-
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
 // ONGLETS
-// ════════════════════════════════════════════════
-function selectTab(key) {
-  currentTab = key;
-  document.querySelectorAll('.md-tab').forEach((t,i) => {
-    const keys = ['fac','hlp','ang','trad','lieu','type','note'];
-    t.classList.toggle('active', keys[i] === key);
-  });
-  document.querySelectorAll('.md-section').forEach(s => s.classList.remove('visible'));
+// ════════════════════════════════════════════════════════════
+function showTab(key) {
+  document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('visible'); });
+  event.currentTarget.classList.add('active');
   document.getElementById('sec-' + key).classList.add('visible');
 }
+window.showTab = showTab;
 
-// ════════════════════════════════════════════════
-// RENDU DU TABLEAU
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
+// RENDU DES TABLEAUX
+// ════════════════════════════════════════════════════════════
+function esc(v) { return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
 function renderTable(key) {
-  const items = STORE[key];
-  const tbody = document.getElementById('tbody-' + key);
-  document.getElementById('cnt-' + key).textContent = ` (${items.length})`;
+  var cfg   = CFG[key];
+  var items = STORE[key];
+  var tbody = document.getElementById('tbody-' + key);
 
-  tbody.innerHTML = items.map((item, i) => `
-    <tr id="row-${key}-${i}">
-      <td class="td-id">${item.id}</td>
-      <td class="td-value" id="cell-${key}-${i}">${escHtml(item.value)}</td>
-      <td class="td-actions">
-        <button class="btn btn-edit" onclick="editerLigne('${key}',${i})">✏️</button>
-        <button class="btn btn-delete" onclick="confirmerSuppression('${key}',${i})" style="margin-left:4px">🗑</button>
-      </td>
-    </tr>
-  `).join('');
+  if (!items.length) {
+    var colspan = cfg.cols.length + 1;
+    tbody.innerHTML = '<tr><td colspan="' + colspan + '" class="empty">Aucune entrée.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = items.map(function(item, i) {
+    // Cellules de données (toutes les colonnes sauf 'id' qui est en première)
+    var cells = cfg.cols.map(function(col) {
+      if (col === 'id') return '<td class="td-id">' + esc(item.id) + '</td>';
+      return '<td class="td-val">' + esc(item[col] !== undefined ? item[col] : '') + '</td>';
+    }).join('');
+
+    return '<tr id="row-' + key + '-' + i + '">' +
+      cells +
+      '<td class="td-act">' +
+        '<button class="btn" onclick="editRow(\'' + key + '\',' + i + ')">✏️</button> ' +
+        '<button class="btn btn-del" onclick="askDelete(\'' + key + '\',' + i + ')">🗑</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
 }
 
-function escHtml(s) { return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+// Rendu initial de tous les tableaux
+Object.keys(CFG).forEach(function(k) { renderTable(k); });
 
-// Initialisation
-Object.keys(STORE).forEach(k => renderTable(k));
-
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
 // ÉDITION INLINE
-// ════════════════════════════════════════════════
-let editingKey = null, editingIdx = null;
+// ════════════════════════════════════════════════════════════
+var editKey = null, editIdx = null;
 
-function editerLigne(key, i) {
-  // Annule édition précédente si même tableau
-  if (editingKey === key && editingIdx !== null) annulerEdition(editingKey, editingIdx);
+function editRow(key, i) {
+  // Annule édition précédente si besoin
+  if (editKey !== null) cancelEdit(editKey, editIdx);
 
-  editingKey = key; editingIdx = i;
-  const cell = document.getElementById(`cell-${key}-${i}`);
-  const oldVal = STORE[key][i].value;
-  cell.innerHTML = `
-    <input class="inline-input" id="inp-${key}-${i}" value="${escHtml(oldVal)}" onkeydown="keyEdit(event,'${key}',${i})">
-  `;
-  // Remplace boutons par Sauv/Annuler
-  const actions = document.querySelector(`#row-${key}-${i} .td-actions`);
-  actions.innerHTML = `
-    <button class="btn btn-save"      onclick="sauverEdition('${key}',${i})">✔</button>
-    <button class="btn btn-cancel-sm" onclick="annulerEdition('${key}',${i})" style="margin-left:4px">✖</button>
-  `;
-  document.getElementById(`inp-${key}-${i}`).focus();
+  editKey = key; editIdx = i;
+  var cfg  = CFG[key];
+  var item = STORE[key][i];
+  var row  = document.getElementById('row-' + key + '-' + i);
+
+  // Remplace chaque cellule par un input (sauf id)
+  var cells = cfg.cols.map(function(col) {
+    if (col === 'id') return '<td class="td-id">' + esc(item.id) + '</td>';
+    var v = item[col] !== undefined ? item[col] : '';
+    return '<td><input class="inp" id="inp-' + key + '-' + i + '-' + col + '" value="' + esc(v) + '" ' +
+      'onkeydown="keyEdit(event,\'' + key + '\',' + i + ')"></td>';
+  }).join('');
+
+  row.innerHTML = cells +
+    '<td class="td-act">' +
+      '<button class="btn btn-ok"  onclick="saveEdit(\'' + key + '\',' + i + ')">✔</button> ' +
+      '<button class="btn"         onclick="cancelEdit(\'' + key + '\',' + i + ')">✖</button>' +
+    '</td>';
+
+  // Focus sur le premier input éditable
+  var firstCol = cfg.cols.find(function(c) { return c !== 'id'; });
+  if (firstCol) {
+    var el = document.getElementById('inp-' + key + '-' + i + '-' + firstCol);
+    if (el) el.focus();
+  }
 }
+window.editRow = editRow;
 
 function keyEdit(e, key, i) {
-  if (e.key === 'Enter') sauverEdition(key, i);
-  if (e.key === 'Escape') annulerEdition(key, i);
+  if (e.key === 'Enter')  saveEdit(key, i);
+  if (e.key === 'Escape') cancelEdit(key, i);
 }
+window.keyEdit = keyEdit;
 
-function sauverEdition(key, i) {
-  const inp = document.getElementById(`inp-${key}-${i}`);
-  if (!inp) return;
-  const newVal = inp.value.trim();
-  if (!newVal) { toast('⚠️ La valeur ne peut pas être vide.', true); return; }
+function saveEdit(key, i) {
+  var cfg  = CFG[key];
+  var item = STORE[key][i];
 
-  const oldVal = STORE[key][i].value;
-  if (newVal !== oldVal) {
-    // Enregistre le renommage pour data.js
-    if (!RENAMES[key][i]) RENAMES[key][i] = oldVal; // garde l'original
-    STORE[key][i].value = newVal;
-    // Sync label si existant
-    if (CONFIGS[key].hasLabel && STORE[key][i].label === oldVal) STORE[key][i].label = newVal;
-    marquerDirty(key);
-  }
-  editingKey = null; editingIdx = null;
+  cfg.cols.forEach(function(col) {
+    if (col === 'id') return;
+    var el = document.getElementById('inp-' + key + '-' + i + '-' + col);
+    if (!el) return;
+    var newVal = el.value.trim();
+
+    // Pour la colonne value, enregistre le renommage
+    if (col === 'value' && newVal !== String(item.value)) {
+      if (!RENAMES[key][i]) RENAMES[key][i] = item.value;
+    }
+
+    // Conversion numérique si nécessaire
+    item[col] = (col === 'value' && cfg.numericValue) ? Number(newVal) : newVal;
+  });
+
+  markDirty(key);
+  editKey = null; editIdx = null;
   renderTable(key);
 }
+window.saveEdit = saveEdit;
 
-function annulerEdition(key, i) {
-  editingKey = null; editingIdx = null;
+function cancelEdit(key, i) {
+  editKey = null; editIdx = null;
   renderTable(key);
 }
+window.cancelEdit = cancelEdit;
 
-// ════════════════════════════════════════════════
-// AJOUT
-// ════════════════════════════════════════════════
-function ajouterLigne(key) {
-  const cfg = CONFIGS[key];
-  // Génère un id unique
-  const existingIds = STORE[key].map(x => x.id);
-  let newId, attempt = 0;
-  do {
-    attempt++;
-    newId = cfg.prefix + 'NEW' + attempt;
-  } while (existingIds.includes(newId));
+// ════════════════════════════════════════════════════════════
+// AJOUT D'UNE LIGNE
+// ════════════════════════════════════════════════════════════
+function addRow(key) {
+  var cfg = CFG[key];
+  var ids = STORE[key].map(function(x) { return x.id; });
+  var n = 1, newId;
+  do { newId = cfg.prefix + 'NEW' + n; n++; } while (ids.indexOf(newId) !== -1);
 
-  const newItem = { id: newId, value: '' };
-  if (cfg.hasLabel) newItem.label = '';
+  var newItem = { id: newId };
+  cfg.cols.forEach(function(col) {
+    if (col === 'id') return;
+    newItem[col] = (col === 'value' && cfg.numericValue) ? 0 : '';
+  });
+
   STORE[key].push(newItem);
   renderTable(key);
-  // Ouvre immédiatement en édition
-  editerLigne(key, STORE[key].length - 1);
-  marquerDirty(key);
+  editRow(key, STORE[key].length - 1);
+  markDirty(key);
 }
+window.addRow = addRow;
 
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
 // SUPPRESSION
-// ════════════════════════════════════════════════
-let pendingDelete = null;
+// ════════════════════════════════════════════════════════════
+var pendingDel = null;
 
-function confirmerSuppression(key, i) {
-  pendingDelete = { key, i };
-  document.getElementById('dlgMsg').textContent =
-    `Supprimer "${STORE[key][i].value}" (${STORE[key][i].id}) ?`;
-  document.getElementById('dlgConfirm').onclick = executerSuppression;
+function askDelete(key, i) {
+  pendingDel = { key: key, i: i };
+  document.getElementById('dlg-msg').textContent =
+    'Supprimer "' + STORE[key][i].value + '" (' + STORE[key][i].id + ') ?';
+  document.getElementById('dlg-ok').onclick = doDelete;
   document.getElementById('overlay').classList.add('open');
 }
+window.askDelete = askDelete;
 
-function executerSuppression() {
-  fermerDialog();
-  if (!pendingDelete) return;
-  const { key, i } = pendingDelete;
+function doDelete() {
+  closeConfirm();
+  if (!pendingDel) return;
+  var key = pendingDel.key, i = pendingDel.i;
   STORE[key].splice(i, 1);
-  pendingDelete = null;
-  marquerDirty(key);
+  pendingDel = null;
+  markDirty(key);
   renderTable(key);
-  toast('🗑 Entrée supprimée');
+  showToast('🗑 Entrée supprimée.');
 }
 
-function fermerDialog() {
+function closeConfirm() {
   document.getElementById('overlay').classList.remove('open');
+  pendingDel = null;
 }
+window.closeConfirm = closeConfirm;
 
-// ════════════════════════════════════════════════
-// DIRTY / DOWNLOAD BAR
-// ════════════════════════════════════════════════
-function marquerDirty(key) {
+document.getElementById('overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeConfirm();
+});
+
+// ════════════════════════════════════════════════════════════
+// DIRTY + BARRE DE SAUVEGARDE
+// ════════════════════════════════════════════════════════════
+function markDirty(key) {
   DIRTY[key] = true;
-  document.getElementById('bar-' + key).classList.add('visible');
+  var bar = document.getElementById('bar-' + key);
+  if (bar) bar.classList.add('on');
 }
 
-// ════════════════════════════════════════════════
-// GÉNÉRATION FICHIERS REF
-// ════════════════════════════════════════════════
-function esc(v) { return (v||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"'); }
+// ════════════════════════════════════════════════════════════
+// GÉNÉRATION DES FICHIERS REF
+// ════════════════════════════════════════════════════════════
+function escJs(v) { return String(v||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"'); }
+
+var FILE_COMMENTS = {
+  lieux:          'Référentiel : Lieux / Salles\n * Chaque entrée : { id, value, label }',
+  types:          'Référentiel : Types d\'ateliers\n * Chaque entrée : { id, value, label }',
+  notes:          'Référentiel : Notes\n * Chaque entrée : { id, value }',
+  jours:          'Référentiel : Jours\n * Chaque entrée : { id, value, label, date }',
+  piment:         'Référentiel : Piment\n * Chaque entrée : { id, value (number), label }',
+  resource_types: 'Référentiel : Types de ressource\n * Chaque entrée : { id, value, label, icon }',
+  heures:         'Référentiel : Heures\n * Chaque entrée : { id, value } — format HH:MM',
+};
 
 function genRefFile(key) {
-  const cfg = CONFIGS[key];
-  const items = STORE[key];
-  const lines = items.map(item => {
-    if (cfg.hasLabel) {
-      return `  { id: "${esc(item.id)}", value: "${esc(item.value)}", label: "${esc(item.label || item.value)}" },`;
-    }
-    return `  { id: "${esc(item.id)}", value: "${esc(item.value)}" },`;
+  var cfg   = CFG[key];
+  var items = STORE[key];
+  var lines = items.map(function(item) {
+    var parts = cfg.cols.map(function(col) {
+      var v = item[col] !== undefined ? item[col] : '';
+      if (col === 'value' && cfg.numericValue) return 'value: ' + Number(v);
+      return col + ': "' + escJs(v) + '"';
+    });
+    return '  { ' + parts.join(', ') + ' },';
   }).join('\n');
 
-  const comments = {
-    fac:  '* Référentiel : Facilitateurs\n * Chaque entrée : { id, value }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : nom exact tel qu\'il apparaît dans AGENDA (champs fac1, fac2)',
-    hlp:  '* Référentiel : Helpers\n * Chaque entrée : { id, value }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : nom exact tel qu\'il apparaît dans AGENDA (champs helper1, helper2, helper3)\n * Note : une même personne peut être à la fois facilitateur et helper selon l\'atelier.',
-    ang:  '* Référentiel : Angels\n * Chaque entrée : { id, value }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : nom exact tel qu\'il apparaît dans AGENDA (champ "angel")',
-    trad: '* Référentiel : Traducteurs\n * Chaque entrée : { id, value }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : nom exact tel qu\'il apparaît dans AGENDA (champ "traduction")',
-    lieu: '* Référentiel : Lieux / Salles\n * Chaque entrée : { id, value, label }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : valeur stockée dans AGENDA (champ "lieu")\n *   label : texte affiché dans les listes déroulantes',
-    type: '* Référentiel : Types d\'ateliers\n * Chaque entrée : { id, value, label }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : valeur stockée dans AGENDA (champ "type")\n *   label : texte affiché dans les listes déroulantes',
-    note: '* Référentiel : Notes\n * Chaque entrée : { id, value }\n *   id    : clé unique (stable, ne jamais changer)\n *   value : texte exact tel qu\'il apparaît dans AGENDA (champ "note")',
-  };
-
-  return `/**\n * TANTRAMOUR 2026 — ${comments[key]}\n */\nconst ${cfg.varName} = [\n${lines}\n];\n`;
+  return '/**\n * TANTRAMOUR 2026 — ' + FILE_COMMENTS[key] + '\n */\nvar ' + cfg.varName + ' = [\n' + lines + '\n];\n';
 }
 
-// ════════════════════════════════════════════════
-// MISE À JOUR data.js AVEC RENOMMAGES
-// ════════════════════════════════════════════════
-function appliquerRenommagesDansAgenda(key) {
-  const fields = CONFIGS[key].dataField;
-  // Construit map : ancienneValeur → nouvelleValeur
-  const renameMap = {};
-  Object.entries(RENAMES[key]).forEach(([i, oldVal]) => {
-    const newVal = STORE[key][parseInt(i)]?.value;
-    if (newVal && newVal !== oldVal) renameMap[oldVal] = newVal;
-  });
-  if (Object.keys(renameMap).length === 0) return false;
+// ════════════════════════════════════════════════════════════
+// PROPAGATION DES RENOMMAGES DANS AGENDA
+// ════════════════════════════════════════════════════════════
+function applyRenames(key) {
+  var cfg = CFG[key];
+  if (!cfg.dataField.length) return;
 
-  SESSION_AGENDA = SESSION_AGENDA.map(entry => {
-    const updated = {...entry};
-    fields.forEach(f => {
-      if (updated[f] && renameMap[updated[f]]) updated[f] = renameMap[updated[f]];
-    });
-    return updated;
+  var map = {};
+  Object.keys(RENAMES[key]).forEach(function(i) {
+    var oldVal = RENAMES[key][i];
+    var newVal = STORE[key][parseInt(i)] ? STORE[key][parseInt(i)].value : null;
+    if (newVal && String(newVal) !== String(oldVal)) map[oldVal] = newVal;
   });
-  return true;
+  if (!Object.keys(map).length) return;
+
+  SESSION_AGENDA = SESSION_AGENDA.map(function(e) {
+    var u = Object.assign({}, e);
+    cfg.dataField.forEach(function(f) {
+      if (u[f] && map[u[f]]) u[f] = map[u[f]];
+    });
+    return u;
+  });
 }
 
 function genDataJs() {
-  const header =
-`/**
- * TANTRAMOUR 2026 — Référentiel de données commun
- * ================================================
- * Source unique pour les 3 rapports HTML.
- */
-
-const AGENDA = [`;
-
-  const lines = SESSION_AGENDA.map((e, i) => {
-    const prev = SESSION_AGENDA[i - 1];
-    let section = '';
+  var lines = SESSION_AGENDA.map(function(e, i) {
+    var prev = SESSION_AGENDA[i - 1];
+    var section = '';
     if (!prev || prev.jour !== e.jour) {
-      const ref = REF_JOURS.find(j => j.value === e.jour);
-      const dateLabel = ref ? ref.date : e.date;
-      section = `\n  // ─── ${e.jour} — ${dateLabel} ${'─'.repeat(Math.max(0, 60 - e.jour.length - dateLabel.length))}\n`;
+      var ref = REF_JOURS.find(function(j) { return j.value === e.jour; });
+      var dl  = ref ? ref.date : e.date;
+      section = '\n  // ─── ' + e.jour + ' — ' + dl + ' ' + '─'.repeat(Math.max(0, 56 - e.jour.length - dl.length)) + '\n';
     }
-    const line = `  {jour:"${esc(e.jour)}",date:"${esc(e.date)}",heure:"${esc(e.heure)}",type:"${esc(e.type)}",atelier:"${esc(e.atelier)}",lieu:"${esc(e.lieu)}",fac1:"${esc(e.fac1)}",fac2:"${esc(e.fac2)}",traduction:"${esc(e.traduction)}",helper1:"${esc(e.helper1)}",helper2:"${esc(e.helper2)}",helper3:"${esc(e.helper3)}",angel:"${esc(e.angel)}",note:"${esc(e.note)}",logistic:"${esc(e.logistic)}"},`;
-    return section + line;
+    var v = escJs;
+    return section + '  {jour:"' + v(e.jour) + '",date:"' + v(e.date) + '",heure:"' + v(e.heure) + '",type:"' + v(e.type) + '",atelier:"' + v(e.atelier) + '",lieu:"' + v(e.lieu) + '",fac1:"' + v(e.fac1) + '",fac2:"' + v(e.fac2) + '",traduction:"' + v(e.traduction) + '",helper1:"' + v(e.helper1) + '",helper2:"' + v(e.helper2) + '",helper3:"' + v(e.helper3) + '",angel:"' + v(e.angel) + '",note:"' + v(e.note) + '",piment:' + (e.piment||0) + ',logisticId:"' + v(e.logisticId||'') + '"},';
   }).join('\n');
 
-  return header + '\n' + lines + `
-];
-
-/**
- * Convertit un objet AGENDA en tableau positionnel [15 colonnes]
- * Indice : [0]jour [1]date [2]heure [3]type [4]atelier [5]lieu
- *          [6]fac1 [7]fac2 [8]traduction [9]helper1 [10]helper2
- *          [11]helper3 [12]angel [13]note [14]logistic
- */
-function agendaToRaw(entries) {
-  return entries.map(e => [
-    e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,
-    e.fac1, e.fac2, e.traduction,
-    e.helper1, e.helper2, e.helper3,
-    e.angel, e.note, e.logistic
-  ]);
-}`;
+  return '/**\n * TANTRAMOUR 2026 — Données AGENDA\n */\nvar AGENDA = [\n' + lines + '\n];\n\nfunction agendaToRaw(entries) {\n  return entries.map(function(e) { return [e.jour,e.date,e.heure,e.type,e.atelier,e.lieu,e.fac1,e.fac2,e.traduction,e.helper1,e.helper2,e.helper3,e.angel,e.note,e.logisticId||"",e.piment||0]; });\n}';
 }
 
-// ════════════════════════════════════════════════
-// SAUVEGARDE VIA SERVEUR LOCAL
-// ════════════════════════════════════════════════
-async function sauverFichier(filename, content) {
+// ════════════════════════════════════════════════════════════
+// SAUVEGARDE
+// ════════════════════════════════════════════════════════════
+async function saveToServer(filename, content) {
+  if (location.protocol === 'file:') throw new Error('Ouvrez via http://localhost:3000 (start.bat).');
+  if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+    var res = await fetch('http://localhost:3000/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: filename, content: content })
+    });
+    if (!res.ok) { var e = await res.json().catch(function(){return{};}); throw new Error(e.error || 'Erreur ' + res.status); }
+    return;
+  }
+  await githubSaveFile(filename, content);
+}
+
+async function save(key, withData) {
+  var cfg = CFG[key];
   try {
-    await githubSaveFile(filename, content);
-    return true;
-  } catch(e) {
-    toast(`❌ Sauvegarde impossible : ${e.message}`, true);
-    return false;
-  }
-}
-
-async function telecharger(key, avecDataJs = false) {
-  const refFile = CONFIGS[key].fileName;
-  const refContent = genRefFile(key);
-
-  if (avecDataJs) {
-    appliquerRenommagesDansAgenda(key);
-    const dataContent = genDataJs();
-    const [ok1, ok2] = await Promise.all([
-      sauverFichier(refFile, refContent),
-      sauverFichier('data.js', dataContent)
-    ]);
-    if (ok1 && ok2) toast(`✅ ${refFile} + data.js mis à jour — rechargez les rapports.`);
-  } else {
-    const ok = await sauverFichier(refFile, refContent);
-    if (ok) toast(`✅ ${refFile} mis à jour — rechargez les rapports.`);
-  }
-
-  if (true) { // toujours nettoyer l'état
+    if (withData) applyRenames(key);
+    await saveToServer(cfg.fileName, genRefFile(key));
+    if (withData && cfg.dataField.length) await saveToServer('data.js', genDataJs());
     DIRTY[key] = false;
-    document.getElementById('bar-' + key).classList.remove('visible');
     RENAMES[key] = {};
+    var bar = document.getElementById('bar-' + key);
+    if (bar) bar.classList.remove('on');
+    showToast('✅ ' + cfg.fileName + ' sauvegardé' + (withData ? ' + data.js' : '') + '.', false);
+  } catch(err) {
+    showToast('❌ ' + err.message, true);
   }
 }
+window.save = save;
 
-// ════════════════════════════════════════════════
+// ════════════════════════════════════════════════════════════
 // TOAST + MODE NUIT
-// ════════════════════════════════════════════════
-function toast(msg, warn = false) {
-  const t = document.getElementById('toast');
+// ════════════════════════════════════════════════════════════
+function showToast(msg, isErr) {
+  var t = document.getElementById('toast');
   t.textContent = msg;
-  t.style.background = warn ? 'var(--warn-bg)' : 'var(--success-bg)';
-  t.style.color = warn ? 'var(--warn)' : 'var(--success)';
-  t.style.borderColor = warn ? 'var(--warn-border)' : 'var(--success-border)';
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 5000);
+  if (isErr === true) {
+    t.style.cssText = 'background:var(--err-bg);color:var(--err);border:1px solid var(--err-border)';
+  } else {
+    t.style.cssText = 'background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-border)';
+  }
+  t.classList.add('on');
+  setTimeout(function() { t.classList.remove('on'); }, isErr === true ? 6000 : 3500);
 }
 
 function toggleMode() {
-  const isDark = document.body.classList.toggle('dark');
-  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+  var dark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = dark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
 }
-
-document.getElementById('overlay').addEventListener('click', function(e) {
-  if (e.target === this) fermerDialog();
-});
-
-// Exposer dans window les fonctions appelées depuis les onclick/onkeydown HTML
-window.toggleMode           = toggleMode;
-window.fermerDialog         = fermerDialog;
-window.ajouterLigne         = ajouterLigne;
-window.editerLigne          = editerLigne;
-window.annulerEdition       = annulerEdition;
-window.sauverEdition        = sauverEdition;
-window.confirmerSuppression = confirmerSuppression;
-window.selectTab            = selectTab;
-window.telecharger          = telecharger;
-window.keyEdit              = keyEdit;
+window.toggleMode = toggleMode;
 
 }); // fin loadData
 </script>

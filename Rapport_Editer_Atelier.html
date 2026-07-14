@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Éditer un atelier</title>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --header-bg:#f0f4fb; --row-alt:#f7f8fa;
+    --tag-bg:#eef2ff; --tag-text:#3b5bdb;
+    --green:#16a34a; --green-bg:#dcfce7; --green-border:#86efac;
+    --badge-h:#e0f2fe; --badge-ht:#0369a1;
+    --badge-a:#fce7f3; --badge-at:#9d174d;
+    --badge-f:#dcfce7; --badge-ft:#166534;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --header-bg:#1c2333; --row-alt:#161b22; --tag-bg:#1c2a4a; --tag-text:#79a8ff;
+    --green-bg:#052e16; --green-border:#166534;
+    --badge-h:#0c2d48; --badge-ht:#58a6ff;
+    --badge-a:#3b1030; --badge-at:#f0abca;
+    --badge-f:#0a2e1a; --badge-ft:#4ade80;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
+  .wrap { max-width:1200px; margin:0 auto; padding:24px 20px 60px; }
+
+  /* ── HEADER ── */
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:20px; font-weight:700; }
+  .logo p  { font-size:26px; font-weight:800; color:var(--accent); line-height:1.2; margin-top:2px; }
+  .header-actions { display:flex; gap:8px; align-items:center; }
+  .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:6px 14px; font-size:13px; color:var(--text); font-family:inherit; display:inline-flex; align-items:center; gap:6px; }
+  .btn:hover { background:var(--border); }
+
+  /* ── FILTERS ── */
+  .filters { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:18px; align-items:flex-end; }
+  .filter-group { display:flex; flex-direction:column; gap:4px; }
+  .filter-group label { font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); font-weight:600; }
+  select, input[type="text"] { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:13px; color:var(--text); font-family:inherit; cursor:pointer; }
+  select { min-width:160px; }
+  input[type="text"] { min-width:200px; }
+  .stats { font-size:12px; color:var(--muted); margin-bottom:14px; }
+  .stats span { color:var(--accent); font-weight:600; }
+
+  /* ── LISTE ATELIERS ── */
+  .list-wrap { border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:28px; }
+  .list-item { display:flex; align-items:center; gap:12px; padding:10px 14px; border-bottom:1px solid var(--border); cursor:pointer; transition:background .1s; }
+  .list-item:last-child { border-bottom:none; }
+  .list-item:hover { background:var(--row-alt); }
+  .list-item.selected { background:#eff6ff; border-left:3px solid var(--accent); }
+  .dark .list-item.selected { background:#0c2d48; }
+  .li-jour { font-size:11px; font-weight:700; color:var(--accent); min-width:52px; white-space:nowrap; }
+  .li-heure { font-size:11px; color:var(--muted); min-width:108px; white-space:nowrap; font-variant-numeric:tabular-nums; }
+  .li-atelier { font-size:13px; font-weight:600; flex:1; }
+  .li-piment { font-size:12px; letter-spacing:-1px; min-width:52px; text-align:center; }
+  .li-type { font-size:10px; font-weight:600; padding:1px 7px; border-radius:4px; background:var(--tag-bg); color:var(--tag-text); white-space:nowrap; max-width:160px; overflow:hidden; text-overflow:ellipsis; }
+  .li-lieu { font-size:11px; color:var(--muted); min-width:70px; }
+  .li-arrow { font-size:14px; color:var(--muted); }
+  .empty { padding:40px; text-align:center; color:var(--muted); }
+
+  /* ── FORMULAIRE D'ÉDITION ── */
+  .editor-panel { background:var(--surface); border:2px solid var(--accent); border-radius:10px; padding:24px 28px; }
+  .editor-title { font-size:16px; font-weight:700; margin-bottom:20px; display:flex; align-items:center; gap:10px; }
+  .editor-title .badge-idx { font-size:11px; font-weight:600; padding:2px 8px; border-radius:4px; background:var(--accent); color:#fff; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px 24px; }
+  @media(max-width:640px) { .form-grid { grid-template-columns:1fr; } }
+  .form-group { display:flex; flex-direction:column; gap:5px; }
+  .form-group.full { grid-column:1/-1; }
+  .form-group label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); }
+  .form-group input, .form-group select, .form-group textarea {
+    background:var(--bg); border:1px solid var(--border); border-radius:6px;
+    padding:8px 10px; font-size:13px; color:var(--text); font-family:inherit; width:100%;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(59,130,212,.12);
+  }
+  .form-group textarea { resize:vertical; min-height:60px; }
+  .piment-btns { display:flex; gap:8px; flex-wrap:wrap; }
+  .piment-btn { cursor:pointer; padding:6px 14px; border-radius:6px; border:2px solid var(--border); background:var(--bg); font-size:13px; font-family:inherit; color:var(--text); transition:all .15s; }
+  .piment-btn.active { border-color:var(--accent); background:#eff6ff; font-weight:700; }
+  .dark .piment-btn.active { background:#0c2d48; }
+
+  /* ── WIDGET HEURE ── */
+  .heure-widget { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .heure-widget select { min-width:0; width:100px; flex-shrink:0; }
+  .heure-sep { font-size:15px; font-weight:700; color:var(--muted); user-select:none; }
+  .heure-preview { font-size:13px; font-weight:700; color:var(--accent); background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:7px 12px; white-space:nowrap; min-width:140px; text-align:center; font-variant-numeric:tabular-nums; }
+  .heure-preview.empty { color:var(--muted); font-weight:400; font-style:italic; }
+
+  /* ── ACTIONS ── */
+  .editor-actions { display:flex; gap:10px; margin-top:24px; flex-wrap:wrap; align-items:center; }
+  .btn-primary { cursor:pointer; background:var(--accent); color:#fff; border:none; border-radius:6px; padding:9px 22px; font-size:15px; font-weight:700; font-family:inherit; display:inline-flex; align-items:center; gap:7px; }
+  .btn-primary:hover { filter:brightness(1.1); }
+  .btn-primary:disabled { opacity:.55; cursor:not-allowed; filter:none; }
+  .btn-secondary { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:9px 20px; font-size:14px; color:var(--text); font-family:inherit; }
+  .btn-secondary:hover { background:var(--border); }
+  .saving-indicator { font-size:13px; color:var(--muted); display:none; align-items:center; gap:6px; }
+  .saving-indicator.show { display:flex; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .spinner { width:15px; height:15px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
+
+  /* ── PANNEAU LOGISTIQUE ── */
+  .logistics-panel { margin-top:40px; border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  .logistics-header { background:var(--header-bg); padding:16px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; border-bottom:1px solid var(--border); }
+  .logistics-header-title { font-size:15px; font-weight:700; }
+  .logistics-header-meta { font-size:12px; color:var(--muted); }
+  .logistics-body { padding:20px 22px; }
+  .logistics-list { display:flex; flex-direction:column; gap:12px; }
+  .logistics-item { border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+  .logistics-item-header { background:var(--surface); padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+  .logistics-item-ateliers { font-size:13px; font-weight:600; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .logistics-item-actions { display:flex; gap:6px; flex-shrink:0; }
+  .logistics-item-body { padding:14px 16px; border-top:1px solid var(--border); background:var(--bg); }
+  .logistics-item-body.collapsed { display:none; }
+  /* Prévisualisation HTML */
+  .logistics-html-preview { font-size:13px; line-height:1.7; color:var(--text); }
+  .logistics-html-preview p  { margin-bottom:6px; }
+  .logistics-html-preview ul { padding-left:20px; }
+  .logistics-html-preview ol { padding-left:20px; }
+  .logistics-html-preview li { margin-bottom:2px; }
+  /* Zone d'édition */
+  .logistics-edit-zone { display:none; }
+  .logistics-edit-zone.active { display:block; }
+  /* Barre de formatage */
+  .rte-toolbar { display:flex; gap:4px; flex-wrap:wrap; padding:6px 8px; background:var(--surface); border:1px solid var(--border); border-bottom:none; border-radius:6px 6px 0 0; }
+  .rte-btn { cursor:pointer; background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:4px 9px; font-size:13px; font-family:inherit; color:var(--text); line-height:1.4; transition:background .1s; }
+  .rte-btn:hover { background:var(--border); }
+  .rte-btn b { font-weight:900; }
+  .rte-sep { width:1px; background:var(--border); margin:2px 4px; align-self:stretch; }
+  /* Zone éditable contenteditable */
+  .rte-editor {
+    min-height:120px; padding:10px 12px;
+    border:1px solid var(--border); border-radius:0 0 6px 6px;
+    background:var(--bg); color:var(--text);
+    font-size:13px; line-height:1.7; font-family:inherit;
+    outline:none; overflow-y:auto;
+  }
+  .rte-editor:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(59,130,212,.12); }
+  .rte-editor ul { padding-left:20px; }
+  .rte-editor ol { padding-left:20px; }
+  .rte-editor li { margin-bottom:2px; }
+  .rte-editor p  { margin-bottom:4px; }
+  .logistics-edit-actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; align-items:center; }
+  .btn-danger { cursor:pointer; background:#fef2f2; color:#dc2626; border:1px solid #fca5a5; border-radius:6px; padding:8px 16px; font-size:13px; font-family:inherit; font-weight:600; }
+  .btn-danger:hover { background:#fca5a5; }
+  .btn-success { cursor:pointer; background:var(--green-bg); color:var(--green); border:1px solid var(--green-border); border-radius:6px; padding:8px 18px; font-size:13px; font-family:inherit; font-weight:700; }
+  .btn-success:hover { filter:brightness(.95); }
+  .logistics-empty { padding:32px; text-align:center; color:var(--muted); font-style:italic; }
+  .logistics-saving { font-size:12px; color:var(--muted); display:none; align-items:center; gap:5px; }
+  .logistics-saving.show { display:flex; }
+
+  /* ── SUCCESS TOAST ── */
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#1f2328; color:#fff; border-radius:8px; padding:12px 20px; font-size:13px; font-weight:600; z-index:999; display:none; align-items:center; gap:8px; box-shadow:0 4px 16px rgba(0,0,0,.25); }
+  .toast.show { display:flex; animation:fadeInUp .25s ease; }
+  @keyframes fadeInUp { from{opacity:0;transform:translateX(-50%) translateY(8px)} to{opacity:1;transform:translateX(-50%) translateY(0)} }
+
+  footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Éditer un atelier</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="index.html">🏠 Home</a>
+      <button class="btn" onclick="hardReload()">🔄 Refresh</button>
+      <button class="btn" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+
+  <!-- FILTRES -->
+  <div class="filters">
+    <div class="filter-group">
+      <label>Jour</label>
+      <select id="filterJour" onchange="renderList()">
+        <option value="">Tous les jours</option>
+        <option value="Jour 1">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7">Jour 7 — Ven. 4 sept.</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Type</label>
+      <select id="filterType" onchange="renderList()">
+        <option value="">Tous les types</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>Recherche</label>
+      <input type="text" id="filterSearch" placeholder="Nom d'atelier…" oninput="renderList()">
+    </div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <!-- LISTE -->
+  <div class="list-wrap" id="listWrap"></div>
+
+  <!-- ÉDITEUR (masqué jusqu'à sélection) -->
+  <div class="editor-panel" id="editorPanel" style="display:none"></div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+<footer><p>Made with IBM Bob</p></footer>
+
+<!-- Référentiels et données (synchrones, chargés avant loadData) -->
+<script src="ref_jours.js"></script>
+<script src="ref_lieux.js"></script>
+<script src="ref_resource_types.js"></script>
+<script src="ref_ressources.js"></script>
+<script src="ref_types.js"></script>
+<script src="ref_heures.js"></script>
+<script src="ref_piment.js"></script>
+<script src="ref_notes.js"></script>
+<script src="github-api.js"></script>
+<script src="loader.js"></script>
+<script>
+loadData(['data.js', 'logistics.js'], function() {
+
+// ══════════════════════════════════════════════
+// ÉTAT
+// ══════════════════════════════════════════════
+let selectedIdx = null;   // index dans AGENDA
+let editedData  = null;   // copie de travail de l'entrée en cours
+
+// ══════════════════════════════════════════════
+// INIT FILTRE TYPE
+// ══════════════════════════════════════════════
+const selType = document.getElementById('filterType');
+REF_TYPES.forEach(t => {
+  const o = document.createElement('option');
+  o.value = t.value; o.text = t.label;
+  selType.appendChild(o);
+});
+
+// ══════════════════════════════════════════════
+// FILTRE + TRI
+// ══════════════════════════════════════════════
+const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+function getFiltered() {
+  const j = document.getElementById('filterJour').value;
+  const t = document.getElementById('filterType').value;
+  const s = document.getElementById('filterSearch').value.trim().toLowerCase();
+  return AGENDA
+    .map((e, i) => ({ e, i }))
+    .filter(({e}) =>
+      (!j || e.jour === j) &&
+      (!t || e.type === t) &&
+      (!s || e.atelier.toLowerCase().includes(s) || (e.fac1||'').toLowerCase().includes(s) || (e.fac2||'').toLowerCase().includes(s))
+    )
+    .sort((a, b) => {
+      const dj = JOUR_ORDER.indexOf(a.e.jour) - JOUR_ORDER.indexOf(b.e.jour);
+      if (dj !== 0) return dj;
+      return heureMin(a.e.heure) - heureMin(b.e.heure);
+    });
+}
+
+function heureMin(h) {
+  if (!h) return 9999;
+  const m = h.replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1])*60+parseInt(m[2]) : 9999;
+}
+
+// ══════════════════════════════════════════════
+// RENDU LISTE
+// ══════════════════════════════════════════════
+function renderList() {
+  const items = getFiltered();
+  document.getElementById('stats').innerHTML = `<span>${items.length}</span> atelier(s) — cliquez sur une ligne pour l'éditer`;
+
+  const wrap = document.getElementById('listWrap');
+  if (!items.length) {
+    wrap.innerHTML = '<div class="empty">Aucun atelier correspondant.</div>';
+    return;
+  }
+
+  wrap.innerHTML = items.map(({e, i}) => {
+    const pimentStr = e.piment > 0 ? '🌶️'.repeat(e.piment) : '<span style="color:var(--muted);font-size:11px">—</span>';
+    const sel = selectedIdx === i ? ' selected' : '';
+    const facs = [e.fac1, e.fac2].filter(Boolean).join(', ');
+    return `<div class="list-item${sel}" onclick="selectAtelier(${i})" id="li-${i}">
+      <div class="li-jour">${e.jour}</div>
+      <div class="li-heure">${e.heure||'—'}</div>
+      <div class="li-atelier">${e.atelier||'—'}${facs ? `<span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:6px">(${facs})</span>` : ''}</div>
+      <div class="li-piment">${pimentStr}</div>
+      <div class="li-type">${e.type||''}</div>
+      <div class="li-lieu">${e.lieu||''}</div>
+      <div class="li-arrow">›</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// SÉLECTION D'UN ATELIER → affiche le formulaire
+// ══════════════════════════════════════════════
+function selectAtelier(idx) {
+  selectedIdx = idx;
+  editedData  = Object.assign({}, AGENDA[idx]); // copie superficielle
+
+  // Mettre à jour la classe selected dans la liste
+  document.querySelectorAll('.list-item').forEach(el => el.classList.remove('selected'));
+  const li = document.getElementById('li-' + idx);
+  if (li) {
+    li.classList.add('selected');
+    li.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  renderEditor();
+  const panel = document.getElementById('editorPanel');
+  panel.style.display = '';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+window.renderList    = renderList;
+window.selectAtelier = selectAtelier;
+
+// ══════════════════════════════════════════════
+// RENDU FORMULAIRE
+// ══════════════════════════════════════════════
+// ── Widget heure : parse ────────────────────────────────────────────────────
+// Extrait HH:MM depuis une chaîne "HH:MM - HH:MM" (tolère . et espaces)
+function parseHeureDebut(h) {
+  if (!h) return '';
+  const m = String(h).replace(/\./g, ':').match(/(\d{1,2}:\d{2})/);
+  if (!m) return '';
+  const [hh, mm] = m[1].split(':');
+  return hh.padStart(2,'0') + ':' + mm.padStart(2,'0');
+}
+function parseHeureFin(h) {
+  if (!h) return '';
+  const norm = String(h).replace(/\./g, ':');
+  const all = norm.match(/(\d{1,2}:\d{2})/g);
+  if (!all || all.length < 2) return '';
+  const [hh, mm] = all[1].split(':');
+  return hh.padStart(2,'0') + ':' + mm.padStart(2,'0');
+}
+
+// Construit un <select> depuis REF_HEURES avec valeur pré-sélectionnée
+function buildHeureSelect(id, val) {
+  const opts = `<option value="">—</option>` +
+    REF_HEURES.map(h =>
+      `<option value="${h.value}"${h.value === val ? ' selected' : ''}>${h.value}</option>`
+    ).join('');
+  return `<select id="${id}" onchange="onHeureChange()">${opts}</select>`;
+}
+
+// Appelé quand l'un des deux selects heure change
+function onHeureChange() {
+  const debut = document.getElementById('f-heure-debut').value;
+  const fin   = document.getElementById('f-heure-fin').value;
+  const prev  = document.getElementById('heure-preview');
+
+  if (debut && fin) {
+    const valeur = debut + ' - ' + fin;
+    editedData.heure = valeur;
+    prev.textContent = valeur;
+    prev.classList.remove('empty');
+  } else if (debut) {
+    editedData.heure = debut;
+    prev.textContent = debut + ' - ?';
+    prev.classList.add('empty');
+  } else {
+    editedData.heure = '';
+    prev.textContent = 'Choisir début et fin';
+    prev.classList.add('empty');
+  }
+}
+window.onHeureChange = onHeureChange;
+
+function buildSelect(id, refArr, val, allowEmpty) {
+  const opts = (allowEmpty ? `<option value="">— aucun —</option>` : '') +
+    refArr.map(r => `<option value="${esc(r.value)}"${r.value==val?' selected':''}>${esc(r.label||r.value)}</option>`).join('');
+  return `<select id="${id}" onchange="fieldChange('${id}')">${opts}</select>`;
+}
+
+function buildPersonSelect(id, refArr, val) {
+  const opts = `<option value="">— aucun —</option>` +
+    refArr.map(r => `<option value="${esc(r.value)}"${r.value===val?' selected':''}>${esc(r.value)}</option>`).join('');
+  return `<select id="${id}" onchange="fieldChange('${id}')">${opts}</select>`;
+}
+
+function renderEditor() {
+  const e = editedData;
+  const panel = document.getElementById('editorPanel');
+
+  // Boutons piment
+  const pimentBtns = REF_PIMENT.map(p =>
+    `<button class="piment-btn${e.piment===p.value?' active':''}" onclick="setPiment(${p.value})">${p.label}</button>`
+  ).join('');
+
+  panel.innerHTML = `
+    <div class="editor-title">
+      ✏️ Édition de l'atelier
+      <span class="badge-idx">#${selectedIdx} — ${AGENDA[selectedIdx].jour}</span>
+    </div>
+
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label>Jour</label>
+        ${buildSelect('f-jour', REF_JOURS.map(j=>({value:j.value,label:j.label})), e.jour, false)}
+      </div>
+
+      <div class="form-group">
+        <label>Heure — Début &amp; Fin</label>
+        <div class="heure-widget">
+          ${buildHeureSelect('f-heure-debut', parseHeureDebut(e.heure))}
+          <span class="heure-sep">—</span>
+          ${buildHeureSelect('f-heure-fin', parseHeureFin(e.heure))}
+          <div class="heure-preview${!e.heure?' empty':''}" id="heure-preview">
+            ${e.heure || 'Choisir début et fin'}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Note logistique</label>
+        ${buildPersonSelect('f-note', REF_NOTES, e.note||'')}
+      </div>
+
+      <div class="form-group full">
+        <label>Nom de l'atelier</label>
+        <input type="text" id="f-atelier" value="${esc(e.atelier||'')}" oninput="fieldChange('f-atelier')">
+      </div>
+
+      <div class="form-group">
+        <label>Type</label>
+        ${buildSelect('f-type', REF_TYPES, e.type, false)}
+      </div>
+
+      <div class="form-group">
+        <label>Lieu</label>
+        ${buildSelect('f-lieu', REF_LIEUX, e.lieu, true)}
+      </div>
+
+      <div class="form-group">
+        <label>Facilitateur principal</label>
+        ${buildPersonSelect('f-fac1', REF_FACILITATEURS, e.fac1||'')}
+      </div>
+
+      <div class="form-group">
+        <label>Facilitateur secondaire</label>
+        ${buildPersonSelect('f-fac2', REF_FACILITATEURS, e.fac2||'')}
+      </div>
+
+      <div class="form-group">
+        <label>Traducteur</label>
+        ${buildPersonSelect('f-traduction', REF_TRADUCTEURS, e.traduction||'')}
+      </div>
+
+      <div class="form-group">
+        <label>Helper 1</label>
+        ${buildPersonSelect('f-helper1', REF_HELPERS, e.helper1||'')}
+      </div>
+
+      <div class="form-group">
+        <label>Helper 2</label>
+        ${buildPersonSelect('f-helper2', REF_HELPERS, e.helper2||'')}
+      </div>
+
+      <div class="form-group">
+        <label>Helper 3</label>
+        ${buildPersonSelect('f-helper3', REF_HELPERS, e.helper3||'')}
+      </div>
+
+      <div class="form-group">
+        <label>Angel</label>
+        ${buildPersonSelect('f-angel', REF_ANGELS, e.angel||'')}
+      </div>
+
+      <div class="form-group full">
+        <label>Niveau Piment</label>
+        <div class="piment-btns" id="piment-btns">${pimentBtns}</div>
+      </div>
+
+    </div>
+
+    <div class="editor-actions">
+      <button class="btn-primary" id="btnUpdate" onclick="saveUpdate()">✅ Update</button>
+      <button class="btn-secondary" onclick="resetEdit()">↩ Annuler</button>
+      <div class="saving-indicator" id="savingIndicator"><div class="spinner"></div> Sauvegarde en cours…</div>
+    </div>
+
+    <!-- ── SECTION LOGISTIQUE liée à l'atelier ── -->
+    <div style="margin-top:32px;padding-top:24px;border-top:2px solid var(--border)">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+        <div>
+          <div style="font-size:15px;font-weight:700;">📦 Informations Logistiques</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px;">Contenu affiché dans le rapport logistique pour cet atelier</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <div class="logistics-saving" id="logSaving"><div class="spinner"></div> Sauvegarde…</div>
+        </div>
+      </div>
+      <div id="logSection"></div>
+    </div>
+  `;
+
+  // Rendre la section logistique pour cet atelier
+  logRenderForAtelier(e.logisticId || '');
+}
+
+// ══════════════════════════════════════════════
+// INTERACTIONS FORMULAIRE
+// ══════════════════════════════════════════════
+function fieldChange(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const field = id.replace('f-', '');
+  const val = el.value;
+  // Mapping id → clé AGENDA
+  const map = {
+    'jour':'jour','atelier':'atelier','type':'type','lieu':'lieu',
+    'fac1':'fac1','fac2':'fac2','traduction':'traduction',
+    'helper1':'helper1','helper2':'helper2','helper3':'helper3',
+    'angel':'angel','note':'note'
+    // 'heure' est géré séparément via onHeureChange()
+  };
+  const key = map[field];
+  if (key) editedData[key] = val;
+
+  // Synchroniser la date si le jour change
+  if (field === 'jour') {
+    const ref = REF_JOURS.find(j => j.value === val);
+    if (ref) editedData.date = ref.date;
+  }
+}
+window.fieldChange = fieldChange;
+
+function setPiment(val) {
+  editedData.piment = val;
+  // Mettre à jour l'état visuel des boutons
+  document.querySelectorAll('.piment-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i === val);
+  });
+}
+window.setPiment = setPiment;
+
+function resetEdit() {
+  editedData = Object.assign({}, AGENDA[selectedIdx]);
+  renderEditor();
+  showToast('↩ Modifications annulées');
+}
+window.resetEdit = resetEdit;
+
+// ══════════════════════════════════════════════
+// SAUVEGARDE DIRECTE → data.js
+// Stratégie : localhost → serveur Python (/save)
+//             ailleurs  → GitHub API
+// ══════════════════════════════════════════════
+async function sauvegarder(content) {
+  // Ouvert en file:// → ni serveur local ni GitHub accessible
+  if (location.protocol === 'file:') {
+    throw new Error('Ouvrez le rapport via http://localhost:3000 (lancez start.bat) pour pouvoir sauvegarder.');
+  }
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (isLocal) {
+    const res = await fetch('http://localhost:3000/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: 'data.js', content })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Serveur local : erreur ${res.status}`);
+    }
+    return;
+  }
+  // GitHub Pages ou autre hébergement distant
+  await githubSaveFile('data.js', content);
+}
+
+async function saveUpdate() {
+  if (selectedIdx === null) return;
+
+  // UI : désactiver le bouton + spinner EN PREMIER (avant tout async)
+  const btn = document.getElementById('btnUpdate');
+  const ind = document.getElementById('savingIndicator');
+  if (btn) btn.disabled = true;
+  if (ind) ind.classList.add('show');
+
+  // Snapshot de l'état original pour rollback si erreur
+  const originalEntry = Object.assign({}, AGENDA[selectedIdx]);
+
+  // Appliquer la modification en mémoire
+  AGENDA[selectedIdx] = Object.assign({}, editedData);
+
+  try {
+    const content = genererDataJs();
+    await sauvegarder(content);
+    // Succès : rafraîchir la liste pour refléter les changements
+    renderList();
+    showToast('✅ data.js mis à jour avec succès !', false);
+  } catch(err) {
+    // Rollback en cas d'erreur
+    AGENDA[selectedIdx] = originalEntry;
+    showToast('❌ Sauvegarde impossible : ' + err.message, true);
+    console.error('[Rapport11] Erreur saveUpdate:', err);
+  } finally {
+    if (btn) btn.disabled = false;
+    if (ind) ind.classList.remove('show');
+  }
+}
+window.saveUpdate = saveUpdate;
+
+// ══════════════════════════════════════════════
+// GÉNÉRATION data.js COMPLET (même format qu'Admin.html)
+// ══════════════════════════════════════════════
+function escJs(v) {
+  return (v||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\r\n/g,'\\n').replace(/\r/g,'\\n').replace(/\n/g,'\\n');
+}
+
+function genererDataJs() {
+  const header =
+`/**
+ * TANTRAMOUR 2026 — Référentiel de données commun
+ * ================================================
+ * Source unique pour les 3 rapports HTML.
+ * Pour mettre à jour : modifier uniquement ce fichier.
+ *
+ * Structure de chaque entrée :
+ *   jour       {string}  "Jour 1" … "Jour 7"
+ *   date       {string}  "Samedi 29 aout" …
+ *   heure      {string}  "9:45 - 11:00" | "Matin" | "APRES MIDI"
+ *   type       {string}  catégorie (ex: "ATELIERS TANTRA (AM)")
+ *   atelier    {string}  nom de l'atelier / activité
+ *   lieu       {string}  salle / espace (ex: "SHIVA", "CHENREZIG" …)
+ *   fac1       {string}  Facilitateur principal
+ *   fac2       {string}  Facilitateur secondaire
+ *   traduction {string}  Langue / traducteur
+ *   helper1    {string}  Helper 1
+ *   helper2    {string}  Helper 2
+ *   helper3    {string}  Helper 3
+ *   angel      {string}  Angel
+ *   note       {string}  Note logistique (ex: "Shift Colibri", "Atelier + long")
+ */
+
+var AGENDA = [`;
+
+  const lines = AGENDA.map((e, i) => {
+    const prev = AGENDA[i - 1];
+    let section = '';
+    if (!prev || prev.jour !== e.jour) {
+      const ref = (typeof REF_JOURS !== 'undefined') ? REF_JOURS.find(j => j.value === e.jour) : null;
+      const dateLabel = ref ? ref.date : e.date;
+      section = `\n  // ─── ${e.jour} — ${dateLabel} ${'─'.repeat(Math.max(0, 60 - e.jour.length - dateLabel.length))}\n`;
+    }
+    const line = `  {jour:"${escJs(e.jour)}",date:"${escJs(e.date)}",heure:"${escJs(e.heure)}",type:"${escJs(e.type)}",atelier:"${escJs(e.atelier)}",lieu:"${escJs(e.lieu)}",fac1:"${escJs(e.fac1)}",fac2:"${escJs(e.fac2)}",traduction:"${escJs(e.traduction)}",helper1:"${escJs(e.helper1)}",helper2:"${escJs(e.helper2)}",helper3:"${escJs(e.helper3)}",angel:"${escJs(e.angel)}",note:"${escJs(e.note)}",piment:${e.piment||0},logisticId:"${escJs(e.logisticId||'')}"},`;
+    return section + line;
+  }).join('\n');
+
+  return header + '\n' + lines + `
+];
+
+/**
+ * Convertit un objet AGENDA en tableau positionnel [16 colonnes]
+ * identique au format RAW utilisé par les rapports.
+ * Indice : [0]jour [1]date [2]heure [3]type [4]atelier [5]lieu
+ *          [6]fac1 [7]fac2 [8]traduction [9]helper1 [10]helper2
+ *          [11]helper3 [12]angel [13]note [14]logisticId [15]piment
+ */
+function agendaToRaw(entries) {
+  return entries.map(e => [
+    e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,
+    e.fac1, e.fac2, e.traduction,
+    e.helper1, e.helper2, e.helper3,
+    e.angel, e.note, e.logisticId || '', e.piment || 0
+  ]);
+}`;
+}
+
+// ══════════════════════════════════════════════
+// UTILITAIRES
+// ══════════════════════════════════════════════
+function esc(v) { return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background  = isError ? '#fef2f2' : '#1f2328';
+  t.style.color       = isError ? '#dc2626' : '#fff';
+  t.style.border      = isError ? '1px solid #fca5a5' : 'none';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), isError ? 6000 : 3500);
+}
+
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(keys => Promise.all(keys.map(k=>caches.delete(k)))).finally(()=>location.reload(true));
+  } else { location.reload(true); }
+}
+window.hardReload = hardReload;
+
+function toggleMode() {
+  const isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+window.toggleMode = toggleMode;
+
+// Auto-refresh si ouvert depuis Home
+if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
+  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
+  hardReload();
+}
+
+renderList();
+
+// ══════════════════════════════════════════════════════
+// SECTION LOGISTIQUE — liée à l'atelier sélectionné
+// ══════════════════════════════════════════════════════
+
+// Copie de travail de logistics.js
+var LOG = Object.assign({}, LOGISTICS);
+
+// ── RENDU de la section pour l'atelier en cours ────────────────────────────
+function logRenderForAtelier(logId) {
+  var sec = document.getElementById('logSection');
+  if (!sec) return;
+
+  // Cas 1 : pas encore d'information logistique pour cet atelier
+  if (!logId || !LOG[logId]) {
+    sec.innerHTML =
+      '<div style="padding:16px;background:var(--surface);border:1px dashed var(--border);border-radius:8px;text-align:center;">' +
+        '<div style="color:var(--muted);font-size:13px;margin-bottom:12px;">Aucune information logistique pour cet atelier.</div>' +
+        '<button class="btn-primary" style="font-size:13px;padding:7px 18px" onclick="logCreer()">＋ Créer les informations logistiques</button>' +
+      '</div>';
+    return;
+  }
+
+  // Cas 2 : une entrée existe — afficher prévisualisation + boutons
+  var entry  = LOG[logId];
+  var safeId = esc(logId);
+  var toolbar = [
+    '<div class="rte-toolbar">',
+      '<button class="rte-btn" title="Gras"       onclick="rteCmd(\'log-rte\',\'bold\')"><b>B</b></button>',
+      '<button class="rte-btn" title="Italique"   onclick="rteCmd(\'log-rte\',\'italic\')"><i>I</i></button>',
+      '<button class="rte-btn" title="Souligné"   onclick="rteCmd(\'log-rte\',\'underline\')"><u>U</u></button>',
+      '<div class="rte-sep"></div>',
+      '<button class="rte-btn" title="Liste à puces"   onclick="rteCmd(\'log-rte\',\'insertUnorderedList\')">• Liste</button>',
+      '<button class="rte-btn" title="Liste numérotée" onclick="rteCmd(\'log-rte\',\'insertOrderedList\')">1. Liste</button>',
+      '<div class="rte-sep"></div>',
+      '<button class="rte-btn" title="Supprimer le formatage" onclick="rteCmd(\'log-rte\',\'removeFormat\')">✖ Format</button>',
+    '</div>',
+  ].join('');
+
+  sec.innerHTML =
+    // Prévisualisation
+    '<div id="log-preview" class="logistics-html-preview" style="padding:10px 0 14px">' +
+      (entry.html || '<em style="color:var(--muted)">Aucun contenu.</em>') +
+    '</div>' +
+
+    // Zone d'édition (masquée par défaut)
+    '<div id="log-editzone" class="logistics-edit-zone">' +
+      toolbar +
+      '<div class="rte-editor" id="log-rte" contenteditable="true">' + (entry.html || '') + '</div>' +
+      '<div class="logistics-edit-actions">' +
+        '<button class="btn-success" onclick="logSaveEntry()">✅ Sauvegarder</button>' +
+        '<button class="btn-secondary" onclick="logCancelEdit()">✖ Annuler</button>' +
+        '<button class="btn-danger" style="margin-left:auto" onclick="logSupprimerEntree()">🗑 Supprimer</button>' +
+        '<div class="logistics-saving" id="logsavind"><div class="spinner"></div> Sauvegarde…</div>' +
+      '</div>' +
+    '</div>' +
+
+    // Barre d'actions prévisualisation
+    '<div id="log-actions" style="display:flex;gap:8px;margin-top:10px;">' +
+      '<button class="btn" onclick="logOuvrirEdition()">✏️ Modifier</button>' +
+    '</div>';
+}
+
+// ── CRÉER une nouvelle entrée logistique pour l'atelier courant ─────────────
+function logCreer() {
+  if (selectedIdx === null) return;
+  var a = AGENDA[selectedIdx];
+  // Génère un ID basé sur le nom de l'atelier
+  var base = ('LOG_' + (a.jour || '').replace(/\s/g,'') + '_' + (a.atelier || 'NEW').replace(/[^A-Za-z0-9]/g,'_').toUpperCase()).slice(0, 40);
+  var newId = base, n = 2;
+  while (LOG[newId]) { newId = base + '_' + n; n++; }
+
+  LOG[newId] = { html: '', text: '', updatedAt: new Date().toISOString().slice(0,10) };
+
+  // Lier l'atelier à ce nouvel ID (en mémoire + dans editedData)
+  editedData.logisticId = newId;
+  AGENDA[selectedIdx].logisticId = newId;
+
+  logRenderForAtelier(newId);
+  logOuvrirEdition();
+}
+window.logCreer = logCreer;
+
+// ── OUVRIR EN ÉDITION ──────────────────────────────────────────────────────
+function logOuvrirEdition() {
+  var preview  = document.getElementById('log-preview');
+  var editzone = document.getElementById('log-editzone');
+  var actions  = document.getElementById('log-actions');
+  if (preview)  preview.style.display  = 'none';
+  if (editzone) editzone.classList.add('active');
+  if (actions)  actions.style.display  = 'none';
+  var rte = document.getElementById('log-rte');
+  if (rte) { rte.focus(); placeCursorAtEnd(rte); }
+}
+window.logOuvrirEdition = logOuvrirEdition;
+
+// ── ANNULER ÉDITION ────────────────────────────────────────────────────────
+function logCancelEdit() {
+  var preview  = document.getElementById('log-preview');
+  var editzone = document.getElementById('log-editzone');
+  var actions  = document.getElementById('log-actions');
+  if (preview)  preview.style.display  = '';
+  if (editzone) editzone.classList.remove('active');
+  if (actions)  actions.style.display  = '';
+}
+window.logCancelEdit = logCancelEdit;
+
+// ── SAUVEGARDER ────────────────────────────────────────────────────────────
+async function logSaveEntry() {
+  if (selectedIdx === null) return;
+  var logId = editedData.logisticId || AGENDA[selectedIdx].logisticId;
+  if (!logId) return;
+
+  var rte     = document.getElementById('log-rte');
+  var newHtml = rte ? rte.innerHTML.trim() : '';
+  var tmp = document.createElement('div');
+  tmp.innerHTML = newHtml;
+  var newText = (tmp.textContent || tmp.innerText || '').trim();
+
+  LOG[logId] = { html: newHtml, text: newText, updatedAt: new Date().toISOString().slice(0,10) };
+
+  var ind = document.getElementById('logsavind');
+  if (ind) ind.classList.add('show');
+  try {
+    await logSauvegarder();
+    showToast('✅ Informations logistiques sauvegardées !');
+    // Mettre à jour la prévisualisation
+    var preview = document.getElementById('log-preview');
+    if (preview) preview.innerHTML = newHtml || '<em style="color:var(--muted)">Aucun contenu.</em>';
+    logCancelEdit();
+  } catch(err) {
+    showToast('❌ Sauvegarde impossible : ' + err.message, true);
+  } finally {
+    if (ind) ind.classList.remove('show');
+  }
+}
+window.logSaveEntry = logSaveEntry;
+
+// ── SUPPRIMER l'entrée logistique de l'atelier courant ────────────────────
+async function logSupprimerEntree() {
+  if (selectedIdx === null) return;
+  var logId = editedData.logisticId || AGENDA[selectedIdx].logisticId;
+  if (!logId) return;
+  if (!confirm('Supprimer les informations logistiques de cet atelier ?')) return;
+
+  delete LOG[logId];
+  // Déconnecter l'atelier
+  editedData.logisticId = '';
+  AGENDA[selectedIdx].logisticId = '';
+
+  var ind = document.getElementById('logSaving');
+  if (ind) ind.classList.add('show');
+  try {
+    await logSauvegarder();
+    await sauvegarder(genererDataJs()); // met à jour data.js pour vider logisticId
+    showToast('🗑 Informations logistiques supprimées.');
+    logRenderForAtelier(''); // affiche "créer"
+  } catch(err) {
+    showToast('❌ Suppression impossible : ' + err.message, true);
+  } finally {
+    if (ind) ind.classList.remove('show');
+  }
+}
+window.logSupprimerEntree = logSupprimerEntree;
+
+// ── COMMANDES RTE ──────────────────────────────────────────────────────────
+function rteCmd(editorId, cmd) {
+  var editor = document.getElementById(editorId);
+  if (!editor) return;
+  editor.focus();
+  document.execCommand(cmd, false, null);
+}
+window.rteCmd = rteCmd;
+
+function placeCursorAtEnd(el) {
+  var range = document.createRange();
+  var sel   = window.getSelection();
+  range.selectNodeContents(el);
+  range.collapse(false);
+  sel.removeAllRanges();
+  sel.addRange(range);
+}
+
+// ── GÉNÉRATION DE logistics.js ─────────────────────────────────────────────
+function escJs(v) {
+  return (v||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\r\n/g,'\\n').replace(/\r/g,'\\n').replace(/\n/g,'\\n');
+}
+
+function genererLogisticsJs() {
+  var keys    = Object.keys(LOG);
+  var entries = keys.map(function(k) {
+    var e = LOG[k];
+    return '  "' + escJs(k) + '": {\n' +
+      '    html: "' + escJs(e.html || '') + '",\n' +
+      '    text: "' + escJs(e.text || '') + '",\n' +
+      '    updatedAt: "' + escJs(e.updatedAt || '') + '"\n' +
+      '  }';
+  }).join(',\n\n');
+  return '/**\n * TANTRAMOUR 2026 — Informations Logistiques\n * ===========================================\n * Structure : LOGISTICS = { "<logisticId>": { html, text, updatedAt } }\n */\n\nvar LOGISTICS = {\n\n' +
+    entries + (entries ? '\n\n' : '') + '};\n';
+}
+
+// ── SAUVEGARDE logistics.js ────────────────────────────────────────────────
+async function logSauvegarder() {
+  if (location.protocol === 'file:') {
+    throw new Error('Ouvrez via http://localhost:3000 (lancez start.bat) pour sauvegarder.');
+  }
+  var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (isLocal) {
+    var res = await fetch('http://localhost:3000/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: 'logistics.js', content: genererLogisticsJs() })
+    });
+    if (!res.ok) {
+      var err = await res.json().catch(function(){return{};});
+      throw new Error(err.error || 'Erreur ' + res.status);
+    }
+    return;
+  }
+  await githubSaveFile('logistics.js', genererLogisticsJs());
+}
+
+}); // fin loadData
+</script>
+</body>
+</html>
