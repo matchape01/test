@@ -130,9 +130,9 @@ var LOGISTICS = {
     updatedAt: "2026-07-21"
   },
 
-  "JOUR2_MOVE___CONNECT_WITH_THE_5_ELEM": {
-    html: "- 2* micros<br>- coussins",
-    text: "- 2* micros\n- coussins",
+  "JOUR2_MEDITATION_ACTIVE": {
+    html: "<ul><li>Micro&nbsp;</li><li>Sono pour faire lancer la musique</li></ul><p></p>",
+    text: "Micro \nSono pour faire lancer la musique",
     validatedByFac: true,
     updatedAt: "2026-07-23"
   }
