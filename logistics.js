@@ -725,9 +725,9 @@ var LOGISTICS = {
   },
 
   "JOUR1_REUNION_D_EQUIPE__HELPERS_": {
-    html: "sdgsd<p></p>",
-    text: "sdgsd",
-    validatedByFac: true,
+    html: "<p></p>",
+    text: "",
+    validatedByFac: false,
     prepDuration: 15,
     updatedAt: "2026-07-31 03:00"
   }
