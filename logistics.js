@@ -725,11 +725,11 @@ var LOGISTICS = {
   },
 
   "JOUR1_REUNION_D_EQUIPE__HELPERS_": {
-    html: "sdg<p></p>",
-    text: "sdg",
+    html: "sdgsd<p></p>",
+    text: "sdgsd",
     validatedByFac: true,
     prepDuration: 15,
-    updatedAt: "2026-07-31 02:55"
+    updatedAt: "2026-07-31 03:00"
   }
 
 };
