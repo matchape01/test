@@ -14,9 +14,9 @@ var LOGISTICS_HELPERS = {
 
   "JOUR1_REUNION_D_EQUIPE__HELPERS_": {
     avant: "qfs<p></p>",
-    pendant: "qsfqsf<p></p>",
-    apres: "qfsfqf<p></p>",
-    updatedAt: "2026-07-31 02:45"
+    pendant: "qfs<p></p>",
+    apres: "qfss<p></p>",
+    updatedAt: "2026-07-31 02:51"
   }
 
 };
