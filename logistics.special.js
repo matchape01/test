@@ -133,7 +133,7 @@ var LOGISTICS_SPECIAL = {
   "JOUR1_REUNION_D_EQUIPE__HELPERS_": {
     html: "qsfqf<p></p>",
     text: "qsfqf",
-    updatedAt: "2026-07-31 02:44"
+    updatedAt: "2026-07-31 02:45"
   }
 
 };
