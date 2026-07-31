@@ -13,10 +13,10 @@ var LOGISTICS_HELPERS = {
   },
 
   "JOUR1_REUNION_D_EQUIPE__HELPERS_": {
-    avant: "sgd<p></p>",
-    pendant: "sgd<p></p>",
-    apres: "dgs<p></p>",
-    updatedAt: "2026-07-31 02:55"
+    avant: "sdgsdg<p></p>",
+    pendant: "sdgsd<p></p>",
+    apres: "sdgsd<p></p>",
+    updatedAt: "2026-07-31 03:00"
   }
 
 };
