@@ -41,7 +41,7 @@ var LOGISTICS = {
     text: "sgds",
     validatedByFac: false,
     prepDuration: 0,
-    updatedAt: "2026-08-01 10:09"
+    updatedAt: "2026-08-13 23:49"
   },
 
   "JOUR2_CESSER_DE_FAIRE__LAISSER_ETRE": {
