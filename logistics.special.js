@@ -19,9 +19,9 @@ var LOGISTICS_SPECIAL = {
   },
 
   "JOUR1_TEST_MATT__COPIE_": {
-    html: "",
-    text: "",
-    updatedAt: "2026-08-01 10:09"
+    html: "gxjfxj",
+    text: "gxjfxj",
+    updatedAt: "2026-08-13 23:57"
   },
 
   "JOUR2_CESSER_DE_FAIRE__LAISSER_ETRE": {
@@ -115,9 +115,9 @@ var LOGISTICS_SPECIAL = {
   },
 
   "LOG_Jour1_PETIT_DEJ_2": {
-    html: "sgjsf",
-    text: "sgjsf",
-    updatedAt: "2026-08-13 23:50"
+    html: "<br>",
+    text: "",
+    updatedAt: "2026-07-20"
   },
 
   "LOG_Jour1_TEST_MATT": {
