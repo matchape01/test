@@ -263,11 +263,11 @@ var LOGISTICS = {
   },
 
   "LOG_Jour1_PETIT_DEJ_2": {
-    html: "gjgj",
-    text: "gjgj",
+    html: "",
+    text: "",
     validatedByFac: false,
     prepDuration: 0,
-    updatedAt: "2026-08-13 23:50"
+    updatedAt: "2026-07-28"
   },
 
   "LOG_Jour1_TEST_3": {
@@ -303,11 +303,11 @@ var LOGISTICS = {
   },
 
   "LOG_Jour1_TEST_MATT_3": {
-    html: "test logistique V4",
-    text: "test logistique V4",
+    html: "<div>test logistique V4</div><div>fhydf</div>",
+    text: "test logistique V4\nfhydf",
     validatedByFac: true,
     prepDuration: 45,
-    updatedAt: "2026-08-01 10:08"
+    updatedAt: "2026-08-13 23:53"
   },
 
   "LOG_Jour2_ANGEL___SHIFT_APR_S_MIDI__PM_": {
