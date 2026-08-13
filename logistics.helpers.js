@@ -22,8 +22,8 @@ var LOGISTICS_HELPERS = {
   "JOUR1_TEST_MATT__COPIE_": {
     avant: "sgds",
     pendant: "sgdsd",
-    apres: "fdfh<p></p>",
-    updatedAt: "2026-08-13 23:49"
+    apres: "",
+    updatedAt: "2026-08-01 10:09"
   },
 
   "JOUR2__CALL__POUR_RASSEMBLEMENT": {
@@ -83,10 +83,10 @@ var LOGISTICS_HELPERS = {
   },
 
   "LOG_Jour1_TEST_MATT_3": {
-    avant: "<div>AVANT 1</div><div>gjf</div><p></p>",
-    pendant: "<div>PENDANT 2</div><div><br></div><div>jg</div><p></p>",
-    apres: "<div>APRES 3</div><div><br></div><div>fgj</div><p></p>",
-    updatedAt: "2026-08-13 23:49"
+    avant: "AVANT 1<p></p>",
+    pendant: "PENDANT 2<p></p>",
+    apres: "APRES 3<p></p>",
+    updatedAt: "2026-08-13 23:53"
   },
 
   "LOG_Jour2_RASSEMBLEMENT": {
