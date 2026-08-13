@@ -1,5 +1,7 @@
 /**
- * TANTRAMOUR 2026 — Informations Logistiques Spéciales
+ * TANTRAMOUR 2026 — Informations Logistiques Spéciales (Supplémentaires)
+ * =======================================================================
+ * Structure : LOGISTICS_SPECIAL = { "<logisticId>": { html, text, updatedAt } }
  */
 
 var LOGISTICS_SPECIAL = {
@@ -113,9 +115,9 @@ var LOGISTICS_SPECIAL = {
   },
 
   "LOG_Jour1_PETIT_DEJ_2": {
-    html: "<br>",
-    text: "",
-    updatedAt: "2026-07-20"
+    html: "sgjsf",
+    text: "sgjsf",
+    updatedAt: "2026-08-13 23:50"
   },
 
   "LOG_Jour1_TEST_MATT": {
@@ -125,9 +127,9 @@ var LOGISTICS_SPECIAL = {
   },
 
   "LOG_Jour1_TEST_MATT_3": {
-    html: "<div>test logistique special V4</div><div>fdgfdhdf</div><div>ghjfg</div>",
-    text: "test logistique special V4\nfdgfdhdf\nghjfg",
-    updatedAt: "2026-08-13 23:49"
+    html: "<div>test logistique special V4</div><div>fdgfdhdf</div>",
+    text: "test logistique special V4\nfdgfdhdf",
+    updatedAt: "2026-08-01 10:08"
   },
 
   "LOG_Jour2_RASSEMBLEMENT": {
