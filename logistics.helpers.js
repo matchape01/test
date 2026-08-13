@@ -23,7 +23,7 @@ var LOGISTICS_HELPERS = {
     avant: "sgds",
     pendant: "sgdsd",
     apres: "",
-    updatedAt: "2026-08-01 10:09"
+    updatedAt: "2026-08-13 00:00"
   },
 
   "JOUR2__CALL__POUR_RASSEMBLEMENT": {
@@ -85,8 +85,8 @@ var LOGISTICS_HELPERS = {
   "LOG_Jour1_TEST_MATT_3": {
     avant: "AVANT 1<p></p>",
     pendant: "PENDANT 2<p></p>",
-    apres: "<div>APRES 3</div><div>gfdjf</div><p></p>",
-    updatedAt: "2026-08-13 00:00"
+    apres: "APRES 3<p></p>",
+    updatedAt: "2026-08-01 10:08"
   },
 
   "LOG_Jour2_RASSEMBLEMENT": {
