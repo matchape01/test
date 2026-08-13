@@ -85,8 +85,8 @@ var LOGISTICS_HELPERS = {
   "LOG_Jour1_TEST_MATT_3": {
     avant: "AVANT 1<p></p>",
     pendant: "PENDANT 2<p></p>",
-    apres: "APRES 3<p></p>",
-    updatedAt: "2026-08-13 23:53"
+    apres: "<div>APRES 3</div><div>gfdjf</div><p></p>",
+    updatedAt: "2026-08-13 00:00"
   },
 
   "LOG_Jour2_RASSEMBLEMENT": {
