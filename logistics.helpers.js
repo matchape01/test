@@ -22,7 +22,7 @@ var LOGISTICS_HELPERS = {
   "JOUR1_TEST_MATT__COPIE_": {
     avant: "sgds",
     pendant: "sgdsd",
-    apres: "<p></p>",
+    apres: "fdfh<p></p>",
     updatedAt: "2026-08-13 23:49"
   },
 
