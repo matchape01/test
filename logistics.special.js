@@ -4,22 +4,22 @@
 
 var LOGISTICS_SPECIAL = {
 
-  "JOUR2_REUNION_D_EQUIPE__HELPERS_": {
-    html: "<br><p><br></p>",
+  "JOUR1_EXTRA_SUPPORT___OPENING_CEREMO": {
+    html: "",
     text: "",
-    updatedAt: "2026-07-28"
+    updatedAt: "2026-08-01 14:46"
   },
 
-  "LOG_Jour1_TEST_MATT": {
-    html: "TEST SPECIAl",
-    text: "TEST SPECIAl",
-    updatedAt: "2026-07-20"
+  "JOUR1_SOIREE_ECSTATIC_DANSE": {
+    html: "",
+    text: "",
+    updatedAt: "2026-07-31 10:10"
   },
 
-  "LOG_Jour1_PETIT_DEJ_2": {
-    html: "<br>",
+  "JOUR1_TEST_MATT__COPIE_": {
+    html: "",
     text: "",
-    updatedAt: "2026-07-20"
+    updatedAt: "2026-08-01 10:09"
   },
 
   "JOUR2_CESSER_DE_FAIRE__LAISSER_ETRE": {
@@ -28,34 +28,10 @@ var LOGISTICS_SPECIAL = {
     updatedAt: "2026-07-20"
   },
 
-  "LOG_Jour1_TEST_MATT_3": {
-    html: "test logistique special V4",
-    text: "test logistique special V4",
-    updatedAt: "2026-07-30 18:09"
-  },
-
-  "JOUR6_VOYAGE_AU_PAYS_DE_MON_SEXE": {
-    html: "<ul><li>Deux flacons de talc.</li></ul><div>*REMARQUE ;&nbsp;On serait plus confortables avec deux heures. Si galère, on s’adaptera avec 1h30.</div><p></p>",
-    text: "Deux flacons de talc.\n*REMARQUE ; On serait plus confortables avec deux heures. Si galère, on s’adaptera avec 1h30.",
-    updatedAt: "2026-07-21"
-  },
-
-  "JOUR4_LOVE_TEMPLE_DEVOTIONNEL": {
-    html: "<ul><li><font face=\"verdana, sans-serif\">3 grandes bassines (suffisamment larges pour les deux pieds).</font></li><li><font face=\"verdana, sans-serif\">3 Chaises associées.</font></li><li><font face=\"verdana, sans-serif\">6 petites serviettes</font></li><li><font face=\"verdana, sans-serif\">3 ou 4 tables basses</font></li><li><font face=\"verdana, sans-serif\">3 grands miroirs pleins pieds</font></li><li><font face=\"verdana, sans-serif\">Abondance d'encens, de bougies et de fleurs pour les offrandes</font></li><li><font face=\"verdana, sans-serif\">Une grande chaise type \"trône\"</font></li></ul><p></p>",
-    text: "3 grandes bassines (suffisamment larges pour les deux pieds).\n3 Chaises associées.\n6 petites serviettes\n3 ou 4 tables basses\n3 grands miroirs pleins pieds\nAbondance d'encens, de bougies et de fleurs pour les offrandes\nUne grande chaise type \"trône\"",
-    updatedAt: "2026-07-21"
-  },
-
-  "JOUR3_YONI___LINGAM_PUJA": {
-    html: "Besoin de 2 assistants avant pour la mise en place qui prend un peu de temps<br>(30 min si les assistants sont efficaces)<p></p>",
-    text: "Besoin de 2 assistants avant pour la mise en place qui prend un peu de temps\n(30 min si les assistants sont efficaces)",
-    updatedAt: "2026-07-21"
-  },
-
-  "JOUR6_PRANAM___DANSE_DEVOTIONNELLE": {
-    html: "o Micro casque<p></p>",
-    text: "o Micro casque",
-    updatedAt: "2026-07-21"
+  "JOUR2_REUNION_D_EQUIPE__HELPERS_": {
+    html: "<br><p><br></p>",
+    text: "",
+    updatedAt: "2026-07-28"
   },
 
   "JOUR2_SHAKTI_PUJA___LE_MYSTERE_DES_M": {
@@ -64,7 +40,103 @@ var LOGISTICS_SPECIAL = {
     updatedAt: "2026-07-21"
   },
 
+  "JOUR2__CALL__POUR_RASSEMBLEMENT": {
+    html: "",
+    text: "",
+    updatedAt: "2026-08-01 14:51"
+  },
+
+  "JOUR3_DJ_SET_AVEC_JUAN_FELIX": {
+    html: "",
+    text: "",
+    updatedAt: "2026-07-31 10:10"
+  },
+
+  "JOUR3_POOL_PARTY_____DJ_PASCAL_DE_LA": {
+    html: "Installer la sono à cote de la piscine&nbsp;(voir avec Felix et le DJ)",
+    text: "Installer la sono à cote de la piscine (voir avec Felix et le DJ)",
+    updatedAt: "2026-07-31 10:07"
+  },
+
+  "JOUR3_YONI___LINGAM_PUJA": {
+    html: "Besoin de 2 assistants avant pour la mise en place qui prend un peu de temps<br>(30 min si les assistants sont efficaces)<p></p>",
+    text: "Besoin de 2 assistants avant pour la mise en place qui prend un peu de temps\n(30 min si les assistants sont efficaces)",
+    updatedAt: "2026-07-21"
+  },
+
+  "JOUR3__CALL__POUR_RASSEMBLEMENT": {
+    html: "",
+    text: "",
+    updatedAt: "2026-08-01 14:52"
+  },
+
+  "JOUR4_LOVE_TEMPLE_DEVOTIONNEL": {
+    html: "<ul><li><font face=\"verdana, sans-serif\">3 grandes bassines (suffisamment larges pour les deux pieds).</font></li><li><font face=\"verdana, sans-serif\">3 Chaises associées.</font></li><li><font face=\"verdana, sans-serif\">6 petites serviettes</font></li><li><font face=\"verdana, sans-serif\">3 ou 4 tables basses</font></li><li><font face=\"verdana, sans-serif\">3 grands miroirs pleins pieds</font></li><li><font face=\"verdana, sans-serif\">Abondance d'encens, de bougies et de fleurs pour les offrandes</font></li><li><font face=\"verdana, sans-serif\">Une grande chaise type \"trône\"</font></li></ul><p></p>",
+    text: "3 grandes bassines (suffisamment larges pour les deux pieds).\n3 Chaises associées.\n6 petites serviettes\n3 ou 4 tables basses\n3 grands miroirs pleins pieds\nAbondance d'encens, de bougies et de fleurs pour les offrandes\nUne grande chaise type \"trône\"",
+    updatedAt: "2026-07-21"
+  },
+
+  "JOUR4__CALL__POUR_RASSEMBLEMENT": {
+    html: "",
+    text: "",
+    updatedAt: "2026-08-01 14:53"
+  },
+
+  "JOUR5_POOL_PARTY___DJ_JUAN_FELIX": {
+    html: "",
+    text: "",
+    updatedAt: "2026-07-31 10:09"
+  },
+
+  "JOUR5__CALL__POUR_RASSEMBLEMENT": {
+    html: "",
+    text: "",
+    updatedAt: "2026-08-01 14:53"
+  },
+
+  "JOUR6_PRANAM___DANSE_DEVOTIONNELLE": {
+    html: "o Micro casque<p></p>",
+    text: "o Micro casque",
+    updatedAt: "2026-07-21"
+  },
+
+  "JOUR6_VOYAGE_AU_PAYS_DE_MON_SEXE": {
+    html: "<ul><li>Deux flacons de talc.</li></ul><div>*REMARQUE ;&nbsp;On serait plus confortables avec deux heures. Si galère, on s’adaptera avec 1h30.</div><p></p>",
+    text: "Deux flacons de talc.\n*REMARQUE ; On serait plus confortables avec deux heures. Si galère, on s’adaptera avec 1h30.",
+    updatedAt: "2026-07-21"
+  },
+
+  "JOUR6__CALL__POUR_RASSEMBLEMENT": {
+    html: "",
+    text: "",
+    updatedAt: "2026-08-01 14:53"
+  },
+
+  "LOG_Jour1_PETIT_DEJ_2": {
+    html: "<br>",
+    text: "",
+    updatedAt: "2026-07-20"
+  },
+
+  "LOG_Jour1_TEST_MATT": {
+    html: "TEST SPECIAl",
+    text: "TEST SPECIAl",
+    updatedAt: "2026-07-20"
+  },
+
+  "LOG_Jour1_TEST_MATT_3": {
+    html: "<div>test logistique special V4</div><div>fdgfdhdf</div><div>ghjfg</div>",
+    text: "test logistique special V4\nfdgfdhdf\nghjfg",
+    updatedAt: "2026-08-13 23:49"
+  },
+
   "LOG_Jour2_RASSEMBLEMENT": {
+    html: "",
+    text: "",
+    updatedAt: "2026-07-28"
+  },
+
+  "LOG_Jour3_LOVE_TEMPLE_DES_EROTYPES__R": {
     html: "",
     text: "",
     updatedAt: "2026-07-28"
@@ -82,6 +154,18 @@ var LOGISTICS_SPECIAL = {
     updatedAt: "2026-07-28"
   },
 
+  "LOG_Jour5_EMBRASSER_LE_MYSTERE": {
+    html: "",
+    text: "",
+    updatedAt: "2026-07-28"
+  },
+
+  "LOG_Jour5_POOL_PARTY___DJ_JUAN_FELIX": {
+    html: "",
+    text: "",
+    updatedAt: "2026-07-28"
+  },
+
   "LOG_Jour5_RASSEMBLEMENT": {
     html: "",
     text: "",
@@ -94,13 +178,7 @@ var LOGISTICS_SPECIAL = {
     updatedAt: "2026-07-28"
   },
 
-  "LOG_Jour3_LOVE_TEMPLE_DES_EROTYPES__R": {
-    html: "",
-    text: "",
-    updatedAt: "2026-07-28"
-  },
-
-  "LOG_Jour5_EMBRASSER_LE_MYSTERE": {
+  "LOG_Jour6_SOIREE_SURPRISE_POUR_ENFLAMMER": {
     html: "",
     text: "",
     updatedAt: "2026-07-28"
@@ -112,19 +190,7 @@ var LOGISTICS_SPECIAL = {
     updatedAt: "2026-07-28"
   },
 
-  "LOG_Jour6_SOIREE_SURPRISE_POUR_ENFLAMMER": {
-    html: "",
-    text: "",
-    updatedAt: "2026-07-28"
-  },
-
   "LOG_Jour7_CEREMONIE_DE_CLOTURE": {
-    html: "",
-    text: "",
-    updatedAt: "2026-07-28"
-  },
-
-  "LOG_Jour5_POOL_PARTY___DJ_JUAN_FELIX": {
     html: "",
     text: "",
     updatedAt: "2026-07-28"
