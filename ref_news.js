@@ -13,5 +13,6 @@
 
 var REF_NEWS = [
   {id:"NEWS_001",type:"dreamteam",fr:"Bienvenue dans l'espace DreamTeam du festival Tantramour 2026 ! Consultez régulièrement cette page pour les dernières annonces.",en:"Welcome to the DreamTeam space for Tantramour 2026! Check this page regularly for the latest announcements.",publishedAt:"2026-08-01 10:00",author:"Admin"},
-  {id:"NEWS_1787071922631",type:"festivalier",fr:"<b>TEST</b> NEWS FESTIVALIER FR",en:"<b>TEST</b> NEWS FESTIVALIER E?G",publishedAt:"2026-08-18 18:52",author:"Admin"}
+  {id:"NEWS_1787071922631",type:"festivalier",fr:"<b>TEST</b> NEWS FESTIVALIER FR",en:"<b>TEST</b> NEWS FESTIVALIER E?G",publishedAt:"2026-08-18 18:52",author:"Admin"},
+  {id:"NEWS_1787071945647",type:"dreamteam",fr:"<b>NEWS 2</b> DREAM TEAM FR",en:"<b>NEWS 2</b> DREAM TEAM ENG",publishedAt:"2026-08-18 18:52",author:"Admin"}
 ];
