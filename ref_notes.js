@@ -1,12 +1,11 @@
 /**
  * TANTRAMOUR 2026 — Référentiel : Notes
- * Modifier cette liste pour ajouter / renommer / supprimer des notes.
- * Chaque entrée : { id, value }
- *   id    : clé unique (stable, ne jamais changer)
- *   value : texte exact tel qu'il apparaît dans AGENDA (champ "note")
+ * Chaque entrée : { id, value, valueEn }
+ *   value   : libellé français (référence)
+ *   valueEn : traduction anglaise
  */
 var REF_NOTES = [
-  { id: "N_ATELIER_LONG",  value: "Atelier + long" },
-  { id: "N_SHIFT_COLIBRI", value: "Shift Colibri" },
-    { id: "N_FEMME", value: "Atelier Femme" },
+  { id: "N_ATELIER_LONG", value: "Atelier + long",  valueEn: "Extended workshop" },
+  { id: "N_FEMME",        value: "Atelier Femme",   valueEn: "Women's workshop"  },
+  { id: "N_HOMME",        value: "Atelier Homme",   valueEn: "Men's workshop"    },
 ];
