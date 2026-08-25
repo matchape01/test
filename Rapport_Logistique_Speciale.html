@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Logistique Spéciale</title>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --purple:#7c3aed; --purple-bg:#f5f3ff; --purple-border:#c4b5fd;
+    --green:#16a34a; --green-bg:#dcfce7; --green-border:#86efac;
+    --tag-bg:#eef2ff; --tag-text:#3b5bdb;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --purple-bg:#1e0e3e; --purple-border:#6d28d9;
+    --green-bg:#052e16; --green-border:#166534;
+    --tag-bg:#1c2a4a; --tag-text:#79a8ff;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
+  .wrap { max-width:960px; margin:0 auto; padding:24px 20px 80px; }
+
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:19px; font-weight:700; }
+  .logo p  { font-size:22px; font-weight:800; color:var(--purple); line-height:1.2; margin-top:2px; }
+  .header-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 14px; font-size:13px; color:var(--text); font-family:inherit; display:inline-flex; align-items:center; gap:6px; text-decoration:none; transition:background .15s; }
+  .btn:hover { background:var(--border); }
+
+  /* ── STATS ── */
+  .stats-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:22px; }
+  .stat-pill { flex:1; min-width:110px; border-radius:8px; padding:12px 14px; border:1px solid var(--border); background:var(--surface); text-align:center; }
+  .stat-pill .num { font-size:26px; font-weight:800; line-height:1; color:var(--accent); }
+  .stat-pill .lbl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); font-weight:600; margin-top:3px; }
+  .stat-pill.ok   { border-color:var(--green-border);  background:var(--green-bg); }
+  .stat-pill.ok .num  { color:var(--green); }
+  .stat-pill.hi   { border-color:var(--purple-border); background:var(--purple-bg); }
+  .stat-pill.hi .num  { color:var(--purple); }
+
+  /* ── FILTRES ── */
+  .filters { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; align-items:flex-end; }
+  .fg { display:flex; flex-direction:column; gap:4px; }
+  .fg label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); }
+  .fg select { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:13px; color:var(--text); font-family:inherit; cursor:pointer; min-width:160px; }
+
+  /* ── SÉPARATEUR JOUR ── */
+  .jour-sep { font-size:13px; font-weight:700; padding:10px 14px; border-radius:8px; background:var(--surface); border:1px solid var(--border); margin:20px 0 10px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .jour-sep-name { display:flex; align-items:center; gap:10px; font-size:15px; }
+  .jour-count { font-size:11px; font-weight:700; background:var(--purple); color:#fff; border-radius:99px; padding:2px 8px; }
+
+  /* ── CARTES ── */
+  .card-list { display:flex; flex-direction:column; gap:8px; margin-bottom:6px; }
+  .ws-card { border-radius:10px; border:1px solid var(--purple-border); overflow:hidden; }
+
+  .ws-header { display:flex; align-items:center; gap:12px; padding:11px 16px; flex-wrap:wrap; background:var(--purple-bg); }
+  .ws-type-badge { font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px; background:var(--tag-bg); color:var(--tag-text); white-space:nowrap; }
+  .ws-name { font-size:14px; font-weight:700; flex:1; min-width:0; }
+  .ws-meta-time { font-size:12px; color:var(--muted); white-space:nowrap; }
+
+  .ws-body { padding:10px 16px 12px; background:var(--bg); border-top:1px solid var(--border); }
+  .ws-fac  { font-size:12px; color:var(--muted); margin-bottom:10px; }
+
+  /* Contenu logistique spécial */
+  .special-content {
+    border-radius:8px; padding:12px 14px;
+    background:var(--purple-bg); border:1px solid var(--purple-border);
+    font-size:13px; line-height:1.7; color:var(--text);
+  }
+  .special-content ul { padding-left:18px; }
+  .special-content li { margin-bottom:2px; }
+  .special-meta { font-size:11px; color:var(--muted); margin-top:8px; text-align:right; }
+
+  .edit-link { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:5px 12px; border-radius:6px; background:var(--accent); color:#fff; text-decoration:none; cursor:pointer; font-family:inherit; transition:filter .15s; border:none; margin-top:10px; }
+  .edit-link:hover { filter:brightness(1.1); }
+
+  .empty { text-align:center; padding:48px 20px; color:var(--muted); font-style:italic; border:2px dashed var(--border); border-radius:12px; }
+  footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>⭐ <span data-i18n="lsp_title">Logistique Spéciale</span></p>
+    </div>
+    <div class="header-actions" id="headerActions">
+      <a class="btn" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="btn" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <a class="btn" href="gestion_planning.html" data-i18n="nav_admin">⚙️ Admin</a>
+      <button class="btn" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="btn" onclick="exportXlsx()">📊 Export Excel</button>
+      <button class="btn" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit">Mode Nuit</span></button>
+    </div>
+  </header>
+
+  <!-- ── STATS ── -->
+  <div class="stats-bar">
+    <div class="stat-pill hi"><div class="num" id="statTotal">—</div><div class="lbl" data-i18n="lsp_stat_total">Besoins spéciaux</div></div>
+    <div class="stat-pill"><div class="num" id="statJours">—</div><div class="lbl" data-i18n="lsp_stat_jours">Jours concernés</div></div>
+    <div class="stat-pill ok"><div class="num" id="statFacs">—</div><div class="lbl" data-i18n="lsp_stat_teachers">Animateurs</div></div>
+  </div>
+
+  <!-- ── FILTRES ── -->
+  <div class="filters">
+    <div class="fg">
+      <label data-i18n="col_jour">Jour</label>
+      <select id="filterJour" onchange="render()">
+        <option value="" data-i18n="filter_tous_jours">Tous les jours</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label data-i18n="col_animateur">Animateur(s)</label>
+      <select id="filterFac" onchange="render()">
+        <option value="" data-i18n="filter_tous_fac">Tous les animateurs</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label data-i18n="col_type">Type</label>
+      <select id="filterType" onchange="render()">
+        <option value="" data-i18n="filter_tous_types">Tous les types</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ── LISTE ── -->
+  <div id="cardList"></div>
+
+</div>
+
+<footer data-i18n="lsp_footer">Tantramour 2026 — Besoins logistiques spéciaux</footer>
+
+<script src="loader.js"></script>
+<script>
+loadData(['data.js', 'logistics.special.js', 'logistics.js'], function() {
+
+// ══════════════════════════════════════
+// CONFIG
+// ══════════════════════════════════════
+var JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+var JOUR_META  = {
+  'Jour 1':{ date:'Samedi 29 août',   emoji:'🌅' },
+  'Jour 2':{ date:'Dimanche 30 août', emoji:'☀️' },
+  'Jour 3':{ date:'Lundi 31 août',    emoji:'🌿' },
+  'Jour 4':{ date:'Mardi 1 sept.',    emoji:'🔥' },
+  'Jour 5':{ date:'Mercredi 2 sept.', emoji:'💧' },
+  'Jour 6':{ date:'Jeudi 3 sept.',    emoji:'🌙' },
+  'Jour 7':{ date:'Vendredi 4 sept.', emoji:'✨' },
+};
+
+// ══════════════════════════════════════
+// DONNÉES — ateliers avec logistique spéciale renseignée
+// ══════════════════════════════════════
+// Index AGENDA par logisticId pour lookup rapide
+var AGENDA_BY_LOGID = {};
+AGENDA.forEach(function(e) {
+  if (e.logisticId) AGENDA_BY_LOGID[e.logisticId] = e;
+});
+
+// On croise LOGISTICS_SPECIAL avec AGENDA :
+// chaque entrée de LOGISTICS_SPECIAL dont text est non vide = un besoin spécial
+var SPECIALS = Object.keys(LOGISTICS_SPECIAL)
+  .filter(function(id) {
+    var s = LOGISTICS_SPECIAL[id];
+    return s && (s.text || '').trim().length > 0;
+  })
+  .map(function(id) {
+    var s    = LOGISTICS_SPECIAL[id];
+    var e    = AGENDA_BY_LOGID[id] || null;
+    var log  = (typeof LOGISTICS !== 'undefined' && LOGISTICS[id]) ? LOGISTICS[id] : null;
+    return {
+      id:        id,
+      html:      s.html  || '',
+      text:      s.text  || '',
+      updatedAt: s.updatedAt || '',
+      // champs AGENDA (peut être null si l'id ne correspond à aucune entrée agenda)
+      atelier:   e ? (e.atelier || '—') : id,
+      type:      e ? (e.type    || '')  : '',
+      jour:      e ? (e.jour    || '')  : '',
+      date:      e ? (e.date    || '')  : '',
+      heure:     e ? (e.heure   || '')  : '',
+      lieu:      e ? (e.lieu    || '')  : '',
+      fac1:      e ? (e.fac1    || '')  : '',
+      fac2:      e ? (e.fac2    || '')  : '',
+      piment:    e ? (e.piment  || 0)   : 0,
+      logInfo:   log ? (log.text || '') : '',
+    };
+  })
+  .sort(function(a, b) {
+    var ji = JOUR_ORDER.indexOf(a.jour) - JOUR_ORDER.indexOf(b.jour);
+    if (ji !== 0) return ji;
+    return heureMin(a.heure) - heureMin(b.heure);
+  });
+
+// ══════════════════════════════════════
+// STATS GLOBALES
+// ══════════════════════════════════════
+function updateStats() {
+  var total = SPECIALS.length;
+  var jours = new Set(SPECIALS.map(function(s){ return s.jour; }).filter(Boolean));
+  var facs  = new Set();
+  SPECIALS.forEach(function(s){
+    if (s.fac1) facs.add(s.fac1);
+    if (s.fac2) facs.add(s.fac2);
+  });
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statJours').textContent = jours.size;
+  document.getElementById('statFacs').textContent  = facs.size;
+}
+
+// ══════════════════════════════════════
+// PEUPLEMENT DES FILTRES
+// ══════════════════════════════════════
+function buildFilters() {
+  var joursPresents = new Set();
+  var facsPresents  = new Set();
+  var typesPresents = new Set();
+  SPECIALS.forEach(function(s) {
+    if (s.jour) joursPresents.add(s.jour);
+    if (s.fac1) facsPresents.add(s.fac1);
+    if (s.fac2) facsPresents.add(s.fac2);
+    if (s.type) typesPresents.add(s.type);
+  });
+
+  var selJour = document.getElementById('filterJour');
+  JOUR_ORDER.filter(function(j){ return joursPresents.has(j); }).forEach(function(j) {
+    var meta = JOUR_META[j] || {};
+    var o = document.createElement('option');
+    o.value = j;
+    o.textContent = j + (meta.date ? ' — ' + meta.date : '');
+    selJour.appendChild(o);
+  });
+
+  var selFac = document.getElementById('filterFac');
+  Array.from(facsPresents).sort(function(a,b){ return a.localeCompare(b,'fr'); }).forEach(function(f) {
+    var o = document.createElement('option');
+    o.value = f; o.textContent = f;
+    selFac.appendChild(o);
+  });
+
+  var selType = document.getElementById('filterType');
+  Array.from(typesPresents).sort().forEach(function(t) {
+    var o = document.createElement('option');
+    o.value = t; o.textContent = t;
+    selType.appendChild(o);
+  });
+}
+
+// ══════════════════════════════════════
+// RENDU
+// ══════════════════════════════════════
+function render() {
+  var fJour = document.getElementById('filterJour').value;
+  var fFac  = document.getElementById('filterFac').value;
+  var fType = document.getElementById('filterType').value;
+
+  var filtered = SPECIALS.filter(function(s) {
+    if (fJour && s.jour !== fJour) return false;
+    if (fFac  && s.fac1 !== fFac && s.fac2 !== fFac) return false;
+    if (fType && s.type !== fType) return false;
+    return true;
+  });
+
+  var container = document.getElementById('cardList');
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty">' + I18n.t('lsp_empty') + '</div>';
+    return;
+  }
+
+  // Grouper par jour
+  var byJour = {};
+  filtered.forEach(function(s) {
+    var j = s.jour || I18n.t('lsp_sans_jour');
+    if (!byJour[j]) byJour[j] = [];
+    byJour[j].push(s);
+  });
+
+  var joursSorted = JOUR_ORDER.filter(function(j){ return byJour[j]; });
+  // Ajouter les entrées sans jour correspondant (edge case)
+  Object.keys(byJour).forEach(function(j){
+    if (joursSorted.indexOf(j) === -1) joursSorted.push(j);
+  });
+
+  var html = '';
+  joursSorted.forEach(function(jour) {
+    var items = byJour[jour];
+    var meta  = JOUR_META[jour] || {};
+    html += '<div class="jour-sep">' +
+      '<div class="jour-sep-name">' +
+        (meta.emoji ? meta.emoji + ' ' : '') +
+        '<span>' + esc(jour) + (meta.date ? ' — ' + meta.date : '') + '</span>' +
+      '</div>' +
+      '<span class="jour-count">' + items.length + '</span>' +
+    '</div>';
+    html += '<div class="card-list">' +
+      items.map(function(s) { return renderCard(s); }).join('') +
+    '</div>';
+  });
+
+  container.innerHTML = html;
+}
+window.render = render;
+
+function getFilteredSpecials() {
+  var fJour = document.getElementById('filterJour').value;
+  var fFac  = document.getElementById('filterFac').value;
+  var fType = document.getElementById('filterType').value;
+
+  return SPECIALS.filter(function(s) {
+    if (fJour && s.jour !== fJour) return false;
+    if (fFac  && s.fac1 !== fFac && s.fac2 !== fFac) return false;
+    if (fType && s.type !== fType) return false;
+    return true;
+  });
+}
+
+function getDuration(h) {
+  if (!h) return '';
+  var parts = String(h).replace(/\./g,':').match(/(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})/);
+  if (!parts) return '';
+  var start = parseInt(parts[1], 10) * 60 + parseInt(parts[2], 10);
+  var end   = parseInt(parts[3], 10) * 60 + parseInt(parts[4], 10);
+  var diff  = end - start;
+  if (diff <= 0) return '';
+  var hh = Math.floor(diff / 60);
+  var mm = diff % 60;
+  if (hh > 0 && mm > 0) return hh + 'h' + (mm < 10 ? '0' : '') + mm;
+  if (hh > 0) return hh + 'h';
+  return mm + 'min';
+}
+
+window.render = render;
+
+function renderCard(s) {
+  var facs = [s.fac1, s.fac2].filter(Boolean).join(' & ');
+  return '<div class="ws-card">' +
+    '<div class="ws-header">' +
+      (s.type ? '<span class="ws-type-badge">' + esc(s.type) + '</span>' : '') +
+      '<span class="ws-name">' + esc(s.atelier) +
+        (s.piment > 0 ? ' <span style="letter-spacing:-1px;font-size:13px">' + '🌶️'.repeat(s.piment) + '</span>' : '') +
+      '</span>' +
+      '<span class="ws-meta-time">' +
+        (s.heure ? esc(s.heure) : '') +
+        (s.lieu  ? ' · 📍 ' + esc(s.lieu) : '') +
+      '</span>' +
+    '</div>' +
+    '<div class="ws-body">' +
+      (facs ? '<div class="ws-fac">🎓 ' + esc(facs) + '</div>' : '') +
+      '<div class="special-content">' + s.html + '</div>' +
+      (s.updatedAt ? '<div class="special-meta">✏️ ' + esc(s.updatedAt) + '</div>' : '') +
+      '<a class="edit-link" href="Rapport_Logistics_Input.html" target="_blank" rel="noopener">✏️ ' + I18n.t('lsp_edit_btn') + '</a>' +
+    '</div>' +
+  '</div>';
+}
+
+// ══════════════════════════════════════
+// EXPORT XLSX
+// ══════════════════════════════════════
+function exportXlsx() {
+  var data = getFilteredSpecials().slice().sort(function(a, b) {
+    var ji = JOUR_ORDER.indexOf(a.jour) - JOUR_ORDER.indexOf(b.jour);
+    if (ji !== 0) return ji;
+    return heureMin(a.heure) - heureMin(b.heure);
+  });
+
+  var HEADERS = ['Jour','Date','Heure','Durée','Atelier','Animateur 1','Animateur 2','Lieu','Type','Piment','Info Spec.','Info log.','Last Update'];
+
+  function escXml(v) {
+    return String(v == null ? '' : v)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+  }
+  function colLetter(n) {
+    var s = '';
+    n++;
+    while (n > 0) { n--; s = String.fromCharCode(65 + (n % 26)) + s; n = Math.floor(n / 26); }
+    return s;
+  }
+  function cellRef(col, row) { return colLetter(col) + row; }
+  function cellS(col, row, val) {
+    return '<c r="' + cellRef(col, row) + '" t="inlineStr"><is><t>' + escXml(val) + '</t></is></c>';
+  }
+
+  var rowsXml = '<row r="1">';
+  HEADERS.forEach(function(h, ci) { rowsXml += cellS(ci, 1, h); });
+  rowsXml += '</row>';
+
+  data.forEach(function(s, ri) {
+    var rowNum = ri + 2;
+    var vals = [
+      s.jour || '',
+      s.date || '',
+      s.heure || '',
+      getDuration(s.heure),
+      s.atelier || '',
+      s.fac1 || '',
+      s.fac2 || '',
+      s.lieu || '',
+      s.type || '',
+      s.piment || 0,
+      s.text || '',
+      s.logInfo || '',
+      s.updatedAt || ''
+    ];
+    rowsXml += '<row r="' + rowNum + '">';
+    vals.forEach(function(v, ci) { rowsXml += cellS(ci, rowNum, v); });
+    rowsXml += '</row>';
+  });
+
+  var colWidths = HEADERS.map(function(h, ci) {
+    var maxLen = data.reduce(function(m, s) {
+      var vals = [
+        s.jour || '',
+        s.date || '',
+        s.heure || '',
+        getDuration(s.heure),
+        s.atelier || '',
+        s.fac1 || '',
+        s.fac2 || '',
+        s.lieu || '',
+        s.type || '',
+        s.piment || 0,
+        s.text || '',
+        s.logInfo || '',
+        s.updatedAt || ''
+      ];
+      return Math.max(m, String(vals[ci] == null ? '' : vals[ci]).length);
+    }, h.length);
+    return Math.min(Math.max(maxLen + 2, 10), 80);
+  });
+  var colsXml = colWidths.map(function(w, ci) {
+    return '<col min="' + (ci + 1) + '" max="' + (ci + 1) + '" width="' + w + '" customWidth="1"/>';
+  }).join('');
+
+  var sheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
+    '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">\n' +
+    '  <sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews>\n' +
+    '  <cols>' + colsXml + '</cols>\n' +
+    '  <sheetData>' + rowsXml + '</sheetData>\n' +
+    '  <autoFilter ref="A1:' + colLetter(HEADERS.length - 1) + '1"/>\n' +
+    '</worksheet>';
+
+  var workbookXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
+    '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">\n' +
+    '  <sheets><sheet name="LogistiqueSpeciale" sheetId="1" r:id="rId1"/></sheets>\n' +
+    '</workbook>';
+
+  var relsWorkbook = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n' +
+    '  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>\n' +
+    '</Relationships>';
+
+  var relsRoot = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">\n' +
+    '  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>\n' +
+    '</Relationships>';
+
+  var contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n' +
+    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">\n' +
+    '  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>\n' +
+    '  <Default Extension="xml" ContentType="application/xml"/>\n' +
+    '  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>\n' +
+    '  <Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>\n' +
+    '</Types>';
+
+  function strToBytes(str) { return new TextEncoder().encode(str); }
+  function crc32(bytes) {
+    var table = (function() {
+      var t = new Uint32Array(256);
+      for (var i = 0; i < 256; i++) {
+        var c = i;
+        for (var j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        t[i] = c;
+      }
+      return t;
+    })();
+    var crc = 0xFFFFFFFF;
+    bytes.forEach(function(b) { crc = table[(crc ^ b) & 0xFF] ^ (crc >>> 8); });
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+  function uint16LE(n) { return [n & 0xFF, (n >> 8) & 0xFF]; }
+  function uint32LE(n) { return [n & 0xFF, (n >> 8) & 0xFF, (n >> 16) & 0xFF, (n >> 24) & 0xFF]; }
+  function makeZipEntry(name, content) {
+    var nameBytes = strToBytes(name);
+    var contentBytes = strToBytes(content);
+    var crc = crc32(contentBytes);
+    var size = contentBytes.length;
+    var date = 0x5765;
+    var time = 0x0000;
+    var localHeader = [
+      0x50, 0x4B, 0x03, 0x04,
+      ...uint16LE(20), ...uint16LE(0), ...uint16LE(0),
+      ...uint16LE(time), ...uint16LE(date),
+      ...uint32LE(crc), ...uint32LE(size), ...uint32LE(size),
+      ...uint16LE(nameBytes.length), ...uint16LE(0),
+      ...nameBytes
+    ];
+    return { name:name, nameBytes:nameBytes, crc:crc, size:size, date:date, time:time, localOffset:0, localHeader:new Uint8Array(localHeader), content:contentBytes };
+  }
+  function buildZip(entries) {
+    var offset = 0;
+    entries.forEach(function(e) {
+      e.localOffset = offset;
+      offset += e.localHeader.length + e.content.length;
+    });
+    var centralDirOffset = offset;
+    var centralParts = entries.map(function(e) {
+      return new Uint8Array([
+        0x50, 0x4B, 0x01, 0x02,
+        ...uint16LE(20), ...uint16LE(20),
+        ...uint16LE(0), ...uint16LE(0),
+        ...uint16LE(e.time), ...uint16LE(e.date),
+        ...uint32LE(e.crc),
+        ...uint32LE(e.size), ...uint32LE(e.size),
+        ...uint16LE(e.nameBytes.length),
+        ...uint16LE(0), ...uint16LE(0),
+        ...uint16LE(0), ...uint16LE(0),
+        ...uint32LE(0),
+        ...uint32LE(e.localOffset),
+        ...e.nameBytes
+      ]);
+    });
+    var centralDirSize = centralParts.reduce(function(s, p) { return s + p.length; }, 0);
+    var eocd = new Uint8Array([
+      0x50, 0x4B, 0x05, 0x06,
+      ...uint16LE(0), ...uint16LE(0),
+      ...uint16LE(entries.length), ...uint16LE(entries.length),
+      ...uint32LE(centralDirSize),
+      ...uint32LE(centralDirOffset),
+      ...uint16LE(0)
+    ]);
+    var totalSize = offset + centralDirSize + eocd.length;
+    var buf = new Uint8Array(totalSize);
+    var pos = 0;
+    entries.forEach(function(e) {
+      buf.set(e.localHeader, pos); pos += e.localHeader.length;
+      buf.set(e.content, pos); pos += e.content.length;
+    });
+    centralParts.forEach(function(p) { buf.set(p, pos); pos += p.length; });
+    buf.set(eocd, pos);
+    return buf;
+  }
+
+  var entries = [
+    makeZipEntry('[Content_Types].xml', contentTypes),
+    makeZipEntry('_rels/.rels', relsRoot),
+    makeZipEntry('xl/workbook.xml', workbookXml),
+    makeZipEntry('xl/_rels/workbook.xml.rels', relsWorkbook),
+    makeZipEntry('xl/worksheets/sheet1.xml', sheetXml)
+  ];
+  var zipBytes = buildZip(entries);
+  var blob = new Blob([zipBytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  var today = new Date().toISOString().slice(0, 10);
+  a.href = url;
+  a.download = 'TAF2026_Info logistic_' + today + '.xlsx';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+window.exportXlsx = exportXlsx;
+
+// ══════════════════════════════════════
+// UTILITAIRES
+// ══════════════════════════════════════
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function heureMin(h) {
+  if (!h) return 9999;
+  var m = String(h).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1])*60+parseInt(m[2]) : 9999;
+}
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(function(k){ return Promise.all(k.map(function(x){ return caches.delete(x); })); })
+      .finally(function(){ location.reload(true); });
+  } else { location.reload(true); }
+}
+window.hardReload = hardReload;
+function toggleMode() {
+  var isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? I18n.t('nav_mode_jour') : I18n.t('nav_mode_nuit');
+}
+window.toggleMode = toggleMode;
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+buildFilters();
+updateStats();
+render();
+
+if (typeof I18n !== 'undefined') {
+  I18n.renderToggleBtn('headerActions', 'btn');
+}
+
+document.addEventListener('tm_lang_changed', function() {
+  render();
+  var isDark = document.body.classList.contains('dark');
+  document.getElementById('modeBtn').textContent = isDark ? I18n.t('nav_mode_jour') : I18n.t('nav_mode_nuit');
+});
+
+}); // fin loadData
+</script>
+</body>
+</html>
