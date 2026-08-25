@@ -67,7 +67,7 @@ var LOGISTICS = {
     text: "Mission: vérifier que les équipements demandés dans la salle sont bien présent.\nVérifier la liste d'équipement et quantité.\nS'il y a un problème, informer Matthieu/ Dorian, Echo Clem.",
     validatedByFac: false,
     prepDuration: 0,
-    updatedAt: "2026-08-25 21:42"
+    updatedAt: "2026-08-24 01:21"
   },
 
   "JOUR2_ALICE___OUVERTURE__1_3____MASS": {
