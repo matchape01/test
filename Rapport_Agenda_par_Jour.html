@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tantramour 2026 — Agenda par Jour</title>
+<title>Tantramour 2026 — Planning par Jour</title>
 <style>
   :root {
     --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
@@ -40,19 +40,19 @@
   /* ── TABLE VIEW ── */
   .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--border); border-radius: 8px; }
   table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-  /* Largeurs fixes pour tenir dans la fenêtre */
-  col.c-jour   { width: 52px; }
-  col.c-date   { width: 108px; }
-  col.c-heure  { width: 110px; }
-  col.c-type   { width: 130px; }
-  col.c-atelier{ width: 202px; }
-  col.c-piment { width: 72px; }
-  col.c-lieu   { width: 82px; }
-  col.c-fac    { width: 130px; }
-  col.c-trad   { width: 80px; }
-  col.c-helper { width: 150px; }
-  col.c-angel  { width: 100px; }
-  col.c-edit   { width: 34px; }
+  /* Largeurs fixes — sans colonne Date, noms sur plusieurs lignes */
+  col.c-jour   { width: 48px; }
+  col.c-date   { width: 100px; }
+  col.c-heure  { width: 108px; }
+  col.c-type   { width: 118px; }
+  col.c-atelier{ width: 190px; }
+  col.c-piment { width: 42px; }
+  col.c-lieu   { width: 76px; }
+  col.c-fac    { width: 160px; }
+  col.c-trad   { width: 90px; }
+  col.c-helper { width: 180px; }
+  col.c-angel  { width: 110px; }
+  col.c-edit   { width: 30px; }
   thead th { background: var(--header-bg); padding: 7px 8px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .4px; color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; cursor: pointer; user-select: none; position: sticky; top: 0; z-index: 1; overflow: hidden; text-overflow: ellipsis; }
   thead th:hover { color: var(--accent); }
   thead th .sort-icon { display: inline-block; margin-left: 3px; opacity: .5; font-size: 9px; }
@@ -66,6 +66,9 @@
   tbody tr.conflict-row:hover { background: #ffe0e8 !important; }
   td { padding: 6px 8px; font-size: 12px; vertical-align: top; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   td.td-wrap { white-space: normal; }
+  /* Colonnes où les noms doivent pouvoir passer à la ligne */
+  td.td-names { white-space: normal; overflow: visible; }
+  td.td-names .pill { display: block; margin: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   /* Colonne Piment — centrée */
   td.td-piment, th.th-piment { text-align: center; }
   td.conflict-cell { background: #fef08a !important; }
@@ -74,21 +77,32 @@
   /* ── CARD VIEW ── */
   .card-list { display: none; flex-direction: column; gap: 20px; }
   /* Groupe jour */
-  .card-day-group { display: flex; flex-direction: column; gap: 0; }
-  .card-day-header { font-size: 15px; font-weight: 700; color: var(--text); padding: 10px 14px; background: var(--header-bg); border: 1px solid var(--border); border-radius: 10px 10px 0 0; border-bottom: none; }
-  .card-day-sub { font-size: 15px; font-weight: 700; color: var(--muted); margin-left: 6px; }
-  .card-day-body { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); border-radius: 0 0 10px 10px; overflow: hidden; }
-  /* Carte individuelle */
-  .card { background: var(--bg); padding: 12px 14px; border-bottom: 1px solid var(--border); }
-  .card:last-child { border-bottom: none; }
-  .card-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
-  .card-heure { font-size: 12px; color: var(--accent); white-space: nowrap; font-variant-numeric: tabular-nums; font-weight: 700; min-width: 80px; padding-top: 2px; }
-  .card-title { font-size: 14px; font-weight: 700; color: var(--text); flex: 1; }
-  .card-meta { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; padding-left: 90px; }
-  .card-rows { display: flex; flex-direction: column; gap: 5px; padding-left: 90px; }
-  .card-row { display: flex; gap: 8px; align-items: flex-start; }
-  .card-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; min-width: 80px; padding-top: 2px; }
-  .card-value { font-size: 13px; color: var(--text); flex: 1; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .card-day-group { display: flex; flex-direction: column; gap: 8px; }
+  .card-day-header { font-size: 15px; font-weight: 700; color: var(--text); padding: 10px 14px; background: var(--header-bg); border: 1px solid var(--border); border-radius: 10px; }
+  .card-day-sub { font-size: 13px; font-weight: 400; color: var(--muted); margin-left: 6px; }
+  /* Bloc de groupe visuel (par type) */
+  .vg-block { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .vg-header { display: flex; align-items: center; gap: 8px; padding: 6px 12px; background: var(--surface); border-bottom: 1px solid var(--border); }
+  .vg-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); flex: 1; }
+  .vg-angel { font-size: 11px; font-weight: 600; color: var(--badge-at); background: var(--badge-a); border-radius: 4px; padding: 2px 8px; white-space: nowrap; }
+  .vg-angel-tel { font-size: 10px; font-weight: 400; opacity: .8; }
+  /* Rangée de mini-cartes */
+  .vg-cards { display: flex; flex-direction: row; }
+  .vg-cards .mini-card:not(:last-child) { border-right: 1px solid var(--border); }
+  /* Mini-carte individuelle */
+  .mini-card { flex: 1; min-width: 0; background: var(--bg); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; }
+  .mini-card-heure { font-size: 11px; font-weight: 700; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .mini-card-prep { font-size: 10px; color: var(--muted); }
+  .mini-card-title { font-size: 12px; font-weight: 700; color: var(--text); line-height: 1.3; }
+  .mini-card-meta { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 2px; }
+  .mini-card-rows { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
+  .mini-card-row { display: flex; gap: 5px; align-items: flex-start; }
+  .mini-card-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .3px; color: var(--muted); font-weight: 600; min-width: 58px; padding-top: 2px; flex-shrink: 0; }
+  .mini-card-val { font-size: 11px; color: var(--text); flex: 1; display: flex; flex-wrap: wrap; gap: 3px; align-items: center; line-height: 1.4; }
+  /* Ligne discrète (repas, réunion, prépa) */
+  .vg-small { padding: 4px 12px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+  .vg-small-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+  .vg-small-items { font-size: 11px; color: var(--muted); }
   /* ── SHARED ── */
   .tag { display: inline-block; background: var(--tag-bg); color: var(--tag-text); border-radius: 4px; padding: 2px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
   .pill { display: inline-block; border-radius: 999px; padding: 2px 8px; font-size: 11px; font-weight: 600; margin: 1px 2px; white-space: nowrap; }
@@ -106,21 +120,23 @@
     .filters { gap: 10px; }
   }
 </style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
 </head>
 <body>
 <!-- ── MODALE MOT DE PASSE ADMIN ── -->
 <div id="editPwOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:12px;padding:36px 32px;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);font-family:-apple-system,'Segoe UI',system-ui,sans-serif;">
     <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#57606a;margin-bottom:6px;">⚙️ Admin — Édition</p>
-    <p style="font-size:17px;font-weight:700;color:#1f2328;margin-bottom:6px;">🔒 Accès restreint</p>
+    <p style="font-size:17px;font-weight:700;color:#1f2328;margin-bottom:6px;" data-i18n="pw_acces_restreint">🔒 Accès restreint</p>
     <p style="font-size:13px;color:#57606a;margin-bottom:16px;" id="editPwAtelier"></p>
     <input id="editPwInput" type="password" placeholder="Mot de passe" autocomplete="off"
       style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:15px;outline:none;margin-bottom:8px;"
       onkeydown="if(event.key==='Enter')checkEditPw()" />
     <p id="editPwError" style="font-size:12px;color:#dc2626;min-height:18px;margin-bottom:12px;"></p>
     <div style="display:flex;gap:10px;">
-      <button onclick="closeEditPw()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#f7f8fa;font-size:14px;cursor:pointer;">Annuler</button>
-      <button onclick="checkEditPw()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#3b82d4;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Ouvrir</button>
+      <button onclick="closeEditPw()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#f7f8fa;font-size:14px;cursor:pointer;" data-i18n="pw_annuler">Annuler</button>
+      <button onclick="checkEditPw()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#3b82d4;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" data-i18n="pw_ouvrir">Ouvrir</button>
     </div>
   </div>
 </div>
@@ -129,65 +145,68 @@
   <header>
     <div class="logo">
       <h1>Tantramour 2026</h1>
-      <p>Agenda par Jour</p>
+      <p data-i18n="r1_title">Planning par Jour</p>
     </div>
     <div class="header-actions">
-      <a class="mode-btn" href="index.html">🏠 Home</a>
-      <button class="mode-btn" onclick="hardReload()">🔄 Refresh</button>
-      <button class="mode-btn" id="viewBtn" onclick="toggleView()">📱 Vue Mobile</button>
-      <button class="mode-btn" onclick="exportXlsx()">📥 Export Excel</button>
-      <button class="mode-btn" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+      <a class="mode-btn" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="mode-btn" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <a class="mode-btn" href="gestion_planning.html" data-i18n="nav_admin">⚙️ Admin</a>
+      <button class="mode-btn" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="mode-btn" id="viewBtn" onclick="toggleView()">📱 <span data-i18n="nav_vue_mobile" id="viewBtnText">Vue Mobile</span></button>
+      <button class="mode-btn" onclick="exportXlsx()">📥 <span data-i18n="nav_export_excel">Export Excel</span></button>
+      <button class="mode-btn" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit" id="modeBtnText">Mode Nuit</span></button>
+      <button class="mode-btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
     </div>
   </header>
 
   <div class="filters">
     <div class="filter-group">
-      <label>Jour / Date</label>
+      <label data-i18n="filter_jour_date">Jour / Date</label>
       <select id="filterJour" onchange="render()">
-        <option value="">Tous les jours</option>
-        <option value="Jour 1">Jour 1 — Sam. 29 août</option>
-        <option value="Jour 2">Jour 2 — Dim. 30 août</option>
-        <option value="Jour 3">Jour 3 — Lun. 31 août</option>
-        <option value="Jour 4">Jour 4 — Mar. 1 sept.</option>
-        <option value="Jour 5">Jour 5 — Mer. 2 sept.</option>
-        <option value="Jour 6">Jour 6 — Jeu. 3 sept.</option>
-        <option value="Jour 7">Jour 7 — Ven. 4 sept.</option>
+        <option value="" data-i18n="filter_tous_jours">Tous les jours</option>
+        <option value="Jour 1" data-i18n="jour1_label">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2" data-i18n="jour2_label">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3" data-i18n="jour3_label">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4" data-i18n="jour4_label">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5" data-i18n="jour5_label">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6" data-i18n="jour6_label">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7" data-i18n="jour7_label">Jour 7 — Ven. 4 sept.</option>
       </select>
     </div>
     <div class="filter-group">
-      <label>Type d'atelier</label>
+      <label data-i18n="filter_type_atelier">Type d'atelier</label>
       <select id="filterType" onchange="render()">
-        <option value="">Tous les types</option>
+        <option value="" data-i18n="filter_tous_types">Tous les types</option>
       </select>
     </div>
     <div class="filter-group">
-      <label>Lieu</label>
+      <label data-i18n="col_lieu">Lieu</label>
       <select id="filterLieu" onchange="render()">
-        <option value="">Tous les lieux</option>
+        <option value="" data-i18n="filter_tous_lieux">Tous les lieux</option>
       </select>
     </div>
     <div class="filter-group">
-      <label>Facilitateur</label>
+      <label data-i18n="filter_animateur">Animateur</label>
       <select id="filterFac" onchange="render()">
-        <option value="">Tous les facilitateurs</option>
+        <option value="" data-i18n="filter_tous_fac">Tous les animateurs</option>
       </select>
     </div>
     <div class="filter-group">
-      <label>Traducteur</label>
+      <label data-i18n="filter_traducteur">Traducteur</label>
       <select id="filterTrad" onchange="render()">
-        <option value="">Tous les traducteurs</option>
+        <option value="" data-i18n="filter_tous_trad">Tous les traducteurs</option>
       </select>
     </div>
     <div class="filter-group">
-      <label>Helper</label>
+      <label data-i18n="filter_helper">Helper</label>
       <select id="filterHelper" onchange="render()">
-        <option value="">Tous les helpers</option>
+        <option value="" data-i18n="filter_tous_helpers">Tous les helpers</option>
       </select>
     </div>
     <div class="filter-group">
-      <label>Angel</label>
+      <label data-i18n="col_angel">Angel</label>
       <select id="filterAngel" onchange="render()">
-        <option value="">Tous les angels</option>
+        <option value="" data-i18n="filter_tous_angels">Tous les angels</option>
       </select>
     </div>
   </div>
@@ -200,22 +219,21 @@
         <col class="c-jour"><col class="c-date"><col class="c-heure">
         <col class="c-type"><col class="c-atelier"><col class="c-piment">
         <col class="c-lieu"><col class="c-fac"><col class="c-trad">
-        <col class="c-helper"><col class="c-angel"><col class="c-edit">
+        <col class="c-helper"><col class="c-angel">
       </colgroup>
       <thead>
         <tr>
-          <th onclick="sortBy(0)">Jour<span class="sort-icon" id="si0">⇅</span></th>
-          <th onclick="sortBy(1)">Date<span class="sort-icon" id="si1">⇅</span></th>
-          <th onclick="sortBy(2)">Heure<span class="sort-icon" id="si2">⇅</span></th>
-          <th onclick="sortBy(3)">Type<span class="sort-icon" id="si3">⇅</span></th>
-          <th onclick="sortBy(4)">Atelier<span class="sort-icon" id="si4">⇅</span></th>
-          <th class="th-piment" onclick="sortBy(10)" title="Niveau Piment">🌶️<span class="sort-icon" id="si10">⇅</span></th>
-          <th onclick="sortBy(5)">Lieu<span class="sort-icon" id="si5">⇅</span></th>
-          <th onclick="sortBy(6)">Facilitateur(s)<span class="sort-icon" id="si6">⇅</span></th>
-          <th onclick="sortBy(7)">Trad.<span class="sort-icon" id="si7">⇅</span></th>
-          <th onclick="sortBy(8)">Helper(s)<span class="sort-icon" id="si8">⇅</span></th>
-          <th onclick="sortBy(9)">Angel<span class="sort-icon" id="si9">⇅</span></th>
-          <th style="cursor:default;"></th>
+          <th onclick="sortBy(0)"><span data-i18n="col_jour">Jour</span><span class="sort-icon" id="si0">⇅</span></th>
+          <th onclick="sortBy(1)"><span data-i18n="col_date">Date</span><span class="sort-icon" id="si1">⇅</span></th>
+          <th onclick="sortBy(2)"><span data-i18n="col_heure">Heure</span><span class="sort-icon" id="si2">⇅</span></th>
+          <th onclick="sortBy(3)"><span data-i18n="col_type">Type</span><span class="sort-icon" id="si3">⇅</span></th>
+          <th onclick="sortBy(4)"><span data-i18n="col_atelier">Atelier</span><span class="sort-icon" id="si4">⇅</span></th>
+          <th class="th-piment" onclick="sortBy(10)" data-i18n-title="col_piment">🌶️<span class="sort-icon" id="si10">⇅</span></th>
+          <th onclick="sortBy(5)"><span data-i18n="col_lieu">Lieu</span><span class="sort-icon" id="si5">⇅</span></th>
+          <th onclick="sortBy(6)"><span data-i18n="col_animateur">Animateur(s)</span><span class="sort-icon" id="si6">⇅</span></th>
+          <th onclick="sortBy(7)"><span data-i18n="col_traducteur">Trad.</span><span class="sort-icon" id="si7">⇅</span></th>
+          <th onclick="sortBy(8)"><span data-i18n="col_helpers">Helper(s)</span><span class="sort-icon" id="si8">⇅</span></th>
+          <th onclick="sortBy(9)"><span data-i18n="col_angel">Angel</span><span class="sort-icon" id="si9">⇅</span></th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -223,21 +241,21 @@
   </div>
   <div class="card-list" id="cardView"></div>
 </div>
-<footer><p>Made with IBM Bob</p></footer>
 
 <script src="ref_lieux.js"></script>
 <script src="ref_resource_types.js"></script>
 <script src="ref_ressources.js"></script>
 <script src="loader.js"></script>
 <script>
-loadData(['data.js'], function() {
+loadData(['data.js', 'logistics.js'], function() {
 // RAW : chaque entrée est augmentée d'une propriété _idx = index dans AGENDA
 const RAW = AGENDA.map((e, i) => {
   const r = [
     e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,
     e.fac1, e.fac2, e.traduction,
-    e.helper1, e.helper2, e.helper3,
-    e.angel, e.note, e.logisticId || '', e.piment || 0
+    e.helper1, e.helper2, e.helper3, e.helper4 || '',
+    e.angel, e.note, e.logisticId || '', e.piment || 0,
+    e.fac3 || '', e.fac4 || ''
   ];
   r._idx = i; // index stable dans AGENDA
   return r;
@@ -269,12 +287,15 @@ function buildConflictIndex() {
       if (!parPersonne.has(nom)) parPersonne.set(nom, []);
       parPersonne.get(nom).push({ atelier: e.atelier, jour: e.jour, heure: e.heure, iv, role, field });
     };
-    add(e.fac1,       'Facilitateur', 'fac1');
-    add(e.fac2,       'Facilitateur', 'fac2');
+    add(e.fac1,       'Animateur', 'fac1');
+    add(e.fac2,       'Animateur', 'fac2');
+    add(e.fac3,       'Animateur', 'fac3');
+    add(e.fac4,       'Animateur', 'fac4');
     add(e.traduction, 'Traducteur',   'traduction');
     add(e.helper1,    'Helper',       'helper1');
     add(e.helper2,    'Helper',       'helper2');
     add(e.helper3,    'Helper',       'helper3');
+    add(e.helper4,    'Helper',       'helper4');
     add(e.angel,      'Angel',        'angel');
   });
 
@@ -310,6 +331,15 @@ function buildConflictIndex() {
 
 const CONFLICT_INDEX = buildConflictIndex();
 
+// ─── Set des animateurs anglophones ───────────────────────────────────────
+const ANGLOPHONES = new Set(
+  (typeof REF_RESSOURCES !== 'undefined' ? REF_RESSOURCES : [])
+    .filter(r => r.roles && r.roles.indexOf('anglophone') !== -1)
+    .map(r => r.value)
+);
+function isAnglophone(nom) { return nom && ANGLOPHONES.has(nom); }
+function hasAnglophoneFac(r) { return isAnglophone(r[6]) || isAnglophone(r[7]); }
+
 // Retourne le Set de champs en conflit pour une ligne RAW (ou null)
 function getConflictFields(r) {
   const k = `${r[4]}||${r[0]}`; // atelier||jour
@@ -328,10 +358,10 @@ REF_LIEUX.filter(l => lieuxPresents.has(l.value)).forEach(l => {
   const o=document.createElement('option'); o.value=l.value; o.text=l.label||l.value; selLieu.appendChild(o);
 });
 
-// Peupler le filtre Facilitateur depuis REF_FACILITATEURS (seulement ceux présents dans les données)
+// Peupler le filtre Animateur depuis REF_ANIMATEURS (seulement ceux présents dans les données)
 const facsPresents = new Set(RAW.flatMap(r=>[r[6],r[7]]).filter(Boolean));
 const selFac = document.getElementById('filterFac');
-REF_FACILITATEURS.filter(f => facsPresents.has(f.value)).forEach(f => {
+REF_ANIMATEURS.filter(f => facsPresents.has(f.value)).forEach(f => {
   const o=document.createElement('option'); o.value=f.value; o.text=f.value; selFac.appendChild(o);
 });
 
@@ -343,14 +373,14 @@ REF_TRADUCTEURS.filter(t => tradsPresents.has(t.value)).forEach(t => {
 });
 
 // Peupler le filtre Helper depuis REF_HELPERS (seulement ceux présents dans les données)
-const helpersPresents = new Set(RAW.flatMap(r=>[r[9],r[10],r[11]]).filter(Boolean));
+const helpersPresents = new Set(RAW.flatMap(r=>[r[9],r[10],r[11],r[12]]).filter(Boolean));
 const selHelper = document.getElementById('filterHelper');
 REF_HELPERS.filter(h => helpersPresents.has(h.value)).forEach(h => {
   const o=document.createElement('option'); o.value=h.value; o.text=h.value; selHelper.appendChild(o);
 });
 
 // Peupler le filtre Angel depuis REF_ANGELS (seulement ceux présents dans les données)
-const angelsPresents = new Set(RAW.map(r=>r[12]).filter(Boolean));
+const angelsPresents = new Set(RAW.map(r=>r[13]).filter(Boolean));
 const selAngel = document.getElementById('filterAngel');
 REF_ANGELS.filter(a => angelsPresents.has(a.value)).forEach(a => {
   const o=document.createElement('option'); o.value=a.value; o.text=a.value; selAngel.appendChild(o);
@@ -372,19 +402,20 @@ function getFiltered() {
     (!l  || r[5]===l) &&
     (!f  || r[6]===f || r[7]===f) &&
     (!tr || r[8]===tr) &&
-    (!h  || r[9]===h || r[10]===h || r[11]===h) &&
-    (!a  || r[12]===a)
+    (!h  || r[9]===h || r[10]===h || r[11]===h || r[12]===h) &&
+    (!a  || r[13]===a)
   );
 }
 
 function sortBy(col) {
   if(sortCol===col) sortAsc=!sortAsc; else { sortCol=col; sortAsc=true; }
-  for(let i=0;i<10;i++){
-    const si=document.getElementById('si'+i);
-    si.textContent='⇅'; si.parentElement.classList.remove('sorted');
-  }
+  // Réinitialiser toutes les icônes de tri présentes dans le thead
+  document.querySelectorAll('.sort-icon').forEach(el => {
+    el.textContent = '⇅';
+    el.parentElement.classList.remove('sorted');
+  });
   const si=document.getElementById('si'+col);
-  si.textContent=sortAsc?'↑':'↓'; si.parentElement.classList.add('sorted');
+  if(si){ si.textContent=sortAsc?'↑':'↓'; si.parentElement.classList.add('sorted'); }
   render();
 }
 
@@ -431,7 +462,7 @@ function render() {
       return dj !== 0 ? dj : heureEnMinutes(a[2]) - heureEnMinutes(b[2]);
     });
   }
-  document.getElementById('stats').innerHTML = `<span>${data.length}</span> atelier(s) affiché(s)`;
+  document.getElementById('stats').innerHTML = `<span>${data.length}</span> ${I18n.t('stats_ateliers')}`;
   if (isMobileView) {
     renderCards(data);
   } else {
@@ -441,25 +472,28 @@ function render() {
 
 // Champs RAW → colonne tableau (index colonne → champ(s) de l'entrée AGENDA)
 const COL_FIELDS = {
-  6: ['fac1','fac2'],
+  6: ['fac1','fac2','fac3','fac4'],
   7: ['traduction'],
-  8: ['helper1','helper2','helper3'],
+  8: ['helper1','helper2','helper3','helper4'],
   9: ['angel'],
 };
 
 function renderTable(data) {
   const tb = document.getElementById('tbody');
-  if(!data.length) { tb.innerHTML=`<tr><td colspan="12" class="empty">Aucun résultat</td></tr>`; return; }
+  if(!data.length) { tb.innerHTML=`<tr><td colspan="11" class="empty">Aucun résultat</td></tr>`; return; }
   tb.innerHTML = data.map(r => {
     const cf = getConflictFields(r);
     const rowCls = cf ? ' class="conflict-row"' : '';
 
-    const cc = (colIdx) => {
-      if (!cf) return '';
+    // Classe conflit sur une cellule td-names
+    const ccNames = (colIdx) => {
+      if (!cf) return ' class="td-names"';
       const fields = COL_FIELDS[colIdx] || [];
-      return fields.some(f => cf.has(f)) ? ' class="conflict-cell"' : '';
+      return fields.some(f => cf.has(f)) ? ' class="td-names conflict-cell"' : ' class="td-names"';
     };
-    const pillsConflict = (vals, fields, cls) => vals.map((v, i) => {
+
+    // Pills avec wrapping vertical, conflit éventuel
+    const pillsNames = (vals, fields, cls) => vals.map((v, i) => {
       if (!v) return '';
       const inConflict = cf && cf.has(fields[i]);
       return inConflict
@@ -467,23 +501,34 @@ function renderTable(data) {
         : `<span class="pill ${cls}">${v}</span>`;
     }).join('');
 
-    const piment = parseInt(r[15]) || 0;
+    const piment = parseInt(r[16]) || 0;
     const pimentHtml = piment > 0 ? '🌶️'.repeat(piment) : '';
 
     const realIdx = r._idx !== undefined ? r._idx : 0;
+    const enBadge = hasAnglophoneFac(r) ? '<span title="Atelier anglophone" style="font-size:11px;margin-left:5px">🇬🇧</span>' : '';
+
+    // Traducteur avec conflit éventuel
+    const tradHtml = r[8]
+      ? `<span class="pill pill-t"${cf&&cf.has('traduction')?' style="background:#fef08a;color:#b91c1c;font-weight:700;border:1px solid #f59e0b"':''}>${r[8]}</span>`
+      : '';
+
+    // Angel avec conflit éventuel
+    const angelHtml = r[13]
+      ? `<span class="pill pill-a"${cf&&cf.has('angel')?' style="background:#fef08a;color:#b91c1c;font-weight:700;border:1px solid #f59e0b"':''}>${r[13]}</span>`
+      : '';
+
     return `<tr${rowCls}>
       <td>${r[0]||''}</td>
       <td>${r[1]||''}</td>
       <td class="heure">${r[2]||''}</td>
       <td><span class="tag" style="font-size:10px">${r[3]||''}</span></td>
-      <td class="td-wrap">${r[4]||''}${r[13]?'<span style="color:#e53e3e;font-weight:700;margin-left:3px">*</span>':''}</td>
+      <td class="td-wrap">${r[4]||''}${enBadge}${r[14]?'<span style="color:#e53e3e;font-weight:700;margin-left:3px">*</span>':''}</td>
       <td class="td-piment">${pimentHtml}</td>
       <td>${r[5]||''}</td>
-      <td${cc(6)}>${pillsConflict([r[6],r[7]],['fac1','fac2'],'pill-f')}</td>
-      <td${cc(7)}>${r[8]?`<span class="pill pill-t"${cf&&cf.has('traduction')?' style="background:#fef08a;color:#b91c1c;font-weight:700;border:1px solid #f59e0b"':''}>${r[8]}</span>`:''}</td>
-      <td${cc(8)}>${pillsConflict([r[9],r[10],r[11]],['helper1','helper2','helper3'],'pill-h')}</td>
-      <td${cc(9)}>${r[12]?`<span class="pill pill-a"${cf&&cf.has('angel')?' style="background:#fef08a;color:#b91c1c;font-weight:700;border:1px solid #f59e0b"':''}>${r[12]}</span>`:''}</td>
-      <td class="td-edit"><button class="btn-edit" title="Éditer dans Admin" onclick="openEditPw(${JSON.stringify(r[0])},${JSON.stringify(r[4])},${realIdx})">✏️</button></td>
+      <td${ccNames(6)}>${pillsNames([r[6],r[7],r[17],r[18]],['fac1','fac2','fac3','fac4'],'pill-f')}</td>
+      <td class="td-names">${tradHtml}</td>
+      <td${ccNames(8)}>${pillsNames([r[9],r[10],r[11],r[12]],['helper1','helper2','helper3','helper4'],'pill-h')}</td>
+      <td class="td-names">${angelHtml}</td>
     </tr>`;
   }).join('');
 }
@@ -495,50 +540,169 @@ function parseHeure(h) {
   return m ? parseInt(m[1])*60 + parseInt(m[2]) : 9999;
 }
 
+// Convertit une heure texte "H:MM" en minutes depuis minuit pour les calculs
+function heureMinutes(h) {
+  if (!h) return null;
+  const m = String(h).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1])*60 + parseInt(m[2]) : null;
+}
+// Formate un nombre de minutes en "H:MM"
+function minutesToHeure(mins) {
+  if (mins == null || mins < 0) return '';
+  const h = Math.floor(mins / 60) % 24;
+  const m = mins % 60;
+  return h + ':' + (m < 10 ? '0' : '') + m;
+}
+
+// ── Lookup téléphone d'un angel depuis REF_RESSOURCES ──────────────────────
+function angelTel(nom) {
+  if (!nom || typeof REF_RESSOURCES === 'undefined') return '';
+  const r = REF_RESSOURCES.find(x => x.value === nom);
+  return (r && r.tel) ? r.tel : '';
+}
+
+// ── Construit une mini-carte atelier ───────────────────────────────────────
+function buildMiniCard(r) {
+  const enBadge = hasAnglophoneFac(r) ? ' <span title="Anglophone" style="font-size:11px">🇬🇧</span>' : '';
+  const lieu    = r[5] ? `<span class="tag" style="font-size:10px">${r[5]}</span>` : '';
+  const facs    = pills([r[6],r[7]],'pill-f');
+  const trad    = r[8]  ? `<span class="pill pill-t">${r[8]}</span>` : '';
+  const helpers = pills([r[9],r[10],r[11],r[12]],'pill-h');
+
+  // Heure + prep
+  const logId  = r[15];
+  const logE   = logId && typeof LOGISTICS !== 'undefined' ? LOGISTICS[logId] : null;
+  const prepMin = logE && logE.prepDuration != null ? logE.prepDuration : null;
+  const debut   = heureMinutes(r[2]);
+  const arrivee = (debut !== null && prepMin !== null) ? minutesToHeure(debut - prepMin) : '';
+  const heureHtml = r[2] ? `<div class="mini-card-heure">${r[2]}${prepMin !== null ? `<span class="mini-card-prep"> ⏱${prepMin}mn${arrivee?' ↑'+arrivee:''}</span>` : ''}</div>` : '';
+
+  const rows = [];
+  if (facs)    rows.push(`<div class="mini-card-row"><span class="mini-card-lbl">Fac.</span><span class="mini-card-val">${facs}</span></div>`);
+  if (trad)    rows.push(`<div class="mini-card-row"><span class="mini-card-lbl">Trad.</span><span class="mini-card-val">${trad}</span></div>`);
+  if (helpers) rows.push(`<div class="mini-card-row"><span class="mini-card-lbl">Helpers</span><span class="mini-card-val">${helpers}</span></div>`);
+  if (r[14])   rows.push(`<div class="mini-card-row"><span class="mini-card-lbl">Note</span><span class="mini-card-val" style="color:#e53e3e;font-size:10px">${r[14]}</span></div>`);
+
+  return `<div class="mini-card">
+    ${heureHtml}
+    <div class="mini-card-title">${r[4]||'—'}${enBadge}</div>
+    <div class="mini-card-meta">${lieu}</div>
+    ${rows.length ? `<div class="mini-card-rows">${rows.join('')}</div>` : ''}
+  </div>`;
+}
+
+// ── Construit un bloc visuel (header + rangée de mini-cartes) ──────────────
+function buildVgBlock(title, items, angelRow) {
+  const angelHtml = angelRow
+    ? `<span class="vg-angel">👼 ${angelRow.nom}${angelRow.tel ? `<span class="vg-angel-tel"> · ${angelRow.tel}</span>` : ''}</span>`
+    : '';
+  return `<div class="vg-block">
+    <div class="vg-header"><span class="vg-title">${title}</span>${angelHtml}</div>
+    <div class="vg-cards">${items.map(buildMiniCard).join('')}</div>
+  </div>`;
+}
+
+// ── Construit une ligne discrète (repas, réunion d'équipe, prépa) ──────────
+function buildSmallLine(emoji, label, items) {
+  const txt = items.map(r => r[4]).filter(Boolean).join(' · ');
+  return `<div class="vg-small"><span class="vg-small-lbl">${emoji} ${label}</span><span class="vg-small-items">${txt||'—'}</span></div>`;
+}
+
 function renderCards(data) {
   const cv = document.getElementById('cardView');
   if (!data.length) { cv.innerHTML=`<div class="empty">Aucun résultat</div>`; return; }
 
-  // Grouper par jour dans l'ordre chronologique
   const DAY_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+  // Grouper par jour
   const dayMap = new Map();
   data.forEach(r => {
-    const k = r[0];
-    if (!dayMap.has(k)) dayMap.set(k, { jour: r[0], date: r[1], items: [] });
-    dayMap.get(k).items.push(r);
+    if (!dayMap.has(r[0])) dayMap.set(r[0], { jour: r[0], date: r[1], items: [] });
+    dayMap.get(r[0]).items.push(r);
   });
-
-  // Trier les ateliers de chaque jour du plus tôt au plus tard
   dayMap.forEach(g => g.items.sort((a,b) => parseHeure(a[2]) - parseHeure(b[2])));
-
   const groups = DAY_ORDER.filter(j => dayMap.has(j)).map(j => dayMap.get(j));
 
+  // ── Ordre des groupes visuels ────────────────────────────────────────────
+  // Chaque entrée : { key, types[], label, mode }
+  //   mode = 'cards'  → mini-cartes côte à côte (avec angel)
+  //   mode = 'small'  → ligne discrète
+  //   mode = 'group'  → regroupe plusieurs types en petite ligne (prepa+rassemblement)
+  const VG_ORDER = [
+    { key:'yoga',        types:['MEDITATION / YOGA'],                                    label:'🧘 Méditation / Yoga',          mode:'cards'  },
+    { key:'ptdej',       types:['REPAS & PAUSE'],         heureMax: 11*60,               label:'Petit déjeuner',                mode:'small'  },
+    { key:'reunion_am',  types:["REUNION D'EQUIPE"],      heureMax: 11*60,               label:'Réunion d\'équipe',             mode:'small'  },
+    { key:'prepa_rass',  types:['PREPA & LOGISTICS','RASSEMBLEMENT'], heureMax: 12*60,   label:'🎯 Préparation & Rassemblement', mode:'cards'  },
+    { key:'tantra_am',   types:['ATELIERS TANTRA (Matin)','TANTRA CAFE & CONFERENCE'],   label:'🌀 Ateliers Tantra – Matin',    mode:'cards', withAngel:'AM' },
+    { key:'art_am',      types:['ATELIER ARTISTIQUE (Matin)','TANTRA CAFE & CONFERENCE'],label:'🎨 Ateliers Artistiques – Matin',mode:'cards', withAngel:'AM' },
+    { key:'dejeuner',    types:['REPAS & PAUSE'],         heureMin: 11*60, heureMax:15*60,label:'Déjeuner',                     mode:'small'  },
+    { key:'support',     types:['SUPPORT EMOTIONNEL'],                                   label:'💙 Support Émotionnel',         mode:'cards'  },
+    { key:'pool_cafe_am',types:['DJ Set','POOL PARTY','TANTRA CAFE & CONFERENCE'], heureMin:12*60, heureMax:16*60, label:'Pool Party / Tantra Café', mode:'cards' },
+    { key:'tantra_pm',   types:['ATELIERS TANTRA (Apres-Midi)','TANTRA CAFE & CONFERENCE'], heureMin:14*60, label:'🌀 Ateliers Tantra – Après-midi', mode:'cards', withAngel:'PM' },
+    { key:'art_pm',      types:['ATELIER ARTISTIQUE (Apres-Midi)','TANTRA CAFE & CONFERENCE'], heureMin:14*60, label:'🎨 Ateliers Artistiques – Après-midi', mode:'cards', withAngel:'PM' },
+    { key:'gouter_dinner',types:['REPAS & PAUSE'],        heureMin: 15*60,               label:'Dîner / Goûter',               mode:'small'  },
+    { key:'prepa_soir',  types:['PREPA & LOGISTICS'],     heureMin: 18*60,               label:'Prépa & Logistique – Soir',    mode:'small'  },
+    { key:'reunion_pm',  types:["REUNION D'EQUIPE"],      heureMin: 11*60,               label:'Réunion d\'équipe',            mode:'small'  },
+    { key:'soir',        types:['CEREMONIE & CONCERT','LOVE TEMPLE','DJ Set','POOL PARTY'], heureMin:18*60, label:'🌙 Soirée', mode:'cards'  },
+  ];
+
   cv.innerHTML = groups.map(g => {
-    const cards = g.items.map(r => {
-      const facs = pills([r[6],r[7]],'pill-f');
-      const helpers = pills([r[9],r[10],r[11]],'pill-h');
-      const angel = r[12] ? `<span class="pill pill-a">${r[12]}</span>` : '';
-      const trad = r[8] ? `<span class="pill pill-t">${r[8]}</span>` : '';
-      const lieu = r[5] ? `<span class="tag">${r[5]}</span>` : '';
-      return `<div class="card">
-        <div class="card-header">
-          <div class="card-heure">${r[2]||''}</div>
-          <div class="card-title">${r[4]||'—'}</div>
-        </div>
-        <div class="card-meta">
-          <span class="tag">${r[3]||''}</span>${lieu ? ' '+lieu : ''}
-        </div>
-        <div class="card-rows">
-          ${facs ? `<div class="card-row"><span class="card-label">Facilitateur</span><span class="card-value">${facs}</span></div>` : ''}
-          ${trad ? `<div class="card-row"><span class="card-label">Traducteur</span><span class="card-value">${trad}</span></div>` : ''}
-          ${helpers||r[13] ? `<div class="card-row"><span class="card-label">Helper(s)</span><span class="card-value">${helpers}${r[13]?`<span style="color:#e53e3e;font-weight:600;font-size:11px;margin-left:6px;border:1px solid #e53e3e;border-radius:4px;padding:1px 6px">${r[13]}</span>`:''}</span></div>` : ''}
-          ${angel ? `<div class="card-row"><span class="card-label">Angel</span><span class="card-value">${angel}</span></div>` : ''}
-        </div>
-      </div>`;
-    }).join('');
+    const items = g.items;
+
+    // Index les SHIFT ANGEL par shift (AM / PM / Soir)
+    const angelByShift = {};
+    items.filter(r => r[3] === 'SHIFT ANGEL').forEach(r => {
+      const atName = (r[4]||'').toLowerCase();
+      const shift  = atName.includes('matin') || atName.includes('am')  ? 'AM'
+                   : atName.includes('pm')    || atName.includes('midi') || atName.includes('apr') ? 'PM'
+                   : 'Soir';
+      if (!angelByShift[shift] && r[13]) {
+        angelByShift[shift] = { nom: r[13], tel: angelTel(r[13]) };
+      }
+    });
+
+    // Tracker pour ne pas afficher deux fois le même atelier
+    const used = new Set();
+    const markUsed = arr => arr.forEach(r => used.add(r));
+
+    // Filtre selon types + fenêtre horaire + non-déjà-utilisé
+    const pick = (types, opts) => {
+      opts = opts || {};
+      return items.filter(r => {
+        if (used.has(r)) return false;
+        if (!types.includes(r[3])) return false;
+        const hm = heureMinutes(r[2]) ?? 9999;
+        if (opts.heureMin !== undefined && hm < opts.heureMin) return false;
+        if (opts.heureMax !== undefined && hm >= opts.heureMax) return false;
+        return true;
+      });
+    };
+
+    const blocks = [];
+
+    VG_ORDER.forEach(vg => {
+      const rows = pick(vg.types, vg);
+      if (!rows.length) return;
+      markUsed(rows);
+
+      if (vg.mode === 'small') {
+        blocks.push(buildSmallLine('', vg.label, rows));
+      } else {
+        const angel = vg.withAngel ? (angelByShift[vg.withAngel] || null) : null;
+        blocks.push(buildVgBlock(vg.label, rows, angel));
+      }
+    });
+
+    // Résidus non capturés → un bloc générique
+    const leftover = items.filter(r => !used.has(r) && r[3] !== 'SHIFT ANGEL');
+    if (leftover.length) {
+      blocks.push(buildVgBlock('Autres', leftover, null));
+    }
+
+    const nb = items.filter(r => r[3] !== 'SHIFT ANGEL').length;
     return `<div class="card-day-group">
-      <div class="card-day-header">${g.jour}<span class="card-day-sub">${g.date}</span><span class="card-day-sub">(${g.items.length} atelier${g.items.length>1?'s':''})</span></div>
-      <div class="card-day-body">${cards}</div>
+      <div class="card-day-header">${g.jour}<span class="card-day-sub"> — ${g.date}</span><span class="card-day-sub"> (${nb} atelier${nb>1?'s':''})</span></div>
+      ${blocks.join('')}
     </div>`;
   }).join('');
 }
@@ -548,7 +712,7 @@ const ADMIN_PW = '007';
 let _editTarget = '';
 
 function openEditPw(jour, atelierName, agendaIdx) {
-  _editTarget = `Admin.html?jour=${encodeURIComponent(jour)}&idx=${agendaIdx}`;
+  _editTarget = `Rapport_Editer_Atelier.html?idx=${agendaIdx}`;
   document.getElementById('editPwAtelier').textContent = `${jour} — ${atelierName}`;
   document.getElementById('editPwInput').value = '';
   document.getElementById('editPwError').textContent = '';
@@ -566,7 +730,7 @@ function checkEditPw() {
     closeEditPw();
     window.open(_editTarget, '_blank', 'noopener');
   } else {
-    document.getElementById('editPwError').textContent = 'Mot de passe incorrect.';
+    document.getElementById('editPwError').textContent = I18n.t('pw_incorrect');
     document.getElementById('editPwInput').select();
   }
 }
@@ -579,7 +743,9 @@ function setView(mobile) {
   isMobileView = mobile;
   document.getElementById('tableView').style.display = mobile ? 'none' : '';
   document.getElementById('cardView').style.display = mobile ? 'flex' : 'none';
-  document.getElementById('viewBtn').textContent = mobile ? '🖥 Vue Tableau' : '📱 Vue Mobile';
+  var vt = document.getElementById('viewBtnText');
+  if (vt) vt.setAttribute('data-i18n', mobile ? 'nav_vue_bureau' : 'nav_vue_mobile');
+  I18n.apply();
   render();
 }
 
@@ -597,7 +763,11 @@ function hardReload() {
 
 function toggleMode() {
   const isDark = document.body.classList.toggle('dark');
-  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+  const mt = document.getElementById('modeBtnText');
+  if (mt) {
+    mt.setAttribute('data-i18n', isDark ? 'nav_mode_jour' : 'nav_mode_nuit');
+    mt.textContent = I18n.t(isDark ? 'nav_mode_jour' : 'nav_mode_nuit');
+  }
 }
 
 // Auto-detect mobile on load
@@ -623,8 +793,8 @@ function exportXlsx() {
 
   // ── Colonnes ────────────────────────────────────────────────────────────
   const HEADERS = ['Jour','Date','Heure','Type','Atelier','Piment','Lieu',
-                   'Facilitateur 1','Facilitateur 2','Traducteur',
-                   'Helper 1','Helper 2','Helper 3','Angel','Note'];
+                   'Animateur 1','Animateur 2','Animateur 3','Animateur 4','Traducteur',
+                   'Helper 1','Helper 2','Helper 3','Helper 4','Angel','Note'];
 
   // ── Helpers XML ─────────────────────────────────────────────────────────
   function esc(v) {
@@ -659,8 +829,8 @@ function exportXlsx() {
   // Données (à partir de la ligne 2)
   data.forEach((r, ri) => {
     const rowNum = ri + 2;
-    // r = [jour, date, heure, type, atelier, lieu, fac1, fac2, trad, h1, h2, h3, angel, note, logisticId, piment]
-    const vals = [r[0],r[1],r[2],r[3],r[4], r[15]||0, r[5],r[6],r[7],r[8],r[9],r[10],r[11],r[12],r[13]];
+    // r = [jour, date, heure, type, atelier, lieu, fac1, fac2, trad, h1, h2, h3, h4, angel, note, logisticId, piment, fac3, fac4]
+    const vals = [r[0],r[1],r[2],r[3],r[4], r[16]||0, r[5],r[6],r[7],r[17]||'',r[18]||'',r[8],r[9],r[10],r[11],r[12],r[13],r[14]];
     rowsXml += `<row r="${rowNum}">`;
     vals.forEach((v, ci) => { rowsXml += cellS(ci, rowNum, v == null ? '' : v); });
     rowsXml += `</row>`;
@@ -669,7 +839,7 @@ function exportXlsx() {
   // ── Calcul des largeurs de colonnes ─────────────────────────────────────
   const colWidths = HEADERS.map((h, ci) => {
     const maxLen = data.reduce((m, r) => {
-      const vals = [r[0],r[1],r[2],r[3],r[4], r[15]||0, r[5],r[6],r[7],r[8],r[9],r[10],r[11],r[12],r[13]];
+      const vals = [r[0],r[1],r[2],r[3],r[4], r[16]||0, r[5],r[6],r[7],r[8],r[9],r[10],r[11],r[12],r[13],r[14]];
       return Math.max(m, String(vals[ci] == null ? '' : vals[ci]).length);
     }, h.length);
     return Math.min(Math.max(maxLen + 2, 10), 60);
