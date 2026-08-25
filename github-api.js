@@ -13,7 +13,7 @@
  */
 
 const GITHUB_OWNER  = 'matchape01';
-const GITHUB_REPO   = 'test';
+const GITHUB_REPO   = 'Tantramour';
 const GITHUB_BRANCH = 'main';   // branche cible (main ou master)
 
 // ── Bandeau de configuration ─────────────────────────────────────────────────
