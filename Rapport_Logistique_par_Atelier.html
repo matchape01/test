@@ -44,6 +44,14 @@
   .recap-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
   .atelier-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
   .atelier-meta { font-size: 13px; color: var(--muted); margin-bottom: 16px; flex-wrap: wrap; }
+  .prep-banner { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; margin: 10px 0 16px; padding: 12px 18px; background: #fffbeb; border: 2px solid #f59e0b; border-radius: 8px; }
+  .dark .prep-banner { background: #2a1f00; border-color: #d97706; }
+  .prep-banner .prep-time { font-size: 18px; font-weight: 800; color: #b45309; }
+  .dark .prep-banner .prep-time { color: #fbbf24; }
+  .prep-banner .prep-arrive { font-size: 15px; font-weight: 600; color: #1f2328; }
+  .dark .prep-banner .prep-arrive { color: #e6edf3; }
+  .prep-banner .prep-arrive span { font-size: 22px; font-weight: 800; color: #b45309; margin-left: 6px; }
+  .dark .prep-banner .prep-arrive span { color: #fbbf24; }
   .recap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 16px; margin-top: 12px; }
   .recap-item { display: flex; flex-direction: column; gap: 4px; }
   .recap-item .ri-label { font-size: 11px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; }
@@ -60,10 +68,18 @@
   .logistics-box { width: 100%; background: var(--logistics-bg); border: 2px solid var(--logistics-border); border-radius: 8px; padding: 16px 20px; font-size: 14px; line-height: 1.7; color: var(--text); white-space: pre-wrap; word-break: break-word; }
   .logistics-box.empty-log { color: var(--muted); font-style: italic; }
   .logistic-box { width: 100%; min-height: 240px; }
+  .logistics-special-label { font-size: 11px; text-transform: uppercase; letter-spacing: .6px; color: #7c5cd8; font-weight: 600; margin-bottom: 10px; margin-top: 20px; }
+  .logistics-special-box { width: 100%; background: #f5f3ff; border: 2px solid #c4b5fd; border-radius: 8px; padding: 16px 20px; font-size: 14px; line-height: 1.7; color: var(--text); white-space: pre-wrap; word-break: break-word; }
+  .dark .logistics-special-box { background: #1e1a2e; border-color: #6d28d9; }
+  .logistics-special-box.empty-log { color: var(--muted); font-style: italic; }
   .placeholder { text-align: center; padding: 64px 20px; color: var(--muted); border: 2px dashed var(--border); border-radius: 10px; }
   .placeholder p { font-size: 15px; margin-bottom: 6px; }
   .placeholder small { font-size: 12px; }
   footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+</style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+<style>
   /* ── RESPONSIVE MOBILE ── */
   @media (max-width: 767px) {
     .wrap { padding: 16px 12px; }
@@ -82,60 +98,69 @@
   <header>
     <div class="logo">
       <h1>Tantramour 2026</h1>
-      <p>Logistique par Atelier</p>
+      <p data-i18n="r4_title">Logistique par Atelier</p>
     </div>
     <div class="header-actions">
-      <a class="mode-btn" href="index.html">🏠 Home</a>
-      <button class="mode-btn" onclick="hardReload()">🔄 Refresh</button>
-      <button class="mode-btn" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+      <a class="mode-btn" href="index_bis.html">🏠 <span data-i18n="nav_home">Home</span></a>
+      <button class="mode-btn" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="mode-btn" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit" id="modeBtnText">Mode Nuit</span></button>
+      <button class="mode-btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
     </div>
   </header>
   <div class="steps">
     <div class="step-group">
-      <label>1. Choisir le jour</label>
+      <label data-i18n="r4_choisir_jour">1. Choisir le jour</label>
       <select id="selDate" onchange="onDateChange()">
-        <option value="">-- Sélectionner un jour --</option>
-        <option value="Jour 1">Jour 1 — Samedi 29 août</option>
-        <option value="Jour 2">Jour 2 — Dimanche 30 août</option>
-        <option value="Jour 3">Jour 3 — Lundi 31 août</option>
-        <option value="Jour 4">Jour 4 — Mardi 1 septembre</option>
-        <option value="Jour 5">Jour 5 — Mercredi 2 septembre</option>
-        <option value="Jour 6">Jour 6 — Jeudi 3 septembre</option>
-        <option value="Jour 7">Jour 7 — Vendredi 4 septembre</option>
+        <option value="" data-i18n="r4_select_jour">-- Sélectionner un jour --</option>
+        <option value="Jour 1" data-i18n="jour1_label">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2" data-i18n="jour2_label">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3" data-i18n="jour3_label">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4" data-i18n="jour4_label">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5" data-i18n="jour5_label">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6" data-i18n="jour6_label">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7" data-i18n="jour7_label">Jour 7 — Ven. 4 sept.</option>
       </select>
     </div>
     <div class="step-group">
-      <label>2. Choisir l'atelier</label>
+      <label data-i18n="filter_animateur">Animateur</label>
+      <select id="selFac" onchange="onFacChange()" disabled>
+        <option value="">— Tous les animateurs —</option>
+      </select>
+    </div>
+    <div class="step-group">
+      <label data-i18n="r4_choisir_atelier">2. Choisir l'atelier</label>
       <select id="selAtelier" onchange="onAtelierChange()" disabled>
-        <option value="">-- Choisir d'abord un jour --</option>
+        <option value="" data-i18n="r4_choisir_dabord">-- Choisir d'abord un jour --</option>
       </select>
     </div>
   </div>
   <div id="placeholder" class="placeholder">
-    <p>Sélectionnez un jour et un atelier</p>
-    <small>La fiche logistique complète s'affichera ici</small>
+    <p data-i18n="r4_placeholder_p">Sélectionnez un jour et un atelier</p>
+    <small data-i18n="r4_placeholder_s">La fiche logistique complète s'affichera ici</small>
   </div>
   <div id="recapSection" class="recap-section">
     <div class="recap-card">
       <div class="atelier-name" id="rAtelier"></div>
       <div class="atelier-meta" id="rMeta"></div>
+      <div class="prep-banner" id="rPrepBanner" style="display:none"></div>
       <div class="recap-grid">
-        <div class="recap-item"><div class="ri-label">Facilitateur(s)</div><div class="ri-value" id="rFac"></div></div>
-        <div class="recap-item"><div class="ri-label">Helper(s)</div><div class="ri-value" id="rHelpers"></div></div>
-        <div class="recap-item"><div class="ri-label">Angel</div><div class="ri-value" id="rAngel"></div></div>
-        <div class="recap-item"><div class="ri-label">Traducteur</div><div class="ri-value" id="rTraduction"></div></div>
+        <div class="recap-item"><div class="ri-label" data-i18n="col_animateur">Animateur(s)</div><div class="ri-value" id="rFac"></div></div>
+        <div class="recap-item"><div class="ri-label" data-i18n="col_helpers">Helper(s)</div><div class="ri-value" id="rHelpers"></div></div>
+        <div class="recap-item"><div class="ri-label" data-i18n="col_angel">Angel</div><div class="ri-value" id="rAngel"></div></div>
+        <div class="recap-item"><div class="ri-label" data-i18n="col_traducteur_long">Traducteur</div><div class="ri-value" id="rTraduction"></div></div>
       </div>
     </div>
     <hr class="divider">
-    <div class="logistics-label">Informations Logistiques</div>
+    <div class="logistics-label" data-i18n="r4_info_logistique">Informations Logistiques</div>
     <div class="logistics-box logistic-box" id="rLogistics"></div>
+    <div class="logistics-special-label" id="rSpecialLabel" style="display:none">⭐ Informations Logistiques Spéciales</div>
+    <div class="logistics-special-box logistic-box" id="rLogisticsSpecial" style="display:none"></div>
   </div>
 </div>
-<footer><p>Made with IBM Bob</p></footer>
 <script src="ref_notes.js"></script>
 <script src="loader.js"></script>
 <script>
-loadData(['logistics.js','data.js'], function() {
+loadData(['logistics.js','logistics.special.js','data.js'], function() {
 const DATA = agendaToRaw(AGENDA);
 const ROWS = DATA.map(r => { while(r.length<15) r.push(""); return r; });
 
@@ -148,18 +173,56 @@ function heureEnMinutes(h) {
 
 function onDateChange() {
   const jour = document.getElementById('selDate').value;
+  const sf = document.getElementById('selFac');
+  const sa = document.getElementById('selAtelier');
+
+  // Réinitialiser animateur et atelier
+  sf.innerHTML = '<option value="">— Tous les animateurs —</option>';
+  sa.innerHTML = '<option value="">-- Sélectionner un atelier --</option>';
+  sa.disabled = true;
+
+  if (!jour) { sf.disabled = true; hideRecap(); return; }
+
+  // Peupler le filtre animateur (triés alphabétiquement)
+  const facsSet = new Set();
+  ROWS.filter(r => r[0] === jour && (r[6] || r[7] || r[17] || r[18])).forEach(r => {
+    if (r[6]) facsSet.add(r[6]);
+    if (r[7]) facsSet.add(r[7]);
+    if (r[17]) facsSet.add(r[17]);
+    if (r[18]) facsSet.add(r[18]);
+  });
+  Array.from(facsSet).sort((a, b) => a.localeCompare(b, 'fr')).forEach(f => {
+    const o = document.createElement('option'); o.value = f; o.text = f; sf.appendChild(o);
+  });
+  sf.disabled = false;
+
+  // Peupler les ateliers (sans filtre fac pour l'instant)
+  populateAteliers(jour, '');
+  hideRecap();
+}
+
+function onFacChange() {
+  const jour = document.getElementById('selDate').value;
+  const fac  = document.getElementById('selFac').value;
+  populateAteliers(jour, fac);
+  hideRecap();
+}
+
+function populateAteliers(jour, fac) {
   const sa = document.getElementById('selAtelier');
   sa.innerHTML = '<option value="">-- Sélectionner un atelier --</option>';
-  if (!jour) { sa.disabled=true; hideRecap(); return; }
-  const ateliers = ROWS.filter(r=>r[0]===jour)
-    .map(r=>({key: r[2]+'|||'+r[4], label: r[2]?`[${r[2]}] ${r[4]}`:r[4], mins: heureEnMinutes(r[2])}))
-    .filter((v,i,a)=>a.findIndex(x=>x.key===v.key)===i)
-    .sort((a,b) => a.mins - b.mins);
-  ateliers.forEach(a=>{
-    const o=document.createElement('option'); o.value=a.key; o.text=a.label; sa.appendChild(o);
+  if (!jour) { sa.disabled = true; return; }
+
+  const ateliers = ROWS
+    .filter(r => r[0] === jour && (!fac || r[6] === fac || r[7] === fac || r[17] === fac || r[18] === fac))
+    .map(r => ({ key: r[2] + '|||' + r[4], label: r[2] ? `[${r[2]}] ${r[4]}` : r[4], mins: heureEnMinutes(r[2]) }))
+    .filter((v, i, a) => a.findIndex(x => x.key === v.key) === i)
+    .sort((a, b) => a.mins - b.mins);
+
+  ateliers.forEach(a => {
+    const o = document.createElement('option'); o.value = a.key; o.text = a.label; sa.appendChild(o);
   });
-  sa.disabled=false;
-  hideRecap();
+  sa.disabled = false;
 }
 
 function onAtelierChange() {
@@ -180,31 +243,67 @@ function hideRecap() {
 function pill(text, cls) { return text ? `<span class="pill ${cls}">${text}</span>` : ''; }
 function pillList(vals, cls) { return vals.filter(Boolean).map(v=>pill(v,cls)).join(''); }
 
+function minutesToHeure(mins) {
+  if (mins >= 9999) return null;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}`;
+}
+
 function showRecap(r) {
   document.getElementById('placeholder').style.display='none';
   document.getElementById('recapSection').classList.add('visible');
   document.getElementById('rAtelier').innerHTML = r[2] ? `<span style="font-weight:700">${r[2]}</span> &nbsp;—&nbsp; ${r[4]}` : r[4];
   const type = r[3]?`<span class="tag">${r[3]}</span> `:'';
   const lieu = r[5]?`<span class="pill pill-lieu">${r[5]}</span>`:'';
-  const noteVal2 = r[13] ? r[13].trim() : '';
+  const noteVal2 = r[14] ? r[14].trim() : '';
   const noteRef2 = noteVal2 ? REF_NOTES.find(n => n.value === noteVal2) : null;
   const noteLabel2 = noteRef2 ? noteRef2.value : noteVal2;
   const notePill = noteLabel2 ? `<span class="pill pill-lieu" style="background:#fff8e1;color:#78350f;border-color:#fde68a">${noteLabel2}</span>` : '';
   document.getElementById('rMeta').innerHTML = `${r[0]} — ${r[1]} &nbsp;·&nbsp; ${r[2]} &nbsp; ${type} ${lieu}${notePill ? ' &nbsp;' + notePill : ''}`;
-  document.getElementById('rFac').innerHTML = pillList([r[6],r[7]],'pill-f') || '<span style="color:var(--muted)">—</span>';
-  document.getElementById('rHelpers').innerHTML = pillList([r[9],r[10],r[11]],'pill-h') || '<span style="color:var(--muted)">—</span>';
-  document.getElementById('rAngel').innerHTML = pill(r[12],'pill-a') || '<span style="color:var(--muted)">—</span>';
+  document.getElementById('rFac').innerHTML = pillList([r[6],r[7],r[17],r[18]],'pill-f') || '<span style="color:var(--muted)">—</span>';
+  document.getElementById('rHelpers').innerHTML = pillList([r[9],r[10],r[11],r[12]],'pill-h') || '<span style="color:var(--muted)">—</span>';
+  document.getElementById('rAngel').innerHTML = pill(r[13],'pill-a') || '<span style="color:var(--muted)">—</span>';
   document.getElementById('rTraduction').innerHTML = pill(r[8],'pill-t') || '<span style="color:var(--muted)">—</span>';
-  // Informations Logistiques — lecture depuis LOGISTICS via logisticId (r[14])
+  // Informations Logistiques — lecture depuis LOGISTICS via logisticId (r[15])
   const logBox = document.getElementById('rLogistics');
-  const logId  = r[14] && r[14].trim();
+  const logId  = r[15] && r[15].trim();
   const logEntry = logId && typeof LOGISTICS !== 'undefined' ? LOGISTICS[logId] : null;
+
+  // Bannière temps de préparation — toujours affichée
+  // Valeur : logEntry.prepDuration si disponible, sinon 0 par défaut
+  const prepBanner = document.getElementById('rPrepBanner');
+  const prepMin    = (logEntry && typeof logEntry.prepDuration === 'number') ? logEntry.prepDuration : 0;
+  const debutMins  = heureEnMinutes(r[2]);
+  const arriveeMins = debutMins - prepMin;
+  const arriveeStr  = minutesToHeure(arriveeMins);
+  let prepHtml = `<div class="prep-time">⏱ Préparation : ${prepMin} min</div>`;
+  if (prepMin > 0 && arriveeStr) {
+    prepHtml += `<div class="prep-arrive">Arriver à la salle à <span>${arriveeStr}</span></div>`;
+  }
+  prepBanner.innerHTML = prepHtml;
+  prepBanner.style.display = '';
+
   if (logEntry) {
     logBox.innerHTML  = logEntry.html || logEntry.text.replace(/\n/g,'<br>');
     logBox.className  = 'logistics-box logistic-box';
   } else {
     logBox.textContent = 'Aucune information logistique renseignée pour cet atelier.';
     logBox.className   = 'logistics-box logistic-box empty-log';
+  }
+  // Informations Logistiques Spéciales
+  const specBox   = document.getElementById('rLogisticsSpecial');
+  const specLabel = document.getElementById('rSpecialLabel');
+  const specEntry = logId && typeof LOGISTICS_SPECIAL !== 'undefined' ? LOGISTICS_SPECIAL[logId] : null;
+  const specText  = specEntry ? (specEntry.text || '').trim() : '';
+  if (specEntry && specText) {
+    specBox.innerHTML  = specEntry.html || specEntry.text.replace(/\n/g,'<br>');
+    specBox.className  = 'logistics-special-box logistic-box';
+    specBox.style.display  = '';
+    specLabel.style.display = '';
+  } else {
+    specBox.style.display  = 'none';
+    specLabel.style.display = 'none';
   }
 }
 
@@ -258,6 +357,7 @@ if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + lo
 window.hardReload      = hardReload;
 window.toggleMode      = toggleMode;
 window.onDateChange    = onDateChange;
+window.onFacChange     = onFacChange;
 window.onAtelierChange = onAtelierChange;
 
 }); // fin loadData
