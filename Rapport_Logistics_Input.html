@@ -141,34 +141,44 @@
   #toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
   #toast.ok   { background:#166534; }
   #toast.err  { background:#dc2626; }
+  .validee-row { display:flex; align-items:center; gap:10px; margin-bottom:24px; padding:12px 16px; border-radius:8px; border:1px solid var(--border); background:var(--surface); }
+  .validee-row input[type=checkbox] { width:18px; height:18px; cursor:pointer; accent-color:var(--green,#16a34a); flex-shrink:0; }
+  .validee-label { font-size:13px; font-weight:600; cursor:pointer; user-select:none; }
+  .validee-row.checked { border-color:var(--green-border,#86efac); background:var(--green-bg,#dcfce7); }
+  .ws-pill.validated { background:var(--green-bg,#dcfce7); color:var(--green,#166534); border:1px solid var(--green-border,#86efac); }
 
   footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
 </style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
 </head>
+<!-- i18n -->
 <body>
 <div class="wrap">
 
   <header>
     <div class="logo">
       <h1>Tantramour 2026</h1>
-      <p>Saisie des besoins logistiques</p>
-      <small>Logistics Needs Input</small>
+      <p data-i18n="r14_title">Saisie des besoins logistiques</p>
     </div>
-    <a class="btn" href="index.html">🏠 Home</a>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a class="btn" href="index_bis.html">🏠 <span data-i18n="nav_home">Home</span></a>
+      <button class="btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')" style="cursor:pointer;">🌐 EN</button>
+    </div>
   </header>
 
   <!-- ══════════════════════════════════
        ÉTAPE 1 — Qui êtes-vous ?
   ══════════════════════════════════ -->
   <div id="step1">
-    <p class="step-title">Étape 1 — Qui êtes-vous ?</p>
-    <p class="step-sub">Sélectionnez votre nom pour accéder à la liste de vos ateliers.</p>
+    <p class="step-title" data-i18n="r14_step1_title">Étape 1 — Qui êtes-vous ?</p>
+    <p class="step-sub" data-i18n="r14_step1_sub">Sélectionnez votre nom pour accéder à la liste de vos ateliers.</p>
     <select class="big" id="selFac" onchange="onFacChange()">
-      <option value="">— Choisissez votre nom —</option>
+      <option value="" data-i18n="r14_step1_select">— Choisissez votre nom —</option>
     </select>
     <div style="margin-top:14px;">
       <button class="btn btn-primary" id="btnStep1Next" onclick="onFacSelect()" disabled
-              style="padding:10px 28px;font-size:14px;">
+              style="padding:10px 28px;font-size:14px;" data-i18n="r14_step1_next">
         Suivant →
       </button>
     </div>
@@ -179,9 +189,9 @@
   ══════════════════════════════════ -->
   <div id="step2" style="display:none">
     <div class="breadcrumb">
-      <span class="bc-step link" onclick="goStep1()">Étape 1 — Identité</span>
+      <span class="bc-step link" onclick="goStep1()" data-i18n="r14_bc_step1">Étape 1 — Identité</span>
       <span class="bc-sep">›</span>
-      <span class="bc-step active">Étape 2 — Choisir un atelier</span>
+      <span class="bc-step active" data-i18n="r14_bc_step2">Étape 2 — Choisir un atelier</span>
     </div>
 
     <div class="fac-banner">
@@ -192,7 +202,7 @@
       </div>
     </div>
 
-    <p class="step-title" style="margin-bottom:14px;">Vos ateliers</p>
+    <p class="step-title" style="margin-bottom:14px;" data-i18n="r14_my_workshops">Vos ateliers</p>
     <div class="ws-list" id="wsList"></div>
   </div>
 
@@ -201,11 +211,11 @@
   ══════════════════════════════════ -->
   <div id="step3" style="display:none">
     <div class="breadcrumb">
-      <span class="bc-step link" onclick="goStep1()">Étape 1 — Identité</span>
+      <span class="bc-step link" onclick="goStep1()" data-i18n="r14_bc_step1">Étape 1 — Identité</span>
       <span class="bc-sep">›</span>
-      <span class="bc-step link" onclick="goStep2()">Étape 2 — Mes ateliers</span>
+      <span class="bc-step link" onclick="goStep2()" data-i18n="r14_bc_step2_alt">Étape 2 — Mes ateliers</span>
       <span class="bc-sep">›</span>
-      <span class="bc-step active">Étape 3 — Fiche atelier</span>
+      <span class="bc-step active" data-i18n="r14_bc_step3">Étape 3 — Fiche atelier</span>
     </div>
 
     <!-- En-tête lecture seule -->
@@ -219,50 +229,94 @@
     <div class="admin-notice">
       <span class="admin-notice-icon">ℹ️</span>
       <div>
-        <strong>Informations gérées par l'Administrateur</strong><br>
-        Le jour, les horaires, le lieu, le type, les facilitateurs, les helpers, le traducteur et l'angel ne peuvent pas être modifiés ici.
-        Pour toute correction, contactez un <strong>Administrateur</strong>.
+        <strong data-i18n="r14_admin_title">Informations gérées par l'Administrateur</strong><br>
+        <span data-i18n="r14_admin_body">Le jour, les horaires, le lieu, le type, les animateurs, les helpers, le traducteur et l'angel ne peuvent pas être modifiés ici. Pour toute correction, contactez un</span>
+        <strong data-i18n="r14_admin_role">Administrateur</strong>.
       </div>
     </div>
 
     <!-- Grille infos lecture seule -->
-    <p class="section-label">Informations de l'atelier <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(lecture seule)</span></p>
+    <p class="section-label"><span data-i18n="r14_ws_info">Informations de l'atelier</span> <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;" data-i18n="r14_readonly">(lecture seule)</span></p>
     <div class="readonly-grid" id="s3ReadGrid"></div>
 
     <hr class="edit-section-sep">
-    <p class="section-label" style="margin-bottom:16px;">✏️ Informations modifiables</p>
+    <p class="section-label" style="margin-bottom:16px;" data-i18n="r14_editable">✏️ Informations modifiables</p>
 
     <!-- Nom de l'atelier -->
     <div class="field-wrap">
-      <label for="s3Nom">Nom de l'atelier</label>
-      <input type="text" id="s3Nom" placeholder="Nom de l'atelier">
+      <label for="s3Nom" data-i18n="r14_field_nom">Nom de l'atelier</label>
+      <input type="text" id="s3Nom" data-i18n-placeholder="r14_field_nom_ph" placeholder="Nom de l'atelier">
+    </div>
+
+    <!-- Durée de préparation -->
+    <div class="field-wrap">
+      <label>⏱ Estimation durée préparation</label>
+      <select id="s3PrepDuration" style="padding:7px 12px;border:1px solid var(--border);border-radius:6px;font-size:14px;background:var(--bg);color:var(--text);font-family:inherit;cursor:pointer;">
+        <option value="0">0 min — Aucune préparation</option>
+        <option value="10">10 min</option>
+        <option value="15" selected>15 min</option>
+        <option value="20">20 min</option>
+        <option value="30">30 min</option>
+        <option value="40">40 min</option>
+        <option value="45">45 min</option>
+        <option value="50">50 min</option>
+        <option value="60">60 min</option>
+        <option value="70">70 min</option>
+        <option value="80">80 min</option>
+        <option value="90">90 min</option>
+        <option value="100">100 min</option>
+        <option value="110">110 min</option>
+        <option value="120">120 min</option>
+      </select>
     </div>
 
     <!-- Piment -->
     <div class="field-wrap">
-      <label>Niveau Piment</label>
+      <label data-i18n="r14_field_piment">Niveau Piment</label>
       <div class="piment-btns" id="s3PimentBtns"></div>
     </div>
 
     <!-- Informations logistiques -->
     <div class="field-wrap" style="margin-bottom:6px;">
-      <label>📝 Informations logistiques</label>
+      <label data-i18n="r14_field_log">📝 Informations logistiques</label>
       <div class="toolbar">
         <button class="tb-btn" onclick="fmt('bold')"><strong>G</strong></button>
         <button class="tb-btn" onclick="fmt('italic')"><em>I</em></button>
         <button class="tb-btn" onclick="fmt('underline')"><u>S</u></button>
-        <button class="tb-btn" onclick="fmt('insertUnorderedList')">• Liste</button>
-        <button class="tb-btn" onclick="fmt('insertOrderedList')">1. Liste</button>
-        <button class="tb-btn" onclick="fmt('removeFormat')">✖ Format</button>
+        <button class="tb-btn" onclick="fmt('insertUnorderedList')" data-i18n="r14_tb_liste">• Liste</button>
+        <button class="tb-btn" onclick="fmt('insertOrderedList')" data-i18n="r14_tb_num">1. Liste</button>
+        <button class="tb-btn" onclick="fmt('removeFormat')" data-i18n="r14_tb_format">✖ Format</button>
       </div>
       <div id="logisticEditor" contenteditable="true" spellcheck="true"></div>
-      <p class="editor-hint">Décrivez vos besoins matériels, de salle, techniques ou autres. Utilisez la liste à puces pour plus de clarté.</p>
+      <p class="editor-hint" data-i18n="r14_editor_hint">Décrivez vos besoins matériels, de salle, techniques ou autres. Utilisez la liste à puces pour plus de clarté.</p>
+    </div>
+
+    <!-- Informations logistiques spéciales -->
+    <div class="field-wrap" style="margin-bottom:6px;margin-top:20px;">
+      <label style="color:#7c5cd8" data-i18n="r14_special_label">⭐ Informations logistiques spéciales</label>
+      <div class="toolbar" style="border-bottom-color:#c4b5fd">
+        <button class="tb-btn" onclick="fmtSpecial('bold')"><strong>G</strong></button>
+        <button class="tb-btn" onclick="fmtSpecial('italic')"><em>I</em></button>
+        <button class="tb-btn" onclick="fmtSpecial('underline')"><u>S</u></button>
+        <button class="tb-btn" onclick="fmtSpecial('insertUnorderedList')" data-i18n="r14_tb_liste">• Liste</button>
+        <button class="tb-btn" onclick="fmtSpecial('insertOrderedList')" data-i18n="r14_tb_num">1. Liste</button>
+        <button class="tb-btn" onclick="fmtSpecial('removeFormat')" data-i18n="r14_tb_format">✖ Format</button>
+      </div>
+      <div id="logisticSpecialEditor" contenteditable="true" spellcheck="true"
+           style="min-height:140px;max-height:360px;overflow-y:auto;border:1px solid #c4b5fd;border-radius:8px;padding:12px 14px;font-size:14px;line-height:1.6;background:#f5f3ff;color:var(--text);outline:none;"></div>
+      <p class="editor-hint" data-i18n="r14_special_hint">Informations supplémentaires / spéciales (internes). Utilisez la liste à puces pour plus de clarté.</p>
+    </div>
+
+    <div class="validee-row" id="valideeRow">
+      <input type="checkbox" id="s3ValidatedByFac" onchange="toggleValideeStyle()">
+      <label class="validee-label" for="s3ValidatedByFac" data-i18n="r14_validee_fac">Validée par le animateur</label>
     </div>
 
     <div class="editor-actions">
-      <button class="btn btn-primary" onclick="askConfirm()">💾 Enregistrer</button>
-      <button class="btn" onclick="goStep2()">← Retour à mes ateliers</button>
+      <button class="btn btn-primary" onclick="askConfirm()" data-i18n="r14_btn_save">💾 Enregistrer</button>
+      <button class="btn" onclick="goStep2()" data-i18n="r14_btn_back">← Retour à mes ateliers</button>
       <span id="edSavedAt" style="font-size:12px;color:var(--muted);margin-left:8px;"></span>
+      <span id="edSpecialSavedAt" style="font-size:12px;color:#7c5cd8;margin-left:8px;"></span>
     </div>
   </div>
 
@@ -271,21 +325,20 @@
 <!-- ── MODALE CONFIRMATION ── -->
 <div class="modal-overlay" id="confirmOverlay">
   <div class="modal-box">
-    <h2>⚠️ Confirmer l'enregistrement</h2>
-    <p>Vous êtes sur le point de sauvegarder les modifications pour :</p>
+    <h2 data-i18n="r14_confirm_title">⚠️ Confirmer l'enregistrement</h2>
+    <p data-i18n="r14_confirm_p1">Vous êtes sur le point de sauvegarder les modifications pour :</p>
     <p style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;" id="confirmAtelier"></p>
-    <div class="modal-warning">
+    <div class="modal-warning" data-i18n="r14_confirm_warn">
       Ce changement sera immédiatement visible par toute l'équipe. Vérifiez bien votre saisie avant de confirmer.
     </div>
     <div class="modal-actions">
-      <button class="btn" style="flex:1" onclick="closeConfirm()">Annuler</button>
-      <button class="btn btn-danger" style="flex:1" onclick="doSave()">✔ Confirmer et enregistrer</button>
+      <button class="btn" style="flex:1" onclick="closeConfirm()" data-i18n="r14_confirm_cancel">Annuler</button>
+      <button class="btn btn-danger" style="flex:1" onclick="doSave()" data-i18n="r14_confirm_ok">✔ Confirmer et enregistrer</button>
     </div>
   </div>
 </div>
 
 <div id="toast"></div>
-<footer><p>Made with IBM Bob</p></footer>
 
 <script src="github-api.js"></script>
 <script src="ref_resource_types.js"></script>
@@ -294,7 +347,7 @@
 <script src="ref_lieux.js"></script>
 <script src="loader.js"></script>
 <script>
-loadData(['data.js','logistics.js'], function() {
+loadData(['data.js','logistics.js','logistics.special.js'], function() {
 
 const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
 
@@ -304,9 +357,11 @@ const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 
   AGENDA.forEach(function(e) {
     if (e.fac1) present.add(e.fac1);
     if (e.fac2) present.add(e.fac2);
+    if (e.fac3) present.add(e.fac3);
+    if (e.fac4) present.add(e.fac4);
   });
   var sel = document.getElementById('selFac');
-  REF_FACILITATEURS
+  REF_ANIMATEURS
     .filter(function(f) { return present.has(f.value); })
     .forEach(function(f) {
       var o = document.createElement('option');
@@ -371,7 +426,7 @@ function heureMin(h) {
 function getWorkshops(fac) {
   return AGENDA
     .map(function(e, i) { return { e: e, i: i }; })
-    .filter(function(x) { return x.e.fac1 === fac || x.e.fac2 === fac; })
+    .filter(function(x) { return x.e.fac1 === fac || x.e.fac2 === fac || x.e.fac3 === fac || x.e.fac4 === fac; })
     .sort(function(a, b) {
       var dj = JOUR_ORDER.indexOf(a.e.jour) - JOUR_ORDER.indexOf(b.e.jour);
       return dj !== 0 ? dj : heureMin(a.e.heure) - heureMin(b.e.heure);
@@ -384,22 +439,25 @@ function buildStep2(fac) {
   document.getElementById('facAvatar').textContent = initiales(fac);
   document.getElementById('facName').textContent   = fac;
   document.getElementById('facSub').textContent    =
-    ws.length === 0 ? 'Aucun atelier trouvé.'
-    : ws.length + ' atelier' + (ws.length > 1 ? 's' : '') + ' assigné' + (ws.length > 1 ? 's' : '') + ' en tant que facilitateur';
+    ws.length === 0 ? I18n.t('r14_no_ws')
+    : ws.length + ' ' + (ws.length > 1 ? I18n.t('r14_ws_count_many') : I18n.t('r14_ws_count_one'));
 
   var list = document.getElementById('wsList');
   if (!ws.length) {
-    list.innerHTML = '<div class="empty-ws">Aucun atelier trouvé pour ce facilitateur.</div>';
+    list.innerHTML = '<div class="empty-ws">' + I18n.t('r14_no_ws_fac') + '</div>';
     return;
   }
 
   list.innerHTML = ws.map(function(x) {
     var e = x.e;
-    var hasLog = e.logisticId && LOGISTICS[e.logisticId];
-    var pillHtml = hasLog
-      ? '<span class="ws-pill filled">✔ Rempli</span>'
-      : '<span class="ws-pill empty">⚠ À remplir</span>';
-    var facs = [e.fac1, e.fac2].filter(Boolean).join(' & ');
+    var logEntry = e.logisticId && LOGISTICS[e.logisticId];
+    var hasContent = logEntry && (LOGISTICS[e.logisticId].text || '').trim().length > 0;
+    var isValidated = logEntry && LOGISTICS[e.logisticId].validatedByFac;
+    var pillHtml = hasContent
+      ? '<span class="ws-pill filled">' + I18n.t('r14_pill_filled') + '</span>'
+      : '<span class="ws-pill empty">' + I18n.t('r14_pill_empty') + '</span>';
+    if (isValidated) pillHtml += '<span class="ws-pill validated">' + I18n.t('r14_pill_validee') + '</span>';
+    var facs = [e.fac1, e.fac2, e.fac3, e.fac4].filter(Boolean).join(' & ');
     return '<div class="ws-card" onclick="selectWorkshop(' + x.i + ')">' +
       '<div class="ws-card-left">' +
         '<div class="ws-card-jour">' + e.jour + (e.date ? ' — ' + e.date : '') + '</div>' +
@@ -432,19 +490,19 @@ function selectWorkshop(agendaIdx) {
   ].filter(Boolean).join('&nbsp;&nbsp;&nbsp;');
 
   // Grille lecture seule
-  var facs    = [e.fac1, e.fac2].filter(Boolean).join(' / ') || '—';
-  var helpers = [e.helper1, e.helper2, e.helper3].filter(Boolean).join(', ') || '—';
+  var facs    = [e.fac1, e.fac2, e.fac3, e.fac4].filter(Boolean).join(' / ') || '—';
+  var helpers = [e.helper1, e.helper2, e.helper3, e.helper4].filter(Boolean).join(', ') || '—';
   document.getElementById('s3ReadGrid').innerHTML = [
-    ['Jour',            e.jour         || '—'],
-    ['Date',            e.date         || '—'],
-    ['Heure',           e.heure        || '—'],
-    ['Lieu',            e.lieu         || '—'],
-    ['Type',            e.type         || '—'],
-    ['Facilitateur(s)', facs               ],
-    ['Traducteur',      e.traduction   || '—'],
-    ['Helper(s)',       helpers            ],
-    ['Angel',           e.angel        || '—'],
-    ['Note',            e.note         || '—'],
+    [I18n.t('r14_grid_jour'),    e.jour         || '—'],
+    [I18n.t('r14_grid_date'),    e.date         || '—'],
+    [I18n.t('r14_grid_heure'),   e.heure        || '—'],
+    [I18n.t('r14_grid_lieu'),    e.lieu         || '—'],
+    [I18n.t('r14_grid_type'),    e.type         || '—'],
+    [I18n.t('r14_grid_fac'),     facs               ],
+    [I18n.t('r14_grid_trad'),    e.traduction   || '—'],
+    [I18n.t('r14_grid_helpers'), helpers            ],
+    [I18n.t('r14_grid_angel'),   e.angel        || '—'],
+    [I18n.t('r14_grid_note'),    e.note         || '—'],
   ].map(function(pair) {
     return '<div><div class="ro-label">' + pair[0] + '</div><div class="ro-value">' + esc(pair[1]) + '</div></div>';
   }).join('');
@@ -461,7 +519,21 @@ function selectWorkshop(agendaIdx) {
   document.getElementById('logisticEditor').innerHTML = existing || '<p></p>';
 
   var updatedAt = hasLog ? LOGISTICS[currentLogId].updatedAt : '';
-  document.getElementById('edSavedAt').textContent = updatedAt ? 'Dernière mise à jour : ' + updatedAt : '';
+  document.getElementById('edSavedAt').textContent = updatedAt ? I18n.t('r14_last_update') + ' ' + updatedAt : '';
+  var isValidated = hasLog && !!LOGISTICS[currentLogId].validatedByFac;
+  document.getElementById('s3ValidatedByFac').checked = isValidated;
+  document.getElementById('valideeRow').classList.toggle('checked', isValidated);
+  var prepDur = hasLog && LOGISTICS[currentLogId].prepDuration !== undefined
+    ? LOGISTICS[currentLogId].prepDuration
+    : 15;
+  document.getElementById('s3PrepDuration').value = String(prepDur);
+
+  // Éditeur logistique spécial
+  var hasSpecial = currentLogId && typeof LOGISTICS_SPECIAL !== 'undefined' && LOGISTICS_SPECIAL[currentLogId];
+  var existingSpecial = hasSpecial ? LOGISTICS_SPECIAL[currentLogId].html : '';
+  document.getElementById('logisticSpecialEditor').innerHTML = existingSpecial || '<p></p>';
+  var updatedAtSpecial = hasSpecial ? LOGISTICS_SPECIAL[currentLogId].updatedAt : '';
+  document.getElementById('edSpecialSavedAt').textContent = updatedAtSpecial ? I18n.t('r14_last_update') + ' ' + updatedAtSpecial : '';
 
   showStep(3);
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -483,12 +555,24 @@ function setPiment(val) {
 }
 window.setPiment = setPiment;
 
+function toggleValideeStyle() {
+  var checked = document.getElementById('s3ValidatedByFac').checked;
+  document.getElementById('valideeRow').classList.toggle('checked', checked);
+}
+window.toggleValideeStyle = toggleValideeStyle;
+
 // RTE
 function fmt(cmd) {
   document.getElementById('logisticEditor').focus();
   document.execCommand(cmd, false, null);
 }
 window.fmt = fmt;
+
+function fmtSpecial(cmd) {
+  document.getElementById('logisticSpecialEditor').focus();
+  document.execCommand(cmd, false, null);
+}
+window.fmtSpecial = fmtSpecial;
 
 // ─── Confirmation ────────────────────────────────────────────────────────────
 function askConfirm() {
@@ -527,21 +611,34 @@ async function doSave() {
   var edEl  = document.getElementById('logisticEditor');
   var html  = edEl.innerHTML.trim();
   var text  = edEl.innerText.trim();
-  LOGISTICS[currentLogId] = { html: html, text: text, updatedAt: today };
+  var validatedByFac = document.getElementById('s3ValidatedByFac').checked;
+  var prepDuration = parseInt(document.getElementById('s3PrepDuration').value, 10) || 0;
+  LOGISTICS[currentLogId] = { html: html, text: text, validatedByFac: validatedByFac, prepDuration: prepDuration, updatedAt: today };
+
+  // Contenu logistique spécial
+  var specEl   = document.getElementById('logisticSpecialEditor');
+  var specHtml = specEl.innerHTML.trim();
+  var specText = specEl.innerText.trim();
+  if (specHtml && specHtml !== '<p></p>' && specHtml !== '<br>') {
+    if (typeof LOGISTICS_SPECIAL === 'undefined') window.LOGISTICS_SPECIAL = {};
+    LOGISTICS_SPECIAL[currentLogId] = { html: specHtml, text: specText, updatedAt: today };
+  }
 
   try {
-    await saveFile('logistics.js', buildLogisticsJs());
-    await saveFile('data.js',      buildDataJs());
+    await saveFile('logistics.js',         buildLogisticsJs());
+    await saveFile('logistics.special.js', buildLogisticsSpecialJs());
+    await saveFile('data.js',              buildDataJs());
 
     // Mettre à jour l'UI
-    document.getElementById('edSavedAt').textContent = 'Dernière mise à jour : ' + today;
+    document.getElementById('edSavedAt').textContent = I18n.t('r14_last_update') + ' ' + today;
+    document.getElementById('edSpecialSavedAt').textContent = (specHtml && specHtml !== '<p></p>') ? I18n.t('r14_last_update') + ' ' + today : '';
     document.getElementById('s3Title').textContent   = newNom;
-    showToast('✔ Sauvegardé avec succès', 'ok');
+    showToast('✔ ' + I18n.t('r14_btn_save').replace('💾 ', '') + ' — OK', 'ok');
 
     // Rafraîchir la liste étape 2
     buildStep2(currentFac);
   } catch(err) {
-    showToast('❌ Erreur lors de la sauvegarde : ' + err.message, 'err');
+    showToast('❌ ' + err.message, 'err');
   }
 }
 window.doSave = doSave;
@@ -563,9 +660,12 @@ function escJs(s) {
 function buildLogisticsJs() {
   var entries = Object.entries(LOGISTICS).map(function(pair) {
     var id = pair[0], v = pair[1];
+    var prepDur = (v.prepDuration !== undefined && v.prepDuration !== null) ? v.prepDuration : 15;
     return '  "' + escJs(id) + '": {\n' +
       '    html: "' + escJs(v.html || '') + '",\n' +
       '    text: "' + escJs(v.text || '') + '",\n' +
+      '    validatedByFac: ' + (v.validatedByFac ? 'true' : 'false') + ',\n' +
+      '    prepDuration: ' + prepDur + ',\n' +
       '    updatedAt: "' + escJs(v.updatedAt || '') + '"\n' +
       '  }';
   }).join(',\n\n');
@@ -574,11 +674,26 @@ function buildLogisticsJs() {
     entries + (entries ? '\n\n' : '') + '};\n';
 }
 
+function buildLogisticsSpecialJs() {
+  var src = (typeof LOGISTICS_SPECIAL !== 'undefined') ? LOGISTICS_SPECIAL : {};
+  var entries = Object.entries(src).map(function(pair) {
+    var id = pair[0], v = pair[1];
+    return '  "' + escJs(id) + '": {\n' +
+      '    html: "' + escJs(v.html || '') + '",\n' +
+      '    text: "' + escJs(v.text || '') + '",\n' +
+      '    updatedAt: "' + escJs(v.updatedAt || '') + '"\n' +
+      '  }';
+  }).join(',\n\n');
+
+  return '/**\n * TANTRAMOUR 2026 — Informations Logistiques Spéciales (Supplémentaires)\n */\n\nvar LOGISTICS_SPECIAL = {\n\n' +
+    entries + (entries ? '\n\n' : '') + '};\n';
+}
+
 function buildDataJs() {
   var header = '/**\n * TANTRAMOUR 2026 — Référentiel de données commun\n' +
     ' * ================================================\n' +
     ' * Structure : jour, date, heure, type, atelier, lieu,\n' +
-    ' *   fac1, fac2, traduction, helper1, helper2, helper3,\n' +
+    ' *   fac1, fac2, traduction, helper1, helper2, helper3, helper4,\n' +
     ' *   angel, note, piment, logisticId\n */\n\nvar AGENDA = [\n';
 
   var lines = AGENDA.map(function(e) {
@@ -586,9 +701,11 @@ function buildDataJs() {
       '",heure:"' + escJs(e.heure) + '",type:"' + escJs(e.type) +
       '",atelier:"' + escJs(e.atelier) + '",lieu:"' + escJs(e.lieu) +
       '",fac1:"' + escJs(e.fac1) + '",fac2:"' + escJs(e.fac2) +
+      '",fac3:"' + escJs(e.fac3||'') + '",fac4:"' + escJs(e.fac4||'') +
+      '",meetingRoles:"' + escJs(e.meetingRoles||'') +
       '",traduction:"' + escJs(e.traduction) + '",helper1:"' + escJs(e.helper1) +
       '",helper2:"' + escJs(e.helper2) + '",helper3:"' + escJs(e.helper3) +
-      '",angel:"' + escJs(e.angel) + '",note:"' + escJs(e.note) +
+      '",helper4:"' + escJs(e.helper4 || '') + '",angel:"' + escJs(e.angel) + '",note:"' + escJs(e.note) +
       '",piment:' + (e.piment || 0) +
       ',logisticId:"' + escJs(e.logisticId) + '"}';
   }).join(',\n');
@@ -598,8 +715,9 @@ function buildDataJs() {
     '  return entries.map(function(e) { return [\n' +
     '    e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,\n' +
     '    e.fac1, e.fac2, e.traduction,\n' +
-    '    e.helper1, e.helper2, e.helper3,\n' +
-    '    e.angel, e.note, e.logisticId, e.piment || 0\n' +
+    '    e.helper1, e.helper2, e.helper3, e.helper4 || \'\',\n' +
+    '    e.angel, e.note, e.logisticId, e.piment || 0,\n' +
+    '    e.fac3 || \'\', e.fac4 || \'\', e.meetingRoles || \'\'\n' +
     '  ]; });\n}\n';
 
   return header + lines + footer;
@@ -652,3 +770,6 @@ if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + lo
 </script>
 </body>
 </html>
+
+
+
