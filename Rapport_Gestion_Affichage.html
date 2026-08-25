@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Gestion de l'Affichage des Rapports</title>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+<script src="github-api.js"></script>
+<script src="loader.js"></script>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#1d4ed8;
+    --ok:#16a34a; --ok-bg:#dcfce7;
+    --warn:#ca8a04; --warn-bg:#fef9c3; --warn-border:#fde68a;
+    --danger:#dc2626; --danger-bg:#fee2e2;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --ok:#4ade80; --ok-bg:#052e16;
+    --warn:#facc15; --warn-bg:#2a1f00; --warn-border:#713f12;
+    --danger:#f87171; --danger-bg:#3b1010;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.5; background:var(--bg); color:var(--text); }
+  .wrap { max-width:1100px; margin:0 auto; padding:24px 20px 100px; }
+
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:20px; font-weight:700; }
+  .logo p  { font-size:24px; font-weight:800; color:var(--accent); line-height:1.2; margin-top:2px; }
+  .header-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 14px; font-size:13px; font-weight:600; color:var(--text); font-family:inherit; display:inline-flex; align-items:center; gap:6px; text-decoration:none; transition:all .15s; }
+  .btn:hover { background:var(--border); }
+  .btn-save { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .btn-save:hover { filter:brightness(1.1); }
+
+  .help-box { background:var(--surface); border:1px solid var(--border); border-left:4px solid var(--accent); border-radius:6px; padding:12px 16px; margin-bottom:20px; font-size:13px; color:var(--text); }
+
+  /* ── SECTIONS DRAG & DROP ── */
+  .section-group { margin-bottom:28px; background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+  .section-header { padding:12px 18px; background:rgba(0,0,0,.03); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; font-weight:700; font-size:15px; }
+  .section-count { font-size:12px; font-weight:600; color:var(--muted); }
+
+  .report-list { min-height:40px; padding:8px 12px; display:flex; flex-direction:column; gap:8px; }
+  .report-item { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:10px 14px; display:flex; align-items:center; gap:12px; transition:all .15s; }
+  .report-item.inactive { opacity:.5; background:var(--surface); }
+  .report-item.dragging { opacity:.25; }
+
+  .drag-handle { cursor:grab; font-size:16px; color:var(--muted); user-select:none; padding:0 4px; }
+  .report-icon { font-size:20px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; background:var(--surface); border:1px solid var(--border); border-radius:6px; flex-shrink:0; }
+  .report-info { flex:1; min-width:0; }
+  .report-title { font-weight:700; font-size:14px; display:flex; align-items:center; gap:8px; }
+  .report-url { font-size:11px; font-family:monospace; color:var(--muted); margin-top:2px; }
+  .report-desc { font-size:12px; color:var(--muted); }
+
+  .controls-group { display:flex; align-items:center; gap:12px; flex-shrink:0; flex-wrap:wrap; }
+  .toggle-label { display:flex; align-items:center; gap:6px; font-size:12px; font-weight:600; cursor:pointer; user-select:none; }
+  .toggle-label input[type="checkbox"] { cursor:pointer; width:16px; height:16px; accent-color:var(--accent); }
+
+  .select-sec { background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:5px 8px; font-size:12px; color:var(--text); font-family:inherit; cursor:pointer; outline:none; }
+
+  /* ── SAVE BAR STICKY ── */
+  .save-bar-sticky { position:fixed; bottom:0; left:0; right:0; z-index:90; padding:14px 24px; display:none; align-items:center; justify-content:space-between; gap:12px; background:var(--warn-bg); border-top:2px solid var(--warn-border); box-shadow:0 -4px 16px rgba(0,0,0,.1); }
+  .save-bar-sticky.on { display:flex; }
+  .save-bar-msg { font-size:13px; font-weight:700; color:var(--warn); }
+
+  #toast { position:fixed; bottom:24px; right:24px; border-radius:8px; padding:12px 18px; font-size:13px; font-weight:600; z-index:200; display:none; max-width:420px; background:#1f2328; color:#fff; }
+  #toast.on { display:block; animation:slideIn .25s ease; }
+  @keyframes slideIn { from{transform:translateY(10px);opacity:0} to{transform:translateY(0);opacity:1} }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>🎛️ Gestion de l'Affichage des Rapports</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="gestion_planning.html">← Gestion Planning</a>
+      <a class="btn" href="index_bis.html">🌀 DreamTeam</a>
+      <button class="btn btn-save" onclick="saveConfiguration()">💾 Sauvegarder</button>
+      <button class="btn" onclick="document.body.classList.toggle('dark')">🌙</button>
+    </div>
+  </header>
+
+  <div class="help-box">
+    <strong>💡 Organisation de l'affichage :</strong>
+    <ul style="padding-left:20px;margin-top:6px;line-height:1.6;">
+      <li><strong>Sections Disponibles</strong> : Choisissez dans quelle section de <code>gestion_planning.html</code> chaque rapport apparaît.</li>
+      <li><strong>Affichage DreamTeam</strong> : Cochez la case <em>« Afficher sur page DreamTeam »</em> pour faire apparaître le rapport sur <code>index_bis.html</code>.</li>
+      <li><strong>Activer / Désactiver</strong> : Décochez <em>« Actif »</em> pour masquer complètement un rapport sans le supprimer.</li>
+      <li><strong>Ordre d'affichage</strong> : Utilisez les boutons <strong>▲ / ▼</strong> pour réordonner les cartes dans chaque section.</li>
+    </ul>
+  </div>
+
+  <div id="sectionsContainer"></div>
+
+</div>
+
+<!-- BARRE DE SAUVEGARDE STICKY -->
+<div class="save-bar-sticky" id="saveBar">
+  <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+  <div style="display:flex;gap:8px;">
+    <button class="btn btn-save" onclick="saveConfiguration()">💾 Sauvegarder ref_display_reports.js</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+var SECTIONS = [
+  "DreamTeam",
+  "Gestion planning",
+  "Logistique",
+  "Contrôle & Vérification",
+  "Admin"
+];
+
+var REPORTS_STORE = [];
+var isDirty = false;
+
+loadData(['ref_display_reports.js'], function() {
+  if (typeof REF_DISPLAY_REPORTS !== 'undefined' && Array.isArray(REF_DISPLAY_REPORTS)) {
+    REPORTS_STORE = JSON.parse(JSON.stringify(REF_DISPLAY_REPORTS));
+  }
+  render();
+});
+
+function markDirty() {
+  isDirty = true;
+  document.getElementById('saveBar').classList.add('on');
+}
+
+function render() {
+  var container = document.getElementById('sectionsContainer');
+  if (!container) return;
+
+  var html = '';
+
+  SECTIONS.forEach(function(secName) {
+    var secReports = REPORTS_STORE.filter(function(r) { return r.section === secName; });
+    secReports.sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+
+    html += '<div class="section-group">' +
+      '<div class="section-header">' +
+        '<span>📁 ' + esc(secName) + '</span>' +
+        '<span class="section-count">' + secReports.length + ' rapport(s)</span>' +
+      '</div>' +
+      '<div class="report-list" data-section="' + esc(secName) + '">';
+
+    if (secReports.length === 0) {
+      html += '<div style="padding:12px;color:var(--muted);font-style:italic;font-size:12px;">Aucun rapport dans cette section</div>';
+    } else {
+      secReports.forEach(function(rep, idx) {
+        var isFirst = (idx === 0);
+        var isLast = (idx === secReports.length - 1);
+
+        html += '<div class="report-item' + (!rep.active ? ' inactive' : '') + '" id="rep-item-' + esc(rep.id) + '">' +
+          '<div class="report-icon">' + (rep.icon || '📄') + '</div>' +
+          '<div class="report-info">' +
+            '<div class="report-title">' +
+              esc(rep.title) +
+              (rep.isProtected ? ' <span title="Accès protégé par mot de passe" style="font-size:12px;">🔒</span>' : '') +
+            '</div>' +
+            '<div class="report-desc">' + esc(rep.desc || '') + '</div>' +
+            '<div class="report-url">🔗 ' + esc(rep.url) + '</div>' +
+          '</div>' +
+          '<div class="controls-group">' +
+            '<label class="toggle-label" title="Afficher sur index_bis.html">' +
+              '<input type="checkbox" ' + (rep.showInDreamTeam ? 'checked ' : '') + 'onchange="toggleDreamTeam(\'' + esc(rep.id) + '\', this.checked)">' +
+              '🌀 DreamTeam' +
+            '</label>' +
+            '<label class="toggle-label" title="Activer ou désactiver ce rapport">' +
+              '<input type="checkbox" ' + (rep.active ? 'checked ' : '') + 'onchange="toggleActive(\'' + esc(rep.id) + '\', this.checked)">' +
+              'Actif' +
+            '</label>' +
+            '<select class="select-sec" onchange="changeSection(\'' + esc(rep.id) + '\', this.value)">' +
+              SECTIONS.map(function(s) {
+                return '<option value="' + esc(s) + '"' + (rep.section === s ? ' selected' : '') + '>' + esc(s) + '</option>';
+              }).join('') +
+            '</select>' +
+            '<div style="display:flex;gap:3px;">' +
+              '<button class="btn" style="padding:3px 7px;font-size:11px;" ' + (isFirst ? 'disabled ' : '') + 'onclick="moveReport(\'' + esc(rep.id) + '\', -1)" title="Monter">▲</button>' +
+              '<button class="btn" style="padding:3px 7px;font-size:11px;" ' + (isLast ? 'disabled ' : '') + 'onclick="moveReport(\'' + esc(rep.id) + '\', 1)" title="Descendre">▼</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>';
+      });
+    }
+
+    html += '</div></div>';
+  });
+
+  container.innerHTML = html;
+}
+
+function toggleActive(id, active) {
+  var rep = REPORTS_STORE.find(function(r) { return r.id === id; });
+  if (rep) {
+    rep.active = !!active;
+    markDirty();
+    render();
+  }
+}
+
+function toggleDreamTeam(id, val) {
+  var rep = REPORTS_STORE.find(function(r) { return r.id === id; });
+  if (rep) {
+    rep.showInDreamTeam = !!val;
+    markDirty();
+    render();
+  }
+}
+
+function changeSection(id, newSection) {
+  var rep = REPORTS_STORE.find(function(r) { return r.id === id; });
+  if (rep && rep.section !== newSection) {
+    rep.section = newSection;
+    // Réassigner le prochain ordre disponible dans la nouvelle section
+    var inNewSec = REPORTS_STORE.filter(function(r) { return r.section === newSection; });
+    rep.order = inNewSec.length + 1;
+    markDirty();
+    render();
+  }
+}
+
+function moveReport(id, direction) {
+  var rep = REPORTS_STORE.find(function(r) { return r.id === id; });
+  if (!rep) return;
+
+  var secReports = REPORTS_STORE.filter(function(r) { return r.section === rep.section; });
+  secReports.sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+
+  var currentIndex = secReports.findIndex(function(r) { return r.id === id; });
+  if (currentIndex === -1) return;
+
+  var targetIndex = currentIndex + direction;
+  if (targetIndex < 0 || targetIndex >= secReports.length) return;
+
+  var targetRep = secReports[targetIndex];
+  var tempOrder = rep.order || (currentIndex + 1);
+  rep.order = targetRep.order || (targetIndex + 1);
+  targetRep.order = tempOrder;
+
+  // Normaliser les ordres
+  secReports.sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+  secReports.forEach(function(r, idx) { r.order = idx + 1; });
+
+  markDirty();
+  render();
+}
+
+function generateJsContent() {
+  var str = '/**\n' +
+    ' * TANTRAMOUR 2026 — Configuration de l\'affichage des rapports\n' +
+    ' * ============================================================\n' +
+    ' * Permet d\'activer/désactiver les rapports et de choisir leur section.\n' +
+    ' */\n' +
+    'var REF_DISPLAY_REPORTS = ' + JSON.stringify(REPORTS_STORE, null, 2) + ';\n';
+  return str;
+}
+
+async function saveConfiguration() {
+  var content = generateJsContent();
+  var fileName = 'ref_display_reports.js';
+
+  try {
+    // 1. Tenter la sauvegarde serveur local
+    var res = await fetch('http://localhost:3000/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: fileName, content: content })
+    });
+    if (res.ok) {
+      showToast('✅ Configuration sauvegardée sur le serveur local !');
+      isDirty = false;
+      document.getElementById('saveBar').classList.remove('on');
+      return;
+    }
+  } catch(e) {}
+
+  // 2. Fallback GitHub API si token configuré
+  if (typeof githubSaveFile === 'function') {
+    try {
+      await githubSaveFile(fileName, content);
+      showToast('✅ Configuration sauvegardée sur GitHub !');
+      isDirty = false;
+      document.getElementById('saveBar').classList.remove('on');
+      return;
+    } catch(err) {
+      console.warn('GitHub save fallback:', err);
+    }
+  }
+
+  // 3. Fallback téléchargement direct
+  var blob = new Blob([content], { type: 'text/javascript;charset=utf-8' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fileName;
+  a.click();
+  showToast('📥 Fichier téléchargé (remplacez ' + fileName + ' dans le dossier Rapports).');
+  isDirty = false;
+  document.getElementById('saveBar').classList.remove('on');
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  setTimeout(function() { t.classList.remove('on'); }, 3500);
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
