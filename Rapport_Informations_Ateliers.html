@@ -1,0 +1,1531 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tantramour 2026 — Informations Ateliers</title>
+  <script src="ref_translations.js"></script>
+  <script src="i18n.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <style>
+    :root {
+      --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+      --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+      --green:#16a34a; --green-bg:#dcfce7; --green-border:#86efac;
+      --orange:#ca8a04; --orange-bg:#fef9c3; --orange-border:#fde68a;
+      --purple:#7c3aed; --purple-bg:#f5f3ff; --purple-border:#c4b5fd;
+      --fr-bg:#eff6ff; --fr-border:#bfdbfe;
+      --en-bg:#f0fdf4; --en-border:#bbf7d0;
+      --tag-bg:#f0f4ff; --tag-text:#3b5bdb;
+      --ws-hdr-bg:#fefce8; --ws-hdr-border:#fde68a; --ws-hdr-text:#854d0e;
+    }
+    .dark {
+      --bg:#0d1117; --surface:#161b22; --border:#30363d;
+      --text:#e6edf3; --muted:#8b949e;
+      --green:#4ade80; --green-bg:#052e16; --green-border:#166534;
+      --purple-bg:#1e1438; --purple-border:#6d28d9;
+      --fr-bg:#0c2d48; --fr-border:#1e4976;
+      --en-bg:#052e16; --en-border:#166534;
+      --tag-bg:#1c2444; --tag-text:#93b4fb;
+      --ws-hdr-bg:#2d2500; --ws-hdr-border:#92400e; --ws-hdr-text:#fcd34d;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
+    .wrap { max-width:900px; margin:0 auto; padding:24px 20px 80px; }
+
+    /* ── HEADER ── */
+    header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+    .logo h1 { font-size:19px; font-weight:700; }
+    .logo p  { font-size:20px; font-weight:800; color:var(--accent); line-height:1.2; margin-top:2px; }
+    .header-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 14px; font-size:13px; color:var(--text); font-family:inherit; display:inline-flex; align-items:center; gap:6px; text-decoration:none; transition:background .15s; }
+    .btn:hover { background:var(--border); }
+    .btn:disabled { opacity:.6; cursor:wait; }
+    .btn-sm { padding:5px 10px; font-size:12px; }
+    .hidden-file-input { display:none; }
+
+    .import-panel { display:none; margin-bottom:16px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 18px; }
+    .import-panel.open { display:block; }
+    .import-title { font-size:12px; font-weight:700; margin-bottom:6px; }
+    .import-help { font-size:12px; color:var(--muted); margin-bottom:12px; }
+    .import-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .import-summary { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+    .import-summary-box { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; }
+    .import-summary-title { font-size:12px; font-weight:700; margin-bottom:8px; }
+    .import-summary-list { display:flex; flex-direction:column; gap:8px; }
+    .import-item { border:1px solid var(--border); border-radius:8px; padding:10px; background:var(--bg); }
+    .import-item-head { display:flex; justify-content:space-between; gap:8px; align-items:flex-start; margin-bottom:8px; }
+    .import-item-title { font-size:13px; font-weight:700; }
+    .import-item-meta { font-size:11px; color:var(--muted); }
+    .import-item-context { margin-top:4px; font-size:11px; color:var(--muted); }
+    .import-fields-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; }
+    .import-field { border:1px solid var(--border); border-radius:8px; padding:8px; background:var(--surface); }
+    .import-field-name { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; }
+    .import-field-values { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:start; margin-top:4px; }
+    .import-field-value { font-size:12px; white-space:pre-wrap; word-break:break-word; }
+    .import-field-arrow { color:var(--muted); font-size:12px; padding-top:2px; }
+    .import-choice { display:flex; gap:12px; margin-top:6px; font-size:12px; }
+    .import-choice label { display:flex; align-items:center; gap:5px; cursor:pointer; }
+    .import-empty { font-size:12px; color:var(--muted); font-style:italic; }
+    .status-ok { color:#166534; }
+    .status-warn { color:#92400e; }
+
+    @media(max-width:900px) {
+      .import-fields-grid { grid-template-columns:1fr; }
+    }
+
+    /* ── FILTRES ── */
+    .filters-panel { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 18px; margin-bottom:18px; }
+    .filters-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:12px; }
+    .filters-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:10px; align-items:end; }
+    .filter-group { display:flex; flex-direction:column; gap:4px; }
+    .filter-label { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+    .filter-select { background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:12px; color:var(--text); font-family:inherit; cursor:pointer; width:100%; }
+    .filter-select:focus { border-color:var(--accent); outline:none; }
+    .filter-reset-wrap { display:flex; align-items:flex-end; }
+
+    /* ── RÉSULTATS ── */
+    .results-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .results-count { font-size:13px; color:var(--muted); }
+    .results-count strong { color:var(--text); }
+
+    /* ── LISTE ── */
+    .ws-list { display:flex; flex-direction:column; gap:8px; }
+    .ws-card { display:flex; align-items:center; gap:12px; padding:13px 16px; border:1px solid var(--border); border-radius:10px; background:var(--surface); cursor:pointer; transition:border-color .15s,background .15s; }
+    .ws-card:hover { border-color:var(--accent); background:var(--fr-bg); }
+    .dark .ws-card:hover { background:#0c2d48; }
+    .ws-card-left { flex:1; min-width:0; }
+    .ws-card-jour { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:1px; }
+    .ws-card-name { font-size:14px; font-weight:700; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .ws-card-meta { font-size:11px; color:var(--muted); display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .ws-card-right { flex-shrink:0; display:flex; align-items:center; gap:6px; }
+    .tag { display:inline-block; border-radius:4px; padding:1px 6px; font-size:10px; font-weight:600; white-space:nowrap; }
+    .tag-type { background:var(--tag-bg); color:var(--tag-text); }
+    .pill { font-size:10px; font-weight:700; padding:2px 8px; border-radius:99px; white-space:nowrap; border:1px solid; }
+    .pill-green  { background:var(--green-bg); color:var(--green); border-color:var(--green-border); }
+    .pill-orange { background:var(--orange-bg); color:var(--orange); border-color:var(--orange-border); }
+    .pill-grey   { background:var(--surface); color:var(--muted); border-color:var(--border); }
+    .empty { text-align:center; padding:40px; color:var(--muted); font-style:italic; border:2px dashed var(--border); border-radius:10px; }
+
+    /* ── MODALE DÉTAIL ── */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9999; align-items:flex-start; justify-content:center; padding:24px 16px; overflow-y:auto; }
+    .modal-overlay.open { display:flex; }
+    .modal-box { background:var(--bg); border-radius:14px; max-width:680px; width:100%; border:1px solid var(--border); box-shadow:0 12px 40px rgba(0,0,0,.2); }
+    .modal-top { display:flex; align-items:flex-start; justify-content:space-between; padding:18px 22px 14px; border-bottom:1px solid var(--border); gap:12px; }
+    .modal-top-left { flex:1; min-width:0; }
+    .modal-top-right { display:flex; flex-direction:column; align-items:flex-end; gap:8px; flex-shrink:0; }
+    .modal-atelier { font-size:18px; font-weight:800; line-height:1.3; }
+    .modal-sub { font-size:12px; color:var(--muted); margin-top:3px; }
+    .modal-close { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:6px 10px; font-size:15px; font-weight:700; font-family:inherit; color:var(--text); line-height:1; }
+    .modal-close:hover { background:var(--border); }
+    .modal-lang-toggle { display:flex; border:1px solid var(--border); border-radius:6px; overflow:hidden; }
+    .modal-lang-btn { cursor:pointer; background:var(--surface); border:none; padding:5px 12px; font-size:12px; font-weight:700; font-family:inherit; color:var(--muted); }
+    .modal-lang-btn:not(:last-child) { border-right:1px solid var(--border); }
+    .modal-lang-btn.active { background:var(--accent); color:#fff; }
+    .modal-body { padding:18px 22px 22px; display:flex; flex-direction:column; gap:20px; }
+    .modal-grid { display:grid; grid-template-columns:auto 1fr; gap:6px 16px; align-items:start; }
+    .modal-lbl { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); white-space:nowrap; padding-top:2px; }
+    .modal-val { font-size:13px; }
+    .modal-desc-box { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 14px; font-size:13px; line-height:1.6; }
+    .modal-desc-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:6px; }
+    .no-content { font-style:italic; color:var(--muted); font-size:12px; }
+    .validated-badge { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:6px; }
+    .validated-yes { background:#dcfce7; color:#166534; }
+    .validated-no  { background:#fee2e2; color:#dc2626; }
+    .dark .validated-yes { background:#0a2e1a; color:#4ade80; }
+    .dark .validated-no  { background:#2d0a0a; color:#f87171; }
+    .badge { display:inline-flex; align-items:center; gap:3px; font-size:10px; font-weight:700; padding:2px 7px; border-radius:4px; white-space:nowrap; }
+    .badge-lang { font-size:10px; font-weight:700; padding:1px 5px; border-radius:3px; }
+    .badge-fr { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
+    .badge-en { background:#f0fdf4; color:#166534; border:1px solid #86efac; }
+    .piment { letter-spacing:-2px; font-size:13px; }
+
+    @media(max-width:640px) {
+      .modal-top { flex-direction:column; }
+      .modal-top-right { flex-direction:row; align-items:center; }
+    }
+
+    /* ── TOAST ── */
+    #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:#1f2328; color:#fff; border-radius:8px; padding:12px 22px; font-size:13px; font-weight:600; z-index:10000; transition:transform .3s,opacity .3s; opacity:0; white-space:nowrap; }
+    #toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+
+    footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>ℹ️ <span data-i18n="ria_title">Informations Ateliers</span></p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="btn" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <a class="btn" href="gestion_planning.html" data-i18n="nav_admin">⚙️ Admin</a>
+      <button class="btn" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="btn" onclick="exportAteliersDetailsExcel()">📥 Export Excel</button>
+      <button class="btn" onclick="toggleImportPanel()">📤 Import Excel</button>
+      <button class="btn" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit">Mode Nuit</span></button>
+      <input class="hidden-file-input" id="importExcelInput" type="file" accept=".xlsx" onchange="handleImportFile(event)">
+      <button class="btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
+    </div>
+  </header>
+
+  <div class="import-panel" id="importPanel">
+    <div class="import-title">Import des informations ateliers</div>
+    <div class="import-help">Importe un fichier Excel au format <strong>TAF2026_ATELIERS DETAILS</strong> (23 ou 26 colonnes, avec ou sans Animateur 3/4). Seuls les champs Atelier (FR), Piment, Workshop name (ENG), Description (FR/ENG), Instructions participants (FR/ENG), Estimation préparation, Informations logistiques, Besoins logistiques spécifiques et Consignes HELPER (avant/pendant/après) sont pris en compte, avec l’ID comme repère.</div>
+    <div class="import-actions">
+      <button class="btn" onclick="triggerImportFile()">Choisir un fichier .xlsx</button>
+      <button class="btn btn-sm" onclick="closeImportPanel()">Fermer</button>
+    </div>
+    <div class="import-summary" id="importSummary"></div>
+  </div>
+
+  <!-- ══ ÉCRAN LISTE ══ -->
+  <div id="screenList">
+
+    <div class="filters-panel">
+      <div class="filters-title">🔍 <span data-i18n="r_desc_filters_title">Filtres</span></div>
+      <div class="filters-grid">
+        <div class="filter-group">
+          <div class="filter-label" data-i18n="r_desc_filter_jour">📅 Jour</div>
+          <select class="filter-select" id="fJour" onchange="applyFilters()">
+            <option value="" data-i18n="r_desc_all_days">Tous les jours</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label" data-i18n="r_desc_filter_type">🏷 Type</div>
+          <select class="filter-select" id="fType" onchange="applyFilters()">
+            <option value="" data-i18n="r_desc_all_types">Tous les types</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">👤 Nom</div>
+          <select class="filter-select" id="fNom" onchange="applyFilters()">
+            <option value="">Tout le monde</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label">🎭 Rôle</div>
+          <select class="filter-select" id="fRole" onchange="applyFilters()">
+            <option value="">Tous les rôles</option>
+            <option value="animateur">Animateur</option>
+            <option value="helper">Helper</option>
+            <option value="traducteur">Traducteur</option>
+            <option value="angel">Angel</option>
+          </select>
+        </div>
+        <div class="filter-reset-wrap">
+          <button class="btn btn-sm" onclick="resetFilters()" data-i18n="r_desc_filter_reset">✕ Réinitialiser</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-bar">
+      <div class="results-count" id="resultsCount"></div>
+    </div>
+
+    <div class="ws-list" id="wsList"></div>
+
+  </div><!-- /screenList -->
+
+  <div class="modal-overlay" id="detailModal" onclick="closeModalOnOverlay(event)">
+    <div class="modal-box" id="detailBox">
+      <div class="modal-top">
+        <div class="modal-top-left">
+          <div class="modal-atelier" id="mTitle">—</div>
+          <div class="modal-sub" id="mSub"></div>
+        </div>
+        <div class="modal-top-right">
+          <button class="modal-close" onclick="closeModal()" title="Fermer">✕</button>
+          <div class="modal-lang-toggle">
+            <button class="modal-lang-btn active" id="mlBtnFr" onclick="setModalLang('fr')">FR</button>
+            <button class="modal-lang-btn" id="mlBtnEn" onclick="setModalLang('en')">ENG</button>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body" id="mBody"></div>
+    </div>
+  </div>
+
+  <footer data-i18n="ria_footer">Tantramour 2026 — Informations Ateliers</footer>
+</div>
+
+<div id="toast"></div>
+
+<script src="github-api.js"></script>
+<script src="loader.js"></script>
+<script src="ref_piment.js"></script>
+<script src="ref_consignes_type.js"></script>
+<script src="ref_consignes_recurrentes.js"></script>
+<script>
+if (typeof LOGISTICS_HELPERS === 'undefined') window.LOGISTICS_HELPERS = {};
+loadData(['data.js','ref_descriptions.js','logistics.js','logistics.special.js','logistics.helpers.js','ref_jours.js','ref_notes.js','ref_consignes_type.js','ref_consignes_recurrentes.js'], function() {
+
+// ════════════════════════════════════════════
+// CONSTANTES
+// ════════════════════════════════════════════
+var JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+var JOUR_META  = {
+  'Jour 1':{ labelEn:'Day 1', date:'Samedi 29 août',   dateEn:'Sat. Aug 29',  emoji:'🌅' },
+  'Jour 2':{ labelEn:'Day 2', date:'Dimanche 30 août', dateEn:'Sun. Aug 30',  emoji:'☀️' },
+  'Jour 3':{ labelEn:'Day 3', date:'Lundi 31 août',    dateEn:'Mon. Aug 31',  emoji:'🌿' },
+  'Jour 4':{ labelEn:'Day 4', date:'Mardi 1 sept.',    dateEn:'Tue. Sep 1',   emoji:'🔥' },
+  'Jour 5':{ labelEn:'Day 5', date:'Mercredi 2 sept.', dateEn:'Wed. Sep 2',   emoji:'💧' },
+  'Jour 6':{ labelEn:'Day 6', date:'Jeudi 3 sept.',    dateEn:'Thu. Sep 3',   emoji:'🌙' },
+  'Jour 7':{ labelEn:'Day 7', date:'Vendredi 4 sept.', dateEn:'Fri. Sep 4',   emoji:'✨' },
+};
+
+function jourLabel(jour) {
+  var lang = (typeof I18n !== 'undefined') ? I18n.getLang() : 'fr';
+  var meta = JOUR_META[jour] || {};
+  return (lang === 'en' && meta.labelEn) ? meta.labelEn : (jour || '—');
+}
+
+// ════════════════════════════════════════════
+// ÉTAT
+// ════════════════════════════════════════════
+var currentAgendaIdx = -1;
+var _modalLang = 'fr';
+var _modalEntry = null;
+var IMPORT_ALLOWED_PIMENTS = { '0':true, '1':true, '2':true, '3':true };
+var IMPORT_ALLOWED_PREP = { '0':true, '15':true, '20':true, '30':true, '45':true, '50':true, '60':true, '80':true, '90':true, '100':true, '110':true, '120':true };
+// Format 23 cols (interne) : ID, Atelier, Anim1, Anim2, Type, Date, Jour, HeureDébut, HeureFin, Lieu, Piment, Note, ...
+// Format 26 cols (TRANSFORM_UPLOAD) : idem mais avec Anim3 et Anim4 en cols 5-6 → décalage de +2 à partir de la col 5
+var IMPORT_HEADERS_BASE = [
+  'ID','Atelier (FR)','Animateur 1','Animateur 2'
+]; // cols 1-4 communes aux deux formats
+var IMPORT_HEADERS_23 = [
+  'ID','Atelier (FR)','Animateur 1','Animateur 2','Type','Date (DD/MM/YYYY)','Jour','Heure de début','Heure de fin','Lieu','Piment','Note',
+  'Workshop name (ENG)','Description (FR)','Description (ENG)','Instructions participants (FR)','Participant instructions (ENG)',
+  'Estimation préparation','Informations logistiques','Besoins logistiques spécifiques','Consignes HELPER – AVANT','Consignes HELPER – PENDANT','Consignes HELPER – APRES'
+];
+var IMPORT_HEADERS_26 = [
+  'ID','Atelier (FR)','Animateur 1','Animateur 2','Animateur 3','Animateur 4','Type','Date (DD/MM/YYYY)','Jour','Heure de début','Heure de fin','Lieu','Piment','Note',
+  'Workshop name (ENG)','Description (FR)','Description (ENG)','Instructions participants (FR)','Participant instructions (ENG)',
+  'Estimation préparation','Informations logistiques','Besoins logistiques spécifiques','Consignes HELPER – AVANT','Consignes HELPER – PENDANT','Consignes HELPER – APRES','Commentaire'
+];
+// Décalage 0 = format 23 cols, décalage 2 = format 26 cols
+var IMPORT_FIELD_DEFS = [
+  { key:'piment',        label:'Piment',                              col:11 },
+  { key:'nomEn',         label:'Workshop name (ENG)',                 col:13 },
+  { key:'descFr',        label:'Description (FR)',                    col:14 },
+  { key:'descEn',        label:'Description (ENG)',                   col:15 },
+  { key:'consigne',      label:'Instructions participants (FR)',       col:16 },
+  { key:'consigneEn',    label:'Participant instructions (ENG)',       col:17 },
+  { key:'prepDuration',  label:'Estimation préparation',              col:18 },
+  { key:'logInfo',       label:'Informations logistiques',            col:19 },
+  { key:'logSpecial',    label:'Besoins logistiques spécifiques',     col:20 },
+  { key:'helperAvant',   label:'Consignes HELPER – AVANT',            col:21 },
+  { key:'helperPendant', label:'Consignes HELPER – PENDANT',          col:22 },
+  { key:'helperApres',   label:'Consignes HELPER – APRES',            col:23 }
+]; // cols pour format 23 — buildImportPreview() applique le décalage si format 26
+var IMPORT_PREVIEW = null;
+
+// ════════════════════════════════════════════
+// INDEX DESCRIPTIONS
+// ════════════════════════════════════════════
+var DESCS_BY_NAME = {};
+if (typeof REF_DESCRIPTIONS !== 'undefined') {
+  REF_DESCRIPTIONS.forEach(function(d) {
+    DESCS_BY_NAME[(d.atelier||'').trim().toLowerCase()] = d;
+  });
+}
+function getDesc(atelier) {
+  return DESCS_BY_NAME[(atelier||'').trim().toLowerCase()] || null;
+}
+function rebuildDescIndex() {
+  DESCS_BY_NAME = {};
+  if (typeof REF_DESCRIPTIONS === 'undefined') return;
+  REF_DESCRIPTIONS.forEach(function(d) {
+    DESCS_BY_NAME[(d.atelier||'').trim().toLowerCase()] = d;
+  });
+}
+
+// ════════════════════════════════════════════
+// PEUPLEMENT DES FILTRES
+// ════════════════════════════════════════════
+function buildFilters() {
+  var jours=new Set(), types=new Set(), noms=new Set();
+
+  AGENDA.forEach(function(e) {
+    if (e.jour)       jours.add(e.jour);
+    if (e.type)       types.add(e.type);
+    if (e.fac1)       noms.add(e.fac1);
+    if (e.fac2)       noms.add(e.fac2);
+    if (e.fac3)       noms.add(e.fac3);
+    if (e.fac4)       noms.add(e.fac4);
+    if (e.helper1)    noms.add(e.helper1);
+    if (e.helper2)    noms.add(e.helper2);
+    if (e.helper3)    noms.add(e.helper3);
+    if (e.helper4)    noms.add(e.helper4);
+    if (e.traduction) noms.add(e.traduction);
+    if (e.angel)      noms.add(e.angel);
+  });
+
+  function fill(selId, set, sorted) {
+    var sel = document.getElementById(selId);
+    (sorted ? Array.from(set).sort(function(a,b){return a.localeCompare(b,'fr');}) : JOUR_ORDER.filter(function(j){return set.has(j);}))
+      .forEach(function(v) {
+        var o = document.createElement('option');
+        o.value = v; o.textContent = v;
+        if (selId === 'fJour') {
+          var meta = JOUR_META[v] || {};
+          o.textContent = v + (meta.date ? ' — ' + meta.date : '');
+        }
+        sel.appendChild(o);
+      });
+  }
+
+  fill('fJour', jours, false);
+  fill('fType', types, true);
+  fill('fNom',  noms,  true);
+}
+
+// ════════════════════════════════════════════
+// FILTRAGE
+// ════════════════════════════════════════════
+function getFiltered() {
+  var fJ = document.getElementById('fJour').value;
+  var fT = document.getElementById('fType').value;
+  var fR = document.getElementById('fRole').value;
+  var fN = document.getElementById('fNom').value;
+
+  var result = [];
+  AGENDA.forEach(function(e, idx) {
+    if (fJ && e.jour !== fJ) return;
+    if (fT && e.type !== fT) return;
+    if (fN) {
+      var inAnim = (e.fac1 === fN || e.fac2 === fN || e.fac3 === fN || e.fac4 === fN);
+      var inHelp = (e.helper1 === fN || e.helper2 === fN || e.helper3 === fN || e.helper4 === fN);
+      var inTrad = (e.traduction === fN);
+      var inAngel= (e.angel === fN);
+      if (fR === 'animateur'  && !inAnim)  return;
+      if (fR === 'helper'     && !inHelp)  return;
+      if (fR === 'traducteur' && !inTrad)  return;
+      if (fR === 'angel'      && !inAngel) return;
+      if (!fR && !inAnim && !inHelp && !inTrad && !inAngel) return;
+    } else if (fR) {
+      if (fR === 'animateur'  && !e.fac1 && !e.fac2 && !e.fac3 && !e.fac4)                    return;
+      if (fR === 'helper'     && !e.helper1 && !e.helper2 && !e.helper3 && !e.helper4)         return;
+      if (fR === 'traducteur' && !e.traduction)                                                 return;
+      if (fR === 'angel'      && !e.angel)                                                      return;
+    }
+    result.push({ e:e, idx:idx });
+  });
+
+  result.sort(function(a,b) {
+    var dj = JOUR_ORDER.indexOf(a.e.jour) - JOUR_ORDER.indexOf(b.e.jour);
+    if (dj !== 0) return dj;
+    return heureMin(a.e.heure) - heureMin(b.e.heure);
+  });
+  return result;
+}
+
+function applyFilters() { renderList(getFiltered()); }
+window.applyFilters = applyFilters;
+
+function resetFilters() {
+  ['fJour','fType','fRole','fNom'].forEach(function(id){
+    document.getElementById(id).value = '';
+  });
+  applyFilters();
+}
+window.resetFilters = resetFilters;
+
+// ════════════════════════════════════════════
+// RENDU LISTE
+// ════════════════════════════════════════════
+function renderList(items) {
+  var list  = document.getElementById('wsList');
+  var count = document.getElementById('resultsCount');
+  count.innerHTML = I18n.t('r_desc_showing') + ' <strong>' + items.length + '</strong> ' +
+    (items.length > 1 ? I18n.t('r_desc_workshops') : I18n.t('r_desc_workshop'));
+
+  if (!items.length) {
+    list.innerHTML = '<div class="empty">' + I18n.t('r_desc_no_result') + '</div>';
+    return;
+  }
+
+  list.innerHTML = items.map(function(item) {
+    var e   = item.e;
+    var idx = item.idx;
+    var meta = JOUR_META[e.jour] || {};
+    var facs = [e.fac1,e.fac2].filter(Boolean).join(' & ');
+    var pimentStr = e.piment > 0 ? ' ' + '🌶️'.repeat(e.piment) : '';
+    var logEntry = e.logisticId && typeof LOGISTICS !== 'undefined' && LOGISTICS[e.logisticId];
+    var hasLog = logEntry && (logEntry.text||'').trim();
+    var isVal  = (getDesc(e.atelier) && getDesc(e.atelier).validatedByFac) ||
+                 (logEntry && logEntry.validatedByFac);
+    var pills = '';
+    if (isVal)  pills += '<span class="pill pill-green">' + I18n.t('rsa_pill_validee') + '</span>';
+    if (hasLog) pills += '<span class="pill pill-green">Log ✓</span>';
+    else        pills += '<span class="pill pill-grey">Log —</span>';
+
+    var langNow = I18n.getLang();
+    var dateLabel = langNow === 'en' ? (meta.dateEn || meta.date) : meta.date;
+    return '<div class="ws-card" onclick="selectAtelier(' + idx + ')">' +
+      '<div class="ws-card-left">' +
+        '<div class="ws-card-jour">' + esc(jourLabel(e.jour)) + (dateLabel ? ' — ' + dateLabel : '') +
+          (e.heure ? ' · ' + esc(e.heure) : '') + '</div>' +
+        '<div class="ws-card-name">' + esc(e.atelier||'—') + pimentStr + (e.id ? ' <span style="color:var(--muted);font-size:12px">(' + esc(e.id) + ')</span>' : '') + '</div>' +
+        '<div class="ws-card-meta">' +
+          '<span class="tag tag-type">' + esc(e.type||'') + '</span>' +
+          (e.lieu ? '<span>📍 '+esc(e.lieu)+'</span>' : '') +
+          (facs   ? '<span>🎓 '+esc(facs)+'</span>'   : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="ws-card-right">' + pills +
+        '<span style="font-size:16px;color:var(--muted);margin-left:2px">›</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  window._currentItems = items;
+}
+
+// ════════════════════════════════════════════
+// SÉLECTION → DÉTAIL
+// ════════════════════════════════════════════
+function selectAtelier(agendaIdx) {
+  var e = AGENDA[agendaIdx];
+  if (!e) return;
+  currentAgendaIdx = agendaIdx;
+  _modalEntry = e;
+  _modalLang = (typeof I18n !== 'undefined') ? I18n.getLang() : 'fr';
+  document.getElementById('mlBtnFr').classList.toggle('active', _modalLang==='fr');
+  document.getElementById('mlBtnEn').classList.toggle('active', _modalLang==='en');
+
+  var pm = parseInt(e.piment)||0;
+  document.getElementById('mTitle').innerHTML = esc(e.atelier||'—') + (pm ? ' '+pimentHtml(pm) : '');
+  document.getElementById('mSub').textContent = jourSubtitle(e.jour, _modalLang);
+
+  renderModalBody();
+  document.getElementById('detailModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+window.selectAtelier = selectAtelier;
+
+window.setModalLang = function(lang) {
+  _modalLang = lang;
+  document.getElementById('mlBtnFr').classList.toggle('active', lang==='fr');
+  document.getElementById('mlBtnEn').classList.toggle('active', lang==='en');
+  if (_modalEntry) document.getElementById('mSub').textContent = jourSubtitle(_modalEntry.jour, lang);
+  renderModalBody();
+};
+
+window.closeModal = function() {
+  document.getElementById('detailModal').classList.remove('open');
+  document.body.style.overflow = '';
+};
+window.closeModalOnOverlay = function(ev) {
+  if (ev.target === document.getElementById('detailModal')) closeModal();
+};
+document.addEventListener('keydown', function(ev) {
+  if (ev.key === 'Escape') closeModal();
+});
+
+function renderModalBody() {
+  var e = _modalEntry;
+  var lang = _modalLang;
+  if (!e) return;
+
+  var logId = e.logisticId || '';
+  var logE = logId && typeof LOGISTICS!=='undefined' ? LOGISTICS[logId] : null;
+  var logH = logId && typeof LOGISTICS_HELPERS!=='undefined' ? LOGISTICS_HELPERS[logId] : null;
+  var logS = logId && typeof LOGISTICS_SPECIAL!=='undefined' ? LOGISTICS_SPECIAL[logId] : null;
+  var desc = getDesc(e.atelier);
+
+  var dur = calcDuree(e.heure);
+  var prep = (logE && logE.prepDuration != null) ? logE.prepDuration : 15;
+  var debut = heureMin(e.heure);
+  var arrivee = (debut!==null) ? fmtHeure(debut-prep) : '';
+
+  var facs = [e.fac1,e.fac2,e.fac3,e.fac4].filter(Boolean);
+  var helpers = [e.helper1,e.helper2,e.helper3,e.helper4].filter(Boolean);
+  var hasBilingue = isBilingue(e.fac1) || isBilingue(e.fac2) || isBilingue(e.fac3) || isBilingue(e.fac4);
+  var langBadge = (e.traduction || hasBilingue)
+    ? '<span class="badge badge-lang badge-en">FR / EN</span>'
+    : '<span class="badge badge-lang badge-fr">FR</span>';
+
+  var noteVal = e.note ? noteLabel(e.note, lang) : '';
+  var nomAtelierVal = esc(e.atelier||'—') + ' ' + langBadge;
+  var typeVal = e.type ? esc(e.type) : '—';
+  var jourDate = jourSubtitle(e.jour, lang);
+  var horaireVal = esc(e.heure||'—') + (dur ? ' <span style="color:var(--muted);font-size:11px">('+fmtDuree(dur)+')</span>' : '');
+  var rows1 = [];
+  rows1.push(['🧘 '+(lang==='en'?'Workshop (FR/ENG)':'Nom atelier (FR/ENG)'), nomAtelierVal]);
+  rows1.push(['🏷 '+(lang==='en'?'Type':'Type'), typeVal]);
+  rows1.push(['📅 '+(lang==='en'?'Day - Date':'Jour - Date'), jourDate]);
+  rows1.push(['🕐 '+(lang==='en'?'Schedule':'Horaire'), horaireVal]);
+  if (arrivee) rows1.push(['⏰ '+(lang==='en'?'Arrive at':'Arrivée'), '<strong style="color:#dc2626">'+arrivee+'</strong>']);
+  if (e.lieu) rows1.push(['📍 '+(lang==='en'?'Venue':'Lieu'), esc(e.lieu)]);
+  rows1.push(['🎓 '+(lang==='en'?'Teacher(s)':'Animateur(s)'), facs.length ? facs.map(esc).join(' &amp; ') : '—']);
+  rows1.push(['🙌 '+(lang==='en'?'Helper(s)':'Helper(s)'), helpers.length ? helpers.map(esc).join(', ') : '—']);
+  rows1.push(['🌐 '+(lang==='en'?'Translator':'Traducteur'), e.traduction ? esc(e.traduction) : '—']);
+  rows1.push(['👼 Angel', angelWithPhone(e.angel)]);
+  rows1.push(['🏷 Note', noteVal ? esc(noteVal) : '—']);
+
+  var gridHtml1 = rows1.map(function(r) {
+    return '<div class="modal-lbl">'+r[0]+'</div><div class="modal-val">'+r[1]+'</div>';
+  }).join('');
+
+  var noTxt = '<span class="no-content">—</span>';
+  var dark = document.body.classList.contains('dark');
+  var descTxt = (lang==='en' && desc && desc.descEn && desc.descEn.trim())
+    ? desc.descEn : (desc && desc.descFr && desc.descFr.trim() ? desc.descFr : '');
+  var consigneTxt = (lang==='en' && desc && desc.consigneEn && desc.consigneEn.trim())
+    ? desc.consigneEn : (desc && desc.consigne && desc.consigne.trim() ? desc.consigne : '');
+  var consigneLabel = lang==='en' ? '⚠️ Participant instructions' : '⚠️ Instructions participants';
+
+  // ── Consignes type actives pour cet atelier ──────────────────────────────
+  var _disabled = e._consignesDisabled || {};
+  function _consignesTypeBlock(placement) {
+    if (typeof REF_CONSIGNES_TYPE === 'undefined') return '';
+    var items = REF_CONSIGNES_TYPE.filter(function(c) {
+      if (c.actif === false) return false;
+      if (_disabled[c.id]) return false;
+      if (!c.placements || c.placements.indexOf(placement) === -1) return false;
+      if (c.types && c.types.length > 0 && e.type && c.types.indexOf(e.type) === -1) return false;
+      return true;
+    });
+    if (!items.length) return '';
+    var html = '';
+    items.forEach(function(c) {
+      var txt = (lang==='en' && c.valueEn && c.valueEn.trim()) ? c.valueEn : c.valueFr;
+      if (txt) html += esc(txt).replace(/\n/g,'<br>') + '<br>';
+    });
+    return html ? '<span>' + html + '</span>' : '';
+  }
+
+  // ── Consignes récurrentes sélectionnées pour cet atelier ─────────────────
+  var _corecSel = e._corecSelected || {};
+  function _consignesRecurrentesBlock(placement) {
+    if (typeof REF_CONSIGNES_RECURRENTES === 'undefined') return '';
+    var selectedIds = (_corecSel[placement] || []);
+    if (!selectedIds.length) return '';
+    var items = REF_CONSIGNES_RECURRENTES.filter(function(c) {
+      return c.actif !== false && selectedIds.indexOf(c.id) !== -1;
+    });
+    if (!items.length) return '';
+    var html = '';
+    items.forEach(function(c) {
+      var txt = (lang==='en' && c.valueEn && c.valueEn.trim()) ? c.valueEn : c.valueFr;
+      if (txt) html += esc(txt).replace(/\n/g,'<br>') + '<br>';
+    });
+    return html ? '<span>' + html + '</span>' : '';
+  }
+
+  var S_INFO = dark
+    ? 'background:#2d2500;border:2px solid #92400e;border-radius:12px;padding:16px 18px;margin-bottom:0'
+    : 'background:#fefce8;border:2px solid #fde68a;border-radius:12px;padding:16px 18px;margin-bottom:0';
+  var S_INFO_TL = dark ? 'color:#fcd34d' : 'color:#854d0e';
+  var S_LOG = dark
+    ? 'background:#052e16;border:2px solid #16a34a;border-radius:12px;padding:16px 18px;margin-bottom:0'
+    : 'background:#f0fdf4;border:2px solid #4ade80;border-radius:12px;padding:16px 18px;margin-bottom:0';
+  var S_LOG_TL = dark ? 'color:#4ade80' : 'color:#166534';
+  var S_SPEC = dark
+    ? 'background:#1a0533;border:2px solid #9333ea;border-radius:12px;padding:16px 18px;margin-bottom:0'
+    : 'background:#faf5ff;border:2px solid #c084fc;border-radius:12px;padding:16px 18px;margin-bottom:0';
+  var S_SPEC_TL = dark ? 'color:#c084fc' : 'color:#7e22ce';
+  var S_HELP = dark
+    ? 'background:#0c1a40;border:2px solid #2563eb;border-radius:12px;padding:16px 18px;margin-bottom:0'
+    : 'background:#eff6ff;border:2px solid #3b82f6;border-radius:12px;padding:16px 18px;margin-bottom:0';
+  var S_HELP_TL = dark ? 'color:#60a5fa' : 'color:#1d4ed8';
+  var titleStyle = 'font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;padding-bottom:8px;margin-bottom:14px;border-bottom:2px solid;';
+
+  var sec1 = '<div style="'+S_INFO+'">'+
+    '<div style="'+titleStyle+S_INFO_TL+';border-bottom-color:'+(dark?'#92400e':'#fde68a')+'">'+
+      '1) '+(lang==='en'?'General information':'Informations générales')+
+    '</div>'+
+    '<div class="modal-grid">'+gridHtml1+'</div>'+
+    '<div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">'+
+      '<div class="modal-desc-box" style="border-color:'+(dark?'#92400e':'#fcd34d')+';background:'+(dark?'#2d2006':'#fffbeb')+'">'+
+        '<div class="modal-desc-lbl" style="color:#92400e">'+consigneLabel+'</div>'+
+        _consignesRecurrentesBlock('Participant')+
+        _consignesTypeBlock('Participant')+
+        '<div>'+(consigneTxt ? esc(consigneTxt).replace(/\n/g,'<br>') : noTxt)+'</div>'+
+      '</div>'+
+      '<div class="modal-desc-box">'+
+        '<div class="modal-desc-lbl">'+(lang==='en'?'Description':'Description atelier')+'</div>'+
+        '<div>'+(descTxt ? esc(descTxt).replace(/\n/g,'<br>') : noTxt)+'</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+
+  var isDefaultPrep = !(logE && logE.prepDuration != null);
+  var prepVal = prep+' min'+
+    (isDefaultPrep ? ' <span style="font-size:10px;color:var(--muted);font-style:italic;">('+(lang==='en'?'default':'défaut')+')</span>' : '')+
+    (arrivee ? ' &rarr; '+(lang==='en'?'arrival':'arrivée')+' <strong style="color:#dc2626">'+arrivee+'</strong>' : '');
+
+  var validBadge = logE
+    ? (logE.validatedByFac
+        ? '<span class="validated-badge validated-yes">&#10003; '+(lang==='en'?'Validated by teacher':'Validé par animateur')+'</span>'
+        : '<span class="validated-badge validated-no">&#8987; '+(lang==='en'?'Not yet validated':'Non encore validé')+'</span>')
+    : '<span class="validated-badge validated-no">&#8987; '+(lang==='en'?'Not yet validated':'Non encore validé')+'</span>';
+
+  var updatedAt = logE && logE.updatedAt ? logE.updatedAt : (logH && logH.updatedAt ? logH.updatedAt : (logS && logS.updatedAt ? logS.updatedAt : (desc && desc.updatedAt ? desc.updatedAt : '')));
+  var avantTxt = logH && logH.avant && logH.avant.trim().replace(/<[^>]*>/g,'').trim() ? logH.avant : '';
+  var pendantTxt = logH && logH.pendant && logH.pendant.trim().replace(/<[^>]*>/g,'').trim() ? logH.pendant : '';
+  var apresTxt = logH && logH.apres && logH.apres.trim().replace(/<[^>]*>/g,'').trim() ? logH.apres : '';
+  var logInfoTxt = logE && logE.html && logE.html.trim() ? logE.html : '';
+  var logSpecTxt = logS && logS.html && logS.html.trim().replace(/<[^>]*>/g,'').trim() ? logS.html : '';
+
+  var sec_log = '<div style="'+S_LOG+'">'+
+    '<div style="'+titleStyle+S_LOG_TL+';border-bottom-color:'+(dark?'#16a34a':'#4ade80')+'">'+
+      '2) '+(lang==='en'?'Logistics information':'Informations logistiques')+
+    '</div>'+
+    '<div class="modal-grid" style="margin-bottom:10px">'+
+      '<div class="modal-lbl" style="white-space:nowrap">'+(lang==='en'?'Preparation':'Préparation')+'</div>'+
+      '<div class="modal-val" style="white-space:nowrap">'+prepVal+'</div>'+
+    '</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px;">'+
+      '<div class="modal-desc-box">'+
+        '<div class="modal-desc-lbl">'+(lang==='en'?'Logistics info':'Informations logistiques')+'</div>'+
+        _consignesRecurrentesBlock('Logistique')+
+        _consignesTypeBlock('Logistique')+
+        '<div>'+(logInfoTxt ? logInfoTxt : noTxt)+'</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+
+  var sec_spec = '<div style="'+S_SPEC+'">'+
+    '<div style="'+titleStyle+S_SPEC_TL+';border-bottom-color:'+(dark?'#9333ea':'#c084fc')+'">'+
+      '3) '+(lang==='en'?'Specific logistics needs':'Besoins logistiques spécifiques')+
+    '</div>'+
+    _consignesRecurrentesBlock('Spécifique')+
+    _consignesTypeBlock('Spécifique')+
+    '<div>'+(logSpecTxt ? logSpecTxt : noTxt)+'</div>'+
+  '</div>';
+
+  var sec_help = '<div style="'+S_HELP+'">'+
+    '<div style="'+titleStyle+S_HELP_TL+';border-bottom-color:'+(dark?'#2563eb':'#3b82f6')+'">'+
+      '4) '+(lang==='en'?'Helper instructions':'Consignes helpers')+
+    '</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px;">'+
+      '<div class="modal-desc-box">'+
+        '<div class="modal-desc-lbl">'+(lang==='en'?'To do before':'À faire avant')+'</div>'+
+        _consignesTypeBlock('Avant')+
+        _consignesRecurrentesBlock('Avant')+
+        '<div>'+(avantTxt ? avantTxt : noTxt)+'</div>'+
+      '</div>'+
+      '<div class="modal-desc-box">'+
+        '<div class="modal-desc-lbl">'+(lang==='en'?'To do during':'À faire pendant')+'</div>'+
+        _consignesTypeBlock('Pendant')+
+        _consignesRecurrentesBlock('Pendant')+
+        '<div>'+(pendantTxt ? pendantTxt : noTxt)+'</div>'+
+      '</div>'+
+      '<div class="modal-desc-box">'+
+        '<div class="modal-desc-lbl">'+(lang==='en'?'To do after':'À faire après')+'</div>'+
+        _consignesTypeBlock('Après')+
+        _consignesRecurrentesBlock('Après')+
+        '<div>'+(apresTxt ? apresTxt : noTxt)+'</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+
+  var sec_footer =
+    '<div style="padding:10px 4px 2px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:4px;">'+
+      validBadge+
+      '<div style="font-size:11px;color:var(--muted)">'+(lang==='en'?'Last updated':'Dernière modification')+' : '+(updatedAt ? esc(updatedAt) : '—')+'</div>'+
+    '</div>';
+
+  document.getElementById('mBody').innerHTML =
+    '<div style="display:flex;flex-direction:column;gap:14px">'+
+      sec1 + sec_log + sec_spec + sec_help + sec_footer +
+    '</div>';
+}
+
+// ════════════════════════════════════════════
+// UTILITAIRES
+// ════════════════════════════════════════════
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function htmlToText(html) {
+  if (!html) return '';
+  var div = document.createElement('div');
+  div.innerHTML = html;
+  return (div.textContent || div.innerText || '').replace(/\s+\n/g, '\n').trim();
+}
+function noteLabel(val, lang) {
+  if (!val) return '';
+  if (typeof REF_NOTES !== 'undefined') {
+    var e = REF_NOTES.find(function(n){ return n.value===val; });
+    if (e) return (lang==='en' && e.valueEn) ? e.valueEn : e.value;
+  }
+  return val;
+}
+function pimentHtml(n) {
+  return n > 0 ? '<span class="piment">'+'🌶️'.repeat(n)+'</span>' : '';
+}
+function isBilingue(nom) {
+  if (!nom || typeof REF_RESSOURCES==='undefined') return false;
+  var r = REF_RESSOURCES.find(function(x){ return x.value===nom; });
+  return r && r.langues && r.langues.indexOf('FR')!==-1 && r.langues.indexOf('EN')!==-1;
+}
+function angelWithPhone(nom) {
+  if (!nom) return '—';
+  if (typeof REF_RESSOURCES === 'undefined') return esc(nom);
+  var r = REF_RESSOURCES.find(function(x){ return x.value===nom; });
+  if (!r || !r.tel) return esc(nom);
+  return esc(nom) + ' <span style="color:var(--muted)">(' + esc(r.tel) + ')</span>';
+}
+function heureMin(h) {
+  if (!h) return null;
+  var m = String(h).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1])*60+parseInt(m[2]) : null;
+}
+function calcDuree(h) {
+  if (!h) return null;
+  var m = String(h).replace(/\./g,':').replace(/[–—]/g,'-').match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  var d = (parseInt(m[3])*60+parseInt(m[4])) - (parseInt(m[1])*60+parseInt(m[2]));
+  if (d < 0) d += 1440;
+  return d;
+}
+function fmtDuree(mins) {
+  if (!mins) return '';
+  var h = Math.floor(mins/60), mn = mins%60;
+  return h > 0 ? (mn > 0 ? h+'h'+(mn<10?'0':'')+mn : h+'h') : mn+'min';
+}
+function fmtHeure(mins) {
+  if (mins == null) return '';
+  var h = Math.floor(mins/60)%24, m = mins%60;
+  return h+':'+(m<10?'0':'')+m;
+}
+function jourSubtitle(jour, lang) {
+  var m = JOUR_META[jour];
+  if (!m) return jour;
+  var j = (lang === 'en' && m.labelEn) ? m.labelEn : jour;
+  var d = (lang === 'en' && m.dateEn) ? m.dateEn : m.date;
+  return j + (d ? ' — ' + d : '');
+}
+function parseHeureDebut(heure) {
+  if (!heure) return '';
+  var match = String(heure).replace(/\./g, ':').match(/(\d{1,2}:\d{2})/);
+  if (!match) return '';
+  var parts = match[1].split(':');
+  return parts[0].padStart(2, '0') + ':' + parts[1].padStart(2, '0');
+}
+function parseHeureFin(heure) {
+  if (!heure) return '';
+  var all = String(heure).replace(/\./g, ':').match(/(\d{1,2}:\d{2})/g);
+  if (!all || all.length < 2) return '';
+  var parts = all[1].split(':');
+  return parts[0].padStart(2, '0') + ':' + parts[1].padStart(2, '0');
+}
+function buildAteliersExportRows() {
+  return AGENDA.map(function(e) {
+    var desc = getDesc(e.atelier) || {};
+    var logId = e.logisticId || '';
+    var logEntry = logId && typeof LOGISTICS !== 'undefined' ? LOGISTICS[logId] : null;
+    var specEntry = logId && typeof LOGISTICS_SPECIAL !== 'undefined' ? LOGISTICS_SPECIAL[logId] : null;
+    var helpEntry = logId && typeof LOGISTICS_HELPERS !== 'undefined' ? LOGISTICS_HELPERS[logId] : null;
+    return {
+      id: e.id || '',
+      atelier: e.atelier || '',
+      fac1: e.fac1 || '',
+      fac2: e.fac2 || '',
+      fac3: e.fac3 || '',
+      fac4: e.fac4 || '',
+      date: getExportDateValue(e),
+      jour: e.jour || '',
+      type: e.type || '',
+      heureDebut: parseHeureDebut(e.heure || ''),
+      heureFin: parseHeureFin(e.heure || ''),
+      lieu: e.lieu || '',
+      piment: e.piment || 0,
+      note: e.note || '',
+      nomEn: desc.nomEn || '',
+      descFr: desc.descFr || '',
+      descEn: desc.descEn || '',
+      consigneFr: desc.consigne || '',
+      consigneEn: desc.consigneEn || '',
+      prepDuration: logEntry && logEntry.prepDuration !== undefined ? logEntry.prepDuration : '',
+      logInfo: logEntry ? htmlToText(logEntry.html || logEntry.text || '') : '',
+      logSpecial: specEntry ? htmlToText(specEntry.html || specEntry.text || '') : '',
+      helperAvant: helpEntry ? htmlToText(helpEntry.avant || '') : '',
+      helperPendant: helpEntry ? htmlToText(helpEntry.pendant || '') : '',
+      helperApres: helpEntry ? htmlToText(helpEntry.apres || '') : ''
+    };
+  });
+}
+function escapeXml(value) {
+  return String(value == null ? '' : value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+function formatExportDate(dateStr) {
+  if (!dateStr) return '';
+  var match = String(dateStr).match(/(\d{1,2})\s+[A-Za-zéû\.]+\s+(\d{4})/);
+  if (!match) return dateStr;
+  var day = String(parseInt(match[1], 10)).padStart(2, '0');
+  var year = match[2];
+  var monthMap = {
+    janvier:'01', fevrier:'02', février:'02', mars:'03', avril:'04', mai:'05', juin:'06', juillet:'07',
+    aout:'08', août:'08', septembre:'09', octobre:'10', novembre:'11', decembre:'12', décembre:'12'
+  };
+  var monthKey = String(dateStr).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').match(/\d{1,2}\s+([a-z]+)\s+\d{4}/);
+  var month = monthKey && monthMap[monthKey[1]] ? monthMap[monthKey[1]] : '';
+  return month ? (day + '/' + month + '/' + year) : dateStr;
+}
+var JOUR_DATE_MAP = {
+  'Jour 1': '29/08/2026',
+  'Jour 2': '30/08/2026',
+  'Jour 3': '31/08/2026',
+  'Jour 4': '01/09/2026',
+  'Jour 5': '02/09/2026',
+  'Jour 6': '03/09/2026',
+  'Jour 7': '04/09/2026'
+};
+function getExportDateValue(entry) {
+  if (entry.jour && JOUR_DATE_MAP[entry.jour]) return JOUR_DATE_MAP[entry.jour];
+  var refJour = typeof REF_JOURS !== 'undefined'
+    ? REF_JOURS.find(function(j) { return j.value === entry.jour; })
+    : null;
+  if (refJour && refJour.dateDdMmYyyy) return refJour.dateDdMmYyyy;
+  return formatExportDate(entry.date || '');
+}
+
+function buildExcelRows(rows) {
+  return rows.map(function(row) {
+    return [
+      row.id,row.atelier,row.fac1,row.fac2,row.fac3,row.fac4,row.type,row.date,row.jour,row.heureDebut,row.heureFin,row.lieu,row.piment,row.note,
+      row.nomEn,row.descFr,row.descEn,row.consigneFr,row.consigneEn,row.prepDuration,row.logInfo,row.logSpecial,row.helperAvant,row.helperPendant,row.helperApres
+    ];
+  });
+}
+function downloadExcelFile(rows, filename) {
+  var workbook = new ExcelJS.Workbook();
+  var sheet = workbook.addWorksheet('Ateliers');
+  var headers = [
+    'ID','Atelier (FR)','Animateur 1','Animateur 2','Animateur 3','Animateur 4','Type','Date (DD/MM/YYYY)','Jour','Heure de début','Heure de fin','Lieu','Piment','Note',
+    'Workshop name (ENG)','Description (FR)','Description (ENG)','Instructions participants (FR)','Participant instructions (ENG)',
+    'Estimation préparation','Informations logistiques','Besoins logistiques spécifiques','Consignes HELPER – AVANT','Consignes HELPER – PENDANT','Consignes HELPER – APRES'
+  ];
+  var grayColumns = { 13:true, 15:true, 16:true, 17:true, 18:true, 19:true, 20:true, 21:true, 22:true, 23:true, 24:true, 25:true };
+  var columnWidths = [12, 30, 24, 24, 24, 24, 18, 14, 12, 14, 14, 16, 10, 18, 28, 36, 36, 36, 36, 20, 40, 40, 30, 30, 30];
+
+  sheet.addRow(headers);
+  buildExcelRows(rows).forEach(function(values) {
+    sheet.addRow(values);
+  });
+
+  sheet.columns.forEach(function(column, index) {
+    column.width = columnWidths[index] || 18;
+  });
+ 
+  sheet.autoFilter = {
+    from: { row: 1, column: 1 },
+    to: { row: 1, column: headers.length }
+  };
+  sheet.views = [{ state: 'frozen', xSplit: 2, ySplit: 1 }];
+
+  sheet.getRow(1).eachCell(function(cell) {
+    cell.font = { bold: true };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9EAF7' } };
+    cell.border = {
+      right: { style: 'dotted', color: { argb: 'FF9CA3AF' } },
+      bottom: { style: 'thin', color: { argb: 'FFD1D5DB' } }
+    };
+  });
+
+  sheet.eachRow(function(row, rowNumber) {
+    if (rowNumber === 1) return;
+    var baseColor = rowNumber % 2 === 0 ? 'FFFFFFFF' : 'FFF3F4F6';
+    row.eachCell(function(cell, colNumber) {
+      var fillColor = grayColumns[colNumber] ? 'FFE5E7EB' : baseColor;
+      cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: fillColor } };
+      cell.border = {
+        right: { style: 'dotted', color: { argb: 'FF9CA3AF' } },
+        bottom: { style: 'thin', color: { argb: 'FFE5E7EB' } }
+      };
+      cell.alignment = {
+        vertical: 'top',
+        wrapText: colNumber >= 13
+      };
+      if (colNumber === 6 && cell.value) {
+        cell.numFmt = 'dd/mm/yyyy';
+      }
+    });
+  });
+
+  sheet.getColumn(6).eachCell(function(cell, rowNumber) {
+    if (rowNumber === 1 || !cell.value) return;
+    var parts = String(cell.value).split('/');
+    if (parts.length === 3) {
+      cell.value = new Date(Date.UTC(Number(parts[2]), Number(parts[1]) - 1, Number(parts[0])));
+      cell.numFmt = 'dd/mm/yyyy';
+    }
+  });
+
+  return workbook.xlsx.writeBuffer().then(function(buffer) {
+    var blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+}
+function exportAteliersDetailsExcel() {
+  var rows = buildAteliersExportRows();
+  var now = new Date();
+  var yyyy = now.getFullYear();
+  var mm = String(now.getMonth() + 1).padStart(2, '0');
+  var dd = String(now.getDate()).padStart(2, '0');
+  var filename = 'TAF2026_ATELIERS DETAILS_' + yyyy + '_' + mm + '_' + dd + '.xlsx';
+  if (typeof ExcelJS === 'undefined') {
+    showToast('❌ Bibliothèque Excel indisponible', true);
+    return;
+  }
+  downloadExcelFile(rows, filename).then(function() {
+    showToast('✅ Export Excel généré');
+  });
+}
+window.exportAteliersDetailsExcel = exportAteliersDetailsExcel;
+
+function toggleImportPanel() {
+  var panel = document.getElementById('importPanel');
+  panel.classList.toggle('open');
+}
+window.toggleImportPanel = toggleImportPanel;
+
+function closeImportPanel() {
+  document.getElementById('importPanel').classList.remove('open');
+}
+window.closeImportPanel = closeImportPanel;
+
+function triggerImportFile() {
+  document.getElementById('importExcelInput').click();
+}
+window.triggerImportFile = triggerImportFile;
+
+function normalizeCellValue(value) {
+  if (value == null) return '';
+  if (typeof value === 'object') {
+    if (value.text != null) return normalizeCellValue(value.text);
+    if (value.richText && value.richText.length) {
+      return normalizeCellValue(value.richText.map(function(part) { return part.text || ''; }).join(''));
+    }
+    if (value.result != null) return normalizeCellValue(value.result);
+    if (value.formula != null && value.result == null) return normalizeCellValue(value.formula);
+    if (value.sharedFormula != null && value.result == null) return normalizeCellValue(value.sharedFormula);
+    if (value.hyperlink != null) return normalizeCellValue(value.text || value.hyperlink);
+  }
+  return String(value).replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+}
+function normalizeComparableValue(value) {
+  return normalizeCellValue(value).replace(/\s+/g, ' ').trim();
+}
+function formatImportValue(value) {
+  var txt = normalizeCellValue(value);
+  return txt || '—';
+}
+function parseImportNumber(value) {
+  var txt = normalizeCellValue(value);
+  if (!txt) return '';
+  if (/^\d+(?:[\.,]\d+)?$/.test(txt)) {
+    return String(Number(txt.replace(',', '.')));
+  }
+  return txt;
+}
+function textToHtml(text) {
+  var safe = esc(normalizeCellValue(text));
+  return safe ? safe.replace(/\n/g, '<br>') : '';
+}
+function getAgendaByIdMap() {
+  var map = {};
+  AGENDA.forEach(function(entry, idx) {
+    if (entry.id) map[entry.id] = { entry:entry, idx:idx };
+  });
+  return map;
+}
+
+// Index de fallback : clé = "atelier|jour" normalisé → pour matcher même si l'ID a changé
+function getAgendaByKeyMap() {
+  var map = {};
+  AGENDA.forEach(function(entry, idx) {
+    var key = normalizeComparableValue((entry.atelier||'') + '|' + (entry.jour||''));
+    if (key && !map[key]) map[key] = { entry:entry, idx:idx };
+  });
+  return map;
+}
+function getImportHeaderError(row) {
+  // Détecte le format : si la colonne 5 est "Animateur 3" → format 26 cols (TRANSFORM_UPLOAD)
+  var col5 = normalizeComparableValue(row.getCell(5).value);
+  var headers = (col5 === normalizeComparableValue('Animateur 3')) ? IMPORT_HEADERS_26 : IMPORT_HEADERS_23;
+  // Vérifie chaque colonne connue (ignore les colonnes supplémentaires en fin de fichier)
+  for (var i = 0; i < headers.length; i++) {
+    if (normalizeComparableValue(row.getCell(i + 1).value) !== normalizeComparableValue(headers[i])) {
+      return 'Structure invalide : colonne ' + String.fromCharCode(65 + i) + ' attendue « ' + headers[i] + ' ».';
+    }
+  }
+  return headers === IMPORT_HEADERS_26 ? '__FORMAT26__' : '';
+}
+function handleImportFile(event) {
+  var file = event.target.files && event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  if (!/\.xlsx$/i.test(file.name)) {
+    showToast('❌ Le fichier doit être au format .xlsx', true);
+    renderImportError('Le fichier sélectionné n’est pas un .xlsx.');
+    return;
+  }
+  if (typeof ExcelJS === 'undefined') {
+    showToast('❌ Bibliothèque Excel indisponible', true);
+    renderImportError('La bibliothèque ExcelJS est indisponible.');
+    return;
+  }
+  closeModal();
+  document.getElementById('importPanel').classList.add('open');
+  renderImportLoading(file.name);
+  file.arrayBuffer().then(function(buffer) {
+    var workbook = new ExcelJS.Workbook();
+    return workbook.xlsx.load(buffer);
+  }).then(function(workbook) {
+    var sheet = workbook.worksheets[0];
+    if (!sheet) throw new Error('Le fichier Excel ne contient aucune feuille.');
+    var headerError = getImportHeaderError(sheet.getRow(1));
+    var colOffset = 0;
+    if (headerError === '__FORMAT26__') {
+      colOffset = 2; // Animateur 3 + Animateur 4 insérés en cols 5-6
+      headerError = '';
+    }
+    if (headerError) throw new Error(headerError);
+    var preview = buildImportPreview(sheet, colOffset);
+    IMPORT_PREVIEW = preview;
+    renderImportPreview(preview, file.name);
+    if (!preview.items.length) {
+      showToast('ℹ️ Aucune modification détectée');
+    }
+  }).catch(function(err) {
+    IMPORT_PREVIEW = null;
+    renderImportError(err.message || 'Import impossible.');
+    showToast('❌ ' + (err.message || 'Import impossible'), true);
+  });
+}
+window.handleImportFile = handleImportFile;
+
+function buildImportPreview(sheet, colOffset) {
+  colOffset = colOffset || 0;
+  var agendaById  = getAgendaByIdMap();
+  var agendaByKey = getAgendaByKeyMap();
+  var items = [];
+  var warnings = [];
+  var seenIds = {};
+  for (var rowNumber = 2; rowNumber <= sheet.rowCount; rowNumber++) {
+    var row = sheet.getRow(rowNumber);
+    var id = normalizeCellValue(row.getCell(1).value);
+    if (!id) continue;
+    if (seenIds[id]) {
+      throw new Error('ID atelier dupliqué dans le fichier importé : ' + id + '.');
+    }
+    seenIds[id] = true;
+    var agendaInfo = agendaById[id];
+    if (!agendaInfo) {
+      // Fallback : chercher par atelier + jour + heure si l'ID a changé
+      // Fallback par nom d'atelier + jour (les heures peuvent avoir changé)
+      // Format 23 : Atelier=col2, Jour=col7 ; Format 26 : Jour=col9 (colOffset=2)
+      var xlsAtelier = normalizeCellValue(row.getCell(2).value);
+      var xlsJour    = normalizeCellValue(row.getCell(7 + colOffset).value);
+      var fallbackKey = normalizeComparableValue(xlsAtelier + '|' + xlsJour);
+      agendaInfo = agendaByKey[fallbackKey];
+      if (agendaInfo) {
+        warnings.push('ℹ️ ID « ' + id + ' » introuvable (ligne ' + rowNumber + '), correspondance trouvée par nom+jour+heure : « ' + agendaInfo.entry.atelier + ' ».');
+      } else {
+        warnings.push('⚠️ ID atelier inconnu ignoré : « ' + id + ' » (ligne ' + rowNumber + ') — cet atelier n\'existe plus dans le planning actuel.');
+        continue;
+      }
+    }
+    var entry = agendaInfo.entry;
+    var desc = getDesc(entry.atelier) || {};
+    var logId = entry.logisticId || '';
+    var logEntry = logId && typeof LOGISTICS !== 'undefined' ? LOGISTICS[logId] : null;
+    var specEntry = logId && typeof LOGISTICS_SPECIAL !== 'undefined' ? LOGISTICS_SPECIAL[logId] : null;
+    var helpEntry = logId && typeof LOGISTICS_HELPERS !== 'undefined' ? LOGISTICS_HELPERS[logId] : null;
+    var changes = [];
+
+    IMPORT_FIELD_DEFS.forEach(function(def) {
+      var raw = row.getCell(def.col + colOffset).value;
+      var nextValue = (def.key === 'piment' || def.key === 'prepDuration') ? parseImportNumber(raw) : normalizeCellValue(raw);
+      var currentValue = '';
+      if (def.key === 'piment') currentValue = String(entry.piment || 0);
+      else if (def.key === 'nomEn') currentValue = normalizeCellValue(desc.nomEn || '');
+      else if (def.key === 'descFr') currentValue = normalizeCellValue(desc.descFr || '');
+      else if (def.key === 'descEn') currentValue = normalizeCellValue(desc.descEn || '');
+      else if (def.key === 'consigne') currentValue = normalizeCellValue(desc.consigne || '');
+      else if (def.key === 'consigneEn') currentValue = normalizeCellValue(desc.consigneEn || '');
+      else if (def.key === 'prepDuration') currentValue = logEntry && logEntry.prepDuration != null ? String(logEntry.prepDuration) : '';
+      else if (def.key === 'logInfo') currentValue = normalizeCellValue(htmlToText(logEntry ? (logEntry.html || logEntry.text || '') : ''));
+      else if (def.key === 'logSpecial') currentValue = normalizeCellValue(htmlToText(specEntry ? (specEntry.html || specEntry.text || '') : ''));
+      else if (def.key === 'helperAvant') currentValue = normalizeCellValue(htmlToText(helpEntry ? helpEntry.avant || '' : ''));
+      else if (def.key === 'helperPendant') currentValue = normalizeCellValue(htmlToText(helpEntry ? helpEntry.pendant || '' : ''));
+      else if (def.key === 'helperApres') currentValue = normalizeCellValue(htmlToText(helpEntry ? helpEntry.apres || '' : ''));
+
+      if (def.key === 'piment' && nextValue !== '' && !IMPORT_ALLOWED_PIMENTS[nextValue]) {
+        warnings.push('⚠️ Piment invalide pour « ' + id + ' » : valeur « ' + nextValue + ' » ignorée (valeurs acceptées : 0, 1, 2, 3).');
+        return; // on ignore ce champ, l'import continue
+      }
+      if (def.key === 'prepDuration' && nextValue !== '' && !IMPORT_ALLOWED_PREP[nextValue]) {
+        warnings.push('⚠️ Estimation préparation invalide pour « ' + id + ' » : valeur « ' + nextValue + ' » ignorée (valeurs acceptées : 0, 15, 20, 30, 45, 50, 60, 80, 90, 100, 110, 120).');
+        return; // on ignore ce champ, l'import continue
+      }
+      if (normalizeComparableValue(currentValue) === normalizeComparableValue(nextValue)) return;
+      changes.push({ key:def.key, label:def.label, currentValue:currentValue, nextValue:nextValue, choice:'apply' });
+    });
+
+    if (changes.length) {
+      items.push({
+        id:id,
+        atelier:entry.atelier || '',
+        agendaIdx:agendaInfo.idx,
+        jour: entry.jour || '',
+        heure: entry.heure || '',
+        lieu: entry.lieu || '',
+        facs: [entry.fac1, entry.fac2, entry.fac3, entry.fac4].filter(Boolean).join(' & '),
+        changes:changes
+      });
+    }
+  }
+  return { items:items, warnings:warnings, totalChanges:items.reduce(function(sum, item) { return sum + item.changes.length; }, 0) };
+}
+
+function renderImportLoading(filename) {
+  document.getElementById('importSummary').innerHTML =
+    '<div class="import-summary-box"><div class="import-summary-title">Lecture du fichier</div><div class="import-empty">Analyse en cours : ' + esc(filename) + '</div></div>';
+}
+function renderImportError(message) {
+  document.getElementById('importSummary').innerHTML =
+    '<div class="import-summary-box"><div class="import-summary-title status-warn">Import impossible</div><div class="import-empty">' + esc(message) + '</div></div>';
+}
+function renderImportPreview(preview, filename) {
+  var summary = document.getElementById('importSummary');
+  var warningsHtml = (preview.warnings && preview.warnings.length)
+    ? '<div style="margin-bottom:12px;padding:10px 14px;border-radius:6px;background:#fff7ed;border:1px solid #fb923c;color:#9a3412;font-size:13px;line-height:1.6;">' +
+        '<strong>⚠️ ' + preview.warnings.length + ' avertissement(s) — lignes ou valeurs ignorées, import non bloqué</strong>' +
+        '<ul style="margin:6px 0 0 18px;padding:0;">' +
+          preview.warnings.map(function(w){ return '<li>' + esc(w) + '</li>'; }).join('') +
+        '</ul>' +
+      '</div>'
+    : '';
+  if (!preview.items.length) {
+    summary.innerHTML =
+      '<div class="import-summary-box">' + warningsHtml + '<div class="import-summary-title status-ok">Fichier analysé</div><div class="import-empty">Aucune modification détectée dans ' + esc(filename) + '.</div></div>';
+    return;
+  }
+  summary.innerHTML =
+    '<div class="import-summary-box">' +
+      warningsHtml +
+      '<div class="import-summary-title">Validation des modifications</div>' +
+      '<div class="import-help">Chaque ligne propose les différences détectées. Tu peux accepter ou ignorer chaque valeur avant enregistrement.</div>' +
+      '<div class="import-item-meta">' + preview.items.length + ' atelier(s) concerné(s) · ' + preview.totalChanges + ' changement(s)</div>' +
+      '<div class="import-summary-list">' + preview.items.map(function(item, itemIdx) {
+        return '<div class="import-item">' +
+          '<div class="import-item-head">' +
+            '<div>' +
+              '<div class="import-item-title">' + esc(item.atelier || item.id) + '</div>' +
+              '<div class="import-item-meta">ID : ' + esc(item.id) + '</div>' +
+              '<div class="import-item-context">' +
+                (item.jour ? esc(item.jour) : '—') +
+                (item.heure ? ' · ' + esc(item.heure) : '') +
+                (item.lieu ? ' · ' + esc(item.lieu) : '') +
+                (item.facs ? ' · ' + esc(item.facs) : '') +
+              '</div>' +
+            '</div>' +
+            '<div class="import-item-meta">' + item.changes.length + ' changement(s)</div>' +
+          '</div>' +
+          '<div class="import-fields-grid">' + item.changes.map(function(change, changeIdx) {
+            return '<div class="import-field">' +
+              '<div class="import-field-name">' + esc(change.label) + '</div>' +
+              '<div class="import-field-values">' +
+                '<div class="import-field-value">' + esc(formatImportValue(change.currentValue)).replace(/\n/g,'<br>') + '</div>' +
+                '<div class="import-field-arrow">→</div>' +
+                '<div class="import-field-value">' + esc(formatImportValue(change.nextValue)).replace(/\n/g,'<br>') + '</div>' +
+              '</div>' +
+              '<div class="import-choice">' +
+                '<label><input type="radio" name="import-choice-' + itemIdx + '-' + changeIdx + '" value="apply" checked onchange="setImportChoice(' + itemIdx + ',' + changeIdx + ',\'apply\')"> Accepter</label>' +
+                '<label><input type="radio" name="import-choice-' + itemIdx + '-' + changeIdx + '" value="skip" onchange="setImportChoice(' + itemIdx + ',' + changeIdx + ',\'skip\')"> Ignorer</label>' +
+              '</div>' +
+            '</div>';
+          }).join('') + '</div>' +
+        '</div>';
+      }).join('') + '</div>' +
+      '<div class="import-actions">' +
+        '<button class="btn" id="importApplyBtn" onclick="applyImportPreview()">✅ Valider l’import</button>' +
+        '<button class="btn btn-sm" id="importCancelBtn" onclick="clearImportPreview()">✕ Annuler</button>' +
+      '</div>' +
+    '</div>';
+}
+function clearImportPreview() {
+  IMPORT_PREVIEW = null;
+  document.getElementById('importSummary').innerHTML = '';
+}
+window.clearImportPreview = clearImportPreview;
+function setImportChoice(itemIdx, changeIdx, choice) {
+  if (!IMPORT_PREVIEW || !IMPORT_PREVIEW.items[itemIdx] || !IMPORT_PREVIEW.items[itemIdx].changes[changeIdx]) return;
+  IMPORT_PREVIEW.items[itemIdx].changes[changeIdx].choice = choice;
+}
+window.setImportChoice = setImportChoice;
+
+async function saveTextFile(filename, content) {
+  if (location.protocol === 'file:') throw new Error('Ouvrez via http://localhost:3000 (start.bat) pour sauvegarder.');
+  var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (isLocal) {
+    var res = await fetch('http://localhost:3000/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: filename, content: content })
+    });
+    if (!res.ok) {
+      var err = await res.json().catch(function() { return {}; });
+      throw new Error(err.error || ('Erreur ' + res.status));
+    }
+    return;
+  }
+  await githubSaveFile(filename, content);
+}
+function ensureDescEntry(entry) {
+  if (typeof REF_DESCRIPTIONS === 'undefined') window.REF_DESCRIPTIONS = [];
+  var desc = getDesc(entry.atelier);
+  if (desc) return desc;
+  var key = (entry.atelier || 'atelier').toLowerCase().replace(/[^a-z0-9]/g,'_').slice(0,40);
+  desc = {
+    key:key,
+    atelier:entry.atelier || '',
+    nomEn:'',
+    type:entry.type || '',
+    piment:entry.piment || 0,
+    fac1:entry.fac1 || '',
+    fac2:entry.fac2 || '',
+    descFr:'',
+    descEn:'',
+    consigne:'',
+    consigneEn:'',
+    validatedByFac:false,
+    updatedAt:''
+  };
+  REF_DESCRIPTIONS.push(desc);
+  rebuildDescIndex();
+  return desc;
+}
+function ensureLogisticId(entry) {
+  if (entry.logisticId) return entry.logisticId;
+  var safeName = (entry.atelier || 'ATELIER').replace(/[^a-zA-Z0-9]/g,'_').slice(0,30).toUpperCase();
+  var jourKey = (entry.jour || '').replace(/\s+/g,'').toUpperCase();
+  entry.logisticId = jourKey + '_' + safeName;
+  return entry.logisticId;
+}
+function generateRefDescriptionsJs() {
+  return '/**\n * TANTRAMOUR 2026 — Descriptions des Ateliers (FR / EN)\n * Géré automatiquement\n */\n\nvar REF_DESCRIPTIONS = [\n\n' +
+    REF_DESCRIPTIONS.map(function(d) {
+      return '  { key:' + JSON.stringify(d.key || '') + ', atelier:' + JSON.stringify(d.atelier || '') + ', nomEn:' + JSON.stringify(d.nomEn || '') + ', type:' + JSON.stringify(d.type || '') + ', piment:' + JSON.stringify(d.piment || 0) + ', fac1:' + JSON.stringify(d.fac1 || '') + ', fac2:' + JSON.stringify(d.fac2 || '') + ', descFr:' + JSON.stringify(d.descFr || '') + ', descEn:' + JSON.stringify(d.descEn || '') + ', consigne:' + JSON.stringify(d.consigne || '') + ', consigneEn:' + JSON.stringify(d.consigneEn || '') + ', validatedByFac:' + JSON.stringify(!!d.validatedByFac) + ', updatedAt:' + JSON.stringify(d.updatedAt || '') + ' }';
+    }).join(',\n') + '\n\n];\n';
+}
+function generateLogisticsJs() {
+  var keys = Object.keys(LOGISTICS || {}).sort();
+  return '/**\n * TANTRAMOUR 2026 — Informations logistiques\n * Géré automatiquement\n */\n\nvar LOGISTICS = {\n' + keys.map(function(key) {
+    var item = LOGISTICS[key] || {};
+    return '  ' + JSON.stringify(key) + ': { html:' + JSON.stringify(item.html || '') + ', text:' + JSON.stringify(item.text || '') + ', validatedByFac:' + JSON.stringify(!!item.validatedByFac) + ', prepDuration:' + JSON.stringify(item.prepDuration != null ? item.prepDuration : '') + ', updatedAt:' + JSON.stringify(item.updatedAt || '') + ' }';
+  }).join(',\n') + '\n};\n';
+}
+function generateLogisticsSpecialJs() {
+  var keys = Object.keys(LOGISTICS_SPECIAL || {}).sort();
+  return '/**\n * TANTRAMOUR 2026 — Besoins logistiques spécifiques\n * Géré automatiquement\n */\n\nvar LOGISTICS_SPECIAL = {\n' + keys.map(function(key) {
+    var item = LOGISTICS_SPECIAL[key] || {};
+    return '  ' + JSON.stringify(key) + ': { html:' + JSON.stringify(item.html || '') + ', text:' + JSON.stringify(item.text || '') + ', updatedAt:' + JSON.stringify(item.updatedAt || '') + ' }';
+  }).join(',\n') + '\n};\n';
+}
+function generateLogisticsHelpersJs() {
+  var keys = Object.keys(LOGISTICS_HELPERS || {}).sort();
+  return '/**\n * TANTRAMOUR 2026 — Consignes helpers\n * Géré automatiquement\n */\n\nvar LOGISTICS_HELPERS = {\n' + keys.map(function(key) {
+    var item = LOGISTICS_HELPERS[key] || {};
+    return '  ' + JSON.stringify(key) + ': { avant:' + JSON.stringify(item.avant || '') + ', pendant:' + JSON.stringify(item.pendant || '') + ', apres:' + JSON.stringify(item.apres || '') + ', updatedAt:' + JSON.stringify(item.updatedAt || '') + ' }';
+  }).join(',\n') + '\n};\n';
+}
+function setImportSavingState(isSaving) {
+  var applyBtn = document.getElementById('importApplyBtn');
+  var cancelBtn = document.getElementById('importCancelBtn');
+  if (applyBtn) {
+    applyBtn.disabled = isSaving;
+    applyBtn.textContent = isSaving ? '⏳ Enregistrement en cours...' : '✅ Valider l’import';
+  }
+  if (cancelBtn) cancelBtn.disabled = isSaving;
+}
+async function applyImportPreview() {
+  if (!IMPORT_PREVIEW || !IMPORT_PREVIEW.items.length) return;
+  var items = IMPORT_PREVIEW.items;
+  var appliedCount = 0;
+  var now = new Date().toISOString().slice(0,10) + ' ' + new Date().toTimeString().slice(0,5);
+
+  items.forEach(function(item) {
+    var entry = AGENDA[item.agendaIdx];
+    if (!entry) return;
+    var selectedChanges = item.changes.filter(function(change) { return change.choice !== 'skip'; });
+    if (!selectedChanges.length) return;
+    var desc = null;
+    var logId = '';
+    selectedChanges.forEach(function(change) {
+      var value = change.nextValue;
+      if (change.key === 'piment') {
+        entry.piment = parseInt(value || '0', 10) || 0;
+        desc = desc || ensureDescEntry(entry);
+        desc.piment = entry.piment;
+        desc.updatedAt = now;
+      } else if (change.key === 'nomEn' || change.key === 'descFr' || change.key === 'descEn' || change.key === 'consigne' || change.key === 'consigneEn') {
+        desc = desc || ensureDescEntry(entry);
+        desc[change.key] = normalizeCellValue(value);
+        desc.type = entry.type || desc.type || '';
+        desc.fac1 = entry.fac1 || desc.fac1 || '';
+        desc.fac2 = entry.fac2 || desc.fac2 || '';
+        desc.updatedAt = now;
+      } else {
+        logId = logId || ensureLogisticId(entry);
+        if (typeof LOGISTICS === 'undefined') window.LOGISTICS = {};
+        if (typeof LOGISTICS_SPECIAL === 'undefined') window.LOGISTICS_SPECIAL = {};
+        if (typeof LOGISTICS_HELPERS === 'undefined') window.LOGISTICS_HELPERS = {};
+        if (!LOGISTICS[logId]) LOGISTICS[logId] = { html:'', text:'', validatedByFac:false, prepDuration:'', updatedAt:'' };
+        if (!LOGISTICS_SPECIAL[logId]) LOGISTICS_SPECIAL[logId] = { html:'', text:'', updatedAt:'' };
+        if (!LOGISTICS_HELPERS[logId]) LOGISTICS_HELPERS[logId] = { avant:'', pendant:'', apres:'', updatedAt:'' };
+
+        if (change.key === 'prepDuration') {
+          LOGISTICS[logId].prepDuration = value === '' ? '' : parseInt(value, 10);
+          LOGISTICS[logId].updatedAt = now;
+        } else if (change.key === 'logInfo') {
+          LOGISTICS[logId].html = textToHtml(value);
+          LOGISTICS[logId].text = normalizeCellValue(value);
+          LOGISTICS[logId].updatedAt = now;
+        } else if (change.key === 'logSpecial') {
+          LOGISTICS_SPECIAL[logId].html = textToHtml(value);
+          LOGISTICS_SPECIAL[logId].text = normalizeCellValue(value);
+          LOGISTICS_SPECIAL[logId].updatedAt = now;
+        } else if (change.key === 'helperAvant' || change.key === 'helperPendant' || change.key === 'helperApres') {
+          var helperKey = change.key === 'helperAvant' ? 'avant' : (change.key === 'helperPendant' ? 'pendant' : 'apres');
+          LOGISTICS_HELPERS[logId][helperKey] = textToHtml(value);
+          LOGISTICS_HELPERS[logId].updatedAt = now;
+        }
+      }
+      appliedCount++;
+    });
+  });
+
+  if (!appliedCount) {
+    showToast('ℹ️ Aucune valeur sélectionnée pour l’import');
+    return;
+  }
+
+  setImportSavingState(true);
+  try {
+    var saveResults = await Promise.allSettled([
+      saveTextFile('data.js', 'var AGENDA = ' + JSON.stringify(AGENDA, null, 2) + ';\n'),
+      saveTextFile('ref_descriptions.js', generateRefDescriptionsJs()),
+      saveTextFile('logistics.js', generateLogisticsJs()),
+      saveTextFile('logistics.special.js', generateLogisticsSpecialJs()),
+      saveTextFile('logistics.helpers.js', generateLogisticsHelpersJs())
+    ]);
+    var saveError = saveResults.find(function(result) { return result.status === 'rejected'; });
+    if (saveError) throw saveError.reason;
+    rebuildDescIndex();
+    applyFilters();
+    if (_modalEntry) {
+      var modalId = _modalEntry.id;
+      _modalEntry = modalId ? (getAgendaByIdMap()[modalId] || {}).entry || _modalEntry : _modalEntry;
+      renderModalBody();
+    }
+    IMPORT_PREVIEW = null;
+    document.getElementById('importSummary').innerHTML = '<div class="import-summary-box"><div class="import-summary-title status-ok">Import terminé</div><div class="import-empty">Les nouvelles valeurs ont bien été enregistrées et sont disponibles dans les rapports.</div></div>';
+    alert('Import enregistré : ' + appliedCount + ' valeur(s) ont bien été sauvegardées.');
+    showToast('✅ Import enregistré (' + appliedCount + ' valeur(s))');
+  } catch (err) {
+    var message = err && err.message ? err.message : String(err || 'Erreur inconnue');
+    renderImportError(message);
+    alert('Import impossible : ' + message);
+    showToast('❌ ' + message, true);
+  } finally {
+    setImportSavingState(false);
+  }
+}
+window.applyImportPreview = applyImportPreview;
+
+function showToast(message, isError) {
+  var toast = document.getElementById('toast');
+  if (!toast) {
+    if (isError) console.error(message);
+    else console.log(message);
+    return;
+  }
+  toast.textContent = message;
+  toast.style.background = isError ? '#b91c1c' : '#1f2328';
+  toast.classList.add('show');
+  clearTimeout(showToast._timer);
+  showToast._timer = setTimeout(function() {
+    toast.classList.remove('show');
+  }, 2600);
+}
+function heureMin(h) {
+  if (!h) return 9999;
+  var m = String(h).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1])*60+parseInt(m[2]) : 9999;
+}
+function getDureeAtelier(heure) {
+  if (!heure) return '';
+  var m = String(heure).replace(/\./g,':').match(/(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})/);
+  if (!m) return '';
+  var debut = parseInt(m[1])*60+parseInt(m[2]);
+  var fin   = parseInt(m[3])*60+parseInt(m[4]);
+  var dur   = fin - debut;
+  if (dur <= 0) return '';
+  var h  = Math.floor(dur/60);
+  var mn = dur % 60;
+  return h > 0 ? h + 'h' + (mn > 0 ? (mn < 10 ? '0' : '') + mn : '') : mn + ' min';
+}
+
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+    }).finally(function() { location.reload(true); });
+  } else { location.reload(true); }
+}
+window.hardReload = hardReload;
+
+function toggleMode() {
+  var isDark = document.body.classList.toggle('dark');
+  var modeBtn = document.getElementById('modeBtn');
+  if (isDark) {
+    modeBtn.innerHTML = '☀️ <span data-i18n="nav_mode_jour">' + I18n.t('nav_mode_jour') + '</span>';
+  } else {
+    modeBtn.innerHTML = '🌙 <span data-i18n="nav_mode_nuit">' + I18n.t('nav_mode_nuit') + '</span>';
+  }
+}
+window.toggleMode = toggleMode;
+
+if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_'+location.pathname)) {
+  sessionStorage.setItem('_refreshed_'+location.pathname,'1');
+  hardReload();
+}
+
+// ── Re-render on language change
+document.addEventListener('tm_lang_changed', function() {
+  applyFilters();
+  if (document.getElementById('detailModal').classList.contains('open') && currentAgendaIdx >= 0) {
+    selectAtelier(currentAgendaIdx);
+  }
+});
+
+// ── Init
+buildFilters();
+applyFilters();
+
+}); // fin loadData
+</script>
+</body>
+</html>
