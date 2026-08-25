@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Agenda</title>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --hour-col:48px;
+    --slot:30; /* minutes par slot = 1 ligne de grille */
+    /* couleurs types */
+    --c-tantra:#be185d;  --c-tantra-bg:#fdf2f8;  --c-tantra-bd:#fbcfe8;
+    --c-art:#c2410c;     --c-art-bg:#fff7ed;      --c-art-bd:#fed7aa;
+    --c-yoga:#16a34a;    --c-yoga-bg:#f0fdf4;     --c-yoga-bd:#86efac;
+    --c-cere:#7c3aed;    --c-cere-bg:#f5f3ff;     --c-cere-bd:#c4b5fd;
+    --c-pool:#166534;    --c-pool-bg:#f0fdf4;     --c-pool-bd:#4ade80;
+    --c-love:#dc2626;    --c-love-bg:#fff1f2;     --c-love-bd:#fca5a5;
+    --c-rass:#1e40af;    --c-rass-bg:#eff6ff;     --c-rass-bd:#93c5fd;
+    --c-dj:#6d28d9;      --c-dj-bg:#f5f3ff;       --c-dj-bd:#c4b5fd;
+    --c-conf:#0e7490;    --c-conf-bg:#ecfeff;     --c-conf-bd:#67e8f9;
+    --c-support:#0e7490; --c-support-bg:#ecfeff;  --c-support-bd:#67e8f9;
+    --c-meeting:#92400e; --c-meeting-bg:#fffbeb;  --c-meeting-bd:#fcd34d;
+    --c-prepa:#374151;   --c-prepa-bg:#f9fafb;    --c-prepa-bd:#9ca3af;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --c-tantra-bg:#2d0a1e; --c-tantra-bd:#9d174d;
+    --c-art-bg:#2a1200;    --c-art-bd:#c2410c;
+    --c-yoga-bg:#052e1a;   --c-yoga-bd:#16a34a;
+    --c-cere-bg:#1a0a2e;   --c-cere-bd:#7c3aed;
+    --c-pool-bg:#001a0a;   --c-pool-bd:#166534;
+    --c-love-bg:#2d0000;   --c-love-bd:#991b1b;
+    --c-rass-bg:#0c1a40;   --c-rass-bd:#1e40af;
+    --c-dj-bg:#1a0a2e;     --c-dj-bd:#7c3aed;
+    --c-conf-bg:#00141a;   --c-conf-bd:#0e7490;
+    --c-support-bg:#00141a;--c-support-bd:#0e7490;
+    --c-meeting-bg:#2a1500; --c-meeting-bd:#92400e;
+    --c-prepa-bg:#1a1d20;   --c-prepa-bd:#4b5563;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { height:100%; overflow:hidden; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:12px; line-height:1.4; background:var(--bg); color:var(--text); display:flex; flex-direction:column; }
+
+  /* ── HEADER ── */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-bottom:1px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:100; flex-wrap:wrap; gap:8px; }
+  .topbar-left { display:flex; align-items:baseline; gap:12px; }
+  .topbar-left h1 { font-size:15px; font-weight:700; }
+  .topbar-left p  { font-size:13px; font-weight:800; color:var(--accent); }
+  .topbar-right { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:4px 10px; font-size:11px; color:var(--text); font-family:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
+  .btn:hover { background:var(--border); }
+  .chip { cursor:pointer; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; border:1px solid var(--border); background:var(--surface); color:var(--muted); white-space:nowrap; }
+  .chip:hover { border-color:var(--accent); color:var(--accent); }
+  .chip.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+  /* ── LÉGENDE ── */
+  .legend { display:flex; flex-wrap:wrap; gap:8px; padding:8px 16px; border-bottom:1px solid var(--border); background:var(--surface); }
+  .leg { display:flex; align-items:center; gap:4px; font-size:10px; color:var(--muted); white-space:nowrap; }
+  .leg-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+
+  /* ── SCROLL WRAPPER ── */
+  .cal-scroll { overflow-x:auto; overflow-y:auto; width:100%; flex:1; min-height:0; }
+
+  /* ── GRILLE CALENDRIER ── */
+  /* Layout: colonne heures + groupes jours proportionnels sur toute la largeur */
+  .cal-wrap { display:flex; flex-direction:column; width:100%; }
+
+  /* En-tête : pleine largeur */
+  .cal-head { display:flex; width:100%; position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:2px solid var(--border); }
+  .head-hour { width:var(--hour-col); flex-shrink:0; border-right:1px solid var(--border); }
+
+  /* Groupe jour dans l'en-tête — prend sa part proportionnelle */
+  .head-day-group { display:flex; flex-direction:column; border-right:2px solid var(--border); min-width:0; overflow:hidden; }
+  .hd-jour { background:var(--text); color:#fff; padding:4px 4px; text-align:center; display:flex; align-items:baseline; justify-content:center; gap:6px; white-space:nowrap; overflow:hidden; }
+  .hd-name { font-size:11px; font-weight:700; }
+  .hd-date { font-size:9px; opacity:.7; }
+  /* Rangée des lieux */
+  .hd-lieux { display:flex; background:var(--surface); border-top:1px solid var(--border); }
+  .hd-lieu { flex:1; min-width:0; padding:2px 1px; text-align:center; font-size:7px; font-weight:700; text-transform:uppercase; letter-spacing:.01em; color:var(--muted); border-right:1px solid var(--border); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .hd-lieu:last-child { border-right:none; }
+
+  /* Corps calendrier — pleine largeur */
+  .cal-body { display:flex; width:100%; position:relative; }
+
+  /* Colonne heures */
+  .col-hours { width:var(--hour-col); flex-shrink:0; border-right:1px solid var(--border); position:relative; }
+  .hour-label { position:absolute; right:4px; font-size:9px; color:var(--muted); line-height:1; transform:translateY(-50%); font-variant-numeric:tabular-nums; white-space:nowrap; }
+
+  /* Groupe jour dans le corps — proportionnel */
+  .col-day-group { display:flex; border-right:2px solid var(--border); min-width:0; overflow:hidden; }
+
+  /* Sous-colonne lieu — largeur 100% répartie, sans minimum fixe */
+  .col-lieu { min-width:0; flex:1; position:relative; border-right:1px solid var(--border); overflow:hidden; }
+  .col-lieu:last-child { border-right:none; }
+
+  /* Lignes horaires (fond) */
+  .hour-line { position:absolute; left:0; right:0; border-top:1px solid var(--border); }
+  .hour-line.full { border-top-color:var(--border); }
+  .hour-line.half { border-top:1px dashed var(--border); opacity:.5; }
+
+  /* ── BLOC ATELIER ── */
+  .evt {
+    position:absolute; left:1px; right:1px;
+    border-radius:3px; border-left:3px solid #9ca3af;
+    background:var(--surface); border-top:1px solid var(--border); border-right:1px solid var(--border); border-bottom:1px solid var(--border);
+    padding:2px 3px; overflow:hidden; cursor:default;
+    transition:box-shadow .1s;
+  }
+  .evt:hover { box-shadow:0 2px 8px rgba(0,0,0,.15); z-index:20; }
+  .evt-name { font-size:9px; font-weight:600; line-height:1.2; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .evt-meta { font-size:8px; color:var(--muted); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .evt-fac  { font-size:8px; color:var(--muted); margin-top:1px; font-style:italic; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .evt-time { font-size:8px; color:var(--muted); margin-top:1px; font-variant-numeric:tabular-nums; }
+
+  /* couleurs par type */
+  .t-tantra  { border-left-color:var(--c-tantra);  background:var(--c-tantra-bg);  border-color:var(--c-tantra-bd); }
+  .t-tantra  .evt-name { color:var(--c-tantra); }
+  .t-art     { border-left-color:var(--c-art);     background:var(--c-art-bg);     border-color:var(--c-art-bd); }
+  .t-art     .evt-name { color:var(--c-art); }
+  .t-yoga    { border-left-color:var(--c-yoga);    background:var(--c-yoga-bg);    border-color:var(--c-yoga-bd); }
+  .t-yoga    .evt-name { color:var(--c-yoga); }
+  .t-cere    { border-left-color:var(--c-cere);    background:var(--c-cere-bg);    border-color:var(--c-cere-bd); }
+  .t-cere    .evt-name { color:var(--c-cere); }
+  .t-pool    { border-left-color:var(--c-pool);    background:var(--c-pool-bg);    border-color:var(--c-pool-bd); }
+  .t-pool    .evt-name { color:var(--c-pool); }
+  .t-love    { border-left-color:var(--c-love);    background:var(--c-love-bg);    border-color:var(--c-love-bd); }
+  .t-love    .evt-name { color:var(--c-love); }
+  .t-rass    { border-left-color:var(--c-rass);    background:var(--c-rass-bg);    border-color:var(--c-rass-bd); }
+  .t-rass    .evt-name { color:var(--c-rass); }
+  .t-dj      { border-left-color:var(--c-dj);      background:var(--c-dj-bg);      border-color:var(--c-dj-bd); }
+  .t-dj      .evt-name { color:var(--c-dj); }
+  .t-support { border-left-color:var(--c-support); background:var(--c-support-bg); border-color:var(--c-support-bd); }
+  .t-support .evt-name { color:var(--c-support); }
+  .t-conf    { border-left-color:var(--c-conf);    background:var(--c-conf-bg);    border-color:var(--c-conf-bd); }
+  .t-conf    .evt-name { color:var(--c-conf); }
+  .t-meeting { border-left-color:var(--c-meeting); background:var(--c-meeting-bg); border-color:var(--c-meeting-bd); }
+  .t-meeting .evt-name { color:var(--c-meeting); }
+  .t-prepa   { border-left-color:var(--c-prepa);   background:var(--c-prepa-bg);   border-color:var(--c-prepa-bd); }
+  .t-prepa   .evt-name { color:var(--c-prepa); }
+
+  /* ── TOOLTIP CUSTOM ── */
+  #evtTooltip {
+    display:none; position:fixed; z-index:9999; pointer-events:none;
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:8px; padding:10px 14px;
+    box-shadow:0 4px 18px rgba(0,0,0,.18);
+    max-width:280px; min-width:160px;
+  }
+  #evtTooltip .tt-name { font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px; line-height:1.3; }
+  #evtTooltip .tt-row  { font-size:12px; color:var(--muted); display:flex; gap:6px; align-items:flex-start; margin-top:3px; line-height:1.4; }
+  #evtTooltip .tt-row b { color:var(--text); font-weight:600; flex-shrink:0; }
+
+  @media print {
+    .topbar, .legend { position:static; }
+    .cal-scroll { overflow:visible; }
+    .evt { break-inside:avoid; }
+    #evtTooltip { display:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>Tantramour 2026</h1>
+    <p>Agenda du festival</p>
+  </div>
+  <div class="topbar-right" id="jourChips"></div>
+  <div class="topbar-right">
+    <a class="btn" href="index_bis.html">← Retour</a>
+    <button class="btn" onclick="document.body.classList.toggle('dark')">🌙</button>
+    <button class="btn" onclick="window.print()">🖨️</button>
+  </div>
+</div>
+
+<div class="legend" id="legend"></div>
+
+<div id="evtTooltip"></div>
+
+<div class="cal-scroll" id="calScroll">
+  <div class="cal-wrap" id="calWrap"></div>
+</div>
+
+<script src="loader.js"></script>
+<script>
+loadData(['data.js'], function() {
+
+// ── Config ────────────────────────────────────────────────────────────────────
+var H_START = 7;    // première heure affichée (7h00)
+var H_END   = 25;   // dernière heure affichée (01h00 = heure 25 pour le calcul)
+var PX_PER_MIN = 1.6; // pixels par minute
+
+var TYPES_PUBLICS = new Set([
+  'MEDITATION / YOGA','RASSEMBLEMENT',
+  'ATELIERS TANTRA (Matin)','ATELIERS TANTRA (Apres-Midi)',
+  'ATELIER ARTISTIQUE (Matin)','ATELIER ARTISTIQUE (Apres-Midi)',
+  'TANTRA CAFE','CONFERENCE','SUPPORT EMOTIONNEL',
+  'POOL PARTY','DJ Set','CEREMONIE & CONCERT','LOVE TEMPLE',
+  'REUNION','PREPA & LOGISTICS','SHIFT ANGEL',
+]);
+
+var TYPE_SHORT = {
+  'ATELIERS TANTRA (Matin)':'Tantra Matin','ATELIERS TANTRA (Apres-Midi)':'Tantra AM',
+  'ATELIER ARTISTIQUE (Matin)':'Art Matin','ATELIER ARTISTIQUE (Apres-Midi)':'Art AM',
+  'MEDITATION / YOGA':'Méditation / Yoga','RASSEMBLEMENT':'Rassemblement',
+  'CEREMONIE & CONCERT':'Cérémonie & Concert','LOVE TEMPLE':'Love Temple',
+  'SUPPORT EMOTIONNEL':'Support Émotionnel','DJ Set':'DJ Set',
+  'POOL PARTY':'Pool Party','TANTRA CAFE':'Tantra Café','CONFERENCE':'Conférence',
+  'REUNION':'Réunion','PREPA & LOGISTICS':'Prépa & Logistique',
+};
+
+var TYPE_CSS = {
+  'ATELIERS TANTRA (Matin)':'t-tantra','ATELIERS TANTRA (Apres-Midi)':'t-tantra',
+  'ATELIER ARTISTIQUE (Matin)':'t-art','ATELIER ARTISTIQUE (Apres-Midi)':'t-art',
+  'MEDITATION / YOGA':'t-yoga','RASSEMBLEMENT':'t-rass',
+  'CEREMONIE & CONCERT':'t-cere','LOVE TEMPLE':'t-love',
+  'SUPPORT EMOTIONNEL':'t-support','DJ Set':'t-dj',
+  'POOL PARTY':'t-pool','TANTRA CAFE':'t-yoga','CONFERENCE':'t-conf',
+  'REUNION':'t-meeting','PREPA & LOGISTICS':'t-prepa',
+};
+
+var TYPE_COLOR = {
+  't-tantra':'#be185d','t-art':'#c2410c','t-yoga':'#16a34a',
+  't-rass':'#1e40af','t-cere':'#7c3aed','t-love':'#dc2626',
+  't-support':'#0e7490','t-dj':'#6d28d9','t-pool':'#166534','t-conf':'#0e7490',
+  't-meeting':'#92400e','t-prepa':'#374151',
+};
+
+// Ordre fixe des lieux — chaque lieu = une sous-colonne dans chaque jour
+var LIEUX_ORDER = ['SHIVA','CHENREZIG','SHAKTI','TARA','GANESH','HANUMAN','PISCINE','BUDDHA','EXTERIEUR','TEST',''];
+
+var JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+var JOUR_DATES = {
+  'Jour 1':'Sam. 29/08','Jour 2':'Dim. 30/08','Jour 3':'Lun. 31/08',
+  'Jour 4':'Mar. 01/09','Jour 5':'Mer. 02/09','Jour 6':'Jeu. 03/09','Jour 7':'Ven. 04/09',
+};
+
+var activeJour = ''; // '' = tous
+
+// ── Parsing heure ─────────────────────────────────────────────────────────────
+function parseHM(s) {
+  if (!s) return null;
+  var m = String(s).replace(/\./g,':').trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  return parseInt(m[1])*60 + parseInt(m[2]);
+}
+function parseInterval(h) {
+  if (!h) return null;
+  var norm = String(h).replace(/\./g,':').replace(/[–—]/g,'-').trim();
+  var parts = norm.split(/\s*-+\s*/);
+  if (parts.length < 2) return null;
+  var s = parseHM(parts[0]), e = parseHM(parts[1]);
+  if (s == null || e == null) return null;
+  // Ateliers qui finissent après minuit : e < s → ajouter 24h
+  if (e < s) e += 24*60;
+  return { s:s, e:e };
+}
+
+// ── Conversion minutes → pixels ───────────────────────────────────────────────
+var OFFSET_MIN = H_START * 60;
+function minToPx(min) { return (min - OFFSET_MIN) * PX_PER_MIN; }
+function durationPx(dur) { return Math.max(dur * PX_PER_MIN, 18); }
+
+var TOTAL_PX = (H_END - H_START) * 60 * PX_PER_MIN;
+
+// ── Escape HTML ───────────────────────────────────────────────────────────────
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Filtrage données ──────────────────────────────────────────────────────────
+function getJours() {
+  var s = new Set(AGENDA.filter(function(e){ return TYPES_PUBLICS.has(e.type); }).map(function(e){ return e.jour; }));
+  return JOUR_ORDER.filter(function(j){ return s.has(j); });
+}
+
+function getFiltered(jour) {
+  return AGENDA.filter(function(e){ return TYPES_PUBLICS.has(e.type) && e.jour === jour; });
+}
+
+// ── Lieux présents pour un jour ───────────────────────────────────────────────
+// Retourne les lieux dans LIEUX_ORDER qui ont au moins un événement ce jour-là
+function getLieuxForJour(ateliers) {
+  var present = new Set(ateliers.map(function(e){ return e.lieu || ''; }));
+  return LIEUX_ORDER.filter(function(l){ return present.has(l); });
+}
+
+// ── Rendu légende ─────────────────────────────────────────────────────────────
+function renderLegend() {
+  var seen = new Set();
+  var html = '';
+  Array.from(TYPES_PUBLICS).forEach(function(t) {
+    var css = TYPE_CSS[t];
+    if (!css || seen.has(css)) return;
+    seen.add(css);
+    var col = TYPE_COLOR[css] || '#9ca3af';
+    html += '<div class="leg"><div class="leg-dot" style="background:'+col+';"></div><span>'+esc(TYPE_SHORT[t]||t)+'</span></div>';
+  });
+  document.getElementById('legend').innerHTML = html;
+}
+
+// ── Rendu chips jours ─────────────────────────────────────────────────────────
+function renderChips() {
+  var jours = getJours();
+  var html = '<span class="chip'+(activeJour===''?' on':'')+'" onclick="setJour(\'\')">Tous</span>';
+  jours.forEach(function(j) {
+    html += '<span class="chip'+(activeJour===j?' on':'')+'" onclick="setJour(\''+j+'\')">'+j+'</span>';
+  });
+  document.getElementById('jourChips').innerHTML = html;
+}
+
+// ── Rendu calendrier ──────────────────────────────────────────────────────────
+function render() {
+  renderChips();
+
+  var jours = activeJour ? [activeJour] : getJours();
+  var wrap = document.getElementById('calWrap');
+
+  // Pré-calculer les lieux présents par jour pour dimensionner les en-têtes
+  var lieuxParJour = {};
+  jours.forEach(function(j) {
+    lieuxParJour[j] = getLieuxForJour(getFiltered(j));
+  });
+
+  // ── En-tête (jour + sous-colonnes lieux) ────────────────────────────────────
+  var headHtml = '<div class="cal-head">';
+  headHtml += '<div class="head-hour"></div>';
+  jours.forEach(function(j) {
+    var lieux = lieuxParJour[j];
+    // Cellule jour (span sur nb de lieux sous-colonnes)
+    headHtml += '<div class="head-day-group" style="flex:'+lieux.length+' 1 0;min-width:0;">';
+    headHtml += '<div class="hd-jour"><span class="hd-name">'+esc(j)+'</span><span class="hd-date">'+esc(JOUR_DATES[j]||'')+'</span></div>';
+    headHtml += '<div class="hd-lieux">';
+    lieux.forEach(function(l) {
+      headHtml += '<div class="hd-lieu">'+(l || '—')+'</div>';
+    });
+    headHtml += '</div></div>';
+  });
+  headHtml += '</div>';
+
+  // ── Corps ────────────────────────────────────────────────────────────────────
+  var bodyHtml = '<div class="cal-body">';
+
+  // Colonne heures
+  bodyHtml += '<div class="col-hours" style="height:'+TOTAL_PX+'px;">';
+  for (var h=H_START; h<=H_END; h++) {
+    var yFull = minToPx(h*60);
+    var label = h < 24 ? (h < 10 ? '0'+h : h)+':00' : '0'+(h-24)+':00';
+    bodyHtml += '<div class="hour-line full" style="top:'+yFull+'px;"></div>';
+    bodyHtml += '<div class="hour-label" style="top:'+yFull+'px;">'+label+'</div>';
+    if (h < H_END) {
+      var yHalf = minToPx(h*60+30);
+      bodyHtml += '<div class="hour-line half" style="top:'+yHalf+'px;"></div>';
+    }
+  }
+  bodyHtml += '</div>';
+
+  // Groupes jours → sous-colonnes lieux
+  jours.forEach(function(jour) {
+    var ateliers = getFiltered(jour);
+    var lieux = lieuxParJour[jour];
+
+    bodyHtml += '<div class="col-day-group" style="flex:'+lieux.length+' 1 0;min-width:0;">';
+
+    lieux.forEach(function(lieu) {
+      // Événements de ce lieu
+      var events = [];
+      ateliers.forEach(function(e) {
+        if ((e.lieu || '') !== lieu) return;
+        var iv = parseInterval(e.heure);
+        if (!iv) return;
+        events.push({ e:e, iv:iv });
+      });
+
+      bodyHtml += '<div class="col-lieu" style="height:'+TOTAL_PX+'px;">';
+
+      // Lignes horaires de fond
+      for (var h=H_START; h<=H_END; h++) {
+        bodyHtml += '<div class="hour-line full" style="top:'+minToPx(h*60)+'px;"></div>';
+        if (h < H_END) bodyHtml += '<div class="hour-line half" style="top:'+minToPx(h*60+30)+'px;"></div>';
+      }
+
+      // Dans chaque sous-colonne lieu, gérer les chevauchements éventuels
+      // Algorithme : pour chaque événement, _ncols = nb de pistes dans son groupe de chevauchement
+      var evts = events.slice().sort(function(a,b){ return a.iv.s - b.iv.s; });
+      // Étape 1 : affecter les pistes (cols)
+      var colEnds = []; // colEnds[i] = heure de fin de la dernière entrée dans la piste i
+      evts.forEach(function(ev) {
+        var placed = false;
+        for (var c=0; c<colEnds.length; c++) {
+          if (ev.iv.s >= colEnds[c]) { ev._col=c; colEnds[c]=ev.iv.e; placed=true; break; }
+        }
+        if (!placed) { ev._col=colEnds.length; colEnds.push(ev.iv.e); }
+        ev._ncols = 1; // sera recalculé
+      });
+      // Étape 2 : pour chaque événement, compter combien d'événements se chevauchent avec lui
+      // → _ncols = taille maximale du cluster de chevauchement qui l'englobe
+      evts.forEach(function(ev) {
+        var maxCol = ev._col;
+        evts.forEach(function(other) {
+          // chevauchement : les intervalles se superposent
+          if (other.iv.s < ev.iv.e && other.iv.e > ev.iv.s) {
+            if (other._col > maxCol) maxCol = other._col;
+          }
+        });
+        ev._ncols = maxCol + 1;
+      });
+
+      evts.forEach(function(item) {
+        var e   = item.e;
+        var iv  = item.iv;
+        var css = TYPE_CSS[e.type] || '';
+        var top    = minToPx(iv.s);
+        var height = durationPx(iv.e - iv.s);
+        var pct    = 100 / item._ncols;
+        var left   = 'calc('+(item._col * pct).toFixed(1)+'% + 2px)';
+        var width  = 'calc('+pct.toFixed(1)+'% - 4px)';
+        var fmtH   = e.heure ? e.heure.replace(/\s+/g,' ').trim() : '';
+        var facs   = [e.fac1, e.fac2, e.fac3, e.fac4].filter(function(f){ return f && String(f).trim()!==''; });
+        var facsStr = facs.join(', ');
+
+        bodyHtml += '<div class="evt '+css+'" style="top:'+top.toFixed(1)+'px;height:'+height.toFixed(1)+'px;left:'+left+';width:'+width+';"'
+          +' data-tt-name="'+esc(e.atelier)+'"'
+          +' data-tt-heure="'+esc(fmtH)+'"'
+          +' data-tt-lieu="'+esc(e.lieu||'')+'"'
+          +' data-tt-facs="'+esc(facsStr)+'"'
+          +'>';
+        bodyHtml += '<div class="evt-name">'+esc(e.atelier)+'</div>';
+        if (height > 28) {
+          if (facsStr) bodyHtml += '<div class="evt-fac">'+esc(facsStr)+'</div>';
+          if (height > 40) bodyHtml += '<div class="evt-time">'+esc(fmtH)+'</div>';
+        }
+        bodyHtml += '</div>';
+      });
+
+      bodyHtml += '</div>'; // col-lieu
+    });
+
+    bodyHtml += '</div>'; // col-day-group
+  });
+
+  bodyHtml += '</div>'; // cal-body
+
+  wrap.innerHTML = headHtml + bodyHtml;
+
+  // Scroll automatique vers 7h30
+  var scrollTarget = minToPx(7*60+30) + 42;
+  document.getElementById('calScroll').scrollTop = Math.max(0, scrollTarget - 60);
+}
+
+// ── Action filtre ─────────────────────────────────────────────────────────────
+function setJour(j) { activeJour = j; render(); }
+window.setJour = setJour;
+
+// ── Tooltip custom ────────────────────────────────────────────────────────────
+(function() {
+  var tip = document.getElementById('evtTooltip');
+  var MARGIN = 14; // distance au curseur
+
+  document.addEventListener('mouseover', function(ev) {
+    var el = ev.target.closest('.evt');
+    if (!el) return;
+    var name  = el.dataset.ttName  || '';
+    var heure = el.dataset.ttHeure || '';
+    var lieu  = el.dataset.ttLieu  || '';
+    var facs  = el.dataset.ttFacs  || '';
+    var html  = '<div class="tt-name">'+esc(name)+'</div>';
+    if (heure) html += '<div class="tt-row"><b>🕐</b><span>'+esc(heure)+'</span></div>';
+    if (lieu)  html += '<div class="tt-row"><b>📍</b><span>'+esc(lieu)+'</span></div>';
+    if (facs)  html += '<div class="tt-row"><b>👤</b><span>'+esc(facs)+'</span></div>';
+    tip.innerHTML = html;
+    tip.style.display = 'block';
+  });
+
+  document.addEventListener('mousemove', function(ev) {
+    if (tip.style.display === 'none') return;
+    var x = ev.clientX + MARGIN;
+    var y = ev.clientY + MARGIN;
+    // Éviter de déborder à droite
+    if (x + tip.offsetWidth + 4 > window.innerWidth)  x = ev.clientX - tip.offsetWidth - MARGIN;
+    // Éviter de déborder en bas
+    if (y + tip.offsetHeight + 4 > window.innerHeight) y = ev.clientY - tip.offsetHeight - MARGIN;
+    tip.style.left = x + 'px';
+    tip.style.top  = y + 'px';
+  });
+
+  document.addEventListener('mouseout', function(ev) {
+    if (!ev.target.closest('.evt')) return;
+    var to = ev.relatedTarget;
+    if (to && to.closest('.evt') === ev.target.closest('.evt')) return;
+    tip.style.display = 'none';
+  });
+})();
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+renderLegend();
+render();
+
+}); // fin loadData
+</script>
+</body>
+</html>
