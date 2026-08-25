@@ -66,5 +66,5 @@ var REF_EQUIPEMENTS = [
   { type: "Tantramour", categorie: "Ambiance & décoration", id: "EQ_NEW02", value: "Encens", stock: 0, description: "Encens", remarque: "" },
   { type: "Tantramour", categorie: "Animation", id: "EQ_NEW03", value: "Masque", stock: 0, description: "Masque", remarque: "" },
   { type: "Autre", categorie: "Animation", id: "TEST_EQMATT", value: "TEST ITEM UPLAOD", stock: 56, description: "TEST ITEM UPLAOD", remarque: "" },
-  { type: "Autre", categorie: "Animation", id: "TEST_EQMATT2", value: "TEST ITEM UPLAOD 2", stock: 56, description: "TEST ITEM UPLAOD", remarque: "" },
+  { type: "Animateur", categorie: "Animation", id: "TEST_EQMATT2", value: "TEST ITEM UPLAOD 2", stock: 56, description: "TEST ITEM UPLAOD", remarque: "" },
 ];
