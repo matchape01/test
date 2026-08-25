@@ -1,545 +1,1076 @@
-
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Manuel Utilisateur — Tantramour 2026</title>
+<title>Manuel — Tantramour 2026</title>
 <style>
   :root {
-    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
-    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
-    --header-bg: #f0f4fb; --tag-bg: #eef2ff; --tag-text: #3b5bdb;
-    --green: #16a34a; --green-bg: #dcfce7;
-    --purple: #7c3aed; --purple-bg: #ede9fe;
-    --orange: #d97706; --orange-bg: #fef3c7;
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --header-bg:#f0f4fb; --tag-bg:#eef2ff; --tag-text:#3b5bdb;
+    --green:#16a34a; --green-bg:#dcfce7; --green-bd:#86efac;
+    --purple:#7c3aed; --purple-bg:#ede9fe; --purple-bd:#c4b5fd;
+    --orange:#d97706; --orange-bg:#fef3c7; --orange-bd:#fcd34d;
+    --pink:#be185d;   --pink-bg:#fce7f3;   --pink-bd:#fbcfe8;
+    --blue-bg:#eff6ff; --blue-bd:#bfdbfe;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.7; background: var(--bg); color: var(--text); }
-  .page { max-width: 760px; margin: 0 auto; padding: 40px 24px 60px; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.7; background:var(--bg); color:var(--text); }
+  .page { max-width:760px; margin:0 auto; padding:40px 24px 80px; }
+
+  /* ── TOP BAR ── */
+  .topbar { display:flex; align-items:center; gap:10px; margin-bottom:32px; flex-wrap:wrap; }
+  .btn-home { display:inline-flex; align-items:center; gap:6px; padding:7px 14px; background:var(--surface); border:1px solid var(--border); border-radius:8px; font-size:13px; font-weight:600; color:var(--text); text-decoration:none; }
+  .btn-home:hover { background:var(--border); }
+  .lang-toggle { display:flex; border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-left:auto; }
+  .lang-btn { cursor:pointer; background:var(--surface); border:none; padding:7px 16px; font-size:12px; font-weight:700; color:var(--muted); font-family:inherit; transition:background .15s, color .15s; }
+  .lang-btn:not(:last-child) { border-right:1px solid var(--border); }
+  .lang-btn.active { background:var(--accent); color:#fff; }
+  .lang-btn:hover:not(.active) { background:var(--border); color:var(--text); }
 
   /* ── COVER ── */
-  .cover { text-align: center; padding: 48px 0 40px; border-bottom: 2px solid var(--border); margin-bottom: 40px; }
-  .cover-tag { display: inline-block; background: var(--tag-bg); color: var(--tag-text); border-radius: 4px; padding: 3px 10px; font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; margin-bottom: 16px; }
-  .cover h1 { font-size: 32px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
-  .cover h2 { font-size: 17px; font-weight: 400; color: var(--muted); margin-bottom: 24px; }
-  .cover-meta { font-size: 12px; color: var(--muted); }
+  .cover { text-align:center; padding:40px 0 36px; border-bottom:2px solid var(--border); margin-bottom:40px; }
+  .cover-tag { display:inline-block; background:var(--tag-bg); color:var(--tag-text); border-radius:4px; padding:3px 10px; font-size:11px; font-weight:700; letter-spacing:.8px; text-transform:uppercase; margin-bottom:14px; }
+  .cover h1 { font-size:30px; font-weight:800; margin-bottom:6px; }
+  .cover h2 { font-size:16px; font-weight:400; color:var(--muted); margin-bottom:18px; }
+  .cover-meta { font-size:12px; color:var(--muted); }
 
   /* ── TOC ── */
-  .toc { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px 24px; margin-bottom: 40px; }
-  .toc-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom: 12px; }
-  .toc ol { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 4px; }
-  .toc li { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-  .toc-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: var(--accent); color: #fff; border-radius: 50%; font-size: 11px; font-weight: 700; flex-shrink: 0; }
-  .toc-num.green { background: var(--green); }
-  .toc-num.purple { background: var(--purple); }
-  .toc-num.orange { background: var(--orange); }
-  .toc a { color: var(--text); text-decoration: none; font-weight: 500; }
-  .toc a:hover { color: var(--accent); }
+  .toc { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:20px 24px; margin-bottom:40px; }
+  .toc-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:12px; }
+  .toc ol { list-style:none; padding:0; display:flex; flex-direction:column; gap:4px; }
+  .toc li { display:flex; align-items:center; gap:10px; font-size:13px; }
+  .toc-num { display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; background:var(--accent); color:#fff; border-radius:50%; font-size:11px; font-weight:700; flex-shrink:0; }
+  .toc-num.pink   { background:var(--pink); }
+  .toc-num.green  { background:var(--green); }
+  .toc-num.purple { background:var(--purple); }
+  .toc-num.orange { background:var(--orange); }
+  .toc a { color:var(--text); text-decoration:none; font-weight:500; }
+  .toc a:hover { color:var(--accent); }
 
   /* ── SECTIONS ── */
-  .section { margin-bottom: 48px; }
-  .section-header { display: flex; align-items: center; gap: 14px; padding-bottom: 12px; border-bottom: 2px solid var(--border); margin-bottom: 24px; }
-  .section-icon { font-size: 24px; flex-shrink: 0; }
-  .section-title { font-size: 20px; font-weight: 800; color: var(--text); }
-  .section-subtitle { font-size: 13px; color: var(--muted); font-weight: 400; }
-  .section-badge { display: inline-block; border-radius: 4px; padding: 2px 8px; font-size: 11px; font-weight: 700; margin-left: 8px; }
-  .badge-read { background: var(--green-bg); color: var(--green); }
-  .badge-edit { background: var(--orange-bg); color: var(--orange); }
-  .badge-admin { background: var(--purple-bg); color: var(--purple); }
+  .section { margin-bottom:48px; }
+  .section-header { display:flex; align-items:center; gap:14px; padding-bottom:12px; border-bottom:2px solid var(--border); margin-bottom:22px; }
+  .section-icon { font-size:24px; flex-shrink:0; }
+  .section-title { font-size:20px; font-weight:800; }
+  .section-subtitle { font-size:13px; color:var(--muted); font-weight:400; }
+  .section-badge { display:inline-block; border-radius:4px; padding:2px 8px; font-size:11px; font-weight:700; margin-left:8px; }
+  .badge-read   { background:var(--green-bg);   color:var(--green); }
+  .badge-public { background:var(--pink-bg);    color:var(--pink); }
 
-  /* ── CONTENT BLOCKS ── */
-  h3 { font-size: 14px; font-weight: 700; color: var(--text); margin: 20px 0 8px; padding-left: 10px; border-left: 3px solid var(--accent); }
-  h3.green { border-left-color: var(--green); }
-  h3.purple { border-left-color: var(--purple); }
-  h3.orange { border-left-color: var(--orange); }
-  p { margin-bottom: 10px; color: var(--text); }
-  ul, ol { padding-left: 20px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px; }
-  li { font-size: 13px; }
+  /* ── CONTENT ── */
+  h3 { font-size:14px; font-weight:700; color:var(--text); margin:20px 0 8px; padding-left:10px; border-left:3px solid var(--accent); }
+  h3.pink   { border-left-color:var(--pink); }
+  h3.green  { border-left-color:var(--green); }
+  h3.purple { border-left-color:var(--purple); }
+  h3.orange { border-left-color:var(--orange); }
+  p { margin-bottom:10px; }
+  ul, ol { padding-left:20px; margin-bottom:10px; display:flex; flex-direction:column; gap:4px; }
+  li { font-size:13px; }
 
   /* ── TABLE ── */
-  .data-table { width: 100%; border-collapse: collapse; margin: 12px 0 20px; font-size: 13px; }
-  .data-table thead th { background: var(--header-bg); padding: 8px 12px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); border-bottom: 1px solid var(--border); }
-  .data-table tbody td { padding: 7px 12px; border-bottom: 1px solid var(--border); vertical-align: top; }
-  .data-table tbody tr:last-child td { border-bottom: none; }
-  .data-table tbody tr:nth-child(even) { background: var(--surface); }
+  .data-table { width:100%; border-collapse:collapse; margin:12px 0 20px; font-size:13px; }
+  .data-table thead th { background:var(--header-bg); padding:8px 12px; text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); border-bottom:1px solid var(--border); }
+  .data-table tbody td { padding:7px 12px; border-bottom:1px solid var(--border); vertical-align:top; }
+  .data-table tbody tr:last-child td { border-bottom:none; }
+  .data-table tbody tr:nth-child(even) { background:var(--surface); }
 
   /* ── CALLOUTS ── */
-  .callout { border-radius: 8px; padding: 12px 16px; margin: 14px 0; font-size: 13px; line-height: 1.6; display: flex; gap: 10px; }
-  .callout-icon { flex-shrink: 0; font-size: 16px; margin-top: 1px; }
-  .callout.info { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; }
-  .callout.warn { background: var(--orange-bg); border: 1px solid #fcd34d; color: #92400e; }
-  .callout.tip { background: var(--green-bg); border: 1px solid #86efac; color: #14532d; }
+  .callout { border-radius:8px; padding:12px 16px; margin:14px 0; font-size:13px; line-height:1.6; display:flex; gap:10px; }
+  .callout-icon { flex-shrink:0; font-size:16px; margin-top:1px; }
+  .callout.info { background:var(--blue-bg); border:1px solid var(--blue-bd); color:#1e40af; }
+  .callout.tip  { background:var(--green-bg); border:1px solid var(--green-bd); color:#14532d; }
+  .callout.warn { background:var(--orange-bg); border:1px solid var(--orange-bd); color:#92400e; }
 
-  /* ── BUTTONS DEMO ── */
-  .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
-  .demo-btn { display: inline-block; border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: 600; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
-  .demo-btn.primary { background: var(--green); color: #fff; border-color: var(--green); }
-  .demo-btn.accent { background: var(--accent); color: #fff; border-color: var(--accent); }
-  .demo-btn.purple { background: var(--purple); color: #fff; border-color: var(--purple); }
-  .demo-btn.danger { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+  /* ── PILLS / BADGES ── */
+  .pill { display:inline-block; border-radius:999px; padding:1px 8px; font-size:11px; font-weight:600; margin:1px; }
+  .pill-f { background:#dcfce7; color:#166534; }
+  .pill-h { background:#e0f2fe; color:#0369a1; }
+  .pill-a { background:#fce7f3; color:#9d174d; }
+  .pill-t { background:var(--tag-bg); color:var(--tag-text); }
 
-  /* ── PILL / TAG ── */
-  .pill { display: inline-block; border-radius: 999px; padding: 1px 8px; font-size: 11px; font-weight: 600; margin: 1px; }
-  .pill-f { background: #dcfce7; color: #166534; }
-  .pill-h { background: #e0f2fe; color: #0369a1; }
-  .pill-a { background: #fce7f3; color: #9d174d; }
-  .pill-t { background: var(--tag-bg); color: var(--tag-text); }
-  .tag { display: inline-block; background: var(--tag-bg); color: var(--tag-text); border-radius: 4px; padding: 1px 6px; font-size: 11px; font-weight: 600; }
+  .demo-btn { display:inline-block; border-radius:6px; padding:5px 12px; font-size:12px; font-weight:600; border:1px solid var(--border); background:var(--surface); color:var(--text); }
+  .btn-row { display:flex; flex-wrap:wrap; gap:8px; margin:10px 0; }
 
-  /* ── STEP ── */
-  .steps-block { display: flex; flex-direction: column; gap: 10px; margin: 12px 0; }
-  .step { display: flex; gap: 12px; align-items: flex-start; }
-  .step-n { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; background: var(--accent); color: #fff; border-radius: 50%; font-size: 12px; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
-  .step-n.green { background: var(--green); }
-  .step-n.orange { background: var(--orange); }
-  .step-n.purple { background: var(--purple); }
-  .step-body { font-size: 13px; }
-  .step-body strong { color: var(--text); }
+  /* ── STEPS ── */
+  .steps-block { display:flex; flex-direction:column; gap:10px; margin:12px 0; }
+  .step { display:flex; gap:12px; align-items:flex-start; }
+  .step-n { display:inline-flex; align-items:center; justify-content:center; min-width:24px; height:24px; background:var(--accent); color:#fff; border-radius:50%; font-size:12px; font-weight:700; flex-shrink:0; margin-top:1px; }
+  .step-n.pink   { background:var(--pink); }
+  .step-n.green  { background:var(--green); }
+  .step-n.purple { background:var(--purple); }
+  .step-n.orange { background:var(--orange); }
+  .step-body { font-size:13px; }
 
-  /* ── DIVIDER ── */
-  .divider { border: none; border-top: 1px solid var(--border); margin: 28px 0; }
+  .divider { border:none; border-top:1px solid var(--border); margin:32px 0; }
+  code { background:var(--surface); border:1px solid var(--border); border-radius:4px; padding:1px 6px; font-size:12px; font-family:'Courier New',monospace; }
+  .footer { margin-top:48px; padding-top:16px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
 
-  /* ── CODE ── */
-  code { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; font-size: 12px; font-family: 'Courier New', monospace; color: var(--text); }
+  /* ── LANG HIDE/SHOW ──
+     Règle : les éléments [data-lang] visibles par défaut = FR seulement.
+     En mode .lang-en : on masque FR et on affiche EN.
+     Spécificité : les sélecteurs avec tag (span/div/p…) sont plus spécifiques
+     que [attr] seul — on doit donc toujours utiliser la même spécificité ou
+     la classe parente .lang-en pour l'emporter. ── */
 
-  /* ── FOOTER ── */
-  .footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+  /* FR visible par défaut, EN masqué */
+  span[data-lang="fr"],
+  div[data-lang="fr"],
+  p[data-lang="fr"],
+  li[data-lang="fr"],
+  h3[data-lang="fr"]  { display:revert; }
+
+  span[data-lang="en"],
+  div[data-lang="en"],
+  p[data-lang="en"],
+  li[data-lang="en"],
+  h3[data-lang="en"]  { display:none; }
+
+  /* Mode anglais : inverser */
+  .lang-en span[data-lang="fr"],
+  .lang-en div[data-lang="fr"],
+  .lang-en p[data-lang="fr"],
+  .lang-en li[data-lang="fr"],
+  .lang-en h3[data-lang="fr"]  { display:none; }
+
+  .lang-en span[data-lang="en"] { display:inline; }
+  .lang-en div[data-lang="en"],
+  .lang-en p[data-lang="en"],
+  .lang-en li[data-lang="en"],
+  .lang-en h3[data-lang="en"]  { display:block; }
 </style>
 </head>
 <body>
-<div class="page">
+<div class="page" id="pageRoot">
 
-  <div style="margin-bottom:24px;">
-    <a href="index.html" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;background:#f7f8fa;border:1px solid #e5e7eb;border-radius:8px;font-size:13px;font-weight:600;color:#1f2328;text-decoration:none;">🏠 Home</a>
+  <!-- ── TOP BAR ── -->
+  <div class="topbar">
+    <a href="index_bis.html" class="btn-home">🏠 <span data-lang="fr">Accueil</span><span data-lang="en">Home</span></a>
+    <div class="lang-toggle">
+      <button class="lang-btn active" id="btnFr" onclick="setLang('fr')">FR</button>
+      <button class="lang-btn"        id="btnEn" onclick="setLang('en')">EN</button>
+    </div>
   </div>
 
+  <!-- ── COVER ── -->
   <div class="cover">
-    <div class="cover-tag">Documentation</div>
+    <div class="cover-tag">
+      <span data-lang="fr">Documentation</span>
+      <span data-lang="en">Documentation</span>
+    </div>
     <h1>Tantramour 2026</h1>
-    <h2>Manuel utilisateur — Suite de gestion du festival</h2>
-    <div class="cover-meta">6 pages · Lecture, édition et gestion des référentiels</div>
+    <h2>
+      <span data-lang="fr">Manuel utilisateur — DreamTeam</span>
+      <span data-lang="en">User Manual — DreamTeam</span>
+    </h2>
+    <div class="cover-meta">
+      <span data-lang="fr">9 rapports · Programme festivaliers, plannings équipes</span>
+      <span data-lang="en">9 reports · Festival programme, team schedules</span>
+    </div>
   </div>
 
-  
+  <!-- ── TABLE DES MATIÈRES ── -->
   <div class="toc">
-    <div class="toc-title">Table des matières</div>
+    <div class="toc-title">
+      <span data-lang="fr">Table des matières</span>
+      <span data-lang="en">Table of contents</span>
+    </div>
     <ol>
-      <li><span class="toc-num">1</span><a href="#home">Page d'accueil (Home)</a></li>
-      <li><span class="toc-num">2</span><a href="#rapport1">Rapport 1 — Agenda par Jour</a></li>
-      <li><span class="toc-num">3</span><a href="#rapport2">Rapport 2 — Agenda par Personne</a></li>
-      <li><span class="toc-num">4</span><a href="#rapport3">Rapport 3 — Logistique par Atelier</a></li>
-      <li><span class="toc-num orange">5</span><a href="#admin">Admin — Édition des ateliers</a></li>
-      <li><span class="toc-num purple">6</span><a href="#masterdata">Master Data — Gestion des référentiels</a></li>
+      <li><span class="toc-num pink">1</span><a href="#programme">
+        <span data-lang="fr">Programme Festival (festivaliers)</span>
+        <span data-lang="en">Festival Programme (attendees)</span>
+      </a></li>
+      <li><span class="toc-num green">2</span><a href="#infos">
+        <span data-lang="fr">Informations Ateliers (helpers & intervenants)</span>
+        <span data-lang="en">Workshop Information (helpers & facilitators)</span>
+      </a></li>
+      <li><span class="toc-num">3</span><a href="#planning">
+        <span data-lang="fr">Mon Planning V2</span>
+        <span data-lang="en">My Planning V2</span>
+      </a></li>
+      <li><span class="toc-num orange">4</span><a href="#angels">
+        <span data-lang="fr">Planning Angels</span>
+        <span data-lang="en">Angels Schedule</span>
+      </a></li>
+      <li><span class="toc-num purple">5</span><a href="#traducteurs">
+        <span data-lang="fr">Planning Traducteurs</span>
+        <span data-lang="en">Translators Schedule</span>
+      </a></li>
+      <li><span class="toc-num">6</span><a href="#colibri">
+        <span data-lang="fr">Planning Colibri 🐦</span>
+        <span data-lang="en">Colibri Schedule 🐦</span>
+      </a></li>
+      <li><span class="toc-num" style="background:#0369a1">7</span><a href="#charge">
+        <span data-lang="fr">Charge de travail — Helpers, Angels &amp; Traducteurs</span>
+        <span data-lang="en">Workload — Helpers, Angels &amp; Translators</span>
+      </a></li>
+      <li><span class="toc-num pink">8</span><a href="#agenda-simplifie">
+        <span data-lang="fr">Mon Agenda Simplifié</span>
+        <span data-lang="en">My Simplified Schedule</span>
+      </a></li>
+      <li><span class="toc-num pink">9</span><a href="#agenda-salle">
+        <span data-lang="fr">Agenda Simplifié par Salle</span>
+        <span data-lang="en">Simplified Schedule by Room</span>
+      </a></li>
     </ol>
   </div>
 
-  
-  
-  
-  <div class="section" id="home">
+
+  <!-- ══════════════════════════════════════
+       1 — PROGRAMME FESTIVAL
+  ══════════════════════════════════════ -->
+  <div class="section" id="programme">
     <div class="section-header">
-      <div class="section-icon">🏠</div>
+      <div class="section-icon">🎪</div>
       <div>
-        <div class="section-title">Page d'accueil <span class="section-badge badge-read">Lecture</span></div>
-        <div class="section-subtitle">Point d'entrée central vers toutes les pages</div>
+        <div class="section-title">
+          <span data-lang="fr">Programme Festival</span>
+          <span data-lang="en">Festival Programme</span>
+          <span class="section-badge badge-public">
+            <span data-lang="fr">Festivaliers</span>
+            <span data-lang="en">Attendees</span>
+          </span>
+        </div>
+        <div class="section-subtitle">
+          <span data-lang="fr">Ateliers publics jour par jour · Bilingue FR / EN</span>
+          <span data-lang="en">Public workshops day by day · Bilingual FR / EN</span>
+        </div>
       </div>
     </div>
 
-    <p>La page d'accueil (<code>index.html</code>) est le hub de navigation. Elle permet d'accéder en un clic à l'ensemble des outils du festival.</p>
-
-    <h3>Navigation disponible</h3>
-    <table class="data-table">
-      <thead><tr><th>Carte / Bouton</th><th>Description</th></tr></thead>
-      <tbody>
-        <tr><td>📅 Rapport 1 — Agenda par Jour</td><td>Voir tous les ateliers filtrés par jour ou par type</td></tr>
-        <tr><td>👤 Rapport 2 — Agenda par Personne</td><td>Voir le planning d'une personne spécifique (Fac, Helper, Angel, Traducteur)</td></tr>
-        <tr><td>📋 Rapport 3 — Logistique par Atelier</td><td>Consulter la fiche logistique complète d'un atelier</td></tr>
-        <tr><td>⚙️ Admin</td><td>Éditer les données d'un atelier et sauvegarder</td></tr>
-        <tr><td>🗂 Master Data</td><td>Gérer les référentiels (facilitateurs, helpers, lieux, etc.)</td></tr>
-      </tbody>
-    </table>
-
-    <div class="callout info">
-      <div class="callout-icon">ℹ️</div>
-      <div>Toutes les pages doivent être ouvertes via <strong>http://localhost:3000</strong> (serveur local Python). Lancez d'abord <code>start.bat</code> avant d'ouvrir le navigateur.</div>
-    </div>
-  </div>
-
-  <hr class="divider" />
-
-  
-  
-  
-  <div class="section" id="rapport1">
-    <div class="section-header">
-      <div class="section-icon">📅</div>
-      <div>
-        <div class="section-title">Rapport 1 — Agenda par Jour <span class="section-badge badge-read">Lecture</span></div>
-        <div class="section-subtitle">Vue chronologique de tous les ateliers</div>
-      </div>
-    </div>
-
-    <p>Ce rapport affiche l'ensemble des ateliers du festival, organisés dans un tableau avec tri et filtres. Il est idéal pour avoir une vue d'ensemble d'une journée ou d'une catégorie d'atelier.</p>
-
-    <h3>Filtres disponibles</h3>
-    <table class="data-table">
-      <thead><tr><th>Filtre</th><th>Options</th><th>Comportement</th></tr></thead>
-      <tbody>
-        <tr><td><strong>Jour / Date</strong></td><td>Tous les jours, Jour 1 … Jour 7</td><td>Affiche uniquement les ateliers de ce jour</td></tr>
-        <tr><td><strong>Type d'atelier</strong></td><td>Liste des types présents dans les données</td><td>Filtre par catégorie (ex : Ateliers Tantra, Méditation…)</td></tr>
-      </tbody>
-    </table>
-
-    <h3>Colonnes du tableau</h3>
-    <p>Toutes les colonnes sont <strong>triables</strong> par clic sur l'en-tête (↑ croissant, ↓ décroissant) :</p>
-    <table class="data-table">
-      <thead><tr><th>Colonne</th><th>Contenu</th></tr></thead>
-      <tbody>
-        <tr><td>Jour</td><td>Ex : Jour 2</td></tr>
-        <tr><td>Date</td><td>Ex : Dimanche 30 août</td></tr>
-        <tr><td>Heure</td><td>Plage horaire (ex : 11:15 - 13:00)</td></tr>
-        <tr><td>Type d'atelier</td><td>Catégorie avec badge coloré</td></tr>
-        <tr><td>Atelier</td><td>Nom de l'atelier (★ rouge si note renseignée)</td></tr>
-        <tr><td>Lieu</td><td>Salle ou espace</td></tr>
-        <tr><td>Facilitateur(s)</td><td><span class="pill pill-f">Prénom Nom</span> badges verts</td></tr>
-        <tr><td>Traducteur</td><td><span class="pill pill-t">Prénom Nom</span> badge bleu clair</td></tr>
-        <tr><td>Helper(s)</td><td><span class="pill pill-h">Prénom Nom</span> badges bleus</td></tr>
-        <tr><td>Angel</td><td><span class="pill pill-a">Prénom Nom</span> badge rose</td></tr>
-      </tbody>
-    </table>
-
-    <h3>Boutons d'action</h3>
-    <div class="btn-row">
-      <span class="demo-btn">🏠 Home</span>
-      <span class="demo-btn">🔄 Refresh</span>
-      <span class="demo-btn">📱 Vue Mobile</span>
-      <span class="demo-btn">🌙 Mode Nuit</span>
-    </div>
-    <ul>
-      <li><strong>🔄 Refresh</strong> — recharge la page pour prendre en compte les dernières modifications de <code>data.js</code></li>
-      <li><strong>📱 Vue Mobile / 🖥 Vue Tableau</strong> — bascule entre un tableau et des cartes groupées par jour (automatique sous 768px)</li>
-      <li><strong>🌙 / ☀️ Mode Nuit</strong> — thème sombre ou clair</li>
-    </ul>
+    <p data-lang="fr">Cette page est le point d'entrée <strong>public</strong> du festival. Elle permet aux festivaliers de consulter le programme des ateliers jour par jour, avec descriptions et filtre par type.</p>
+    <p data-lang="en">This page is the <strong>public</strong> entry point for the festival. It lets attendees browse the workshop schedule day by day, with descriptions and filters by type.</p>
 
     <div class="callout tip">
       <div class="callout-icon">💡</div>
-      <div>Un astérisque <strong style="color:#e53e3e">*</strong> rouge à côté du nom de l'atelier indique qu'une note logistique est renseignée — consultez le Rapport 3 pour le détail.</div>
-    </div>
-  </div>
-
-  <hr class="divider" />
-
-  
-  
-  
-  <div class="section" id="rapport2">
-    <div class="section-header">
-      <div class="section-icon">👤</div>
       <div>
-        <div class="section-title">Rapport 2 — Agenda par Personne <span class="section-badge badge-read">Lecture</span></div>
-        <div class="section-subtitle">Planning individuel de chaque membre de l'équipe</div>
+        <span data-lang="fr">La page est entièrement <strong>bilingue FR / EN</strong> — le bouton 🌐 traduit instantanément tous les libellés, dates, noms des jours et types d'ateliers.</span>
+        <span data-lang="en">The page is fully <strong>bilingual FR / EN</strong> — the 🌐 button instantly translates all labels, dates, day names and workshop types.</span>
       </div>
     </div>
 
-    <p>Ce rapport permet de retrouver rapidement tous les ateliers auxquels une personne est affectée, quel que soit son rôle (facilitateur, helper, angel ou traducteur).</p>
+    <h3 class="pink">
+      <span data-lang="fr">Écran 1 — Grille des jours</span>
+      <span data-lang="en">Screen 1 — Day grid</span>
+    </h3>
+    <p data-lang="fr">La page s'ouvre sur une grille compacte de cartes bleues, une par jour du festival. Seuls les jours ayant au moins un atelier public sont affichés. Cliquez sur un jour pour voir le programme.</p>
+    <p data-lang="en">The page opens on a compact grid of blue cards, one per festival day. Only days with at least one public workshop are shown. Click a day to view its programme.</p>
 
-    <h3>Filtres disponibles</h3>
+    <h3 class="pink">
+      <span data-lang="fr">Écran 2 — Programme du jour</span>
+      <span data-lang="en">Screen 2 — Day programme</span>
+    </h3>
+    <p data-lang="fr">Les ateliers sont regroupés par grande tranche de la journée (Yoga/Méditation, Rassemblement, Matin, Après-midi, Soirée). À l'intérieur des blocs Matin et Après-midi, les ateliers sont <strong>groupés par type</strong> et triés par l'heure du premier atelier du type. Chaque grand groupe dispose désormais d'un <strong>fond progressif</strong> allant du plus clair au plus sombre pour faciliter la lecture visuelle du jour.</p>
+    <p data-lang="en">Workshops are grouped by time of day (Yoga/Meditation, Gathering, Morning, Afternoon, Evening). Inside the Morning and Afternoon blocks, workshops are <strong>grouped by type</strong> and sorted by the earliest start time of each type. Each main group now has a <strong>progressive background shade</strong> from light to dark to make the day view easier to scan visually.</p>
+
+    <p data-lang="fr">Des <strong>chips de filtre</strong> colorés par type permettent d'affiner l'affichage. Chaque carte d'atelier affiche :</p>
+    <p data-lang="en"><strong>Coloured filter chips</strong> by type let you narrow the view. Each workshop card shows:</p>
     <table class="data-table">
-      <thead><tr><th>Filtre</th><th>Options</th><th>Comportement</th></tr></thead>
+      <thead><tr>
+        <th><span data-lang="fr">Zone</span><span data-lang="en">Area</span></th>
+        <th><span data-lang="fr">Contenu</span><span data-lang="en">Content</span></th>
+      </tr></thead>
       <tbody>
-        <tr><td><strong>Personne</strong></td><td>Liste de toutes les personnes de l'équipe</td><td>Affiche uniquement les ateliers de cette personne</td></tr>
-        <tr><td><strong>Jour / Date</strong></td><td>Tous les jours, Jour 1 … Jour 7</td><td>Restreint à une journée</td></tr>
-        <tr><td><strong>Rôle</strong></td><td>Facilitateur, Helper, Angel, Traducteur</td><td>Filtre par type de responsabilité</td></tr>
-        <tr><td><strong>Type d'atelier</strong></td><td>Catégories des ateliers</td><td>Filtre par catégorie</td></tr>
+        <tr>
+          <td><span data-lang="fr"><strong>En-tête</strong></span><span data-lang="en"><strong>Header</strong></span></td>
+          <td><span data-lang="fr">Type coloré + bouton Détails</span><span data-lang="en">Coloured type + Details button</span></td>
+        </tr>
+        <tr>
+          <td><span data-lang="fr"><strong>Nom + Piment</strong></span><span data-lang="en"><strong>Name + Heat</strong></span></td>
+          <td><span data-lang="fr">Nom de l'atelier et niveau d'intensité 🌶️</span><span data-lang="en">Workshop name and intensity level 🌶️</span></td>
+        </tr>
+        <tr>
+          <td><span data-lang="fr"><strong>Heure – Durée</strong></span><span data-lang="en"><strong>Time – Duration</strong></span></td>
+          <td><span data-lang="fr">Plage horaire et durée calculée automatiquement</span><span data-lang="en">Time slot and automatically calculated duration</span></td>
+        </tr>
+        <tr>
+          <td><span data-lang="fr"><strong>Lieu + Langue</strong></span><span data-lang="en"><strong>Venue + Language</strong></span></td>
+          <td><span data-lang="fr">Salle et badge FR ou FR/ENG si bilingue</span><span data-lang="en">Room and FR or FR/ENG badge if bilingual</span></td>
+        </tr>
+        <tr>
+          <td><span data-lang="fr"><strong>Animateurs</strong></span><span data-lang="en"><strong>Facilitators</strong></span></td>
+          <td><span data-lang="fr">Prénom(s) des animateurs 🎓</span><span data-lang="en">Facilitator name(s) 🎓</span></td>
+        </tr>
+        <tr>
+          <td><span data-lang="fr"><strong>Consigne / Note</strong></span><span data-lang="en"><strong>Instruction / Note</strong></span></td>
+          <td><span data-lang="fr">Badge ⚠️ si une consigne est définie · Badge 🏷 si une note est renseignée</span><span data-lang="en">⚠️ badge if an instruction is set · 🏷 badge if a note is entered</span></td>
+        </tr>
       </tbody>
     </table>
 
-    <h3>Codes couleur des rôles</h3>
-    <div class="btn-row" style="align-items:center">
-      <span class="pill pill-f">Facilitateur</span>
-      <span class="pill pill-h">Helper</span>
-      <span class="pill pill-a">Angel</span>
-      <span class="pill pill-t">Traducteur</span>
-    </div>
-
-    <h3>Vue Mobile — cartes par personne</h3>
-    <p>En vue mobile, les ateliers sont regroupés <strong>par personne puis par jour</strong>. Si une personne a plusieurs ateliers à la même heure dans le même rôle, ils sont <strong>fusionnés en une seule carte</strong> "ateliers simultanés".</p>
-
-    <h3>Boutons d'action</h3>
-    <div class="btn-row">
-      <span class="demo-btn">🏠 Home</span>
-      <span class="demo-btn">🔄 Refresh</span>
-      <span class="demo-btn">📱 Vue Mobile</span>
-      <span class="demo-btn">🌙 Mode Nuit</span>
-    </div>
+    <h3 class="pink">
+      <span data-lang="fr">Modale de détail</span>
+      <span data-lang="en">Detail modal</span>
+    </h3>
+    <p data-lang="fr">Cliquez n'importe où sur une carte (ou sur le bouton <strong>ℹ️ Détails</strong>) pour ouvrir la fiche complète de l'atelier :</p>
+    <p data-lang="en">Click anywhere on a card (or the <strong>ℹ️ Details</strong> button) to open the full workshop sheet:</p>
+    <ul>
+      <li><span data-lang="fr">Badge type coloré, nom, jour et date</span><span data-lang="en">Coloured type badge, name, day and date</span></li>
+      <li><span data-lang="fr">Grille info : horaire, lieu, animateur(s), piment, traducteur</span><span data-lang="en">Info grid: time, venue, facilitator(s), heat level, translator</span></li>
+      <li><span data-lang="fr">Instructions participants (⚠️) — toujours affichées</span><span data-lang="en">Participant instructions (⚠️) — always shown</span></li>
+      <li><span data-lang="fr">Description FR ou EN selon la langue active</span><span data-lang="en">FR or EN description depending on the active language</span></li>
+      <li><span data-lang="fr">Toggle FR / ENG dans l'en-tête de la modale pour basculer la langue du contenu</span><span data-lang="en">FR / ENG toggle in the modal header to switch the content language</span></li>
+    </ul>
 
     <div class="callout info">
       <div class="callout-icon">ℹ️</div>
-      <div>Le filtre <strong>Personne</strong> liste automatiquement toutes les personnes présentes dans <code>data.js</code> — facilitateurs, helpers, angels <em>et</em> traducteurs. Pas de saisie manuelle nécessaire.</div>
+      <div>
+        <span data-lang="fr"><strong>Bouton ← Choisir un autre jour</strong> (gros bouton bleu) — revient à la grille des jours.</span>
+        <span data-lang="en"><strong>← Choose another day</strong> button (large blue button) — returns to the day grid.</span>
+      </div>
     </div>
   </div>
 
   <hr class="divider" />
 
-  
-  
-  
-  <div class="section" id="rapport3">
+
+  <!-- ══════════════════════════════════════
+       2 — INFORMATIONS ATELIERS
+  ══════════════════════════════════════ -->
+  <div class="section" id="infos">
+    <div class="section-header">
+      <div class="section-icon">📘</div>
+      <div>
+        <div class="section-title">
+          <span data-lang="fr">Informations Ateliers</span>
+          <span data-lang="en">Workshop Information</span>
+          <span class="section-badge badge-read">
+            <span data-lang="fr">DreamTeam</span>
+            <span data-lang="en">DreamTeam</span>
+          </span>
+        </div>
+        <div class="section-subtitle">
+          <span data-lang="fr">Consignes, besoins logistiques et infos pour helpers et intervenants</span>
+          <span data-lang="en">Instructions, logistics needs and info for helpers and facilitators</span>
+        </div>
+      </div>
+    </div>
+
+    <p data-lang="fr">Ce rapport centralise les informations opérationnelles des ateliers à destination des helpers et intervenants. Il donne accès aux consignes, besoins matériels et notes logistiques, organisés par jour et par atelier. Depuis la page <strong>Gestion planning</strong>, il se trouve désormais à côté de <strong>Saisie des informations Ateliers</strong>.</p>
+    <p data-lang="en">This report centralises operational workshop information for helpers and facilitators. It provides access to instructions, material needs and logistics notes, organised by day and workshop. From the <strong>Planning management</strong> page, it is now located next to <strong>Workshop Information Entry</strong>.</p>
+
+    <h3 class="green">
+      <span data-lang="fr">Navigation</span>
+      <span data-lang="en">Navigation</span>
+    </h3>
+    <div class="steps-block">
+      <div class="step">
+        <div class="step-n green">1</div>
+        <div class="step-body">
+          <span data-lang="fr">Sélectionnez un <strong>jour</strong> dans le filtre en haut de page.</span>
+          <span data-lang="en">Select a <strong>day</strong> from the filter at the top of the page.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n green">2</div>
+        <div class="step-body">
+          <span data-lang="fr">Sélectionnez un <strong>atelier</strong> dans la liste — un clic ouvre une <strong>popup</strong> avec les informations détaillées de l'atelier.</span>
+          <span data-lang="en">Select a <strong>workshop</strong> from the list — clicking it opens a <strong>popup</strong> with the workshop's detailed information.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n green">3</div>
+        <div class="step-body">
+          <span data-lang="fr">La popup affiche toutes les informations disponibles, avec le même format FR / EN que dans Mon Planning V2.</span>
+          <span data-lang="en">The popup shows all available information, using the same FR / EN format as in My Planning V2.</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="green">
+      <span data-lang="fr">Contenu de la fiche</span>
+      <span data-lang="en">Sheet content</span>
+    </h3>
+    <table class="data-table">
+      <thead><tr>
+        <th><span data-lang="fr">Zone</span><span data-lang="en">Area</span></th>
+        <th><span data-lang="fr">Contenu</span><span data-lang="en">Content</span></th>
+      </tr></thead>
+      <tbody>
+        <tr><td><span data-lang="fr">Informations générales</span><span data-lang="en">General information</span></td>
+            <td><span data-lang="fr">Nom atelier (FR/ENG), type, jour/date, horaire/durée, arrivée, lieu</span><span data-lang="en">Workshop name (FR/ENG), type, day/date, schedule/duration, arrival time, venue</span></td></tr>
+        <tr><td><span data-lang="fr">Équipe</span><span data-lang="en">Team</span></td>
+            <td><span data-lang="fr">Animateur(s), Helper(s), Traducteur, Angel, Note — affichés même si la valeur est vide</span><span data-lang="en">Teacher(s), Helper(s), Translator, Angel, Note — shown even if the value is empty</span></td></tr>
+        <tr><td><span data-lang="fr">Instructions participantes</span><span data-lang="en">Participant instructions</span></td>
+            <td><span data-lang="fr">Bloc dédié toujours visible dans la popup</span><span data-lang="en">Dedicated block always visible in the popup</span></td></tr>
+        <tr><td><span data-lang="fr">Description atelier</span><span data-lang="en">Workshop description</span></td>
+            <td><span data-lang="fr">Description FR ou EN selon la langue de la popup</span><span data-lang="en">FR or EN description depending on the popup language</span></td></tr>
+        <tr><td><span data-lang="fr">Informations logistiques</span><span data-lang="en">Logistics information</span></td>
+            <td><span data-lang="fr">Besoins matériels, installation, besoins spécifiques et consignes helpers</span><span data-lang="en">Material needs, setup, specific needs and helper instructions</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <hr class="divider" />
+
+
+  <!-- ══════════════════════════════════════
+       3 — MON PLANNING V2
+  ══════════════════════════════════════ -->
+  <div class="section" id="planning">
     <div class="section-header">
       <div class="section-icon">📋</div>
       <div>
-        <div class="section-title">Rapport 3 — Logistique par Atelier <span class="section-badge badge-read">Lecture</span></div>
-        <div class="section-subtitle">Fiche logistique complète d'un atelier</div>
+        <div class="section-title">
+          <span data-lang="fr">Mon Planning V2</span>
+          <span data-lang="en">My Planning V2</span>
+          <span class="section-badge badge-read">
+            <span data-lang="fr">DreamTeam</span>
+            <span data-lang="en">DreamTeam</span>
+          </span>
+        </div>
+        <div class="section-subtitle">
+          <span data-lang="fr">Vue par ressource — détails ateliers, logistique, popup FR/EN</span>
+          <span data-lang="en">View by resource — workshop details, logistics, FR/EN popup</span>
+        </div>
       </div>
     </div>
 
-    <p>Ce rapport affiche la fiche complète d'un atelier sélectionné : équipe, salle, note et informations logistiques détaillées. C'est la page de référence pour la préparation terrain.</p>
+    <p data-lang="fr">Ce rapport donne à chaque membre de la DreamTeam une vue complète de son planning personnel. Il est organisé par personne et affiche tous les ateliers auxquels elle est affectée, quel que soit son rôle. L'onglet principal s'appelle désormais <strong>Tous tes rôles confondus</strong>.</p>
+    <p data-lang="en">This report gives each DreamTeam member a complete view of their personal schedule. It is organised by person and shows all workshops they are assigned to, regardless of their role. The main tab is now called <strong>All your roles combined</strong>.</p>
 
-    <h3>Navigation en 2 étapes</h3>
-    <div class="steps-block">
-      <div class="step">
-        <div class="step-n">1</div>
-        <div class="step-body"><strong>Choisir le jour</strong> — sélectionnez un jour parmi les 7 disponibles. Le sélecteur d'ateliers s'active automatiquement.</div>
-      </div>
-      <div class="step">
-        <div class="step-n">2</div>
-        <div class="step-body"><strong>Choisir l'atelier</strong> — la liste affiche tous les ateliers de ce jour au format <code>[HH:MM] Nom de l'atelier</code>. Sélectionnez-en un pour afficher la fiche.</div>
-      </div>
-    </div>
-
-    <h3>Contenu de la fiche</h3>
+    <h3>
+      <span data-lang="fr">Filtres disponibles</span>
+      <span data-lang="en">Available filters</span>
+    </h3>
     <table class="data-table">
-      <thead><tr><th>Zone</th><th>Contenu</th></tr></thead>
+      <thead><tr>
+        <th><span data-lang="fr">Filtre</span><span data-lang="en">Filter</span></th>
+        <th><span data-lang="fr">Comportement</span><span data-lang="en">Behaviour</span></th>
+      </tr></thead>
       <tbody>
-        <tr><td><strong>En-tête</strong></td><td>Nom de l'atelier, heure, jour, date, type et lieu</td></tr>
-        <tr><td><strong>Facilitateur(s)</strong></td><td>Badges verts — personnes en charge de l'animation</td></tr>
-        <tr><td><strong>Helper(s)</strong></td><td>Badges bleus — personnes en soutien</td></tr>
-        <tr><td><strong>Angel</strong></td><td>Badge rose — personne en charge du soutien émotionnel</td></tr>
-        <tr><td><strong>Traducteur</strong></td><td>Badge bleu clair — traducteur assigné</td></tr>
-        <tr><td><strong>Note</strong></td><td>Note courte normalisée (ex : "Shift Colibri", "Atelier + long")</td></tr>
-        <tr><td><strong>Informations Logistiques</strong></td><td>Texte libre détaillé pour la préparation terrain</td></tr>
+        <tr><td><span data-lang="fr"><strong>Personne</strong></span><span data-lang="en"><strong>Person</strong></span></td>
+            <td><span data-lang="fr">Affiche uniquement le planning de cette personne</span><span data-lang="en">Shows only that person's schedule</span></td></tr>
+        <tr><td><span data-lang="fr"><strong>Recherche nom</strong></span><span data-lang="en"><strong>Name search</strong></span></td>
+            <td><span data-lang="fr">Permet de retrouver rapidement une ressource dans la liste</span><span data-lang="en">Lets you quickly find a resource in the list</span></td></tr>
+        <tr><td><span data-lang="fr"><strong>Vue</strong></span><span data-lang="en"><strong>View</strong></span></td>
+            <td><span data-lang="fr">Tous tes rôles confondus, Animateur, Helper, Traducteur, Angel ou Colibri</span><span data-lang="en">All your roles combined, Teacher, Helper, Translator, Angel or Colibri</span></td></tr>
       </tbody>
     </table>
+
+    <h3>
+      <span data-lang="fr">Codes couleur des rôles</span>
+      <span data-lang="en">Role colour codes</span>
+    </h3>
+    <div class="btn-row">
+      <span class="pill pill-f"><span data-lang="fr">Animateur</span><span data-lang="en">Teacher</span></span>
+      <span class="pill pill-h">Helper</span>
+      <span class="pill pill-a">Angel</span>
+      <span class="pill pill-t"><span data-lang="fr">Traducteur</span><span data-lang="en">Translator</span></span>
+    </div>
+
+    <h3>
+      <span data-lang="fr">Shifts Angel — affichage collapsible</span>
+      <span data-lang="en">Angel shifts — collapsible display</span>
+    </h3>
+    <p data-lang="fr">Dans l'onglet <strong>Angel</strong>, les shifts sont affichés sous forme de lignes condensées. Les ateliers couverts par un shift sont <strong>masqués par défaut</strong> et s'affichent en cliquant sur la ligne du shift (chevron ▶ / ▼). Le nombre d'ateliers couverts est indiqué dans la pill du shift.</p>
+    <p data-lang="en">In the <strong>Angel</strong> tab, shifts are displayed as condensed rows. The workshops covered by a shift are <strong>hidden by default</strong> and appear by clicking on the shift row (chevron ▶ / ▼). The number of covered workshops is shown in the shift pill.</p>
 
     <div class="callout tip">
       <div class="callout-icon">💡</div>
-      <div>Si les champs Note ou Informations Logistiques affichent un texte en italique grisé, c'est qu'aucune information n'a encore été saisie pour cet atelier. Utilisez <strong>Admin</strong> pour les compléter.</div>
+      <div>
+        <span data-lang="fr">Cliquer sur un shift angel révèle les ateliers individuels couverts avec leurs horaires précis, en retrait visuel sous la ligne du shift.</span>
+        <span data-lang="en">Clicking an angel shift reveals the individual workshops it covers, with their precise times, visually indented below the shift row.</span>
+      </div>
     </div>
+
+    <h3>
+      <span data-lang="fr">Fiche logistique — modale popup</span>
+      <span data-lang="en">Logistics sheet — popup modal</span>
+    </h3>
+    <p data-lang="fr">Chaque atelier dans la liste ouvre une modale popup avec les informations complètes de l'atelier : nom atelier (FR/ENG), type, jour/date, horaire/durée, lieu, équipe, note, instructions participantes, description, logistique et consignes helpers — disponibles en <strong>FR et EN</strong> via le toggle dans la modale.</p>
+    <p data-lang="en">Each workshop in the list opens a popup modal with the workshop's full details: workshop name (FR/ENG), type, day/date, schedule/duration, venue, team, note, participant instructions, description, logistics and helper instructions — available in <strong>FR and EN</strong> via the toggle inside the modal.</p>
   </div>
 
   <hr class="divider" />
 
-  
-  
-  
-  <div class="section" id="admin">
+
+  <!-- ══════════════════════════════════════
+       4 — PLANNING ANGELS
+  ══════════════════════════════════════ -->
+  <div class="section" id="angels">
     <div class="section-header">
-      <div class="section-icon">⚙️</div>
+      <div class="section-icon">👼</div>
       <div>
-        <div class="section-title">Admin — Édition des ateliers <span class="section-badge badge-edit">Édition</span></div>
-        <div class="section-subtitle">Modifier les données d'un atelier et sauvegarder dans data.js</div>
+        <div class="section-title">
+          <span data-lang="fr">Planning Angels</span>
+          <span data-lang="en">Angels Schedule</span>
+          <span class="section-badge badge-read">
+            <span data-lang="fr">DreamTeam</span>
+            <span data-lang="en">DreamTeam</span>
+          </span>
+        </div>
+        <div class="section-subtitle">
+          <span data-lang="fr">Vue du planning des Angels avec leurs contacts</span>
+          <span data-lang="en">Angels schedule view with their contact details</span>
+        </div>
       </div>
     </div>
 
-    <p>La page Admin permet de modifier tous les champs d'un atelier existant et de sauvegarder directement dans <code>data.js</code> via le serveur local.</p>
+    <p data-lang="fr">Ce rapport présente le planning de tous les <strong>Angels</strong> du festival. Pour chaque Angel, il affiche les shifts assignés regroupés par jour, ainsi que les informations de contact.</p>
+    <p data-lang="en">This report presents the schedule of all festival <strong>Angels</strong>. For each Angel, it shows the assigned shifts grouped by day, along with contact information.</p>
 
-    <div class="callout warn">
-      <div class="callout-icon">⚠️</div>
-      <div>Le serveur local (<code>start.bat</code>) doit être actif pour que la sauvegarde fonctionne. Sans lui, le bouton "Valider" ne peut pas écrire sur le disque.</div>
-    </div>
-
-    <h3 class="orange">Sélection de l'atelier à modifier</h3>
-    <div class="steps-block">
-      <div class="step">
-        <div class="step-n orange">1</div>
-        <div class="step-body"><strong>Choisir le jour</strong> dans le premier menu déroulant.</div>
-      </div>
-      <div class="step">
-        <div class="step-n orange">2</div>
-        <div class="step-body"><strong>Choisir l'atelier</strong> dans le second menu (se déverrouille automatiquement).</div>
-      </div>
-      <div class="step">
-        <div class="step-n orange">3</div>
-        <div class="step-body">Le formulaire s'affiche pré-rempli avec les données actuelles de l'atelier.</div>
-      </div>
-    </div>
-
-    <h3 class="orange">Champs du formulaire</h3>
+    <h3 class="orange">
+      <span data-lang="fr">Filtres disponibles</span>
+      <span data-lang="en">Available filters</span>
+    </h3>
     <table class="data-table">
-      <thead><tr><th>Champ</th><th>Type</th><th>Source des options</th></tr></thead>
+      <thead><tr>
+        <th><span data-lang="fr">Filtre</span><span data-lang="en">Filter</span></th>
+        <th><span data-lang="fr">Comportement</span><span data-lang="en">Behaviour</span></th>
+      </tr></thead>
       <tbody>
-        <tr><td>Jour</td><td>Liste déroulante</td><td><code>ref_jours.js</code></td></tr>
-        <tr><td>Date</td><td>Texte (auto-rempli)</td><td>Calculé depuis le Jour</td></tr>
-        <tr><td>Heure</td><td>Texte libre</td><td>Saisie manuelle</td></tr>
-        <tr><td>Lieu / Salle</td><td>Liste déroulante</td><td><code>ref_lieux.js</code></td></tr>
-        <tr><td>Type d'atelier</td><td>Liste déroulante</td><td><code>ref_types.js</code></td></tr>
-        <tr><td>Nom de l'atelier</td><td>Texte libre</td><td>Saisie manuelle</td></tr>
-        <tr><td>Facilitateur 1 &amp; 2</td><td>Listes déroulantes</td><td><code>ref_ressources.js</code></td></tr>
-        <tr><td>Traducteur</td><td>Liste déroulante</td><td><code>ref_ressources.js</code></td></tr>
-        <tr><td>Helper 1, 2 &amp; 3</td><td>Listes déroulantes</td><td><code>ref_ressources.js</code></td></tr>
-        <tr><td>Angel</td><td>Liste déroulante</td><td><code>ref_ressources.js</code></td></tr>
-        <tr><td>Note</td><td>Liste déroulante</td><td><code>ref_notes.js</code></td></tr>
-        <tr><td>Informations Logistiques</td><td>Zone de texte libre</td><td>Saisie manuelle</td></tr>
+        <tr><td><strong>Angel</strong></td>
+            <td><span data-lang="fr">Affiche uniquement le planning de l'Angel sélectionné</span><span data-lang="en">Shows only the selected Angel's schedule</span></td></tr>
+        <tr><td><span data-lang="fr"><strong>Jour</strong></span><span data-lang="en"><strong>Day</strong></span></td>
+            <td><span data-lang="fr">Restreint l'affichage aux shifts du jour sélectionné</span><span data-lang="en">Restricts the view to shifts on the selected day</span></td></tr>
       </tbody>
     </table>
 
-    <h3 class="orange">Sauvegarde</h3>
-    <div class="steps-block">
-      <div class="step">
-        <div class="step-n orange">1</div>
-        <div class="step-body">Modifiez les champs souhaités dans le formulaire.</div>
-      </div>
-      <div class="step">
-        <div class="step-n orange">2</div>
-        <div class="step-body">Cliquez sur <strong class="demo-btn primary" style="font-size:11px">✅ Valider et sauvegarder data.js</strong> — une boîte de confirmation s'affiche.</div>
-      </div>
-      <div class="step">
-        <div class="step-n orange">3</div>
-        <div class="step-body">Confirmez : <code>data.js</code> est écrit sur le disque via le serveur local. Un message de succès apparaît.</div>
-      </div>
-      <div class="step">
-        <div class="step-n orange">4</div>
-        <div class="step-body">Cliquez <strong>🔄 Refresh</strong> dans les rapports pour voir les nouvelles données.</div>
-      </div>
-    </div>
-  </div>
-
-  <hr class="divider" />
-
-  
-  
-  
-  <div class="section" id="masterdata">
-    <div class="section-header">
-      <div class="section-icon">🗂</div>
-      <div>
-        <div class="section-title">Master Data — Gestion des référentiels <span class="section-badge badge-admin">Admin</span></div>
-        <div class="section-subtitle">Ajouter, renommer ou supprimer des entrées dans les listes de référence</div>
-      </div>
-    </div>
-
-    <p>Master Data est la page de gestion des <strong>listes de référence</strong> utilisées dans Admin et dans les rapports. Chaque modification est sauvegardée dans le fichier <code>ref_*.js</code> correspondant, avec option de mise à jour simultanée de <code>data.js</code>.</p>
-
-    <h3 class="purple">Les 4 référentiels disponibles dans Master Data</h3>
-    <p>Les ressources (Facilitateurs, Helpers, Angels, Traducteurs) sont désormais gérées dans le <strong>Rapport 12 — Gérer les Ressources</strong>.</p>
-    <table class="data-table">
-      <thead><tr><th>Onglet</th><th>Fichier</th><th>Utilisé dans</th></tr></thead>
-      <tbody>
-        <tr><td>📍 Lieux</td><td><code>ref_lieux.js</code></td><td>Champ Lieu / Salle dans Admin</td></tr>
-        <tr><td>🏷️ Types d'atelier</td><td><code>ref_types.js</code></td><td>Champ Type d'atelier dans Admin</td></tr>
-        <tr><td>📝 Notes</td><td><code>ref_notes.js</code></td><td>Champ Note dans Admin &amp; Rapport 3</td></tr>
-      </tbody>
-    </table>
-
-    <h3 class="purple">Actions disponibles par entrée</h3>
-
-    <p><strong>✏️ Éditer une valeur</strong></p>
-    <div class="steps-block">
-      <div class="step">
-        <div class="step-n purple">1</div>
-        <div class="step-body">Cliquez sur <strong>✏️</strong> à droite de la ligne à modifier.</div>
-      </div>
-      <div class="step">
-        <div class="step-n purple">2</div>
-        <div class="step-body">Modifiez le texte dans le champ en ligne (<kbd>Entrée</kbd> pour valider, <kbd>Échap</kbd> pour annuler).</div>
-      </div>
-      <div class="step">
-        <div class="step-n purple">3</div>
-        <div class="step-body">Cliquez <strong>✔</strong> pour confirmer. La barre de sauvegarde apparaît en bas.</div>
-      </div>
-    </div>
-
-    <p><strong>+ Ajouter une entrée</strong></p>
-    <div class="steps-block">
-      <div class="step">
-        <div class="step-n purple">1</div>
-        <div class="step-body">Cliquez sur le bouton <strong>+ Ajouter un [type]</strong> en bas du tableau.</div>
-      </div>
-      <div class="step">
-        <div class="step-n purple">2</div>
-        <div class="step-body">Une nouvelle ligne s'ouvre en mode édition. Saisissez la valeur et validez avec <strong>✔</strong>.</div>
-      </div>
-    </div>
-
-    <p><strong>🗑 Supprimer une entrée</strong></p>
-    <div class="steps-block">
-      <div class="step">
-        <div class="step-n purple">1</div>
-        <div class="step-body">Cliquez sur <strong>🗑</strong> à droite de la ligne. Une boîte de confirmation s'affiche.</div>
-      </div>
-      <div class="step">
-        <div class="step-n purple">2</div>
-        <div class="step-body">Confirmez la suppression. La ligne disparaît et la barre de sauvegarde s'affiche.</div>
-      </div>
-    </div>
-
-    <h3 class="purple">Sauvegarder les modifications</h3>
-    <p>Après toute modification, une barre orange apparaît en bas de la section avec deux options :</p>
-    <div class="btn-row">
-      <span class="demo-btn accent">💾 Télécharger ref_[type].js</span>
-      <span class="demo-btn purple">💾 + data.js mis à jour</span>
-    </div>
-    <table class="data-table" style="margin-top:10px">
-      <thead><tr><th>Bouton</th><th>Effet</th><th>Quand l'utiliser</th></tr></thead>
-      <tbody>
-        <tr>
-          <td><strong>💾 Télécharger ref_[type].js</strong></td>
-          <td>Sauvegarde uniquement le fichier référentiel</td>
-          <td>Ajout ou suppression d'une entrée sans impact sur les ateliers existants</td>
-        </tr>
-        <tr>
-          <td><strong>💾 + data.js mis à jour</strong></td>
-          <td>Sauvegarde le référentiel <em>et</em> met à jour <code>data.js</code> en renommant les occurrences</td>
-          <td>Renommage d'une entrée existante — les ateliers qui la référencent sont mis à jour automatiquement</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="callout warn">
-      <div class="callout-icon">⚠️</div>
-      <div>En cas de <strong>renommage</strong>, utilisez toujours le bouton <strong>+ data.js mis à jour</strong> pour que les ateliers existants reflètent le nouveau nom. Sans cela, les ateliers gardent l'ancienne valeur.</div>
-    </div>
+    <h3 class="orange">
+      <span data-lang="fr">Structure de l'affichage</span>
+      <span data-lang="en">Display structure</span>
+    </h3>
+    <p data-lang="fr">Chaque Angel dispose d'une carte avec son nom et ses informations de contact. Les shifts (ateliers assignés) sont listés par jour et heure avec :</p>
+    <p data-lang="en">Each Angel has a card with their name and contact details. Shifts (assigned workshops) are listed by day and time with:</p>
+    <ul>
+      <li><span data-lang="fr">Jour, heure, nom et lieu de l'atelier</span><span data-lang="en">Day, time, workshop name and venue</span></li>
+      <li><span data-lang="fr">Type d'atelier avec badge coloré</span><span data-lang="en">Workshop type with coloured badge</span></li>
+      <li><span data-lang="fr">Animateur(s) et helpers affectés à l'atelier</span><span data-lang="en">Teacher(s) and helpers assigned to the workshop</span></li>
+    </ul>
 
     <div class="callout info">
       <div class="callout-icon">ℹ️</div>
-      <div>L'ID technique de chaque entrée (ex : <code>F_SABRYNA</code>) ne change jamais — seule la <em>valeur</em> affichée peut être modifiée. Cela garantit la stabilité des références internes.</div>
+      <div>
+        <span data-lang="fr">Ce rapport est idéal pour distribuer à chaque Angel sa feuille de route personnelle avant le festival.</span>
+        <span data-lang="en">This report is ideal for giving each Angel their personal roadmap before the festival.</span>
+      </div>
     </div>
   </div>
 
   <hr class="divider" />
 
-  
-  <div class="section">
+
+  <!-- ══════════════════════════════════════
+       5 — PLANNING TRADUCTEURS
+  ══════════════════════════════════════ -->
+  <div class="section" id="traducteurs">
     <div class="section-header">
-      <div class="section-icon">🗄️</div>
+      <div class="section-icon">🌐</div>
       <div>
-        <div class="section-title">Architecture des fichiers</div>
-        <div class="section-subtitle">Source de vérité et flux de données</div>
+        <div class="section-title">
+          <span data-lang="fr">Planning Traducteurs</span>
+          <span data-lang="en">Translators Schedule</span>
+          <span class="section-badge badge-read">
+            <span data-lang="fr">DreamTeam</span>
+            <span data-lang="en">DreamTeam</span>
+          </span>
+        </div>
+        <div class="section-subtitle">
+          <span data-lang="fr">Vue par traducteur — shifts regroupés, filtres Jour/Traducteur</span>
+          <span data-lang="en">View by translator — grouped shifts, Day/Translator filters</span>
+        </div>
       </div>
     </div>
 
-    <p>Tous les rapports lisent leurs données depuis un fichier central unique :</p>
+    <p data-lang="fr">Ce rapport présente le planning de tous les <strong>Traducteurs</strong> sous forme de cartes individuelles. Les ateliers consécutifs ou proches sont regroupés en shifts pour faciliter la lecture. Le bouton de retour en haut de page renvoie maintenant vers <strong>DreamTeam</strong>.</p>
+    <p data-lang="en">This report shows the schedule of all <strong>Translators</strong> as individual cards. Consecutive or close workshops are grouped into shifts for easy reading. The top navigation button now leads back to <strong>DreamTeam</strong>.</p>
 
+    <h3 class="purple">
+      <span data-lang="fr">Filtres disponibles</span>
+      <span data-lang="en">Available filters</span>
+    </h3>
     <table class="data-table">
-      <thead><tr><th>Fichier</th><th>Rôle</th><th>Modifié par</th></tr></thead>
+      <thead><tr>
+        <th><span data-lang="fr">Filtre</span><span data-lang="en">Filter</span></th>
+        <th><span data-lang="fr">Comportement</span><span data-lang="en">Behaviour</span></th>
+      </tr></thead>
       <tbody>
-        <tr><td><code>data.js</code></td><td>Source de vérité — tous les ateliers (AGENDA)</td><td>Admin, Master Data (bouton + data.js)</td></tr>
-        <tr><td><code>ref_resource_types.js</code></td><td>Types de ressources valides (Facilitateur, Helper…)</td><td>Chargé avant ref_ressources.js</td></tr>
-        <tr><td><code>ref_ressources.js</code></td><td>Référentiel unifié de toutes les ressources</td><td>Rapport 12 — Gérer les Ressources</td></tr>
-        <tr><td><code>ref_lieux.js</code></td><td>Liste des lieux / salles</td><td>Master Data → onglet Lieux</td></tr>
-        <tr><td><code>ref_types.js</code></td><td>Liste des types d'atelier</td><td>Master Data → onglet Types</td></tr>
-        <tr><td><code>ref_notes.js</code></td><td>Liste des notes normalisées</td><td>Master Data → onglet Notes</td></tr>
-        <tr><td><code>server.py</code></td><td>Serveur local Python (port 3000)</td><td>Lancé via <code>start.bat</code></td></tr>
+        <tr><td><span data-lang="fr"><strong>Traducteur</strong></span><span data-lang="en"><strong>Translator</strong></span></td>
+            <td><span data-lang="fr">Affiche uniquement la carte de ce traducteur</span><span data-lang="en">Shows only that translator's card</span></td></tr>
+        <tr><td><span data-lang="fr"><strong>Jour</strong></span><span data-lang="en"><strong>Day</strong></span></td>
+            <td><span data-lang="fr">Restreint les shifts au jour sélectionné</span><span data-lang="en">Restricts shifts to the selected day</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="purple">
+      <span data-lang="fr">Vues disponibles</span>
+      <span data-lang="en">Available views</span>
+    </h3>
+    <div class="btn-row">
+      <span class="demo-btn" style="background:var(--purple-bg);color:var(--purple);border-color:var(--purple-bd)">
+        <span data-lang="fr">👤 Vue par Traducteur</span>
+        <span data-lang="en">👤 View by Translator</span>
+      </span>
+      <span class="demo-btn">
+        <span data-lang="fr">📋 Vue Tableau</span>
+        <span data-lang="en">📋 Table View</span>
+      </span>
+    </div>
+    <ul>
+      <li><span data-lang="fr"><strong>Vue par Traducteur</strong> — blocs individuels avec avatar, nom et compteurs. Chaque shift affiche la plage horaire globale et le détail des ateliers couverts.</span>
+          <span data-lang="en"><strong>View by Translator</strong> — individual blocks with avatar, name and counters. Each shift shows the overall time range and the covered workshops in detail.</span></li>
+      <li><span data-lang="fr"><strong>Vue Tableau</strong> — tableau global triable avec toutes les interventions (Jour, Date, Heure, Atelier, Lieu, Type).</span>
+          <span data-lang="en"><strong>Table View</strong> — sortable global table with all sessions (Day, Date, Time, Workshop, Venue, Type).</span></li>
+    </ul>
+
+    <div class="callout info">
+      <div class="callout-icon">ℹ️</div>
+      <div>
+        <span data-lang="fr">Seuls les ateliers avec un traducteur assigné apparaissent dans ce rapport.</span>
+        <span data-lang="en">Only workshops with an assigned translator appear in this report.</span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+
+  <!-- ══════════════════════════════════════
+       6 — PLANNING COLIBRI
+  ══════════════════════════════════════ -->
+  <div class="section" id="colibri">
+    <div class="section-header">
+      <div class="section-icon">🐦</div>
+      <div>
+        <div class="section-title">
+          <span data-lang="fr">Planning Colibri</span>
+          <span data-lang="en">Colibri Schedule</span>
+          <span class="section-badge badge-read">
+            <span data-lang="fr">DreamTeam</span>
+            <span data-lang="en">DreamTeam</span>
+          </span>
+        </div>
+        <div class="section-subtitle">
+          <span data-lang="fr">Ateliers avec une ressource ayant le rôle Shift Colibri</span>
+          <span data-lang="en">Workshops with a resource in the Shift Colibri role</span>
+        </div>
+      </div>
+    </div>
+
+    <p data-lang="fr">Ce rapport identifie tous les ateliers dans lesquels au moins une ressource (Helper ou Traducteur) a le rôle <strong>Colibri</strong>. Il facilite la coordination des Colibris sur le terrain.</p>
+    <p data-lang="en">This report identifies all workshops in which at least one resource (Helper or Translator) has the <strong>Colibri</strong> role. It facilitates on-site coordination for Colibris.</p>
+
+    <h3>
+      <span data-lang="fr">Filtres disponibles</span>
+      <span data-lang="en">Available filters</span>
+    </h3>
+    <table class="data-table">
+      <thead><tr>
+        <th><span data-lang="fr">Filtre</span><span data-lang="en">Filter</span></th>
+        <th><span data-lang="fr">Comportement</span><span data-lang="en">Behaviour</span></th>
+      </tr></thead>
+      <tbody>
+        <tr><td><span data-lang="fr"><strong>Jour</strong></span><span data-lang="en"><strong>Day</strong></span></td>
+            <td><span data-lang="fr">Restreint l'affichage aux ateliers d'une journée spécifique</span><span data-lang="en">Restricts the view to a specific day's workshops</span></td></tr>
+        <tr><td>Colibri</td>
+            <td><span data-lang="fr">Affiche uniquement les ateliers où cette personne est impliquée en tant que Colibri</span><span data-lang="en">Shows only workshops where this person is involved as Colibri</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3>
+      <span data-lang="fr">Structure de l'affichage</span>
+      <span data-lang="en">Display structure</span>
+    </h3>
+    <p data-lang="fr">Les ateliers sont regroupés par jour. Chaque carte affiche :</p>
+    <p data-lang="en">Workshops are grouped by day. Each card shows:</p>
+    <ul>
+      <li><span data-lang="fr">Jour, heure, nom, lieu et type de l'atelier</span><span data-lang="en">Day, time, name, venue and workshop type</span></li>
+      <li><span data-lang="fr">Les <strong>Animateurs</strong>, <strong>Helpers</strong>, <strong>Traducteur</strong> et <strong>Angel</strong> avec leurs badges colorés</span>
+          <span data-lang="en"><strong>Teachers</strong>, <strong>Helpers</strong>, <strong>Translator</strong> and <strong>Angel</strong> with their coloured badges</span></li>
+      <li><span data-lang="fr">Les Colibris sont mis en évidence avec un badge violet distinctif</span>
+          <span data-lang="en">Colibris are highlighted with a distinctive purple badge</span></li>
+    </ul>
+
+    <h3>
+      <span data-lang="fr">Définition du rôle Colibri</span>
+      <span data-lang="en">Colibri role definition</span>
+    </h3>
+    <p data-lang="fr">Une personne est identifiée comme Colibri si son profil inclut le rôle <code>colibri</code>. Une même personne peut avoir plusieurs rôles (ex : Helper <em>et</em> Colibri).</p>
+    <p data-lang="en">A person is identified as Colibri if their profile includes the <code>colibri</code> role. A person can have multiple roles (e.g. Helper <em>and</em> Colibri).</p>
+
+    <div class="callout info">
+      <div class="callout-icon">ℹ️</div>
+      <div>
+        <span data-lang="fr">Un atelier peut avoir plusieurs Colibris. Il apparaît dans la liste de chaque Colibri concerné lorsque le filtre est actif.</span>
+        <span data-lang="en">A workshop can have several Colibris. It appears in each concerned Colibri's list when the filter is active.</span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+
+  <!-- ══════════════════════════════════════
+       7 — CHARGE DE TRAVAIL
+  ══════════════════════════════════════ -->
+  <div class="section" id="charge">
+    <div class="section-header">
+      <div class="section-icon">⚖️</div>
+      <div>
+        <div class="section-title">
+          <span data-lang="fr">Charge de travail</span>
+          <span data-lang="en">Workload</span>
+          <span class="section-badge" style="background:#e0f2fe;color:#0369a1">
+            <span data-lang="fr">Helpers · Angels · Traducteurs</span>
+            <span data-lang="en">Helpers · Angels · Translators</span>
+          </span>
+        </div>
+        <div class="section-subtitle">
+          <span data-lang="fr">Analyse de la répartition de charge et suggestions d'harmonisation</span>
+          <span data-lang="en">Workload distribution analysis and balancing suggestions</span>
+        </div>
+      </div>
+    </div>
+
+    <p data-lang="fr">Ce rapport analyse la <strong>charge de travail</strong> des Helpers, Angels et Traducteurs, exprimée en heures d'ateliers couverts. Il met en évidence les déséquilibres et propose des <strong>suggestions d'harmonisation</strong> automatiques. Il est entièrement <strong>bilingue FR / EN</strong>.</p>
+    <p data-lang="en">This report analyses the <strong>workload</strong> of Helpers, Angels and Translators, expressed in hours of workshops covered. It highlights imbalances and proposes automatic <strong>harmonisation suggestions</strong>. It is fully <strong>bilingual FR / EN</strong>.</p>
+
+    <h3 style="border-left-color:#0369a1">
+      <span data-lang="fr">Onglets</span>
+      <span data-lang="en">Tabs</span>
+    </h3>
+    <table class="data-table">
+      <thead><tr>
+        <th><span data-lang="fr">Onglet</span><span data-lang="en">Tab</span></th>
+        <th><span data-lang="fr">Contenu</span><span data-lang="en">Content</span></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="pill pill-h">Helpers</span></td>
+          <td><span data-lang="fr">Charge par helper — heures totales et par jour, barre de charge colorée, tri par nom ou durée</span><span data-lang="en">Load per helper — total and daily hours, colour-coded load bar, sort by name or duration</span></td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-a">Angels</span></td>
+          <td><span data-lang="fr">Charge par angel — durée nette couverte (fusion des créneaux qui se chevauchent). 1 shift angel = 1 seul atelier comptabilisé.</span><span data-lang="en">Load per angel — net duration covered (overlapping slots are merged). 1 angel shift = 1 workshop counted.</span></td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-t"><span data-lang="fr">Traducteurs</span><span data-lang="en">Translators</span></span></td>
+          <td><span data-lang="fr">Charge par traducteur — heures totales et par jour</span><span data-lang="en">Load per translator — total and daily hours</span></td>
+        </tr>
+        <tr>
+          <td><span class="pill" style="background:#ede9fe;color:#7c3aed">⚖️ <span data-lang="fr">Harmonisation</span><span data-lang="en">Harmonisation</span></span></td>
+          <td><span data-lang="fr">Propositions de rééquilibrage automatiques entre membres trop / peu chargés</span><span data-lang="en">Automatic rebalancing proposals between over- and under-loaded members</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="border-left-color:#0369a1">
+      <span data-lang="fr">Carte personne — informations affichées</span>
+      <span data-lang="en">Person card — displayed information</span>
+    </h3>
+    <p data-lang="fr">En cliquant sur une personne, ses informations s'affichent avec les détails suivants :</p>
+    <p data-lang="en">Clicking on a person expands their card with the following details:</p>
+    <ul>
+      <li><span data-lang="fr"><strong>Badges rôles distincts</strong> — chaque rôle (Helper, Angel, Traducteur) est affiché séparément avec sa couleur propre, jamais fusionné (ex : pas de "Helper + Traducteur" sur un seul badge)</span><span data-lang="en"><strong>Distinct role badges</strong> — each role (Helper, Angel, Translator) is shown separately with its own colour, never merged (e.g. no "Helper + Translator" on a single badge)</span></li>
+      <li><span data-lang="fr">Heures totales et ventilation par jour</span><span data-lang="en">Total hours and breakdown by day</span></li>
+      <li><span data-lang="fr">Barre de charge par journée : <span style="color:#16a34a">vert &lt; 2 h</span> · <span style="color:#d97706">orange 2–4 h</span> · <span style="color:#dc2626">rouge &gt; 4 h</span></span><span data-lang="en">Daily load bar: <span style="color:#16a34a">green &lt; 2 h</span> · <span style="color:#d97706">orange 2–4 h</span> · <span style="color:#dc2626">red &gt; 4 h</span></span></li>
+    </ul>
+
+    <div class="btn-row" style="margin-top:8px">
+      <span class="pill pill-h">Helper</span>
+      <span class="pill pill-a">Angel</span>
+      <span class="pill pill-t"><span data-lang="fr">Traducteur</span><span data-lang="en">Translator</span></span>
+    </div>
+
+    <h3 style="border-left-color:#0369a1">
+      <span data-lang="fr">Calcul de la charge</span>
+      <span data-lang="en">Load calculation</span>
+    </h3>
+    <table class="data-table">
+      <thead><tr>
+        <th><span data-lang="fr">Rôle</span><span data-lang="en">Role</span></th>
+        <th><span data-lang="fr">Règle de calcul</span><span data-lang="en">Calculation rule</span></th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="pill pill-h">Helper</span></td>
+          <td><span data-lang="fr">Somme des durées de chaque atelier assigné (types REPAS, PREPA, REUNION, TEST exclus)</span><span data-lang="en">Sum of durations of each assigned workshop (REPAS, PREPA, REUNION, TEST types excluded)</span></td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-a">Angel</span></td>
+          <td><span data-lang="fr">Fusion des intervalles qui se chevauchent sur le même jour (<em>interval merging</em>) — durée nette couverte. 1 shift = 1 atelier comptabilisé.</span><span data-lang="en">Overlapping intervals on the same day are merged (<em>interval merging</em>) — net duration covered. 1 shift = 1 workshop counted.</span></td>
+        </tr>
+        <tr>
+          <td><span class="pill pill-t"><span data-lang="fr">Traducteur</span><span data-lang="en">Translator</span></span></td>
+          <td><span data-lang="fr">Somme des durées de chaque atelier traduit</span><span data-lang="en">Sum of durations of each translated workshop</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="border-left-color:#0369a1">
+      <span data-lang="fr">Onglet Harmonisation</span>
+      <span data-lang="en">Harmonisation tab</span>
+    </h3>
+    <p data-lang="fr">L'onglet ⚖️ Harmonisation propose des transferts de charge entre personnes. Une sous-navigation filtre par groupe : Vue globale, Helpers, Angels, Traducteurs.</p>
+    <p data-lang="en">The ⚖️ Harmonisation tab proposes load transfers between people. A sub-navigation filters by group: Global view, Helpers, Angels, Translators.</p>
+    <ul>
+      <li><span data-lang="fr"><strong>Surchargé</strong> — charge &gt; 120 % de la moyenne du groupe (carte orange)</span><span data-lang="en"><strong>Overloaded</strong> — load &gt; 120 % of group average (orange card)</span></li>
+      <li><span data-lang="fr"><strong>Très surchargé</strong> — charge &gt; 140 % de la moyenne (carte rouge)</span><span data-lang="en"><strong>Very overloaded</strong> — load &gt; 140 % of average (red card)</span></li>
+      <li><span data-lang="fr"><strong>Disponible</strong> — charge &lt; 85 % de la moyenne ET charge globale ≤ 130 % de la moyenne globale</span><span data-lang="en"><strong>Available</strong> — load &lt; 85 % of average AND global load ≤ 130 % of global average</span></li>
+    </ul>
+
+    <div class="callout warn">
+      <div class="callout-icon">⚠️</div>
+      <div>
+        <span data-lang="fr">Les Helpers ayant le rôle <code>colibri</code>, <code>manager</code> ou <code>admin</code> sont exclus des calculs de moyenne et des suggestions d'harmonisation.</span>
+        <span data-lang="en">Helpers with the <code>colibri</code>, <code>manager</code> or <code>admin</code> role are excluded from average calculations and harmonisation suggestions.</span>
+      </div>
+    </div>
+  </div>
+
+
+  <hr class="divider" />
+
+
+  <!-- ══════════════════════════════════════
+       8 — MON AGENDA SIMPLIFIÉ
+  ══════════════════════════════════════ -->
+  <div class="section" id="agenda-simplifie">
+    <div class="section-header">
+      <div class="section-icon">📅</div>
+      <div>
+        <div class="section-title">
+          <span data-lang="fr">Mon Agenda Simplifié</span>
+          <span data-lang="en">My Simplified Schedule</span>
+          <span class="section-badge badge-read">
+            <span data-lang="fr">DreamTeam</span>
+            <span data-lang="en">DreamTeam</span>
+          </span>
+        </div>
+        <div class="section-subtitle">
+          <span data-lang="fr">Vue calendrier personnelle — tous tes ateliers positionnés à l'heure</span>
+          <span data-lang="en">Personal calendar view — all your workshops positioned on a timeline</span>
+        </div>
+      </div>
+    </div>
+
+    <p data-lang="fr">Ce rapport offre à chaque membre de la DreamTeam une <strong>vue calendrier visuelle</strong> de son planning personnel. Contrairement à Mon Planning V2 (liste tabulaire), l'agenda simplifié positionne chaque atelier sur une grille horaire continue, par jour, ce qui permet de visualiser d'un seul coup d'œil les créneaux, la durée et l'heure d'arrivée recommandée.</p>
+    <p data-lang="en">This report gives each DreamTeam member a <strong>visual calendar view</strong> of their personal schedule. Unlike My Planning V2 (tabular list), the simplified schedule positions each workshop on a continuous time grid, per day, letting you see at a glance the time slots, duration and recommended arrival time.</p>
+
+    <h3 class="pink">
+      <span data-lang="fr">Utilisation</span>
+      <span data-lang="en">How to use</span>
+    </h3>
+    <div class="steps-block">
+      <div class="step">
+        <div class="step-n pink">1</div>
+        <div class="step-body">
+          <span data-lang="fr">Sélectionnez votre <strong>nom</strong> dans le filtre déroulant en haut de page.</span>
+          <span data-lang="en">Select your <strong>name</strong> from the dropdown filter at the top of the page.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n pink">2</div>
+        <div class="step-body">
+          <span data-lang="fr">La grille affiche <strong>une colonne par jour</strong> où vous avez au moins un atelier. Utilisez les <strong>chips de jour</strong> pour filtrer sur un jour précis.</span>
+          <span data-lang="en">The grid shows <strong>one column per day</strong> where you have at least one workshop. Use the <strong>day chips</strong> to filter on a specific day.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n pink">3</div>
+        <div class="step-body">
+          <span data-lang="fr">Survolez un bloc pour afficher le <strong>tooltip détaillé</strong> (nom, horaire, heure d'arrivée, lieu, équipe).</span>
+          <span data-lang="en">Hover over a block to show the <strong>detailed tooltip</strong> (name, time, arrival time, venue, team).</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="pink">
+      <span data-lang="fr">Codes couleur des rôles</span>
+      <span data-lang="en">Role colour codes</span>
+    </h3>
+    <p data-lang="fr">Les blocs sont colorés selon votre <strong>rôle dominant</strong> dans l'atelier (priorité : Animateur &gt; Traducteur &gt; Helper &gt; Angel &gt; Réunion). Si vous avez plusieurs rôles dans un même atelier, le bloc prend la teinte <strong>multi-rôles</strong> (bleu).</p>
+    <p data-lang="en">Blocks are coloured according to your <strong>dominant role</strong> in the workshop (priority: Teacher &gt; Translator &gt; Helper &gt; Angel &gt; Meeting). If you have multiple roles in the same workshop, the block uses the <strong>multi-role</strong> shade (blue).</p>
+    <div class="btn-row">
+      <span class="pill pill-f"><span data-lang="fr">Animateur</span><span data-lang="en">Teacher</span></span>
+      <span class="pill pill-h">Helper</span>
+      <span class="pill pill-a">Angel</span>
+      <span class="pill pill-t"><span data-lang="fr">Traducteur</span><span data-lang="en">Translator</span></span>
+      <span class="pill" style="background:#eff6ff;color:#1e40af"><span data-lang="fr">Multi-rôles</span><span data-lang="en">Multi-role</span></span>
+      <span class="pill" style="background:#fffbeb;color:#92400e"><span data-lang="fr">Réunion</span><span data-lang="en">Meeting</span></span>
+    </div>
+
+    <h3 class="pink">
+      <span data-lang="fr">Bloc de préparation ⏰</span>
+      <span data-lang="en">Preparation block ⏰</span>
+    </h3>
+    <p data-lang="fr">Avant chaque atelier, un <strong>bloc hachuré gris</strong> représente visuellement la durée de préparation recommandée. Il est accompagné d'une <strong>heure d'arrivée recommandée</strong> (⏰) sur le bloc atelier lui-même :</p>
+    <p data-lang="en">Before each workshop, a <strong>grey hatched block</strong> visually represents the recommended preparation time. It is accompanied by a <strong>recommended arrival time</strong> (⏰) on the workshop block itself:</p>
+    <ul>
+      <li><span data-lang="fr">Préparation <strong>&lt; 1 h</strong> — heure d'arrivée en rouge, libellé normal</span><span data-lang="en">Preparation <strong>&lt; 1 h</strong> — arrival time in red, normal label</span></li>
+      <li><span data-lang="fr">Préparation <strong>≥ 1 h</strong> — heure d'arrivée en orange avec badge <strong>« 1h avant »</strong> pour attirer l'attention</span><span data-lang="en">Preparation <strong>≥ 1 h</strong> — arrival time in orange with <strong>"1h avant"</strong> badge to draw attention</span></li>
+      <li><span data-lang="fr">Les ateliers de type <em>Réunion</em>, <em>Prépa & Logistique</em> et <em>Shift Angel</em> n'ont <strong>aucune préparation</strong> affichée</span><span data-lang="en"><em>Meeting</em>, <em>Prep & Logistics</em> and <em>Angel Shift</em> type workshops show <strong>no preparation</strong> block</span></li>
+    </ul>
+
+    <h3 class="pink">
+      <span data-lang="fr">Export & outils</span>
+      <span data-lang="en">Export & tools</span>
+    </h3>
+    <table class="data-table">
+      <thead><tr>
+        <th><span data-lang="fr">Bouton</span><span data-lang="en">Button</span></th>
+        <th><span data-lang="fr">Action</span><span data-lang="en">Action</span></th>
+      </tr></thead>
+      <tbody>
+        <tr><td>📷 Export JPEG</td>
+            <td><span data-lang="fr">Capture l'intégralité de la grille (tous les jours) en haute résolution — fichier <code>Planning_NOM.jpg</code></span><span data-lang="en">Captures the entire grid (all days) at high resolution — file <code>Planning_NAME.jpg</code></span></td></tr>
+        <tr><td>📅 Export iCal</td>
+            <td><span data-lang="fr">Génère un fichier <code>.ics</code> importable dans Google Calendar, Apple Calendar, Outlook — avec heure d'arrivée dans la description de chaque événement</span><span data-lang="en">Generates an <code>.ics</code> file importable into Google Calendar, Apple Calendar, Outlook — with arrival time in each event description</span></td></tr>
+        <tr><td>🔄 Refresh</td>
+            <td><span data-lang="fr">Recharge les données en conservant le nom sélectionné</span><span data-lang="en">Reloads data while keeping the selected name</span></td></tr>
+        <tr><td>🌐</td>
+            <td><span data-lang="fr">Bascule entre français et anglais — les noms des ateliers s'affichent dans la langue sélectionnée si la traduction est disponible</span><span data-lang="en">Toggles between French and English — workshop names display in the selected language if a translation is available</span></td></tr>
       </tbody>
     </table>
 
     <div class="callout tip">
       <div class="callout-icon">💡</div>
-      <div>Après toute modification (Admin ou Master Data), cliquez sur <strong>🔄 Refresh</strong> dans les rapports pour recharger les données et voir les changements.</div>
+      <div>
+        <span data-lang="fr">Les durées de préparation sont configurées dans <strong>Saisie Ateliers</strong> (bloc Informations Logistiques). Par défaut, la valeur est <strong>15 min</strong> si aucune durée n'est saisie.</span>
+        <span data-lang="en">Preparation durations are configured in <strong>Workshop Entry</strong> (Logistics Information block). The default value is <strong>15 min</strong> if no duration has been entered.</span>
+      </div>
     </div>
   </div>
 
-  <div class="footer">Made with IBM Bob</div>
-</div>
+  <hr class="divider" />
+
+
+  <!-- ══════════════════════════════════════
+       9 — AGENDA SIMPLIFIÉ PAR SALLE
+  ══════════════════════════════════════ -->
+  <div class="section" id="agenda-salle">
+    <div class="section-header">
+      <div class="section-icon">🏛️</div>
+      <div>
+        <div class="section-title">
+          <span data-lang="fr">Agenda Simplifié par Salle</span>
+          <span data-lang="en">Simplified Schedule by Room</span>
+          <span class="section-badge badge-read">
+            <span data-lang="fr">DreamTeam</span>
+            <span data-lang="en">DreamTeam</span>
+          </span>
+        </div>
+        <div class="section-subtitle">
+          <span data-lang="fr">Vue calendrier par salle — tous les ateliers d'une salle positionnés à l'heure</span>
+          <span data-lang="en">Calendar view by room — all workshops in a room positioned on a timeline</span>
+        </div>
+      </div>
+    </div>
+
+    <p data-lang="fr">Ce rapport est la version <strong>centrée sur les salles</strong> de Mon Agenda Simplifié. Au lieu de filtrer par personne, on sélectionne une <strong>salle</strong> et l'on obtient instantanément la grille horaire de tous les ateliers qui s'y déroulent, jour par jour. Il est particulièrement utile pour la gestion de l'espace et la coordination logistique sur le terrain.</p>
+    <p data-lang="en">This report is the <strong>room-centric</strong> version of My Simplified Schedule. Instead of filtering by person, you select a <strong>room</strong> and instantly get the hourly grid of all workshops taking place there, day by day. It is particularly useful for space management and on-site logistics coordination.</p>
+
+    <h3 class="pink">
+      <span data-lang="fr">Utilisation</span>
+      <span data-lang="en">How to use</span>
+    </h3>
+    <div class="steps-block">
+      <div class="step">
+        <div class="step-n pink">1</div>
+        <div class="step-body">
+          <span data-lang="fr">Sélectionnez une <strong>salle</strong> dans le filtre déroulant. La liste est triée selon l'ordre de <code>ref_lieux.js</code>.</span>
+          <span data-lang="en">Select a <strong>room</strong> from the dropdown. The list is sorted according to the order in <code>ref_lieux.js</code>.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n pink">2</div>
+        <div class="step-body">
+          <span data-lang="fr">La grille affiche <strong>une colonne par jour</strong> où cette salle accueille au moins un atelier. Utilisez les <strong>chips de jour</strong> pour filtrer.</span>
+          <span data-lang="en">The grid shows <strong>one column per day</strong> where the room hosts at least one workshop. Use the <strong>day chips</strong> to filter.</span>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-n pink">3</div>
+        <div class="step-body">
+          <span data-lang="fr">Survolez un bloc pour afficher le <strong>tooltip</strong> (nom atelier, type, horaire, heure d'arrivée, équipe).</span>
+          <span data-lang="en">Hover over a block to show the <strong>tooltip</strong> (workshop name, type, schedule, arrival time, team).</span>
+        </div>
+      </div>
+    </div>
+
+    <h3 class="pink">
+      <span data-lang="fr">Codes couleur — par type d'atelier</span>
+      <span data-lang="en">Colour codes — by workshop type</span>
+    </h3>
+    <p data-lang="fr">Contrairement à Mon Agenda Simplifié (couleurs par rôle), ce rapport colore les blocs selon le <strong>type d'atelier</strong> :</p>
+    <p data-lang="en">Unlike My Simplified Schedule (colours by role), this report colours blocks by <strong>workshop type</strong>:</p>
+    <table class="data-table">
+      <thead><tr>
+        <th><span data-lang="fr">Couleur</span><span data-lang="en">Colour</span></th>
+        <th><span data-lang="fr">Types d'ateliers</span><span data-lang="en">Workshop types</span></th>
+      </tr></thead>
+      <tbody>
+        <tr><td><span class="pill" style="background:#dcfce7;color:#166534">Vert</span></td>
+            <td><span data-lang="fr">Tantra, Tantra Café</span><span data-lang="en">Tantra, Tantra Café</span></td></tr>
+        <tr><td><span class="pill" style="background:#e0f2fe;color:#0369a1">Bleu</span></td>
+            <td><span data-lang="fr">Artistique, DJ Set, Pool Party</span><span data-lang="en">Artistic, DJ Set, Pool Party</span></td></tr>
+        <tr><td><span class="pill" style="background:#f5f3ff;color:#7c3aed">Violet</span></td>
+            <td><span data-lang="fr">Yoga / Méditation</span><span data-lang="en">Yoga / Meditation</span></td></tr>
+        <tr><td><span class="pill" style="background:#fee2e2;color:#dc2626">Rouge</span></td>
+            <td><span data-lang="fr">Cérémonie, Concert, Rassemblement</span><span data-lang="en">Ceremony, Concert, Gathering</span></td></tr>
+        <tr><td><span class="pill" style="background:#fffbeb;color:#92400e">Jaune</span></td>
+            <td><span data-lang="fr">Réunion, Repas, Pause</span><span data-lang="en">Meeting, Meal, Break</span></td></tr>
+        <tr><td><span class="pill" style="background:#f3f4f6;color:#374151">Gris</span></td>
+            <td><span data-lang="fr">Autres types</span><span data-lang="en">Other types</span></td></tr>
+      </tbody>
+    </table>
+
+    <h3 class="pink">
+      <span data-lang="fr">Bloc de préparation ⏰</span>
+      <span data-lang="en">Preparation block ⏰</span>
+    </h3>
+    <p data-lang="fr">Les mêmes règles que Mon Agenda Simplifié s'appliquent : un <strong>bloc hachuré gris</strong> précède chaque atelier avec une durée de préparation définie, et l'<strong>heure d'arrivée recommandée</strong> est affichée sur le bloc. Les types <em>Réunion</em>, <em>Prépa &amp; Logistique</em> et <em>Shift Angel</em> n'ont aucun bloc de préparation.</p>
+    <p data-lang="en">The same rules as My Simplified Schedule apply: a <strong>grey hatched block</strong> precedes each workshop with a defined preparation time, and the <strong>recommended arrival time</strong> is shown on the block. <em>Meeting</em>, <em>Prep &amp; Logistics</em> and <em>Angel Shift</em> types have no preparation block.</p>
+
+    <h3 class="pink">
+      <span data-lang="fr">Export JPEG</span>
+      <span data-lang="en">JPEG Export</span>
+    </h3>
+    <p data-lang="fr">Le bouton <strong>📷 Export JPEG</strong> (visible dès qu'une salle est sélectionnée) capture toute la grille en haute résolution et génère un fichier <code>Planning_Salle_NOM.jpg</code>.</p>
+    <p data-lang="en">The <strong>📷 Export JPEG</strong> button (visible once a room is selected) captures the entire grid at high resolution and generates a <code>Planning_Salle_NAME.jpg</code> file.</p>
+
+    <div class="callout info">
+      <div class="callout-icon">ℹ️</div>
+      <div>
+        <span data-lang="fr">Ce rapport est accessible depuis <strong>Gestion Planning</strong>, juste en dessous de la carte « Agenda Simplifié ».</span>
+        <span data-lang="en">This report is accessible from the <strong>Planning Management</strong> page, just below the "Simplified Schedule" card.</span>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="footer">
+    <span data-lang="fr">Tantramour 2026 — Manuel DreamTeam</span>
+    <span data-lang="en">Tantramour 2026 — DreamTeam Manual</span>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+(function() {
+  var root = document.getElementById('pageRoot');
+
+  function setLang(lang) {
+    if (lang === 'en') {
+      root.classList.add('lang-en');
+    } else {
+      root.classList.remove('lang-en');
+    }
+    document.getElementById('btnFr').classList.toggle('active', lang === 'fr');
+    document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+    try { localStorage.setItem('tm_lang', lang); } catch(e) {}
+  }
+
+  window.setLang = setLang;
+
+  // Restaurer la langue sauvegardée
+  try {
+    var saved = localStorage.getItem('tm_lang');
+    if (saved === 'en') setLang('en');
+  } catch(e) {}
+})();
+</script>
 </body>
 </html>
