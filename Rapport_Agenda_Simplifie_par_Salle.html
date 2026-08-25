@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Agenda Simplifié par Salle</title>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --hour-col:56px;
+    /* Couleurs PAR TYPE */
+    --c-tantra:#166534;   --c-tantra-bg:#dcfce7;   --c-tantra-bd:#86efac;
+    --c-art:#0369a1;      --c-art-bg:#e0f2fe;      --c-art-bd:#7dd3fc;
+    --c-yoga:#7c3aed;     --c-yoga-bg:#f5f3ff;     --c-yoga-bd:#c4b5fd;
+    --c-ceremonie:#dc2626;--c-ceremonie-bg:#fee2e2; --c-ceremonie-bd:#fca5a5;
+    --c-reunion:#92400e;  --c-reunion-bg:#fffbeb;  --c-reunion-bd:#fcd34d;
+    --c-other:#374151;    --c-other-bg:#f3f4f6;    --c-other-bd:#d1d5db;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --c-tantra:#4ade80;     --c-tantra-bg:#0a2e1a;    --c-tantra-bd:#166534;
+    --c-art:#58a6ff;        --c-art-bg:#0c2d48;       --c-art-bd:#1d4ed8;
+    --c-yoga:#a78bfa;       --c-yoga-bg:#1e1b4b;      --c-yoga-bd:#7c3aed;
+    --c-ceremonie:#f87171;  --c-ceremonie-bg:#2d0000; --c-ceremonie-bd:#991b1b;
+    --c-reunion:#fcd34d;    --c-reunion-bg:#2a1500;   --c-reunion-bd:#92400e;
+    --c-other:#9ca3af;      --c-other-bg:#1c1f26;     --c-other-bd:#4b5563;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { height:100%; overflow:hidden; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:12px; line-height:1.4; background:var(--bg); color:var(--text); display:flex; flex-direction:column; }
+
+  /* ── HEADER ── */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-bottom:1px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:100; flex-wrap:wrap; gap:8px; }
+  .topbar-left { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  .topbar-left h1 { font-size:15px; font-weight:700; }
+  .topbar-left p  { font-size:13px; font-weight:800; color:var(--accent); }
+  .topbar-right { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:4px 10px; font-size:11px; color:var(--text); font-family:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
+  .btn:hover { background:var(--border); }
+  .chip { cursor:pointer; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; border:1px solid var(--border); background:var(--surface); color:var(--muted); white-space:nowrap; }
+  .chip:hover { border-color:var(--accent); color:var(--accent); }
+  .chip.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+  /* ── FILTRE SALLE ── */
+  .filter-bar { display:flex; align-items:center; gap:10px; padding:8px 16px; border-bottom:1px solid var(--border); background:var(--surface); flex-wrap:wrap; }
+  .filter-bar label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); white-space:nowrap; }
+  .filter-bar select { background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:5px 10px; font-size:12px; color:var(--text); font-family:inherit; cursor:pointer; min-width:220px; }
+  .filter-bar .hint { font-size:11px; color:var(--muted); font-style:italic; }
+
+  /* ── LÉGENDE PAR TYPE ── */
+  .legend { display:flex; flex-wrap:wrap; gap:8px; padding:8px 16px; border-bottom:1px solid var(--border); background:var(--bg); }
+  .leg { display:flex; align-items:center; gap:4px; font-size:10px; color:var(--muted); white-space:nowrap; }
+  .leg-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+
+  /* ── ÉCRAN VIDE ── */
+  .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:260px; gap:12px; color:var(--muted); }
+  .empty-state .icon { font-size:48px; }
+  .empty-state p { font-size:14px; }
+
+  /* ── SCROLL WRAPPER ── */
+  .cal-scroll { overflow-x:auto; overflow-y:auto; width:100%; }
+  #mainContent { flex:1; min-height:0; display:flex; flex-direction:column; }
+  #mainContent .cal-scroll { flex:1; min-height:0; }
+
+  /* ── GRILLE CALENDRIER ── */
+  .cal-wrap { display:flex; flex-direction:column; width:100%; }
+
+  /* En-tête */
+  .cal-head { display:flex; width:100%; position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:2px solid var(--border); }
+  .head-hour { width:var(--hour-col); flex-shrink:0; border-right:1px solid var(--border); }
+  .head-day-group { display:flex; flex-direction:column; border-right:2px solid var(--border); min-width:0; overflow:hidden; }
+  .hd-jour { background:var(--text); color:#fff; padding:8px 6px; text-align:center; display:flex; align-items:baseline; justify-content:center; gap:8px; white-space:nowrap; overflow:hidden; }
+  .hd-name { font-size:14px; font-weight:700; }
+  .hd-date { font-size:12px; opacity:.8; }
+
+  /* Corps calendrier */
+  .cal-body { display:flex; width:100%; position:relative; }
+  .col-hours { width:var(--hour-col); flex-shrink:0; border-right:1px solid var(--border); position:relative; }
+  .hour-label { position:absolute; right:4px; font-size:11px; font-weight:600; color:var(--muted); line-height:1; transform:translateY(-50%); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .col-day { flex:1; min-width:120px; position:relative; border-right:2px solid var(--border); overflow:visible; }
+  .col-day:last-child { border-right:none; }
+
+  /* Lignes horaires (fond) */
+  .hour-line { position:absolute; left:0; right:0; border-top:1px solid var(--border); }
+  .hour-line.full { border-top-color:var(--border); }
+  .hour-line.half { border-top:1px dashed var(--border); opacity:.5; }
+
+  /* ── BLOC ATELIER ── */
+  .evt {
+    position:absolute; left:1px; right:1px;
+    border-radius:3px; border-left:3px solid #9ca3af;
+    background:var(--surface); border-top:1px solid var(--border); border-right:1px solid var(--border); border-bottom:1px solid var(--border);
+    padding:2px 3px; overflow:hidden; cursor:default;
+    transition:box-shadow .1s;
+  }
+  .evt:hover { box-shadow:0 2px 8px rgba(0,0,0,.15); z-index:20; }
+  .evt-name { font-size:11px; font-weight:600; line-height:1.2; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .evt-type { font-size:10px; font-weight:700; margin-top:1px; text-transform:uppercase; letter-spacing:.3px; }
+  .evt-time { font-size:10px; color:var(--muted); margin-top:1px; font-variant-numeric:tabular-nums; }
+  .evt-arrivee { font-size:10px; font-weight:700; color:#dc2626; margin-top:1px; font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .dark .evt-arrivee { color:#f87171; }
+  .evt-arrivee-warn { font-size:10px; font-weight:700; color:#b45309; }
+  .dark .evt-arrivee-warn { color:#fbbf24; }
+  .evt-arrivee-badge { display:inline-block; background:#fef3c7; color:#b45309; font-size:8px; font-weight:700; padding:1px 4px; border-radius:3px; margin-left:3px; vertical-align:middle; text-transform:uppercase; letter-spacing:.3px; }
+  .dark .evt-arrivee-badge { background:#2a1500; color:#fbbf24; }
+  .evt-arrivee-prep { font-size:9px; font-weight:400; color:var(--muted); margin-left:3px; }
+  .evt-facs { font-size:10px; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* ── BLOC RANGEMENT (hachures grises après l'atelier) ── */
+  .evt-range {
+    position:absolute; z-index:1; pointer-events:none;
+    background: repeating-linear-gradient(
+      -45deg, transparent, transparent 3px,
+      rgba(100,116,139,.18) 3px, rgba(100,116,139,.18) 6px
+    );
+    border: 1px dashed rgba(100,116,139,.4);
+    border-radius: 4px;
+    box-sizing: border-box;
+    display:flex; align-items:flex-start; justify-content:center; padding-top:2px;
+  }
+  .dark .evt-range {
+    background: repeating-linear-gradient(
+      -45deg, transparent, transparent 3px,
+      rgba(148,163,184,.15) 3px, rgba(148,163,184,.15) 6px
+    );
+    border-color: rgba(148,163,184,.35);
+  }
+  .evt-range-label {
+    font-size:9px; font-weight:600; color:var(--muted);
+    background:rgba(255,255,255,.8); border-radius:3px; padding:0 3px; white-space:nowrap;
+  }
+  .dark .evt-range-label { background:rgba(22,27,34,.75); color:#8b949e; }
+
+  /* ── BLOC PRÉPARATION (hachures grises avant l'atelier) ── */
+  .evt-prep {
+    position:absolute; left:1px; right:1px;
+    border-radius:3px 3px 0 0;
+    border:1px dashed #9ca3af;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 4px,
+      rgba(156,163,175,.18) 4px,
+      rgba(156,163,175,.18) 8px
+    );
+    pointer-events:none; overflow:hidden; z-index:1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .dark .evt-prep {
+    border-color:#4b5563;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 4px,
+      rgba(75,85,99,.3) 4px,
+      rgba(75,85,99,.3) 8px
+    );
+  }
+  .evt-prep-label {
+    font-size:9px; font-weight:600; color:#6b7280;
+    background:rgba(255,255,255,.75); padding:1px 5px; border-radius:3px;
+    white-space:nowrap; pointer-events:none;
+  }
+  .dark .evt-prep-label { background:rgba(22,27,34,.75); color:#8b949e; }
+
+  /* Couleurs PAR TYPE */
+  .t-tantra { border-left-color:var(--c-tantra); background:var(--c-tantra-bg); border-color:var(--c-tantra-bd); }
+  .t-tantra .evt-name { color:var(--c-tantra); }
+  .t-tantra .evt-type { color:var(--c-tantra); }
+
+  .t-art { border-left-color:var(--c-art); background:var(--c-art-bg); border-color:var(--c-art-bd); }
+  .t-art .evt-name { color:var(--c-art); }
+  .t-art .evt-type { color:var(--c-art); }
+
+  .t-yoga { border-left-color:var(--c-yoga); background:var(--c-yoga-bg); border-color:var(--c-yoga-bd); }
+  .t-yoga .evt-name { color:var(--c-yoga); }
+  .t-yoga .evt-type { color:var(--c-yoga); }
+
+  .t-ceremonie { border-left-color:var(--c-ceremonie); background:var(--c-ceremonie-bg); border-color:var(--c-ceremonie-bd); }
+  .t-ceremonie .evt-name { color:var(--c-ceremonie); }
+  .t-ceremonie .evt-type { color:var(--c-ceremonie); }
+
+  .t-reunion { border-left-color:var(--c-reunion); background:var(--c-reunion-bg); border-color:var(--c-reunion-bd); }
+  .t-reunion .evt-name { color:var(--c-reunion); }
+  .t-reunion .evt-type { color:var(--c-reunion); }
+
+  .t-other { border-left-color:var(--c-other); background:var(--c-other-bg); border-color:var(--c-other-bd); }
+  .t-other .evt-name { color:var(--c-other); }
+  .t-other .evt-type { color:var(--c-other); }
+
+  /* ── TOOLTIP CUSTOM ── */
+  #evtTooltip {
+    display:none; position:fixed; z-index:9999; pointer-events:none;
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:8px; padding:10px 14px;
+    box-shadow:0 4px 18px rgba(0,0,0,.18);
+    max-width:300px; min-width:160px;
+  }
+  #evtTooltip .tt-name { font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px; line-height:1.3; }
+  #evtTooltip .tt-row  { font-size:12px; color:var(--muted); display:flex; gap:6px; align-items:flex-start; margin-top:3px; line-height:1.4; }
+  #evtTooltip .tt-row b { color:var(--text); font-weight:600; flex-shrink:0; min-width:80px; }
+  #evtTooltip .tt-sep { border:none; border-top:1px solid var(--border); margin:6px 0; }
+  #evtTooltip .tt-arrivee { font-size:12px; font-weight:700; color:#dc2626; margin-top:1px; }
+  .dark #evtTooltip .tt-arrivee { color:#f87171; }
+
+  @media print {
+    .topbar, .filter-bar, .legend { position:static; }
+    .cal-scroll { overflow:visible; }
+    .evt { break-inside:avoid; }
+    #evtTooltip { display:none !important; }
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>Tantramour 2026</h1>
+    <p>🏛️ Agenda Simplifié par Salle</p>
+  </div>
+  <div class="topbar-right" id="jourChips"></div>
+  <div class="topbar-right">
+    <a class="btn" href="index.html">🏠 Accueil</a>
+    <a class="btn" href="index_bis.html">🌀 DreamTeam</a>
+    <a class="btn" href="gestion_planning.html">⚙️ Admin</a>
+    <button class="btn" onclick="doRefresh()">🔄 Refresh</button>
+    <button class="btn" id="btnExport" onclick="exportJpeg()" style="display:none;">📷 Export JPEG</button>
+    <button class="btn" onclick="document.body.classList.toggle('dark')">🌙</button>
+  </div>
+</div>
+
+<!-- Filtre SALLE -->
+<div class="filter-bar">
+  <label for="fLieu">🏛️ Salle :</label>
+  <select id="fLieu" onchange="onLieuChange()">
+    <option value="">— Choisissez une salle —</option>
+  </select>
+  <span class="hint" id="filterHint"></span>
+</div>
+
+<!-- Légende par type -->
+<div class="legend">
+  <strong style="font-size:10px;color:var(--text);margin-right:4px;">Légende :</strong>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-tantra);"></div><span>Tantra / Tantra Café</span></div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-art);"></div><span>Artistique / DJ / Pool</span></div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-yoga);"></div><span>Yoga / Méditation</span></div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-ceremonie);"></div><span>Cérémonie / Concert / Rassemblement</span></div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-reunion);"></div><span>Réunion / Repas / Pause</span></div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-other);"></div><span>Autre</span></div>
+</div>
+
+<div id="evtTooltip"></div>
+
+<div id="mainContent">
+  <div class="empty-state">
+    <div class="icon">🏛️</div>
+    <p>Choisissez une salle pour afficher son agenda.</p>
+  </div>
+</div>
+
+<script src="loader.js"></script>
+<script src="ref_lieux.js"></script>
+<script src="ref_descriptions.js"></script>
+<script src="i18n.js"></script>
+<script>
+loadData(['data.js','logistics.js'], function() {
+
+// ── Config ────────────────────────────────────────────────────────────────────
+var H_START = 7;
+var H_END   = 25;
+var PX_PER_MIN = 1.6;
+
+var JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+var JOUR_DATES = {
+  'Jour 1':'Sam. 29/08','Jour 2':'Dim. 30/08','Jour 3':'Lun. 31/08',
+  'Jour 4':'Mar. 01/09','Jour 5':'Mer. 02/09','Jour 6':'Jeu. 03/09','Jour 7':'Ven. 04/09'
+};
+
+// ── CSS class selon type d'atelier ────────────────────────────────────────────
+function typeToCss(type) {
+  if (!type) return 't-other';
+  var t = type.toUpperCase();
+  if (t.indexOf('TANTRA') !== -1) return 't-tantra';
+  if (t.indexOf('ARTISTIQUE') !== -1 || t.indexOf('DJ') !== -1 || t.indexOf('POOL') !== -1) return 't-art';
+  if (t.indexOf('YOGA') !== -1 || t.indexOf('MEDITATION') !== -1) return 't-yoga';
+  if (t.indexOf('CEREMONIE') !== -1 || t.indexOf('CONCERT') !== -1 || t.indexOf('RASSEMBLEMENT') !== -1) return 't-ceremonie';
+  if (t.indexOf('REUNION') !== -1 || t.indexOf('REPAS') !== -1 || t.indexOf('PAUSE') !== -1) return 't-reunion';
+  return 't-other';
+}
+
+// ── Parsing heure ─────────────────────────────────────────────────────────────
+function parseHM(s) {
+  if (!s) return null;
+  var m = String(s).replace(/\./g,':').trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  return parseInt(m[1])*60 + parseInt(m[2]);
+}
+function parseInterval(h) {
+  if (!h) return null;
+  var norm = String(h).replace(/\./g,':').replace(/[–—]/g,'-').trim();
+  var parts = norm.split(/\s*-+\s*/);
+  if (parts.length < 2) return null;
+  var s = parseHM(parts[0]), e = parseHM(parts[1]);
+  if (s == null || e == null) return null;
+  if (e < s) e += 24*60;
+  return { s:s, e:e };
+}
+
+// ── Conversion minutes → pixels ───────────────────────────────────────────────
+var OFFSET_MIN = H_START * 60;
+function minToPx(min) { return (min - OFFSET_MIN) * PX_PER_MIN; }
+function durationPx(dur) { return Math.max(dur * PX_PER_MIN, 18); }
+var TOTAL_PX = (H_END - H_START) * 60 * PX_PER_MIN;
+
+// ── Escape HTML ───────────────────────────────────────────────────────────────
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Index : toutes les salles présentes dans AGENDA ──────────────────────────
+function buildLieuxIndex() {
+  var idx = {}; // lieu → [entry, ...]
+  AGENDA.forEach(function(e) {
+    var lieu = (e.lieu || '').trim();
+    if (!lieu) return;
+    if (!idx[lieu]) idx[lieu] = [];
+    idx[lieu].push(e);
+  });
+  return idx;
+}
+
+var LIEUX_INDEX = buildLieuxIndex();
+
+// ── Ordre des salles depuis REF_LIEUX, puis alphabétique pour les inconnues ───
+var allLieux = (typeof REF_LIEUX !== 'undefined')
+  ? REF_LIEUX.map(function(l){ return l.value; }).filter(function(v){ return LIEUX_INDEX[v]; })
+  : [];
+// Ajouter les salles présentes dans AGENDA mais absentes de REF_LIEUX
+Object.keys(LIEUX_INDEX).forEach(function(l) {
+  if (allLieux.indexOf(l) === -1) allLieux.push(l);
+});
+
+// ── Libellé d'une salle ───────────────────────────────────────────────────────
+function lieuLabel(lieu) {
+  if (typeof REF_LIEUX !== 'undefined') {
+    var ref = REF_LIEUX.find(function(l){ return l.value === lieu; });
+    if (ref) return ref.label;
+  }
+  return lieu;
+}
+
+// ── Peupler le select SALLE ───────────────────────────────────────────────────
+var selLieu = document.getElementById('fLieu');
+allLieux.forEach(function(l) {
+  var o = document.createElement('option');
+  o.value = l; o.text = lieuLabel(l);
+  selLieu.appendChild(o);
+});
+
+var activeLieu = '';
+var activeJour = '';
+
+// ── Tous les jours du festival (même si la salle est vide ce jour-là) ─────────
+function getJoursForLieu(lieu) {
+  return JOUR_ORDER;
+}
+
+// ── Rendu chips jours ─────────────────────────────────────────────────────────
+function renderChips() {
+  if (!activeLieu) { document.getElementById('jourChips').innerHTML = ''; return; }
+  var jours = getJoursForLieu(activeLieu);
+  var html = '<span class="chip'+(activeJour===''?' on':'')+'" onclick="setJour(\'\')">Tous</span>';
+  jours.forEach(function(j) {
+    html += '<span class="chip'+(activeJour===j?' on':'')+'" onclick="setJour(\''+j+'\')">'+j+'</span>';
+  });
+  document.getElementById('jourChips').innerHTML = html;
+}
+
+// ── Rendu principal ───────────────────────────────────────────────────────────
+function render() {
+  renderChips();
+  var mainContent = document.getElementById('mainContent');
+
+  if (!activeLieu) {
+    mainContent.innerHTML = '<div class="empty-state"><div class="icon">🏛️</div><p>Choisissez une salle pour afficher son agenda.</p></div>';
+    document.getElementById('filterHint').textContent = '';
+    return;
+  }
+
+  var jours = activeJour ? [activeJour] : JOUR_ORDER;
+
+  var total = (LIEUX_INDEX[activeLieu] || []).length;
+  var txt = jours.length === 1
+    ? 'Affichage pour ' + activeJour
+    : jours.length + ' jour(s)';
+  document.getElementById('filterHint').textContent = total + ' atelier(s) · ' + txt;
+
+  // ── En-tête (1 colonne par jour) ─────────────────────────────────────────────
+  var headHtml = '<div class="cal-head">';
+  headHtml += '<div class="head-hour"></div>';
+  jours.forEach(function(j) {
+    headHtml += '<div class="head-day-group" style="flex:1 1 0;min-width:120px;">';
+    headHtml += '<div class="hd-jour"><span class="hd-name">'+esc(j)+'</span><span class="hd-date">'+esc(JOUR_DATES[j]||'')+'</span></div>';
+    headHtml += '</div>';
+  });
+  headHtml += '</div>';
+
+  // ── Corps ────────────────────────────────────────────────────────────────────
+  var bodyHtml = '<div class="cal-body">';
+
+  // Colonne heures
+  bodyHtml += '<div class="col-hours" style="height:'+TOTAL_PX+'px;">';
+  for (var h=H_START; h<=H_END; h++) {
+    var yFull = minToPx(h*60);
+    var label = h < 24 ? (h < 10 ? '0'+h : h)+':00' : '0'+(h-24)+':00';
+    bodyHtml += '<div class="hour-line full" style="top:'+yFull+'px;"></div>';
+    bodyHtml += '<div class="hour-label" style="top:'+yFull+'px;">'+label+'</div>';
+    if (h < H_END) bodyHtml += '<div class="hour-line half" style="top:'+minToPx(h*60+30)+'px;"></div>';
+  }
+  bodyHtml += '</div>';
+
+  // 1 colonne par jour
+  jours.forEach(function(jour) {
+    var jourEntries = (LIEUX_INDEX[activeLieu] || []).filter(function(e){ return e.jour === jour; });
+
+    // Collecter les événements valides
+    var events = [];
+    jourEntries.forEach(function(entry) {
+      var iv = parseInterval(entry.heure);
+      if (!iv) return;
+      events.push({ entry:entry, iv:iv });
+    });
+
+    bodyHtml += '<div class="col-day" style="height:'+TOTAL_PX+'px;">';
+
+    // Lignes horaires de fond
+    for (var h=H_START; h<=H_END; h++) {
+      bodyHtml += '<div class="hour-line full" style="top:'+minToPx(h*60)+'px;"></div>';
+      if (h < H_END) bodyHtml += '<div class="hour-line half" style="top:'+minToPx(h*60+30)+'px;"></div>';
+    }
+
+    // Algorithme chevauchement
+    var evts = events.slice().sort(function(a,b){ return a.iv.s - b.iv.s; });
+    var colEnds = [];
+    evts.forEach(function(ev) {
+      var placed = false;
+      for (var c=0; c<colEnds.length; c++) {
+        if (ev.iv.s >= colEnds[c]) { ev._col=c; colEnds[c]=ev.iv.e; placed=true; break; }
+      }
+      if (!placed) { ev._col=colEnds.length; colEnds.push(ev.iv.e); }
+      ev._ncols = 1;
+    });
+    evts.forEach(function(ev) {
+      var maxCol = ev._col;
+      evts.forEach(function(other) {
+        if (other.iv.s < ev.iv.e && other.iv.e > ev.iv.s) {
+          if (other._col > maxCol) maxCol = other._col;
+        }
+      });
+      ev._ncols = maxCol + 1;
+    });
+
+    evts.forEach(function(ev) {
+      var entry  = ev.entry;
+      var iv     = ev.iv;
+      var css    = typeToCss(entry.type);
+      var top    = minToPx(iv.s);
+      var height = durationPx(iv.e - iv.s);
+      var pct    = 100 / ev._ncols;
+      var left   = 'calc('+(ev._col * pct).toFixed(1)+'% + 2px)';
+      var width  = 'calc('+pct.toFixed(1)+'% - 4px)';
+      var fmtH   = entry.heure ? entry.heure.replace(/\s+/g,' ').trim() : '';
+
+      // Calcul heure d'arrivée depuis logistics — même logique que Mon Agenda Simplifié
+      var logEntry = (entry.logisticId && typeof LOGISTICS !== 'undefined') ? LOGISTICS[entry.logisticId] : null;
+      var prepMin  = (entry.type === 'REUNION' || entry.type === 'PREPA & LOGISTICS' || entry.type === 'SHIFT ANGEL')
+        ? 0 : (logEntry && logEntry.prepDuration != null) ? logEntry.prepDuration : 15;
+      var debutMin = parseHM(fmtH.split('-')[0].trim());
+      var arriveeStr = '';
+      if (debutMin !== null && prepMin > 0) {
+        var arrMin = debutMin - prepMin;
+        if (arrMin < 0) arrMin += 24 * 60;
+        arriveeStr = (arrMin < 600 ? '0' : '') + Math.floor(arrMin/60) + ':' + (arrMin%60 < 10 ? '0' : '') + (arrMin%60);
+      }
+
+      // Nom de l'atelier
+      var atelierName = entry.atelier || '';
+
+      // Animateurs pour tooltip et bloc
+      var ttFacs    = [entry.fac1,entry.fac2,entry.fac3,entry.fac4].filter(Boolean).join(', ');
+      var ttHelpers = [entry.helper1,entry.helper2,entry.helper3,entry.helper4].filter(Boolean).join(', ');
+      var ttTrad    = entry.traduction || '';
+      var ttAngel   = entry.angel || '';
+      var typeLabel = entry.type || '';
+
+      // ── Bloc rangement ────────────────────────────────────────────────────
+      var rangeMin = (entry.type === 'REUNION' || entry.type === 'PREPA & LOGISTICS' || entry.type === 'SHIFT ANGEL') ? 0 : (logEntry && logEntry.rangeDuration != null) ? logEntry.rangeDuration : 0;
+      var finMin   = iv.e;
+      if (rangeMin > 0 && finMin !== null) {
+        var rangeTop    = minToPx(finMin);
+        var rangeHeight = durationPx(rangeMin);
+        bodyHtml += '<div class="evt-range"'
+          +' style="top:'+rangeTop.toFixed(1)+'px;height:'+rangeHeight.toFixed(1)+'px;left:'+left+';width:'+width+';">';
+        if (rangeHeight > 16) {
+          var rangeLabel = rangeMin >= 60
+            ? (rangeMin/60 % 1 === 0 ? rangeMin/60+'h' : (Math.floor(rangeMin/60)+'h'+rangeMin%60)) + ' rangement'
+            : rangeMin + 'min rangement';
+          bodyHtml += '<div class="evt-range-label">'+rangeLabel+'</div>';
+        }
+        bodyHtml += '</div>';
+      }
+
+      // ── Bloc préparation ──────────────────────────────────────────────────
+      if (prepMin > 0 && debutMin !== null) {
+        var prepStartMin = iv.s - prepMin;
+        if (prepStartMin >= OFFSET_MIN) {
+          var prepTop    = minToPx(prepStartMin);
+          var prepHeight = durationPx(prepMin);
+          var prepLabel  = prepMin >= 60
+            ? (prepMin/60 % 1 === 0 ? prepMin/60+'h' : (Math.floor(prepMin/60)+'h'+prepMin%60)) + ' de prépa'
+            : prepMin + 'min de prépa';
+          bodyHtml += '<div class="evt-prep"'
+            +' style="top:'+prepTop.toFixed(1)+'px;height:'+prepHeight.toFixed(1)+'px;left:'+left+';width:'+width+';">';
+          if (prepHeight > 16) {
+            bodyHtml += '<div class="evt-prep-label">'+prepLabel+'</div>';
+          }
+          bodyHtml += '</div>';
+        }
+      }
+
+      bodyHtml += '<div class="evt '+css+'"'
+        +' style="top:'+top.toFixed(1)+'px;height:'+height.toFixed(1)+'px;left:'+left+';width:'+width+';"'
+        +' data-tt-name="'+esc(entry.atelier)+'"'
+        +' data-tt-heure="'+esc(fmtH)+'"'
+        +' data-tt-type="'+esc(typeLabel)+'"'
+        +' data-tt-arrivee="'+esc(arriveeStr)+'"'
+        +' data-tt-prep="'+prepMin+'"'
+        +' data-tt-range="'+rangeMin+'"'
+        +' data-tt-facs="'+esc(ttFacs)+'"'
+        +' data-tt-helpers="'+esc(ttHelpers)+'"'
+        +' data-tt-trad="'+esc(ttTrad)+'"'
+        +' data-tt-angel="'+esc(ttAngel)+'"'
+        +'>';
+      bodyHtml += '<div class="evt-name">'+esc(atelierName)+'</div>';
+      if (height > 22 && typeLabel) {
+        bodyHtml += '<div class="evt-type">'+esc(typeLabel)+'</div>';
+      }
+      if (height > 44) {
+        bodyHtml += '<div class="evt-time">'+esc(fmtH)+'</div>';
+        if (arriveeStr) {
+          var isOneHourBefore = (prepMin >= 60);
+          var prepLabelInline = prepMin >= 60
+            ? '(prépa ' + (prepMin % 60 === 0 ? prepMin/60+'h' : Math.floor(prepMin/60)+'h'+prepMin%60) + ')'
+            : '(prépa ' + prepMin + 'min)';
+          bodyHtml += '<div class="evt-arrivee'+(isOneHourBefore?' evt-arrivee-warn':'')+'">'
+            + '⏰ ' + esc(arriveeStr)
+            + ' <span class="evt-arrivee-prep">' + prepLabelInline + '</span>'
+            + (isOneHourBefore ? ' <span class="evt-arrivee-badge">1h avant</span>' : '')
+            + '</div>';
+        }
+      }
+      if (height > 64 && ttFacs) {
+        bodyHtml += '<div class="evt-facs">🎙 '+esc(ttFacs)+'</div>';
+      }
+      bodyHtml += '</div>';
+    });
+
+    bodyHtml += '</div>'; // col-day
+  });
+
+  bodyHtml += '</div>'; // cal-body
+
+  mainContent.innerHTML = '<div class="cal-scroll" id="calScroll"><div class="cal-wrap">'+headHtml+bodyHtml+'</div></div>';
+
+  // Scroll automatique vers 7h30
+  var scrollTarget = minToPx(7*60+30) + 42;
+  var cs = document.getElementById('calScroll');
+  if (cs) cs.scrollTop = Math.max(0, scrollTarget - 60);
+}
+
+// ── Bouton Export JPEG ────────────────────────────────────────────────────────
+function updateExportBtn() {
+  var b = document.getElementById('btnExport');
+  if (b) b.style.display = activeLieu ? 'inline-flex' : 'none';
+}
+
+// ── Événements ───────────────────────────────────────────────────────────────
+window.onLieuChange = function() {
+  activeLieu = document.getElementById('fLieu').value;
+  activeJour = '';
+  render();
+  updateExportBtn();
+};
+
+window.setJour = function(j) {
+  activeJour = j;
+  render();
+};
+
+// ── Export JPEG ───────────────────────────────────────────────────────────────
+window.exportJpeg = function() {
+  if (!activeLieu) return;
+  if (typeof html2canvas === 'undefined') {
+    alert('La librairie html2canvas n\'est pas disponible. Vérifiez votre connexion internet.');
+    return;
+  }
+  var savedJour = activeJour;
+  activeJour = '';
+  render();
+
+  var calScroll = document.getElementById('calScroll');
+  if (!calScroll) { activeJour = savedJour; render(); return; }
+
+  var banner = document.createElement('div');
+  banner.style.cssText = 'background:#1f2328;color:#fff;padding:14px 20px;font-family:-apple-system,"Segoe UI",system-ui,sans-serif;display:flex;align-items:center;gap:16px;border-bottom:3px solid #3b82d4;';
+  banner.innerHTML = '<div style="font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:1px;">Tantramour 2026 — Agenda par Salle</div>'
+    + '<div style="font-size:22px;font-weight:800;letter-spacing:.3px;">🏛️ ' + esc(lieuLabel(activeLieu)) + '</div>';
+
+  var container = document.createElement('div');
+  container.style.cssText = 'position:fixed;left:-9999px;top:0;background:#fff;';
+
+  var calClone = calScroll.cloneNode(true);
+  calClone.style.cssText = 'overflow:visible;width:'+calScroll.scrollWidth+'px;';
+  var inner = calClone.querySelector('.cal-wrap');
+  if (inner) inner.style.width = calScroll.scrollWidth + 'px';
+
+  container.appendChild(banner);
+  container.appendChild(calClone);
+  document.body.appendChild(container);
+
+  var btn = document.getElementById('btnExport');
+  btn.disabled = true;
+  btn.textContent = '⏳ Export…';
+  html2canvas(container, {
+    scale: 2, useCORS: true, backgroundColor: '#ffffff',
+    width: calScroll.scrollWidth, windowWidth: calScroll.scrollWidth
+  }).then(function(canvas) {
+    var link = document.createElement('a');
+    var safeName = activeLieu.replace(/[^a-zA-Z0-9\u00C0-\u024F _-]/g,'').trim().replace(/\s+/g,'_');
+    link.download = 'Planning_Salle_' + safeName + '.jpg';
+    link.href = canvas.toDataURL('image/jpeg', 0.92);
+    link.click();
+  }).catch(function(err) {
+    console.error('Export JPEG échoué :', err);
+    alert('Export échoué : ' + err.message);
+  }).finally(function() {
+    document.body.removeChild(container);
+    btn.disabled = false;
+    btn.innerHTML = '📷 Export JPEG';
+    activeJour = savedJour;
+    if (savedJour) render();
+  });
+};
+
+window.doRefresh = function() {
+  var lieu = document.getElementById('fLieu').value;
+  if (lieu) {
+    location.href = location.pathname + '#lieu=' + encodeURIComponent(lieu);
+  } else {
+    location.reload();
+  }
+};
+
+// ── Restauration du lieu depuis le hash URL après reload ─────────────────────
+(function() {
+  var hash = location.hash;
+  if (!hash) return;
+  var m = hash.match(/[#&]lieu=([^&]*)/);
+  if (!m) return;
+  var lieu = decodeURIComponent(m[1]);
+  var sel = document.getElementById('fLieu');
+  if (!sel) return;
+  for (var i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === lieu) {
+      sel.value = lieu;
+      activeLieu = lieu;
+      activeJour = '';
+      history.replaceState(null, '', location.pathname);
+      updateExportBtn();
+      break;
+    }
+  }
+})();
+
+// ── Tooltip custom ────────────────────────────────────────────────────────────
+(function() {
+  var tip = document.getElementById('evtTooltip');
+  var MARGIN = 14;
+
+  document.addEventListener('mouseover', function(ev) {
+    var el = ev.target.closest('.evt');
+    if (!el) return;
+    var name    = el.dataset.ttName    || '';
+    var heure   = el.dataset.ttHeure   || '';
+    var type    = el.dataset.ttType    || '';
+    var arrivee = el.dataset.ttArrivee || '';
+    var prep    = el.dataset.ttPrep    || '';
+    var range   = el.dataset.ttRange   || '';
+    var facs    = el.dataset.ttFacs    || '';
+    var helpers = el.dataset.ttHelpers || '';
+    var trad    = el.dataset.ttTrad    || '';
+    var angel   = el.dataset.ttAngel   || '';
+    var html = '';
+    html += '<div class="tt-name">'+esc(name)+'</div>';
+    if (type) html += '<div class="tt-row"><b>Type</b><span>'+esc(type)+'</span></div>';
+    if (heure) {
+      html += '<div class="tt-row"><b>Horaire</b><span>'+esc(heure)+'</span></div>';
+      if (arrivee) {
+        var prepTxt = prep && prep !== '0' ? ' <span style="color:var(--muted);font-weight:400;">(prépa ' + esc(prep) + 'min)</span>' : '';
+        html += '<div class="tt-row"><b>⏰ Arrivée</b><span class="tt-arrivee">'+esc(arrivee)+prepTxt+'</span></div>';
+      }
+      if (range && range !== '0') {
+        html += '<div class="tt-row"><b>🧹 Rangement</b><span style="color:var(--muted)">'+esc(range)+' min</span></div>';
+      }
+    }
+    if (facs || helpers || trad || angel) {
+      html += '<hr class="tt-sep">';
+      if (facs)    html += '<div class="tt-row"><b>Animateur(s)</b><span>'+esc(facs)+'</span></div>';
+      if (helpers) html += '<div class="tt-row"><b>Helper(s)</b><span>'+esc(helpers)+'</span></div>';
+      if (trad)    html += '<div class="tt-row"><b>Traducteur</b><span>'+esc(trad)+'</span></div>';
+      if (angel)   html += '<div class="tt-row"><b>Angel</b><span>'+esc(angel)+'</span></div>';
+    }
+    tip.innerHTML = html;
+    tip.style.display = 'block';
+  });
+
+  document.addEventListener('mousemove', function(ev) {
+    if (tip.style.display === 'none') return;
+    var x = ev.clientX + MARGIN;
+    var y = ev.clientY + MARGIN;
+    if (x + tip.offsetWidth + 4 > window.innerWidth)  x = ev.clientX - tip.offsetWidth - MARGIN;
+    if (y + tip.offsetHeight + 4 > window.innerHeight) y = ev.clientY - tip.offsetHeight - MARGIN;
+    tip.style.left = x + 'px';
+    tip.style.top  = y + 'px';
+  });
+
+  document.addEventListener('mouseout', function(ev) {
+    if (!ev.target.closest('.evt')) return;
+    var to = ev.relatedTarget;
+    if (to && to.closest('.evt') === ev.target.closest('.evt')) return;
+    tip.style.display = 'none';
+  });
+})();
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+render();
+
+}); // fin loadData
+</script>
+</body>
+</html>
