@@ -1,0 +1,779 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Règles des rapports</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --header-bg: #f0f4fb;
+    --green: #166534; --green-bg: #dcfce7; --green-border: #86efac;
+    --orange: #c2410c; --orange-bg: #fff7ed; --orange-border: #fdba74;
+    --red: #dc2626; --red-bg: #fef2f2; --red-border: #fca5a5;
+    --purple: #7c3aed; --purple-bg: #ede9fe; --purple-border: #c4b5fd;
+    --blue-bg: #eff6ff; --blue-border: #bfdbfe; --blue-text: #1e40af;
+  }
+  .dark {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --header-bg: #1c2333;
+    --green-bg: #052e16; --green-border: #166534;
+    --orange-bg: #1c1000; --orange-border: #92400e;
+    --red-bg: #2d0a0a; --red-border: #991b1b;
+    --purple-bg: #1e1b4b; --purple-border: #5b21b6;
+    --blue-bg: #0c1a3a; --blue-border: #1e3a8a; --blue-text: #93c5fd;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  /* ── HEADER ── */
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+  .logo h1 { font-size: 20px; font-weight: 700; }
+  .logo p  { font-size: 26px; font-weight: 800; color: var(--purple); line-height: 1.2; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn-ghost { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* ── FILTRES ── */
+  .toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; align-items: flex-end; }
+  .fg { display: flex; flex-direction: column; gap: 4px; }
+  .fg label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+  .fg select, .fg input { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 13px; color: var(--text); font-family: inherit; cursor: pointer; }
+  .fg select { min-width: 180px; }
+  .fg input  { min-width: 220px; }
+
+  /* ── STATS ── */
+  .stats-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+  .stat-pill { flex: 1; min-width: 100px; border-radius: 8px; padding: 10px 14px; border: 1px solid var(--border); background: var(--surface); text-align: center; }
+  .stat-pill .num { font-size: 22px; font-weight: 800; line-height: 1; color: var(--accent); }
+  .stat-pill .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; margin-top: 2px; }
+
+  /* ── CARTE RAPPORT ── */
+  .report-card {
+    border: 1px solid var(--border); border-radius: 12px;
+    overflow: hidden; margin-bottom: 16px;
+    transition: border-color .15s;
+  }
+  .report-card:hover { border-color: var(--accent); }
+
+  .report-header {
+    background: var(--surface); padding: 14px 18px;
+    display: flex; align-items: center; gap: 14px;
+    cursor: pointer; user-select: none; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+    transition: background .15s;
+  }
+  .report-header:hover { background: var(--header-bg); }
+  .report-icon  { font-size: 22px; flex-shrink: 0; }
+  .report-title { font-size: 15px; font-weight: 800; flex: 1; }
+  .report-meta  { font-size: 12px; color: var(--muted); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .type-badge { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+  .badge-read   { background: var(--green-bg);   color: var(--green); }
+  .badge-edit   { background: var(--orange-bg);  color: var(--orange); }
+  .badge-admin  { background: var(--purple-bg);  color: var(--purple); }
+  .badge-algo   { background: var(--blue-bg);    color: var(--blue-text); }
+  .rule-count   { font-size: 11px; font-weight: 700; background: var(--accent); color: #fff; border-radius: 99px; padding: 1px 8px; }
+  .chevron { font-size: 14px; color: var(--muted); margin-left: auto; flex-shrink: 0; transition: transform .2s; }
+  .report-card.open .chevron { transform: rotate(90deg); }
+
+  /* ── BODY DU RAPPORT ── */
+  .report-body { display: none; padding: 0 18px 18px; background: var(--bg); }
+  .report-card.open .report-body { display: block; }
+
+  /* ── SECTION DE RÈGLES ── */
+  .rules-section { margin-top: 16px; }
+  .rules-section-label {
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: .6px; color: var(--muted); padding-bottom: 7px;
+    border-bottom: 1px solid var(--border); margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  /* ── RÈGLE ── */
+  .rule-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 9px 0; border-bottom: 1px solid var(--border);
+  }
+  .rule-row:last-child { border-bottom: none; }
+  .rule-icon-wrap {
+    width: 30px; height: 30px; border-radius: 6px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; margin-top: 1px;
+  }
+  .ri-block  { background: var(--red-bg);    border: 1px solid var(--red-border); }
+  .ri-check  { background: var(--green-bg);  border: 1px solid var(--green-border); }
+  .ri-info   { background: var(--blue-bg);   border: 1px solid var(--blue-border); }
+  .ri-warn   { background: var(--orange-bg); border: 1px solid var(--orange-border); }
+  .ri-algo   { background: var(--purple-bg); border: 1px solid var(--purple-border); }
+
+  .rule-content { flex: 1; min-width: 0; }
+  .rule-text {
+    font-size: 13px; color: var(--text); line-height: 1.55;
+    padding: 4px 8px; border-radius: 4px; min-height: 28px;
+    word-break: break-word;
+  }
+  .rule-text[contenteditable="true"] {
+    border: 1px solid var(--border); background: var(--bg); outline: none;
+    cursor: text;
+  }
+  .rule-text[contenteditable="true"]:focus {
+    border-color: var(--accent); box-shadow: 0 0 0 3px rgba(59,130,212,.12);
+  }
+  .rule-actions { display: flex; gap: 6px; margin-top: 4px; }
+  .btn-sm { cursor: pointer; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 5px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: inherit; }
+  .btn-sm:hover { background: var(--border); }
+  .btn-sm.save  { background: var(--green-bg); color: var(--green); border-color: var(--green-border); }
+  .btn-sm.save:hover { filter: brightness(.95); }
+  .btn-sm.del   { background: var(--red-bg);  color: var(--red);  border-color: var(--red-border); }
+  .btn-sm.del:hover  { filter: brightness(.95); }
+
+  /* ── AJOUTER UNE RÈGLE ── */
+  .add-rule-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; align-items: center; }
+  .add-rule-row select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 9px; font-size: 12px; color: var(--text); font-family: inherit; cursor: pointer; }
+  .add-rule-row input  { flex: 1; min-width: 200px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font-size: 12px; color: var(--text); font-family: inherit; }
+  .add-rule-row input:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  .btn-add-rule { cursor: pointer; background: var(--accent); color: #fff; border: none; border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; font-family: inherit; display: inline-flex; align-items: center; gap: 5px; }
+  .btn-add-rule:hover { filter: brightness(1.1); }
+
+  /* ── LIEN VERS LE RAPPORT ── */
+  .report-link { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--accent); text-decoration: none; padding: 4px 10px; border: 1px solid var(--blue-border); border-radius: 6px; background: var(--blue-bg); margin-top: 14px; }
+  .report-link:hover { filter: brightness(.95); }
+
+  /* ── TOAST ── */
+  #toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(60px); background: #1f2328; color: #fff; border-radius: 8px; padding: 11px 20px; font-size: 13px; font-weight: 700; z-index: 9999; opacity: 0; transition: transform .3s, opacity .3s; white-space: nowrap; }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  #toast.ok  { background: #166534; }
+
+  .empty { text-align: center; padding: 40px; color: var(--muted); border: 2px dashed var(--border); border-radius: 10px; }
+
+  footer { margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+</style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+</head>
+<!-- i18n -->
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Règles des Rapports</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn-ghost" href="index_bis.html">🏠 <span data-i18n="nav_home">Home</span></a>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit">Mode Nuit</span></button>
+      <button class="mode-btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
+    </div>
+  </header>
+
+  <!-- FILTRES -->
+  <div class="toolbar">
+    <div class="fg">
+      <label>Type de rapport</label>
+      <select id="filterType" onchange="renderAll()">
+        <option value="" data-i18n="filter_tous_types">Tous les types</option>
+        <option value="lecture">📖 Lecture</option>
+        <option value="edition">✏️ Édition</option>
+        <option value="admin">🔒 Admin</option>
+        <option value="algo">🤖 Algorithme</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Recherche</label>
+      <input type="text" id="filterSearch" placeholder="Nom de rapport ou règle…" oninput="renderAll()">
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar" id="statsBar"></div>
+
+  <!-- LISTE DES RAPPORTS -->
+  <div id="reportList"></div>
+
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// DONNÉES — Règles par rapport
+// Chaque règle : { type: 'block'|'check'|'info'|'warn'|'algo', text: string }
+// ════════════════════════════════════════════════════════════════
+const ICON_MAP = { block:'🚫', check:'✅', info:'ℹ️', warn:'⚠️', algo:'🤖' };
+const CLS_MAP  = { block:'ri-block', check:'ri-check', info:'ri-info', warn:'ri-warn', algo:'ri-algo' };
+
+var REPORTS = [
+  {
+    id: 'programme_festivaliers',
+    icon: '🎪',
+    title: 'Programme des Ateliers (Festivaliers)',
+    file: 'Rapport_Programme.html',
+    type: 'lecture',
+    description: 'Page publique festivaliers — présentation des ateliers jour par jour avec descriptions et filtre par type.',
+    rules: [
+      { type: 'info',  text: 'Accessible depuis index.html (page d\'accueil publique) sans mot de passe — conçu pour les festivaliers.' },
+      { type: 'info',  text: 'Écran 1 — Grille des jours : affiche uniquement les jours ayant au moins un atelier de type public. Cliquer sur un jour ouvre l\'écran 2.' },
+      { type: 'block', text: 'Seuls les types publics sont affichés : MEDITATION/YOGA, ATELIER ARTISTIQUE, ATELIERS TANTRA, CEREMONIE & CONCERT, DJ Set, POOL PARTY, LOVE TEMPLE, SUPPORT EMOTIONNEL, TANTRA CAFE & CONFERENCE, RASSEMBLEMENT. Les types internes (REPAS, PREPA, REUNION, TEST) sont exclus.' },
+      { type: 'info',  text: 'Écran 2 — Programme du jour : liste des ateliers triée par heure, avec chips de filtre par type (uniquement les types présents ce jour-là).' },
+      { type: 'info',  text: 'Bouton ℹ️ sur chaque atelier : ouvre une modale de détail avec horaire, lieu, animateur(s), niveau piment, traduction, et les descriptions FR et EN si disponibles.' },
+      { type: 'check', text: 'Les descriptions proviennent de ref_descriptions.js — chargé via loadData(). Si aucune description n\'est disponible, un message "Aucune description disponible" s\'affiche.' },
+      { type: 'info',  text: 'Bilingue FR / EN : bouton 🌐 EN dans le header. Tous les libellés d\'interface, dates, noms des jours (Jour 1 → Day 1) et types d\'ateliers sont traduits. La langue est persistée en localStorage.' },
+      { type: 'info',  text: 'Le changement de langue est instantané — un listener tm_lang_changed re-rend la grille des jours, l\'écran programme actif et les chips de filtre sans recharger la page.' },
+      { type: 'check', text: 'Mode nuit adaptatif : les badges badge-note et badge-trad / badge-trad-fr ont fond + texte + bordure distincts en mode jour ET mode nuit (surcharges !important). La classe badge-trad-fr remplace l\'ancien style inline pour le badge FR.' },
+    ]
+  },
+  {
+    id: 'agenda_jour',
+    icon: '📅',
+    title: 'Agenda par Jour',
+    file: 'Rapport_Agenda_par_Jour.html',
+    type: 'lecture',
+    description: 'Vue chronologique de tous les ateliers avec filtres et tri.',
+    rules: [
+      { type: 'info',  text: 'Les données sont lues depuis data.js — aucune modification possible depuis ce rapport.' },
+      { type: 'info',  text: 'Filtres disponibles : Jour, Lieu, Rôle, Type d\'atelier. Les filtres sont cumulatifs.' },
+      { type: 'info',  text: 'Toutes les colonnes sont triables par clic sur l\'en-tête (↑ ascendant, ↓ descendant).' },
+      { type: 'check', text: 'Un ★ rouge à côté du nom d\'atelier signale une note logistique renseignée.' },
+      { type: 'info',  text: 'Le bouton 🔄 Refresh force un rechargement sans cache pour voir les dernières données.' },
+      { type: 'info',  text: 'Bouton ✏️ en dernière colonne : une modale demande le mot de passe admin (007), puis ouvre Éditer un atelier dans un nouvel onglet avec l\'atelier pré-sélectionné via ?idx=N.' },
+    ]
+  },
+  {
+    id: 'agenda_personne',
+    icon: '👤',
+    title: 'Agenda par Personne',
+    file: 'Rapport_Agenda_par_Personne.html',
+    type: 'lecture',
+    description: 'Planning individuel de chaque membre de l\'équipe, tous rôles confondus.',
+    rules: [
+      { type: 'info',  text: 'Affiche tous les rôles d\'une personne : Animateur, Helper, Angel, Traducteur.' },
+      { type: 'info',  text: 'Filtres disponibles : Personne, Jour, Rôle, Type d\'atelier.' },
+      { type: 'check', text: 'La liste des personnes est construite dynamiquement depuis data.js — pas de saisie manuelle.' },
+      { type: 'info',  text: 'Vue mobile : chaque carte atelier affiche un bouton 📋 sous l\'heure. Ouvre une modale bottom-sheet avec les détails complets de l\'atelier et les informations logistiques de logistics.js.' },
+      { type: 'check', text: 'Logistics.js est chargé au démarrage — la modale affiche un message si aucune info logistique n\'est disponible pour cet atelier.' },
+    ]
+  },
+  {
+    id: 'mon_planning',
+    icon: '🗓️',
+    title: 'Mon Planning (My Planning)',
+    file: 'Rapport_Mon_Planning.html',
+    type: 'lecture',
+    description: 'Vue agrégée de toute l\'équipe par rôle ou combinée.',
+    rules: [
+      { type: 'info',  text: 'Onglets : Combiné (tous rôles), Animateurs, Helpers, Traducteurs, Angels.' },
+      { type: 'info',  text: 'Filtres disponibles : Recherche texte (nom), Personne, Jour.' },
+      { type: 'info',  text: 'Deux vues disponibles : Vue par Personne (blocs colorés) et Vue Tableau (triable).' },
+      { type: 'info',  text: 'Bouton 📋 sur chaque ligne : ouvre une modale bottom-sheet avec les détails de l\'atelier (date, heure, lieu, équipe, note) et les informations logistiques de logistics.js.' },
+      { type: 'check', text: 'La modale se ferme en cliquant sur ✕ CLOSE ou en cliquant sur l\'overlay. Scroll body bloqué pendant l\'ouverture.' },
+    ]
+  },
+  {
+    id: 'mon_planning_v2',
+    icon: '📋',
+    title: 'Mon Planning V2',
+    file: 'Rapport_Mon_Planning_V2.html',
+    type: 'lecture',
+    description: 'Vue par ressource — tous les rôles confondus, modale logistique FR/EN, shifts Angel collapsibles.',
+    rules: [
+      { type: 'info',  text: 'Onglet principal : "Tous tes rôles confondus" — affiche tous les ateliers de la personne, quel que soit le rôle (Animateur, Helper, Traducteur, Angel, Colibri).' },
+      { type: 'info',  text: 'Filtres disponibles : Personne (sélecteur), Recherche nom (texte libre), Vue (onglets de rôle).' },
+      { type: 'check', text: 'Shifts Angel collapsibles : les ateliers couverts par un shift sont masqués par défaut (display:none via .angel-covered-row). Clic sur le shift → toggleAngelShift() révèle les ateliers avec animation chevron. Attributs data-shift-group / data-shift-member gèrent le mécanisme.' },
+      { type: 'info',  text: 'Compteur "N ateliers" affiché dans la pill du shift angel.' },
+      { type: 'info',  text: 'Modale logistique popup : nom atelier FR/EN, type, jour/date, horaire/durée, lieu, équipe, note, instructions participantes, description, logistique et consignes helpers. Toggle FR / EN dans la modale.' },
+      { type: 'check', text: 'Codes couleur lignes : NOM = bleu foncé #1e40af, JOUR = gris foncé #374151 (identiques à Charge de travail).' },
+    ]
+  },
+  {
+    id: 'planning_traducteurs',
+    icon: '🌐',
+    title: 'Planning Traducteurs',
+    file: 'Rapport_Traducteurs.html',
+    type: 'lecture',
+    description: 'Vue par traducteur — shifts regroupés, filtres Jour/Traducteur, bascule tableau.',
+    rules: [
+      { type: 'info',  text: 'Filtres disponibles : Traducteur, Jour.' },
+      { type: 'info',  text: 'Deux vues : Vue par Traducteur (blocs avec shifts) et Vue Tableau (triable).' },
+      { type: 'info',  text: 'Les ateliers consécutifs ou simultanés (gap ≤ 5 min) sont regroupés en shifts.' },
+      { type: 'info',  text: 'Seuls les ateliers avec un champ traduction renseigné apparaissent.' },
+    ]
+  },
+  {
+    id: 'ateliers_colibri',
+    icon: '🐦',
+    title: 'Ateliers Colibri',
+    file: 'Rapport_Colibri.html',
+    type: 'lecture',
+    description: 'Liste des ateliers avec une ressource (helper ou traducteur) ayant le rôle "colibri".',
+    rules: [
+      { type: 'algo',  text: 'Un atelier est inclus si au moins un helper ou traducteur assigné possède le rôle "colibri" dans ref_ressources.js.' },
+      { type: 'info',  text: 'Filtres disponibles : Jour, Colibri (personne spécifique).' },
+      { type: 'info',  text: 'Les Colibris sont mis en évidence avec un badge violet distinctif dans chaque carte.' },
+      { type: 'check', text: 'ref_ressources.js est chargé via loadData() pour garantir la fraîcheur du cache.' },
+      { type: 'info',  text: 'Pour ajouter ou retirer le rôle colibri à une personne : utiliser Gérer les Ressources.' },
+    ]
+  },
+  {
+    id: 'logistique_atelier',
+    icon: '📋',
+    title: 'Logistique par Atelier',
+    file: 'Rapport_Logistique_par_Atelier.html',
+    type: 'lecture',
+    description: 'Fiche logistique complète d\'un atelier — référence terrain.',
+    rules: [
+      { type: 'info',  text: 'Navigation en 2 étapes : sélection du jour, puis de l\'atelier.' },
+      { type: 'check', text: 'Les informations logistiques proviennent de logistics.js (saisi par les animateurs).' },
+      { type: 'warn',  text: 'Si Note ou Informations Logistiques sont vides, la fiche affiche un texte grisé en italique.' },
+    ]
+  },
+  {
+    id: 'logistics_input',
+    icon: '✏️',
+    title: 'Saisie des besoins logistiques',
+    file: 'Rapport_Logistics_Input.html',
+    type: 'edition',
+    description: 'Interface dédiée aux animateurs pour saisir leurs besoins atelier par atelier.',
+    rules: [
+      { type: 'check', text: 'Accessible sans mot de passe — conçu pour être partagé aux animateurs.' },
+      { type: 'info',  text: 'Workflow en 3 étapes : identification → choix atelier → saisie et sauvegarde.' },
+      { type: 'block', text: 'Seuls les animateurs ayant des ateliers dans data.js apparaissent dans la liste.' },
+      { type: 'info',  text: 'Champs modifiables : Nom de l\'atelier, Niveau Piment, Informations logistiques (texte riche).' },
+      { type: 'block', text: 'Jour, heure, lieu, équipe sont en lecture seule — contact administrateur pour toute correction.' },
+      { type: 'warn',  text: 'La sauvegarde écrit dans logistics.js. Le serveur local (start.bat) doit être actif.' },
+      { type: 'check', text: 'Un badge "✔ Renseigné" ou "⏳ À compléter" indique le statut de chaque atelier.' },
+    ]
+  },
+  {
+    id: 'conflits',
+    icon: '⚠️',
+    title: 'Conflits de planning',
+    file: 'Rapport_Conflits.html',
+    type: 'algo',
+    description: 'Détection automatique des chevauchements horaires sur toute l\'équipe.',
+    rules: [
+      { type: 'algo',  text: 'Analyse tous les rôles simultanément : Animateur, Helper, Angel, Traducteur.' },
+      { type: 'block', text: 'Les créneaux sans heure précise (ex : "Matin", "Après-midi") sont exclus — durée indéterminable.' },
+      { type: 'algo',  text: 'Chevauchement détecté si : début_A < fin_B ET début_B < fin_A (chevauchement strict, pas simple adjacence).' },
+      { type: 'warn',  text: 'Cartes rouges = chevauchement réel. Cartes orange = mêmes horaires exacts.' },
+      { type: 'info',  text: 'Filtres disponibles : Jour, Personne.' },
+    ]
+  },
+  {
+    id: 'charge_travail',
+    icon: '⚖️',
+    title: 'Charge de travail (Workload)',
+    file: 'Rapport_Charge_Travail.html',
+    type: 'algo',
+    description: 'Analyse de la répartition de charge pour Helpers, Angels et Traducteurs.',
+    rules: [
+      { type: 'block', text: 'Types exclus du calcul de charge : REPAS & PAUSE, PREPA & LOGISTICS, REUNION D\'EQUIPE, TEST. Tous les autres types (ATELIERS TANTRA, MEDITATION, CEREMONIE, LOVE TEMPLE, DJ Set, POOL PARTY, etc.) sont inclus.' },
+      { type: 'algo',  text: 'La durée de chaque atelier est calculée depuis le champ heure (format HH:MM - HH:MM ou HH.MM - HH.MM).' },
+      { type: 'algo',  text: 'Pour les Angels : fusion des intervalles qui se chevauchent sur le même jour (interval merging) — on ne compte que la durée nette couverte. 1 shift angel = 1 seul atelier comptabilisé (merged.length).' },
+      { type: 'info',  text: 'Barre de charge par journée : vert < 2h · orange 2–4h · rouge > 4h.' },
+      { type: 'info',  text: 'Filtre disponible : Jour (restreint le calcul à une journée).' },
+      { type: 'check', text: 'Carte personne — badges rôles distincts : chaque rôle (Helper, Angel, Traducteur) est affiché séparément avec sa couleur propre, jamais fusionné sur un seul badge. Même logique que les badges de jour.' },
+      { type: 'check', text: 'Badges rôles sans émoji : les labels Helper, Angel, Traducteur sont affichés sans émoji préfixe (ex : pas de 🤝 devant "Helper").' },
+      { type: 'info',  text: 'Codes couleur identiques à Mon Planning V2 : ligne NOM = bleu foncé #1e40af, ligne JOUR = gris foncé #374151.' },
+      { type: 'check', text: 'Rapport entièrement bilingue FR / EN via I18n.t() — 90+ clés r6_* dans ref_translations.js couvrent titre, onglets, summaryBar, buildHarmony, renderHarmony et toggleMode.' },
+    ]
+  },
+  {
+    id: 'harmonisation',
+    icon: '📊',
+    title: 'Harmonisation (onglet dans Charge de travail)',
+    file: 'Rapport_Charge_Travail.html',
+    type: 'algo',
+    description: 'Propositions automatiques de rééquilibrage de charge entre Helpers, Angels et Traducteurs.',
+    rules: [
+      { type: 'info',  text: 'L\'onglet ⚖️ Harmonisation s\'affiche directement dans la page (pas de popup). Une sous-navigation permet de filtrer les propositions : Vue globale, Helpers, Angels, Traducteurs.' },
+      { type: 'algo',  text: 'Seuil SURCHARGÉ : charge > 120 % de la moyenne du groupe (helpers, angels ou traducteurs). Carte orange.' },
+      { type: 'algo',  text: 'Seuil TRÈS SURCHARGÉ (alerte) : charge > 140 % de la moyenne. Carte rouge.' },
+      { type: 'algo',  text: 'Zone cible acceptable : entre 80 % et 120 % de la moyenne du groupe.' },
+      { type: 'algo',  text: 'Seuil SOUS-CHARGÉ (disponible) : charge < 85 % de la moyenne du groupe ET charge globale (tous rôles) ≤ 130 % de la moyenne globale.' },
+      { type: 'warn',  text: 'Si un helper a une charge légère en tant que helper mais une charge globale > 130 % de la moyenne globale, il est signalé "déjà chargé sur d\'autres rôles" et non proposé comme disponible.' },
+      { type: 'block', text: 'Certaines personnes sont exclues des suggestions de redistribution (non substituables) — liste EXCLUDED_FROM_SUGGESTIONS codée dans le rapport (animateurs principaux).' },
+      { type: 'block', text: 'Les helpers ayant également le rôle colibri, manager ou admin dans ref_ressources.js sont exclus du calcul des moyennes helpers et de la moyenne globale (même règle que la barre de statistiques de l\'onglet Helpers).' },
+      { type: 'algo',  text: 'Maximum 3 suggestions de transfert proposées par personne surchargée.' },
+      { type: 'algo',  text: 'Les candidats remplaçants sont classés en deux groupes : sous la moyenne d\'abord (en vert), puis égaux ou au-dessus.' },
+      { type: 'info',  text: 'Le premier tableau affiché en Vue globale est le Classement global — Heures totales (Helper + Angel + Traducteur), suivi du tableau Objectif d\'équilibre par catégorie.' },
+    ]
+  },
+  {
+    id: 'editer_atelier',
+    icon: '✏️',
+    title: 'Éditer un atelier',
+    file: 'Rapport_Editer_Atelier.html',
+    type: 'edition',
+    description: 'Modifier tous les champs d\'un atelier — sauvegarde directe dans data.js.',
+    rules: [
+      { type: 'warn',  text: 'Le serveur local (start.bat) doit être actif pour toute sauvegarde.' },
+      { type: 'info',  text: 'Filtres de liste : Jour, Type, Recherche texte. La sélection ouvre le formulaire d\'édition.' },
+      { type: 'info',  text: 'Pré-sélection via URL : le paramètre ?idx=N ouvre directement l\'atelier d\'index N dans AGENDA. Utilisé par Agenda par Jour (bouton ✏️) et Affectation Traducteur (bouton ✏️ Assigner).' },
+      { type: 'check', text: 'L\'heure est saisie via un double sélecteur (début / fin) alimenté par ref_heures.js.' },
+      { type: 'info',  text: 'Les listes Lieu, Type, Note proviennent des fichiers ref_*.js correspondants.' },
+      { type: 'info',  text: 'Les ressources (Fac, Helper, Angel, Traducteur) proviennent de ref_ressources.js.' },
+      { type: 'check', text: 'Le panneau logistique en bas permet d\'éditer logistics.js directement depuis la même page.' },
+      { type: 'info',  text: 'Bouton ＋ Nouvel atelier : formulaire vierge — sauvegarde insère à la fin de AGENDA.' },
+      { type: 'info',  text: 'Bouton 📋 Dupliquer : crée une copie avec le nom suffixé "(COPIE)" et le logisticId réinitialisé. Disponible uniquement sur un atelier existant.' },
+      { type: 'warn',  text: 'Bouton 🗑 Supprimer : suppression irréversible après confirmation. Rollback automatique en cas d\'erreur serveur.' },
+    ]
+  },
+  {
+    id: 'masterdata',
+    icon: '🗂',
+    title: 'Master Data',
+    file: 'MasterData.html',
+    type: 'admin',
+    description: 'Gestion des listes de référence : Lieux, Types d\'ateliers, Notes.',
+    rules: [
+      { type: 'warn',  text: 'Accès protégé par mot de passe (007).' },
+      { type: 'block', text: 'Les ressources (personnes) ne sont PAS gérées ici — utiliser le rapport Gérer les Ressources.' },
+      { type: 'info',  text: 'Trois onglets : 📍 Lieux (ref_lieux.js), 🏷️ Types (ref_types.js), 📝 Notes (ref_notes.js).' },
+      { type: 'warn',  text: 'En cas de renommage, utiliser "💾 + data.js mis à jour" pour propager dans les ateliers existants.' },
+      { type: 'check', text: 'L\'ID technique de chaque entrée ne change jamais — seule la valeur affichée est modifiable.' },
+    ]
+  },
+  {
+    id: 'gerer_ressources',
+    icon: '👥',
+    title: 'Gérer les Ressources',
+    file: 'Rapport_Gerer_Ressources.html',
+    type: 'admin',
+    description: 'Référentiel unifié de toutes les personnes du festival.',
+    rules: [
+      { type: 'check', text: 'Les rôles disponibles (cases à cocher) sont lus dynamiquement depuis ref_resource_types.js.' },
+      { type: 'info',  text: 'Une personne peut avoir plusieurs rôles simultanément (ex : Animateur + Helper + Colibri).' },
+      { type: 'check', text: 'L\'ID est généré automatiquement depuis le nom (ex : "R_ARNAUD"). Toujours préfixé "R_".' },
+      { type: 'block', text: 'L\'ID doit être unique, commencer par "R_" et ne contenir que lettres majuscules, chiffres et "_".' },
+      { type: 'warn',  text: 'Supprimer une ressource ne met pas à jour data.js — vérifier manuellement dans Éditer un atelier.' },
+      { type: 'warn',  text: 'La sauvegarde écrit ref_ressources.js via le serveur local ou GitHub API.' },
+    ]
+  },
+  {
+    id: 'remplacement',
+    icon: '🔄',
+    title: 'Remplacement de Ressource',
+    file: 'Rapport_Remplacement_Ressource.html',
+    type: 'algo',
+    description: 'Gestion des absences — proposition automatique de remplaçants.',
+    rules: [
+      { type: 'block', text: 'Règle 1 — Pas de conflit horaire : tout candidat ayant un atelier (quel que soit le rôle) sur le même créneau est exclu.' },
+      { type: 'block', text: 'Règle 2 — Charge équilibrée : les candidats sont classés par score qui favorise les moins chargés.' },
+      { type: 'algo',  text: 'Score = 100 − (charge_personne / charge_max × 80) + 10 si déjà présent ce jour-là.' },
+      { type: 'block', text: 'Un candidat déjà assigné à l\'atelier cible dans un autre rôle est exclu.' },
+      { type: 'check', text: 'Seuls les créneaux "Validés" sont écrits dans data.js — les créneaux "Ignorés" ne sont pas modifiés.' },
+      { type: 'warn',  text: 'La sauvegarde écrit data.js via serveur local (localhost) ou GitHub API selon l\'environnement.' },
+    ]
+  },
+  {
+    id: 'trad_affectation',
+    icon: '🌐✅',
+    title: 'Affectation Traducteur',
+    file: 'Rapport_Traducteur_Affectation.html',
+    type: 'lecture',
+    description: 'Liste les ateliers anglophones et leur statut de traduction (OK / TBC).',
+    rules: [
+      { type: 'block', text: 'Règle d\'inclusion : tout atelier dont fac1 ou fac2 a le rôle "anglophone" dans ref_ressources.js.' },
+      { type: 'algo',  text: 'Statut ✅ OK : le champ traduction est non vide. Statut ⏳ TBC : le champ traduction est vide.' },
+      { type: 'info',  text: 'Pour un atelier TBC : bouton ✏️ Assigner un traducteur ouvre Éditer un atelier dans un nouvel onglet avec l\'atelier pré-sélectionné via ?idx=N.' },
+      { type: 'info',  text: 'Filtres disponibles : Statut (✅ OK / ⏳ TBC / Tous), Jour.' },
+      { type: 'check', text: 'ref_ressources.js est chargé via loadData() pour garantir la fraîcheur du cache.' },
+    ]
+  },
+  {
+    id: 'logistique_manquante',
+    icon: '📦',
+    title: 'Logistique manquante',
+    file: 'Rapport_Logistique_Manquante.html',
+    type: 'lecture',
+    description: 'Ateliers sans information logistique saisie ou non validés par les animateurs.',
+    rules: [
+      { type: 'info',  text: 'Affiche par défaut tous les ateliers qui nécessitent attention : info logistique manquante OU non validés par le animateur.' },
+      { type: 'block', text: 'Types exclus : REPAS & PAUSE, PREPA & LOGITICS, REUNION D\'EQUIPE, TEST — pas de besoin logistique pour ces ateliers.' },
+      { type: 'block', text: 'Seuls les ateliers ayant au moins un animateur (fac1 ou fac2) sont inclus.' },
+      { type: 'info',  text: 'Les ateliers sont groupés par animateur principal (fac1), triés par jour puis heure.' },
+      { type: 'info',  text: 'Bordure rouge = info logistique manquante (champ text vide). Bordure orange = info présente mais non validée par le animateur.' },
+      { type: 'info',  text: 'Filtres disponibles : Jour, Animateur, Statut (Info manquante / Non validé Fac / Manquant ET non validé).' },
+      { type: 'check', text: 'Bouton ✏️ Saisir : ouvre Rapport_Logistics_Input.html dans un nouvel onglet pour que le animateur complète sa fiche.' },
+      { type: 'info',  text: 'Barre de statistiques : total ateliers avec fac, renseignés, validés Fac, info manquante, non validés.' },
+      { type: 'info',  text: 'Bilingue FR / EN — bouton 🌐 EN dans le header, re-render instantané via tm_lang_changed.' },
+    ]
+  },
+  {
+    id: 'descriptions_manquantes',
+    icon: '📋',
+    title: 'Descriptions manquantes',
+    file: 'Rapport_Descriptions_Manquantes.html',
+    type: 'lecture',
+    description: 'Suivi des ateliers publics sans description FR ou EN — accès direct à l\'éditeur.',
+    rules: [
+      { type: 'info',  text: 'Affiche uniquement les ateliers de types publics (TANTRA, YOGA, ARTISTIQUE, CEREMONIE, etc.) — les types internes (REPAS, PREPA, REUNION, TEST) sont exclus.' },
+      { type: 'block', text: 'Seuls les ateliers ayant au moins un animateur (fac1 ou fac2) sont inclus.' },
+      { type: 'info',  text: 'Dédupliqués par nom d\'atelier : si un même atelier apparaît sur plusieurs jours, il ne compte qu\'une seule fois.' },
+      { type: 'info',  text: 'Filtres disponibles : Jour, Type d\'atelier, Statut (Aucune / FR manquante / EN manquante / Non validée Fac).' },
+      { type: 'info',  text: 'Chaque carte affiche : type, nom, horaire, lieu, animateur(s), pills de statut FR/EN et badge "Validée Fac" si applicable.' },
+      { type: 'info',  text: 'Couleur de la bordure de la carte : rouge = aucune description, orange = EN manquante, bleu = FR manquante.' },
+      { type: 'check', text: 'Bouton ✏️ Compléter : ouvre Rapport_Descriptions_Ateliers.html dans un nouvel onglet pour saisir la description.' },
+      { type: 'info',  text: 'Barre de statistiques : total ateliers publics, FR+EN complets, partiels, aucune, validés Fac.' },
+      { type: 'info',  text: 'Bilingue FR / EN — bouton 🌐 EN dans le header, re-render instantané via tm_lang_changed.' },
+    ]
+  },
+  {
+    id: 'problemes',
+    icon: '🚨',
+    title: 'Problèmes de planning',
+    file: 'Rapport_Problemes.html',
+    type: 'algo',
+    description: 'Détection des ateliers avec ressources insuffisantes ou traducteur manquant.',
+    rules: [
+      { type: 'block', text: 'Cas 1 — Atelier anglophone sans traducteur : fac1 ou fac2 a le rôle "anglophone" ET le champ traduction est vide.' },
+      { type: 'block', text: 'Exception Cas 1 : les types DJ Set et POOL PARTY sont exclus du contrôle traducteur, même si le animateur est anglophone.' },
+      { type: 'block', text: 'Cas 2 — Ressources insuffisantes : nombre de helpers + traducteur < minimum requis.' },
+      { type: 'algo',  text: 'Règle générale : chaque atelier doit avoir au moins 2 ressources (helpers + traducteur cumulés).' },
+      { type: 'info',  text: 'Exception MEDITATION / YOGA : 1 seule ressource suffit (helper ou traducteur).' },
+      { type: 'block', text: 'Types exclus de la vérification : REPAS & PAUSE, PREPA & LOGISTICS, REUNION D\'EQUIPE, TEST, LOVE TEMPLE, DJ Set, POOL PARTY.' },
+      { type: 'block', text: 'Ateliers sans animateur (fac1 et fac2 vides) sont également exclus.' },
+      { type: 'check', text: 'Édition inline : Traducteur, Helper 1/2/3 modifiables directement depuis la carte problème.' },
+      { type: 'warn',  text: 'La sauvegarde écrit data.js via serveur local (localhost) ou GitHub API selon l\'environnement.' },
+    ]
+  },
+];
+
+// ════════════════════════════════════════════════════════════════
+// ÉTAT
+// ════════════════════════════════════════════════════════════════
+var openCards = new Set();       // IDs des cartes ouvertes
+var editingRule = null;          // { reportId, ruleIdx }
+
+// ════════════════════════════════════════════════════════════════
+// RENDU PRINCIPAL
+// ════════════════════════════════════════════════════════════════
+function renderAll() {
+  var typeFilter   = document.getElementById('filterType').value;
+  var searchFilter = document.getElementById('filterSearch').value.trim().toLowerCase();
+
+  var filtered = REPORTS.filter(function(r) {
+    if (typeFilter && r.type !== typeFilter) return false;
+    if (searchFilter) {
+      var inTitle = r.title.toLowerCase().includes(searchFilter);
+      var inDesc  = r.description.toLowerCase().includes(searchFilter);
+      var inRules = r.rules.some(function(ru) { return ru.text.toLowerCase().includes(searchFilter); });
+      if (!inTitle && !inDesc && !inRules) return false;
+    }
+    return true;
+  });
+
+  // Stats
+  var totalRules = filtered.reduce(function(a, r) { return a + r.rules.length; }, 0);
+  var byType = { lecture:0, edition:0, admin:0, algo:0 };
+  REPORTS.forEach(function(r) { if (byType[r.type] !== undefined) byType[r.type]++; });
+  document.getElementById('statsBar').innerHTML =
+    stat(REPORTS.length, 'Rapports') +
+    stat(REPORTS.reduce(function(a,r){ return a+r.rules.length; },0), 'Règles totales') +
+    stat(byType.lecture, '📖 Lecture') +
+    stat(byType.edition + byType.admin, '✏️ Édition / Admin') +
+    stat(byType.algo, '🤖 Algorithme');
+
+  if (!filtered.length) {
+    document.getElementById('reportList').innerHTML = '<div class="empty">Aucun rapport correspondant à votre recherche.</div>';
+    return;
+  }
+
+  document.getElementById('reportList').innerHTML = filtered.map(function(r) {
+    return renderCard(r, searchFilter);
+  }).join('');
+}
+
+function stat(n, lbl) {
+  return '<div class="stat-pill"><div class="num">' + n + '</div><div class="lbl">' + lbl + '</div></div>';
+}
+
+// ════════════════════════════════════════════════════════════════
+// RENDU CARTE
+// ════════════════════════════════════════════════════════════════
+const TYPE_LABEL = { lecture:'📖 Lecture', edition:'✏️ Édition', admin:'🔒 Admin', algo:'🤖 Algorithme' };
+const TYPE_CLS   = { lecture:'badge-read', edition:'badge-edit', admin:'badge-admin', algo:'badge-algo' };
+
+function renderCard(r, searchFilter) {
+  var isOpen = openCards.has(r.id);
+
+  var rulesHtml = r.rules.map(function(rule, idx) {
+    var highlighted = searchFilter && rule.text.toLowerCase().includes(searchFilter)
+      ? rule.text.replace(new RegExp('(' + esc(searchFilter) + ')', 'gi'), '<mark style="background:#fef08a;border-radius:2px">$1</mark>')
+      : esc(rule.text);
+
+    return '<div class="rule-row" id="rulerow_' + r.id + '_' + idx + '">' +
+      '<div class="rule-icon-wrap ' + CLS_MAP[rule.type] + '">' + ICON_MAP[rule.type] + '</div>' +
+      '<div class="rule-content">' +
+        '<div class="rule-text" id="ruletext_' + r.id + '_' + idx + '">' + highlighted + '</div>' +
+        '<div class="rule-actions">' +
+          '<select class="btn-sm" id="ruletype_' + r.id + '_' + idx + '" title="Changer le type">' +
+            Object.keys(ICON_MAP).map(function(t) {
+              return '<option value="' + t + '"' + (rule.type === t ? ' selected' : '') + '>' + ICON_MAP[t] + ' ' + t + '</option>';
+            }).join('') +
+          '</select>' +
+          '<button class="btn-sm" onclick="editRule(\'' + r.id + '\',' + idx + ')">✏️ Modifier</button>' +
+          '<button class="btn-sm del" onclick="deleteRule(\'' + r.id + '\',' + idx + ')">🗑 Supprimer</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  return '<div class="report-card' + (isOpen ? ' open' : '') + '" id="card_' + r.id + '">' +
+    '<div class="report-header" onclick="toggleCard(\'' + r.id + '\')">' +
+      '<div class="report-icon">' + r.icon + '</div>' +
+      '<div class="report-title">' + esc(r.title) + '</div>' +
+      '<div class="report-meta">' +
+        '<span class="type-badge ' + TYPE_CLS[r.type] + '">' + TYPE_LABEL[r.type] + '</span>' +
+        '<span class="rule-count">' + r.rules.length + ' règle' + (r.rules.length > 1 ? 's' : '') + '</span>' +
+        '<span style="font-size:12px;color:var(--muted)">' + esc(r.description) + '</span>' +
+      '</div>' +
+      '<span class="chevron">›</span>' +
+    '</div>' +
+    '<div class="report-body">' +
+      '<div class="rules-section">' +
+        '<div class="rules-section-label">Règles <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;color:var(--muted)">Cliquez ✏️ pour modifier · 🗑 pour supprimer</span></div>' +
+        (rulesHtml || '<div style="padding:10px 0;font-size:13px;color:var(--muted);font-style:italic">Aucune règle définie.</div>') +
+        '<div class="add-rule-row">' +
+          '<select id="newtype_' + r.id + '">' +
+            Object.keys(ICON_MAP).map(function(t) {
+              return '<option value="' + t + '">' + ICON_MAP[t] + ' ' + t + '</option>';
+            }).join('') +
+          '</select>' +
+          '<input type="text" id="newtext_' + r.id + '" placeholder="Texte de la nouvelle règle…" onkeydown="if(event.key===\'Enter\')addRule(\'' + r.id + '\')">' +
+          '<button class="btn-add-rule" onclick="addRule(\'' + r.id + '\')">＋ Ajouter</button>' +
+        '</div>' +
+      '</div>' +
+      '<a class="report-link" href="' + esc(r.file) + '" target="_blank" rel="noopener">🔗 Ouvrir ' + esc(r.title) + ' →</a>' +
+    '</div>' +
+  '</div>';
+}
+
+// ════════════════════════════════════════════════════════════════
+// ACTIONS
+// ════════════════════════════════════════════════════════════════
+function toggleCard(id) {
+  if (openCards.has(id)) openCards.delete(id);
+  else openCards.add(id);
+  renderAll();
+  // Re-scroll vers la carte ouverte
+  setTimeout(function() {
+    var el = document.getElementById('card_' + id);
+    if (el && openCards.has(id)) el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+  }, 50);
+}
+window.toggleCard = toggleCard;
+
+function editRule(reportId, idx) {
+  var report = REPORTS.find(function(r) { return r.id === reportId; });
+  if (!report) return;
+  var rule = report.rules[idx];
+  var textEl = document.getElementById('ruletext_' + reportId + '_' + idx);
+  if (!textEl) return;
+
+  // Activer l'édition inline
+  textEl.contentEditable = 'true';
+  textEl.textContent = rule.text; // texte brut (sans highlights)
+  textEl.focus();
+
+  // Sélectionner tout le texte
+  var range = document.createRange();
+  range.selectNodeContents(textEl);
+  window.getSelection().removeAllRanges();
+  window.getSelection().addRange(range);
+
+  // Remplacer les boutons par Enregistrer / Annuler
+  var actionsEl = textEl.nextElementSibling;
+  if (actionsEl) {
+    actionsEl.innerHTML =
+      '<button class="btn-sm save" onclick="saveRule(\'' + reportId + '\',' + idx + ')">💾 Enregistrer</button>' +
+      '<button class="btn-sm" onclick="cancelEdit(\'' + reportId + '\',' + idx + '\')">Annuler</button>';
+  }
+  textEl.onkeydown = function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); saveRule(reportId, idx); }
+    if (e.key === 'Escape') cancelEdit(reportId, idx);
+  };
+}
+window.editRule = editRule;
+
+function saveRule(reportId, idx) {
+  var report = REPORTS.find(function(r) { return r.id === reportId; });
+  if (!report) return;
+  var textEl = document.getElementById('ruletext_' + reportId + '_' + idx);
+  var typeEl = document.getElementById('ruletype_' + reportId + '_' + idx);
+  if (!textEl) return;
+
+  var newText = textEl.textContent.trim();
+  var newType = typeEl ? typeEl.value : report.rules[idx].type;
+  if (!newText) { showToast('Le texte ne peut pas être vide.'); return; }
+
+  report.rules[idx].text = newText;
+  report.rules[idx].type = newType;
+  showToast('✅ Règle mise à jour.', 'ok');
+  renderAll();
+}
+window.saveRule = saveRule;
+
+function cancelEdit(reportId, idx) {
+  renderAll();
+}
+window.cancelEdit = cancelEdit;
+
+function deleteRule(reportId, idx) {
+  var report = REPORTS.find(function(r) { return r.id === reportId; });
+  if (!report) return;
+  if (!confirm('Supprimer cette règle ?')) return;
+  report.rules.splice(idx, 1);
+  showToast('🗑 Règle supprimée.', 'ok');
+  renderAll();
+}
+window.deleteRule = deleteRule;
+
+function addRule(reportId) {
+  var report = REPORTS.find(function(r) { return r.id === reportId; });
+  if (!report) return;
+  var textEl = document.getElementById('newtext_' + reportId);
+  var typeEl = document.getElementById('newtype_' + reportId);
+  var text = textEl ? textEl.value.trim() : '';
+  var type = typeEl ? typeEl.value : 'info';
+  if (!text) { textEl && textEl.focus(); return; }
+  report.rules.push({ type: type, text: text });
+  if (textEl) textEl.value = '';
+  showToast('✅ Règle ajoutée.', 'ok');
+  renderAll();
+}
+window.addRule = addRule;
+
+// ════════════════════════════════════════════════════════════════
+// UTILITAIRES
+// ════════════════════════════════════════════════════════════════
+function esc(v) {
+  return String(v || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg, type) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(t._t);
+  t._t = setTimeout(function() { t.className = ''; }, 3000);
+}
+
+function toggleMode() {
+  var dark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = dark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+window.toggleMode = toggleMode;
+
+// ── Démarrage ──
+renderAll();
+</script>
+</body>
+</html>
+
+
+
