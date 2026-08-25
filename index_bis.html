@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Rapports</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 15px; line-height: 1.6;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 60px; }
+
+  /* ── BARRE LANGUE (fixée en haut à droite) ── */
+  .lang-bar {
+    position: fixed; top: 14px; right: 18px; z-index: 999;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 20px;
+    font-size: 12px; font-weight: 700; color: var(--text);
+    text-decoration: none; font-family: inherit;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    transition: background .15s, border-color .15s;
+    white-space: nowrap;
+  }
+  .back-btn:hover { background: var(--surface); border-color: var(--accent); color: var(--accent); }
+  .lang-bar .tm-lang-btn {
+    cursor: pointer;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    font-family: inherit;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    transition: background .15s, border-color .15s;
+  }
+  .lang-bar .tm-lang-btn:hover {
+    background: var(--surface);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── EN-TÊTE ── */
+  .logo { margin-bottom: 40px; }
+  .logo h1 { font-size: 26px; font-weight: 700; letter-spacing: .2px; }
+  .logo p  { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  /* ── GROUPE ── */
+  .group { margin-bottom: 32px; }
+  .group-label {
+    font-size: 15px; font-weight: 700;
+    color: var(--text);
+    padding-bottom: 10px; margin-bottom: 2px;
+    border-bottom: 2px solid var(--border);
+  }
+  .group-label span {
+    display: inline-block; margin-right: 8px; font-size: 17px; vertical-align: middle;
+  }
+
+  /* ── GRILLE 2 colonnes ── */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  @media (max-width: 540px) { .grid { grid-template-columns: 1fr; } }
+
+  /* ── CARTE ── */
+  .card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--surface);
+    text-decoration: none; color: inherit;
+    transition: border-color .15s, background .15s;
+    cursor: pointer;
+  }
+  .card:hover { border-color: var(--accent); background: #fff; }
+  .card-icon {
+    font-size: 22px; flex-shrink: 0;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    background: #fff; border: 1px solid var(--border); border-radius: 8px;
+  }
+  .card-body { flex: 1; min-width: 0; text-align: left; }
+  .card-title { font-size: 14px; font-weight: 700; margin-bottom: 1px; }
+  .card-desc  { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .card-arrow { font-size: 16px; color: var(--muted); flex-shrink: 0; }
+
+  /* ── WIDGET MESSAGE IMPORTANT ── */
+  .msg-important {
+    background: #fffbeb;
+    border: 2px solid #fcd34d;
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 28px;
+  }
+  .msg-important-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .msg-important-header-left { display: flex; align-items: center; gap: 7px; }
+  .msg-important-title {
+    font-size: 12px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: .7px;
+    color: #b45309;
+  }
+  .msg-counter {
+    font-size: 11px; color: #92400e; font-weight: 600;
+    background: #fde68a; border-radius: 10px; padding: 1px 7px;
+  }
+  .msg-nav-btn {
+    cursor: pointer; background: none; border: 1.5px solid #fcd34d;
+    border-radius: 50%; width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: #b45309; flex-shrink: 0;
+    transition: background .15s, border-color .15s;
+    padding: 0;
+  }
+  .msg-nav-btn:hover { background: #fde68a; border-color: #f59e0b; }
+  .msg-date { font-size: 11px; color: #92400e; margin-bottom: 4px; }
+  .msg-text { font-size: 14px; color: #1f2328; line-height: 1.6; }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 48px; padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+    font-size: 12px; color: var(--muted);
+  }
+  .footer-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    font-size: 12px; font-weight: 600; color: var(--text);
+    text-decoration: none; cursor: pointer; font-family: inherit;
+  }
+  .footer-btn:hover { background: var(--border); }
+</style>
+<script src="loader.js"></script>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+</head>
+<body>
+
+<!-- ── MODALE MOT DE PASSE ── -->
+<div id="pwOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;padding:36px 32px;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);font-family:-apple-system,'Segoe UI',system-ui,sans-serif;">
+    <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#57606a;margin-bottom:6px;" id="pwTarget"></p>
+    <p style="font-size:17px;font-weight:700;color:#1f2328;margin-bottom:20px;" data-i18n="pw_acces_restreint">🔒 Accès restreint</p>
+    <input id="pwInput" type="password" data-i18n-placeholder="pw_placeholder" placeholder="Mot de passe" autocomplete="off"
+      style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:15px;outline:none;margin-bottom:8px;"
+      onkeydown="if(event.key==='Enter')checkPw()" />
+    <p id="pwError" style="font-size:12px;color:#dc2626;min-height:18px;margin-bottom:12px;"></p>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closePw()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#f7f8fa;font-size:14px;cursor:pointer;" data-i18n="pw_annuler">Annuler</button>
+      <button onclick="checkPw()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#3b82d4;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" data-i18n="pw_ouvrir">Ouvrir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── BOUTON LANGUE + ACCUEIL (haut droite) ── -->
+<div class="lang-bar">
+  <a href="index.html" class="back-btn">🏠 Accueil</a>
+  <button class="tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
+</div>
+
+<div class="wrap">
+
+  <div class="logo">
+    <h1>Tantramour 2026</h1>
+    <p data-i18n="home_subtitle">Page destinée à la DreamTeam</p>
+  </div>
+
+  <!-- ── WIDGET MESSAGE IMPORTANT (DreamTeam) — juste sous le titre ── -->
+  <div id="msgWidget" style="display:none;">
+    <div class="msg-important">
+      <div class="msg-important-header">
+        <div class="msg-important-header-left">
+          <span style="font-size:18px;">⚠️</span>
+          <span class="msg-important-title" id="msgTitle">Message Important</span>
+          <span class="msg-counter" id="msgCounter" style="display:none;"></span>
+        </div>
+        <button class="msg-nav-btn" id="msgNavBtn" onclick="msgDtNext()" style="display:none;" title="Message suivant">›</button>
+      </div>
+      <div id="msgBody"></div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       GROUPE 1 — DREAMTEAM (DYNAMIQUE)
+  ══════════════════════════════════ -->
+  <div class="group">
+    <div class="group-label" style="display:flex;align-items:center;justify-content:space-between;">
+      <div><span>📆</span><span data-i18n="home_group_general">DREAMTEAM</span></div>
+      <a href="user-manual.html" style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:none;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;text-decoration:none;line-height:1;transition:color .15s,border-color .15s;">📖 <span data-i18n="nav_manuel">Manuel</span></a>
+    </div>
+    <div class="grid" id="dtReportsGrid"></div>
+  </div>
+
+  <footer>
+    <div></div>
+    <button onclick="openPw('gestion_planning.html','Gestion Planning — Accès référents')"
+      style="display:inline-flex;align-items:center;gap:8px;padding:7px 16px;background:#1f2328;border:none;border-radius:8px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.4px;">
+      🔐 ADMIN
+    </button>
+  </footer>
+
+</div>
+
+<script>
+// ── MESSAGE IMPORTANT (DreamTeam) ────────────────────────────────────────────
+var _dtNews  = [];  // liste filtrée (dreamteam), ordre chronologique
+var _dtIndex = 0;  // index du message affiché (length-1 = plus récent)
+
+function formatMsgDate(str) {
+  if (!str) return '';
+  var parts = str.split(' ');
+  if (parts.length < 2) return str;
+  var d = parts[0].split('-');
+  if (d.length < 3) return str;
+  return d[2] + '/' + d[1] + '/' + d[0] + ' ' + parts[1];
+}
+
+function renderMsgWidget() {
+  if (typeof REF_NEWS === 'undefined' || !Array.isArray(REF_NEWS)) return;
+  var all = REF_NEWS.filter(function(n) { return (!n.type || n.type === 'dreamteam') && !n.hidden; });
+  if (all.length === 0) return;
+
+  // News prioritaire en tête si elle existe, puis les autres du plus récent au plus ancien
+  var prio = all.filter(function(n) { return n.priority === true; });
+  var rest = all.filter(function(n) { return !n.priority; }).reverse();
+  _dtNews = prio.concat(rest);
+
+  // Afficher la prioritaire (index 0) ou la plus récente si pas de prioritaire
+  _dtIndex = 0;
+
+  var titleEl = document.getElementById('msgTitle');
+  var navBtn  = document.getElementById('msgNavBtn');
+  var counter = document.getElementById('msgCounter');
+  var lang    = (typeof I18n !== 'undefined') ? I18n.getLang() : 'fr';
+
+  if (titleEl) titleEl.textContent = lang === 'en' ? 'Important Info' : 'Message Important';
+
+  if (_dtNews.length > 1) {
+    navBtn.style.display  = '';
+    counter.style.display = '';
+  }
+
+  document.getElementById('msgWidget').style.display = 'block';
+  _renderDtMsg();
+}
+
+function _renderDtMsg() {
+  var lang    = (typeof I18n !== 'undefined') ? I18n.getLang() : 'fr';
+  var n       = _dtNews[_dtIndex];
+  var text    = lang === 'en' ? (n.en || n.fr || '') : (n.fr || n.en || '');
+  var body    = document.getElementById('msgBody');
+  var counter = document.getElementById('msgCounter');
+
+  body.innerHTML =
+    '<div class="msg-date">' + formatMsgDate(n.publishedAt) + '</div>' +
+    '<div class="msg-text">' + text + '</div>';
+
+  if (_dtNews.length > 1) {
+    counter.textContent = (_dtIndex + 1) + ' / ' + _dtNews.length;
+  }
+}
+
+function msgDtNext() {
+  if (_dtNews.length < 2) return;
+  _dtIndex = (_dtIndex + 1) % _dtNews.length;
+  _renderDtMsg();
+}
+
+loadData(['ref_news.js'], function() {
+  renderMsgWidget();
+  document.addEventListener('tm_lang_changed', renderMsgWidget);
+});
+
+// ── FIN MESSAGE IMPORTANT ────────────────────────────────────────────────────
+
+// ── RENDU DYNAMIQUE DREAMTEAM ────────────────────────────────────────────────
+function renderDreamTeamReports() {
+  var grid = document.getElementById('dtReportsGrid');
+  if (!grid) return;
+
+  var reports = (typeof REF_DISPLAY_REPORTS !== 'undefined' && Array.isArray(REF_DISPLAY_REPORTS))
+    ? REF_DISPLAY_REPORTS
+    : [];
+
+  var _t = (typeof I18n !== 'undefined') ? function(k){ return I18n.t(k); } : function(k){ return k; };
+
+  var dtReports = reports.filter(function(r) {
+    return r.showInDreamTeam === true && r.active !== false;
+  });
+
+  dtReports.sort(function(a, b) {
+    return (a.order || 999) - (b.order || 999);
+  });
+
+  var html = '';
+  dtReports.forEach(function(r) {
+    var title = (r.titleKey && _t(r.titleKey) !== r.titleKey) ? _t(r.titleKey) : (r.title || r.titleKey || '');
+    var desc  = (r.descKey && _t(r.descKey) !== r.descKey) ? _t(r.descKey) : (r.desc || r.descKey || '');
+    var icon  = r.icon || '📄';
+    var cardStyle  = r.cardStyle || '';
+    var iconStyle  = r.iconStyle || '';
+    var titleStyle = r.titleStyle || '';
+    var descStyle  = r.descStyle || '';
+    var arrowStyle = r.arrowStyle || '';
+    var isProtected = !!r.isProtected;
+
+    var dataI18nTitle = r.titleKey ? ' data-i18n="' + esc(r.titleKey) + '"' : '';
+    var dataI18nDesc  = r.descKey  ? ' data-i18n="' + esc(r.descKey)  + '"' : '';
+
+    if (isProtected) {
+      html += '<button class="card" onclick="openPw(\'' + esc(r.url) + '\',\'' + esc(icon + ' ' + title) + '\')" style="' + esc(cardStyle) + '">';
+      html += '  <div class="card-icon" style="' + esc(iconStyle) + '">' + icon + '</div>';
+      html += '  <div class="card-body">';
+      html += '    <div class="card-title" style="' + esc(titleStyle) + '"' + dataI18nTitle + '>' + esc(title) + '</div>';
+      html += '    <div class="card-desc" style="' + esc(descStyle) + '"' + dataI18nDesc + '>' + esc(desc) + '</div>';
+      html += '  </div>';
+      html += '  <div class="card-arrow" style="' + esc(arrowStyle) + '">🔒</div>';
+      html += '</button>';
+    } else {
+      html += '<a class="card" href="' + esc(r.url) + '" style="' + esc(cardStyle) + '">';
+      html += '  <div class="card-icon" style="' + esc(iconStyle) + '">' + icon + '</div>';
+      html += '  <div class="card-body">';
+      html += '    <div class="card-title" style="' + esc(titleStyle) + '"' + dataI18nTitle + '>' + esc(title) + '</div>';
+      html += '    <div class="card-desc" style="' + esc(descStyle) + '"' + dataI18nDesc + '>' + esc(desc) + '</div>';
+      html += '  </div>';
+      html += '  <div class="card-arrow" style="' + esc(arrowStyle) + '">›</div>';
+      html += '</a>';
+    }
+  });
+
+  grid.innerHTML = html;
+
+  grid.querySelectorAll('a.card[href]').forEach(function(a) {
+    var base = a.getAttribute('href');
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      location.href = withTs(base);
+    });
+  });
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+loadData(['ref_display_reports.js'], function() {
+  renderDreamTeamReports();
+});
+
+const PW = '007';
+let _dest = '';
+
+// Ajoute un timestamp à l'URL pour forcer un rechargement sans cache
+function withTs(url) {
+  return url + (url.indexOf('?') === -1 ? '?' : '&') + 'v=' + Date.now();
+}
+
+function openPw(url, label) {
+  _dest = url;
+  document.getElementById('pwTarget').textContent = label;
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').textContent = '';
+  const ov = document.getElementById('pwOverlay');
+  ov.style.display = 'flex';
+  setTimeout(() => document.getElementById('pwInput').focus(), 50);
+}
+
+function closePw() {
+  document.getElementById('pwOverlay').style.display = 'none';
+}
+
+var _pwLocked = false;
+function checkPw() {
+  if (_pwLocked) return;
+  var inp = document.getElementById('pwInput');
+  if (inp.value === PW) {
+    closePw();
+    location.href = withTs(_dest);
+  } else {
+    var err = document.getElementById('pwError');
+    var btns = document.querySelectorAll('#pwOverlay button');
+    inp.value = '';
+    inp.style.borderColor = '#dc2626';
+    _pwLocked = true;
+    inp.disabled = true;
+    btns.forEach(function(b) { b.disabled = true; });
+    var remaining = 3;
+    err.textContent = '❌ Incorrect — réessayez dans ' + remaining + 's';
+    var countdown = setInterval(function() {
+      remaining--;
+      if (remaining > 0) {
+        err.textContent = '❌ Incorrect — réessayez dans ' + remaining + 's';
+      } else {
+        clearInterval(countdown);
+        _pwLocked = false;
+        inp.disabled = false;
+        btns.forEach(function(b) { b.disabled = false; });
+        inp.style.borderColor = '';
+        err.textContent = '';
+        inp.focus();
+      }
+    }, 1000);
+  }
+}
+
+document.getElementById('pwOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closePw();
+});
+</script>
+</body>
+</html>
