@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tantramour 2026 — Saisie Ateliers (Descriptions & Logistique)</title>
+  <script src="ref_translations.js"></script>
+  <script src="i18n.js"></script>
+  <style>
+    :root {
+      --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+      --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+      --green:#16a34a; --green-bg:#dcfce7; --green-border:#86efac;
+      --orange:#ca8a04; --orange-bg:#fef9c3; --orange-border:#fde68a;
+      --red:#dc2626; --red-bg:#fee2e2; --red-border:#fca5a5;
+      --fr-bg:#eff6ff; --fr-border:#bfdbfe;
+      --en-bg:#f0fdf4; --en-border:#bbf7d0;
+      --tag-bg:#f0f4ff; --tag-text:#3b5bdb;
+      /* Jaune pour en-tête atelier */
+      --ws-hdr-bg:#fefce8; --ws-hdr-border:#fde68a; --ws-hdr-text:#854d0e;
+    }
+    .dark {
+      --bg:#0d1117; --surface:#161b22; --border:#30363d;
+      --text:#e6edf3; --muted:#8b949e; --accent:#3b82d4;
+      --green:#4ade80; --green-bg:#052e16; --green-border:#166534;
+      --fr-bg:#0c2d48; --fr-border:#1e4976;
+      --en-bg:#052e16; --en-border:#166534;
+      --tag-bg:#1c2444; --tag-text:#93b4fb;
+      --ws-hdr-bg:#2d2500; --ws-hdr-border:#92400e; --ws-hdr-text:#fcd34d;
+    }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
+    .wrap { max-width:960px; margin:0 auto; padding:24px 20px 80px; }
+
+    /* ── HEADER ── */
+    header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+    .logo h1 { font-size:19px; font-weight:700; }
+    .logo p  { font-size:20px; font-weight:800; color:var(--accent); line-height:1.2; margin-top:2px; }
+    .header-actions { display:flex; gap:8px; align-items:center; }
+    .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 14px; font-size:13px; color:var(--text); font-family:inherit; display:inline-flex; align-items:center; gap:6px; text-decoration:none; transition:background .15s; }
+    .btn:hover { background:var(--border); }
+    .btn-primary { background:var(--accent); color:#fff; border-color:var(--accent); font-weight:600; }
+    .btn-primary:hover { background:#2563eb; border-color:#2563eb; }
+    .btn-sm { padding:5px 10px; font-size:12px; }
+
+    /* ── FILTRES ── */
+    .filters-panel { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px 20px; margin-bottom:20px; }
+    .filters-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:14px; }
+    .filters-row { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+    .filter-group { flex:1; min-width:150px; }
+    .filter-label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; }
+    .filter-select { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:8px 10px; font-size:13px; color:var(--text); font-family:inherit; cursor:pointer; }
+    .filter-select:focus { border-color:var(--accent); }
+    .filter-reset { white-space:nowrap; }
+
+    /* ── RÉSULTATS ── */
+    .results-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .results-count { font-size:13px; color:var(--muted); }
+    .results-count strong { color:var(--text); }
+
+    /* ── CARTES LISTE ── */
+    .ws-list { display:flex; flex-direction:column; gap:8px; }
+    .ws-card { display:flex; align-items:center; gap:12px; padding:14px 18px; border:1px solid var(--border); border-radius:10px; background:var(--surface); cursor:pointer; transition:border-color .15s, background .15s; }
+    .ws-card:hover { border-color:var(--accent); background:var(--fr-bg); }
+    .dark .ws-card:hover { background:#0c2d48; }
+    .ws-card-left { flex:1; min-width:0; }
+    .ws-card-jour { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:2px; }
+    .ws-card-name { font-size:14px; font-weight:700; margin-bottom:4px; }
+    .ws-card-meta { font-size:12px; color:var(--muted); display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .ws-card-right { flex-shrink:0; display:flex; align-items:center; gap:8px; }
+    .ws-pill { font-size:11px; font-weight:700; padding:3px 10px; border-radius:99px; white-space:nowrap; }
+    .ws-pill.ok       { background:var(--green-bg);  color:var(--green);  border:1px solid var(--green-border); }
+    .ws-pill.partial  { background:var(--orange-bg); color:var(--orange); border:1px solid var(--orange-border); }
+    .ws-pill.empty    { background:var(--surface);   color:var(--muted);  border:1px solid var(--border); }
+    .ws-pill.validated{ background:var(--green-bg);  color:var(--green);  border:1px solid var(--green-border); }
+    .tag { display:inline-block; border-radius:4px; padding:2px 7px; font-size:11px; font-weight:600; white-space:nowrap; }
+    .tag-type { background:var(--tag-bg); color:var(--tag-text); }
+    .empty { text-align:center; padding:40px; color:var(--muted); font-style:italic; border:2px dashed var(--border); border-radius:10px; }
+
+    /* ── ÉCRAN ÉDITION ── */
+    #screenEdit { display:none; }
+    .back-bar { display:flex; align-items:center; gap:10px; margin-bottom:22px; flex-wrap:wrap; }
+    .breadcrumb { font-size:13px; color:var(--muted); flex:1; }
+    .bc-link { color:var(--accent); cursor:pointer; }
+    .bc-link:hover { text-decoration:underline; }
+
+    /* ── EN-TÊTE ATELIER (fond jaune) ── */
+    .ws-header-box {
+      background:var(--ws-hdr-bg);
+      border:1px solid var(--ws-hdr-border);
+      border-radius:10px;
+      padding:18px 22px;
+      margin-bottom:18px;
+    }
+    .ws-header-jour  { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--ws-hdr-text); margin-bottom:4px; }
+    .ws-header-title { font-size:20px; font-weight:800; color:var(--ws-hdr-text); margin-bottom:10px; }
+    /* 2 colonnes sur ordi, 2 sur tablette, 1 sur mobile */
+    .ws-header-grid  { display:grid; grid-template-columns:1fr 1fr; gap:6px 32px; }
+    @media(max-width:640px) { .ws-header-grid { grid-template-columns:1fr; } }
+    .ws-hdr-field    { display:flex; flex-direction:row; align-items:baseline; gap:8px; min-width:0; }
+    .ws-hdr-label    { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--ws-hdr-text); opacity:.7; white-space:nowrap; flex-shrink:0; min-width:110px; }
+    .ws-hdr-value    { font-size:13px; color:var(--ws-hdr-text); font-weight:500; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+    /* ── NOTICE ADMIN (fond jaune mm couleur) ── */
+    .admin-notice {
+      display:flex; gap:12px; align-items:flex-start;
+      background:var(--ws-hdr-bg);
+      border:1px solid var(--ws-hdr-border);
+      border-radius:8px;
+      padding:12px 16px;
+      margin-bottom:24px;
+      font-size:13px;
+      color:var(--ws-hdr-text);
+    }
+    .admin-notice-icon { font-size:16px; flex-shrink:0; margin-top:1px; }
+
+    /* ── SECTIONS ── */
+    /* ── BLOCS COLORÉS ── */
+    .section-block { margin-bottom:20px; border-radius:12px; padding:18px 20px; }
+    .block-orange  { background:#fff7ed; border:2px solid #f97316; }
+    .block-orange  .section-title { border-bottom-color:#f97316; color:#c2410c; }
+    .block-green   { background:#f0fdf4; border:2px solid #4ade80; }
+    .block-green   .section-title { border-bottom-color:#4ade80; color:#166534; }
+    .block-purple  { background:#faf5ff; border:2px solid #c084fc; }
+    .block-purple  .section-title { border-bottom-color:#c084fc; color:#7e22ce; }
+    .block-blue    { background:#eff6ff; border:2px solid #3b82f6; }
+    .block-blue    .section-title { border-bottom-color:#3b82f6; color:#1d4ed8; }
+    .dark .block-orange  { background:#2a1200; border-color:#c2410c; }
+    .dark .block-green   { background:#052e16; border-color:#16a34a; }
+    .dark .block-purple  { background:#1a0533; border-color:#9333ea; }
+    .dark .block-blue    { background:#0c1a40; border-color:#2563eb; }
+    .section-title { font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.8px; color:var(--text); border-bottom:2px solid var(--border); padding-bottom:8px; margin-bottom:18px; }
+    .section-label { font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); font-weight:700; margin-bottom:8px; }
+    .field-wrap { margin-bottom:18px; }
+    .field-wrap label { display:block; font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); font-weight:700; margin-bottom:6px; }
+    .field-wrap input[type="text"] { width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; background:var(--bg); color:var(--text); font-family:inherit; }
+    .field-wrap input[type="text"]:focus { outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+
+    /* ── NOMS CÔTE À CÔTE ── */
+    .names-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px; }
+    @media(max-width:600px) { .names-row { grid-template-columns:1fr; } }
+
+    /* ── PIMENT ── */
+    .piment-select { width:100%; max-width:280px; padding:9px 12px; border:1px solid var(--border); border-radius:8px; font-size:14px; background:var(--bg); color:var(--text); font-family:inherit; cursor:pointer; margin-bottom:18px; }
+    .piment-select:focus { border-color:var(--accent); outline:2px solid rgba(59,130,246,.15); }
+
+    /* ── DESCRIPTIONS CÔTE À CÔTE ── */
+    .desc-cols { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px; }
+    @media(max-width:680px) { .desc-cols { grid-template-columns:1fr; } }
+    .desc-block { display:flex; flex-direction:column; }
+    .desc-label { display:flex; align-items:center; gap:8px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:6px; }
+    .lang-badge { font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px; }
+    .lang-fr { background:var(--fr-bg); color:#1d4ed8; border:1px solid var(--fr-border); }
+    .lang-en { background:var(--en-bg); color:#166534; border:1px solid var(--en-border); }
+    .desc-area { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:13px; background:var(--bg); color:var(--text); font-family:inherit; resize:vertical; min-height:140px; line-height:1.6; }
+    .desc-area.fr:focus { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.1); background:var(--fr-bg); }
+    .desc-area.en:focus { border-color:#16a34a; box-shadow:0 0 0 3px rgba(22,163,74,.1); background:var(--en-bg); }
+    .desc-area.consigne { min-height:80px; border-color:#f59e0b; }
+    .desc-area.consigne:focus { border-color:#d97706; box-shadow:0 0 0 3px rgba(245,158,11,.15); background:#fffbeb; }
+    .dark .desc-area.consigne:focus { background:#1c1400; }
+    .consigne-badge { font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px; background:#fef3c7; color:#92400e; border:1px solid #fcd34d; }
+
+    /* ── PRÉPARATION / RANGEMENT DURÉE ── */
+    .prep-select { padding:8px 12px; border:1px solid var(--border); border-radius:6px; font-size:14px; background:var(--bg); color:var(--text); font-family:inherit; cursor:pointer; }
+    .prep-select:focus { outline:2px solid var(--accent); outline-offset:1px; }
+
+    /* ── ÉDITEUR RICH TEXT ── */
+    .toolbar { display:flex; gap:4px; flex-wrap:wrap; padding:6px 8px; background:var(--surface); border:1px solid var(--border); border-bottom:none; border-radius:6px 6px 0 0; }
+    .tb-btn { cursor:pointer; background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:4px 9px; font-size:12px; font-family:inherit; color:var(--text); }
+    .tb-btn:hover { background:var(--border); }
+    .rte { min-height:120px; padding:10px 12px; border:1px solid var(--border); border-radius:0 0 6px 6px; background:var(--bg); color:var(--text); font-size:13px; line-height:1.6; cursor:text; }
+    .rte:focus { border-color:var(--accent); outline:2px solid rgba(59,130,212,.15); }
+    .rte p, .rte ul, .rte ol { margin-bottom:4px; }
+    .rte ul, .rte ol { padding-left:20px; }
+    .editor-hint { font-size:12px; color:var(--muted); margin-top:6px; }
+
+    /* ── HELPERS SECTIONS ── */
+    .helper-sub { margin-bottom:16px; }
+    .helper-sub-label { font-size:11px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.4px; padding:4px 10px; background:var(--surface); border:1px solid var(--border); border-radius:6px 6px 0 0; border-bottom:none; margin:0; }
+    .helper-sub .rte { border-radius:0 0 6px 6px; min-height:90px; }
+
+    /* ── SÉPARATEUR ── */
+    .section-sep { border:none; border-top:2px solid var(--border); margin:28px 0 24px; }
+
+    /* ── BLOC ÉQUIPEMENTS ── */
+    .eq-block { margin-top:4px; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+    .eq-block-title { background:var(--surface); padding:10px 16px; font-size:13px; font-weight:700; border-bottom:1px solid var(--border); }
+    .eq-cols { display:grid; grid-template-columns:repeat(4,1fr); }
+    @media(max-width:760px) { .eq-cols { grid-template-columns:1fr; } }
+    .eq-col { border-right:1px solid var(--border); }
+    .eq-col:last-child { border-right:none; }
+    .eq-col-header { background:#f0f4fb; padding:8px 14px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); border-bottom:1px solid var(--border); }
+    .dark .eq-col-header { background:#1c2333; }
+    .eq-item { display:flex; align-items:center; gap:8px; padding:7px 14px; border-bottom:1px solid var(--border); cursor:pointer; transition:background .12s; user-select:none; background:#ffffff; }
+    .dark .eq-item { background:#0d1117; }
+    .eq-item:last-child { border-bottom:none; }
+    .eq-item:hover { background:#f0f4fb; }
+    .dark .eq-item:hover { background:#161b22; }
+    .eq-item.selected { background:#dcfce7; border-left:3px solid #16a34a; padding-left:11px; }
+    .dark .eq-item.selected { background:#052e16; border-left-color:#4ade80; }
+    .eq-item.selected .eq-item-name { color:#15803d; font-weight:600; }
+    .dark .eq-item.selected .eq-item-name { color:#4ade80; }
+    .eq-item-name { flex:1; font-size:13px; }
+    .eq-qty { width:56px; padding:4px 6px; border:1px solid var(--border); border-radius:5px; font-size:13px; background:var(--bg); color:var(--text); font-family:inherit; text-align:center; }
+    .eq-item.selected .eq-qty { border-color:#86efac; background:#f0fdf4; }
+    .dark .eq-item.selected .eq-qty { border-color:#166534; background:#052e16; }
+    .eq-qty:focus { outline:none; border-color:var(--accent); }
+    .eq-qty-lbl { font-size:10px; color:var(--muted); white-space:nowrap; }
+    .eq-cat-header { padding:5px 14px 3px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--accent); background:#eef2ff; border-top:1px solid var(--border); border-bottom:1px solid var(--border); margin-top:2px; }
+    .dark .eq-cat-header { background:#1c2a4a; }
+    .eq-cat-header:first-child { margin-top:0; border-top:none; }
+    .eq-demande-block { border-top:1px solid var(--border); padding:14px 16px; background:var(--surface); }
+    .eq-demande-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:10px; }
+    .eq-demande-list { display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+    .eq-demande-item { display:flex; align-items:center; gap:8px; padding:7px 12px; background:var(--bg); border:1px solid var(--border); border-radius:6px; }
+    .eq-demande-item-name { flex:1; font-size:13px; font-weight:600; }
+    .eq-demande-item-desc { font-size:12px; color:var(--muted); flex:2; }
+    .eq-demande-form { display:flex; gap:8px; flex-wrap:wrap; align-items:flex-end; padding:10px 12px; background:var(--bg); border:1px solid var(--border); border-radius:6px; }
+    .eq-demande-form input { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:6px 10px; font-size:13px; color:var(--text); font-family:inherit; }
+    .eq-demande-form input:focus { outline:none; border-color:var(--accent); }
+    .eq-demande-form .inp-nom { flex:1; min-width:140px; }
+    .eq-demande-form .inp-desc { flex:2; min-width:180px; }
+    .eq-demande-form select { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:6px 10px; font-size:13px; color:var(--text); font-family:inherit; cursor:pointer; }
+    .eq-demande-form select:focus { outline:none; border-color:var(--accent); }
+    .eq-demande-form .sel-type { min-width:120px; }
+    .eq-demande-form .sel-cat  { min-width:160px; }
+    .btn-eq-add { cursor:pointer; background:#f0fdf4; color:#16a34a; border:1px solid #86efac; border-radius:6px; padding:7px 16px; font-size:13px; font-family:inherit; font-weight:700; white-space:nowrap; }
+    .btn-eq-add:hover { background:#dcfce7; }
+    .btn-eq-edit { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:5px; padding:3px 8px; font-size:12px; color:var(--text); font-family:inherit; }
+    .btn-eq-edit:hover { background:var(--border); }
+    .btn-eq-del { cursor:pointer; background:#fef2f2; border:1px solid #fca5a5; border-radius:5px; padding:3px 8px; font-size:12px; color:#dc2626; font-family:inherit; }
+    .btn-eq-del:hover { background:#fca5a5; }
+    .block-teal { background:#f0fdfa; border:2px solid #2dd4bf; }
+    .block-teal .section-title { border-bottom-color:#2dd4bf; color:#0f766e; }
+    .dark .block-teal { background:#042f2e; border-color:#0d9488; }
+
+    /* ── VALIDATION ── */
+    .validee-row { display:flex; align-items:center; gap:10px; margin-bottom:24px; padding:12px 16px; border-radius:8px; border:1px solid var(--border); background:var(--surface); }
+    .validee-row input[type=checkbox] { width:18px; height:18px; cursor:pointer; accent-color:var(--green,#16a34a); flex-shrink:0; }
+    .validee-label { font-size:13px; font-weight:600; cursor:pointer; user-select:none; }
+    .validee-row.checked { border-color:var(--green-border,#86efac); background:var(--green-bg,#dcfce7); }
+    .dark .validee-row.checked { background:#052e16; border-color:#166534; }
+
+    /* ── ACTIONS ── */
+    .editor-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:24px; }
+    .save-stamp { font-size:12px; color:var(--muted); margin-left:8px; }
+
+    /* ── TOAST ── */
+    #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:#1f2328; color:#fff; border-radius:8px; padding:12px 22px; font-size:13px; font-weight:600; z-index:10000; transition:transform .3s,opacity .3s; opacity:0; white-space:nowrap; }
+    #toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+    #toast.ok  { background:#166534; }
+    #toast.err { background:#dc2626; }
+
+    footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ── HEADER ── -->
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>📋 <span data-i18n="rsa_title">Saisie Ateliers — Descriptions &amp; Logistique</span></p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="btn" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <a class="btn" href="gestion_planning.html" data-i18n="nav_admin">⚙️ Admin</a>
+      <button class="btn" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="btn" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit">Mode Nuit</span></button>
+      <button class="btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
+    </div>
+  </header>
+
+  <!-- ════════════════════════════════════════
+       ÉCRAN 1 — LISTE / FILTRES
+  ════════════════════════════════════════ -->
+  <div id="screenList">
+
+    <div class="filters-panel">
+      <div class="filters-title" data-i18n="r_desc_filters_title">🔍 Filtres</div>
+      <div class="filters-row">
+        <div class="filter-group">
+          <div class="filter-label" data-i18n="r_desc_filter_jour">📅 Jour</div>
+          <select class="filter-select" id="filterJour" onchange="applyFilters()">
+            <option value="" data-i18n="r_desc_all_days">Tous les jours</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label" data-i18n="r_desc_filter_fac">🎓 Animateur</div>
+          <select class="filter-select" id="filterFac" onchange="applyFilters()">
+            <option value="" data-i18n="r_desc_all_fac">Tous les animateurs</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label" data-i18n="r_desc_filter_type">🏷 Type d'atelier</div>
+          <select class="filter-select" id="filterType" onchange="applyFilters()">
+            <option value="" data-i18n="r_desc_all_types">Tous les types</option>
+          </select>
+        </div>
+        <div class="filter-group" style="flex:0">
+          <div class="filter-label">&nbsp;</div>
+          <button class="btn filter-reset" onclick="resetFilters()" data-i18n="r_desc_filter_reset">✕ Réinitialiser</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="results-bar">
+      <div class="results-count" id="resultsCount"></div>
+    </div>
+
+    <div class="ws-list" id="wsList"></div>
+
+  </div><!-- /screenList -->
+
+  <!-- ════════════════════════════════════════
+       ÉCRAN 2 — ÉDITION
+  ════════════════════════════════════════ -->
+  <div id="screenEdit">
+
+    <div class="back-bar">
+      <button class="btn btn-sm" onclick="goList()" data-i18n="rsa_back">← Retour à la liste</button>
+      <div class="breadcrumb">
+        <span class="bc-link" onclick="goList()" data-i18n="rsa_breadcrumb">Ateliers</span>
+        &nbsp;›&nbsp;
+        <span id="bcAtelier">—</span>
+      </div>
+    </div>
+
+    <!-- En-tête jaune atelier -->
+    <div class="ws-header-box">
+      <div class="ws-header-jour" id="eJour"></div>
+      <div class="ws-header-title" id="eTitle"></div>
+      <div class="ws-header-grid" id="eGrid"></div>
+    </div>
+
+    <!-- Notice admin (fond jaune) -->
+    <div class="admin-notice">
+      <span class="admin-notice-icon">ℹ️</span>
+      <div>
+        <strong data-i18n="r14_admin_title">Informations gérées par l'Administrateur</strong><br>
+        <span data-i18n="r14_admin_body">Le jour, les horaires, le lieu, le type, les animateurs, les helpers, le traducteur et l'angel ne peuvent pas être modifiés ici. Pour toute correction, contactez un</span>
+        <strong data-i18n="r14_admin_role">Administrateur</strong>.
+      </div>
+    </div>
+
+    <!-- ══ 1 — DESCRIPTION ══ -->
+    <div class="section-block block-orange">
+      <div class="section-title" data-i18n="rsa_sec1_title">1 — Description de l'Atelier</div>
+
+      <!-- Noms (FR + EN côte à côte) -->
+      <div class="names-row">
+        <div class="field-wrap" style="margin-bottom:0">
+          <label data-i18n="rsa_nom_fr_label">🇫🇷 Nom de l'atelier (FR)</label>
+          <input type="text" id="eNomFr" data-i18n-placeholder="rsa_nom_fr_ph" placeholder="Nom en français…">
+        </div>
+        <div class="field-wrap" style="margin-bottom:0">
+          <label data-i18n="rsa_nom_en_label">🇬🇧 Nom de l'atelier (EN)</label>
+          <input type="text" id="eNomEn" data-i18n-placeholder="rsa_nom_en_ph" placeholder="Workshop name in English…">
+        </div>
+      </div>
+
+      <!-- Niveau piment -->
+      <p class="section-label" style="margin-top:18px;" data-i18n="r_desc_piment_label">Niveau Piment</p>
+      <select class="piment-select" id="ePimentSelect" onchange="setPiment(parseInt(this.value))"></select>
+
+      <!-- Descriptions FR + EN côte à côte -->
+      <div class="desc-cols">
+        <div class="desc-block">
+          <div class="desc-label">
+            <span>Description</span>
+            <span class="lang-badge lang-fr">🇫🇷 Français</span>
+          </div>
+          <textarea class="desc-area fr" id="eDescFr"
+            placeholder="Saisissez ou collez la description en français…"
+            style="flex:1;min-height:180px;"></textarea>
+        </div>
+        <div class="desc-block">
+          <div class="desc-label">
+            <span>Description</span>
+            <span class="lang-badge lang-en">🇬🇧 English</span>
+          </div>
+          <textarea class="desc-area en" id="eDescEn"
+            placeholder="Enter or paste the English description…"
+            style="flex:1;min-height:180px;"></textarea>
+        </div>
+      </div>
+
+      <!-- Consignes pour festivalier FR + EN côte à côte -->
+      <div id="cons-type-participant"></div>
+      <div class="desc-cols">
+        <div class="desc-block">
+          <div class="desc-label">
+            <span data-i18n="rsa_consigne_fr_label">Consigne pour festivalier</span>
+            <span class="consigne-badge">⚠️ FR</span>
+          </div>
+          <textarea class="desc-area consigne" id="eConsigneFr"
+            data-i18n-placeholder="rsa_consigne_fr_ph" placeholder="Consignes spéciales pour les festivaliers (FR)…"
+            style="min-height:90px;"></textarea>
+        </div>
+        <div class="desc-block">
+          <div class="desc-label">
+            <span data-i18n="rsa_consigne_en_label">Festival-goer instructions</span>
+            <span class="consigne-badge">⚠️ EN</span>
+          </div>
+          <textarea class="desc-area consigne en" id="eConsigneEn"
+            data-i18n-placeholder="rsa_consigne_en_ph" placeholder="Special instructions for festival-goers (EN)…"
+            style="min-height:90px;border-color:#f59e0b;"></textarea>
+        </div>
+      </div>
+    </div><!-- /section description -->
+
+    <hr class="section-sep">
+
+    <!-- ══ 2 — INFORMATIONS LOGISTIQUES ══ -->
+    <div class="section-block block-green">
+      <div class="section-title" data-i18n="rsa_sec2_title">2 — Informations Logistiques</div>
+
+      <!-- Durée de préparation + rangement -->
+      <div style="display:flex;gap:20px;flex-wrap:wrap;">
+        <div class="field-wrap" style="margin-bottom:0;">
+          <label data-i18n="rsa_prep_label">⏱ Estimation durée de préparation</label>
+          <select class="prep-select" id="ePrepDuration">
+            <option value="0" data-i18n="rsa_prep_0">0 min — Aucune préparation</option>
+            <option value="15" selected>15 min</option>
+            <option value="20">20 min</option>
+            <option value="30">30 min</option>
+            <option value="45">45 min</option>
+            <option value="50">50 min</option>
+            <option value="60">60 min</option>
+            <option value="80">80 min</option>
+            <option value="90">90 min</option>
+            <option value="100">100 min</option>
+            <option value="110">110 min</option>
+            <option value="120">120 min</option>
+          </select>
+        </div>
+        <div class="field-wrap" style="margin-bottom:0;">
+          <label>🧹 Estimation durée rangement</label>
+          <select class="prep-select" id="eRangeDuration">
+            <option value="0">0 min — Aucun rangement</option>
+            <option value="10">10 min</option>
+            <option value="15">15 min</option>
+            <option value="20">20 min</option>
+            <option value="25">25 min</option>
+            <option value="30">30 min</option>
+            <option value="35">35 min</option>
+            <option value="40">40 min</option>
+            <option value="45">45 min</option>
+            <option value="50">50 min</option>
+            <option value="55">55 min</option>
+            <option value="60">60 min</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Besoins logistiques -->
+      <div class="field-wrap" style="margin-bottom:6px;">
+        <label data-i18n="rsa_log_label">Informations logistiques</label>
+        <div id="cons-type-logistique"></div>
+        <p class="editor-hint" style="margin-bottom:8px;margin-top:2px;" data-i18n="rsa_log_hint">Décrivez vos besoins en matériel (tables, chaises, tapis yoga, matelas, coussins, etc…), technique (lumière, micros, câbles, etc…) ou autres. S'il n'y a rien, indiquez « RAS » ou « N/A ». Utilisez la liste à puces pour plus de clarté.</p>
+        <div class="toolbar" id="tbLog">
+          <button class="tb-btn" onclick="fmt('logEditor','bold')"><strong>G</strong></button>
+          <button class="tb-btn" onclick="fmt('logEditor','italic')"><em>I</em></button>
+          <button class="tb-btn" onclick="fmt('logEditor','underline')"><u>S</u></button>
+          <button class="tb-btn" onclick="fmt('logEditor','insertUnorderedList')">• Liste</button>
+          <button class="tb-btn" onclick="fmt('logEditor','insertOrderedList')">1. Liste</button>
+          <button class="tb-btn" onclick="fmt('logEditor','removeFormat')">✖ Format</button>
+        </div>
+        <div id="logEditor" class="rte" contenteditable="true" spellcheck="true"></div>
+      </div>
+    </div><!-- /section logistique -->
+
+    <hr class="section-sep">
+
+    <!-- ══ 3 — BESOINS SPÉCIFIQUES ══ -->
+    <div class="section-block block-purple">
+      <div class="section-title" data-i18n="rsa_special_label">⭐ Besoins logistiques spécifiques</div>
+      <p class="editor-hint" style="margin-bottom:8px;margin-top:-10px;" data-i18n="rsa_special_hint">Décrivez les besoins complémentaires en matériel spécial, achats à faire… S'il n'y a rien, indiquez « RAS » ou « N/A ». Utilisez la liste à puces pour plus de clarté.</p>
+      <div id="cons-type-specifique"></div>
+      <div class="toolbar" style="border-bottom-color:#c4b5fd;">
+        <button class="tb-btn" onclick="fmt('logSpecialEditor','bold')"><strong>G</strong></button>
+        <button class="tb-btn" onclick="fmt('logSpecialEditor','italic')"><em>I</em></button>
+        <button class="tb-btn" onclick="fmt('logSpecialEditor','underline')"><u>S</u></button>
+        <button class="tb-btn" onclick="fmt('logSpecialEditor','insertUnorderedList')">• Liste</button>
+        <button class="tb-btn" onclick="fmt('logSpecialEditor','insertOrderedList')">1. Liste</button>
+        <button class="tb-btn" onclick="fmt('logSpecialEditor','removeFormat')">✖ Format</button>
+      </div>
+      <div id="logSpecialEditor" class="rte" contenteditable="true" spellcheck="true"
+        style="border-color:#c4b5fd;min-height:100px;"></div>
+    </div><!-- /section besoins spécifiques -->
+
+    <hr class="section-sep">
+
+    <!-- ══ 4 — ÉQUIPEMENTS ══ -->
+    <div class="section-block block-teal">
+      <div class="section-title" id="eq-section-title">🔩 4 — Équipements</div>
+      <p class="editor-hint" style="margin-bottom:12px;margin-top:-10px;">Sélectionnez les équipements nécessaires pour cet atelier. Cliquez sur un équipement pour le sélectionner/désélectionner. Ajustez les quantités. Vous pouvez aussi créer un nouvel équipement en choisissant son fournisseur et sa catégorie ci-dessous : il apparaîtra directement dans la bonne colonne.</p>
+
+      <div class="eq-block" id="eq-block-main">
+        <div class="eq-block-title">🔩 Équipements</div>
+        <div class="eq-cols" id="eq-cols-container">
+          <!-- Rempli dynamiquement par buildEqCols() -->
+        </div>
+
+        <!-- Section NEW -->
+        <div class="eq-demande-block">
+          <div class="eq-demande-title">🆕 Ajouter un équipement</div>
+          <div class="eq-demande-form" id="eq-demande-form">
+            <select class="sel-type" id="eq-new-type"></select>
+            <select class="sel-cat" id="eq-new-cat"></select>
+            <input type="text" class="inp-nom" id="eq-new-nom" placeholder="Nom de l'équipement…">
+            <input type="text" class="inp-desc" id="eq-new-desc" placeholder="Description…">
+            <span class="eq-qty-lbl">Qté</span>
+            <input type="number" class="eq-qty" id="eq-new-qty" min="0" max="999" value="1" style="width:64px;">
+            <button class="btn-eq-add" onclick="eqDemandeAjouter()">＋ Enregistrer</button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /section équipements -->
+
+    <hr class="section-sep">
+
+    <!-- ══ 5 — CONSIGNES HELPERS ══ -->
+    <div class="section-block block-blue">
+      <div class="section-title" data-i18n="rsa_helpers_label">🤝 5 — Consignes pour Helpers</div>
+      <p class="editor-hint" style="margin-bottom:12px;margin-top:-10px;" data-i18n="rsa_helpers_hint">Décrivez tout ce que les helpers auront à faire pour cet atelier. S'il n'y a rien à faire, indiquez « RAS » ou « N/A » à chaque étape. Utilisez la liste à puces pour plus de clarté.</p>
+
+      <!-- Avant -->
+      <div class="helper-sub">
+        <div class="helper-sub-label" data-i18n="rsa_helper_avant">🔧 Avant l'atelier — Préparation - Installation</div>
+        <div id="cons-type-avant"></div>
+        <div class="toolbar" style="border-radius:0;border-top:none;">
+          <button class="tb-btn" onclick="fmt('helperAvant','insertUnorderedList')">• Liste</button>
+          <button class="tb-btn" onclick="fmt('helperAvant','bold')"><strong>G</strong></button>
+          <button class="tb-btn" onclick="fmt('helperAvant','removeFormat')">✖</button>
+        </div>
+        <div id="helperAvant" class="rte" contenteditable="true" spellcheck="true" style="border-radius:0 0 6px 6px;"></div>
+      </div>
+
+      <!-- Pendant -->
+      <div class="helper-sub">
+        <div class="helper-sub-label" data-i18n="rsa_helper_pendant">▶️ Pendant l'atelier</div>
+        <div id="cons-type-pendant"></div>
+        <div class="toolbar" style="border-radius:0;border-top:none;">
+          <button class="tb-btn" onclick="fmt('helperPendant','insertUnorderedList')">• Liste</button>
+          <button class="tb-btn" onclick="fmt('helperPendant','bold')"><strong>G</strong></button>
+          <button class="tb-btn" onclick="fmt('helperPendant','removeFormat')">✖</button>
+        </div>
+        <div id="helperPendant" class="rte" contenteditable="true" spellcheck="true" style="border-radius:0 0 6px 6px;"></div>
+      </div>
+
+      <!-- Après -->
+      <div class="helper-sub">
+        <div class="helper-sub-label" data-i18n="rsa_helper_apres">🧹 Après l'atelier — Désinstallation – Rangement – Nettoyage</div>
+        <div id="cons-type-apres"></div>
+        <div class="toolbar" style="border-radius:0;border-top:none;">
+          <button class="tb-btn" onclick="fmt('helperApres','insertUnorderedList')">• Liste</button>
+          <button class="tb-btn" onclick="fmt('helperApres','bold')"><strong>G</strong></button>
+          <button class="tb-btn" onclick="fmt('helperApres','removeFormat')">✖</button>
+        </div>
+        <div id="helperApres" class="rte" contenteditable="true" spellcheck="true" style="border-radius:0 0 6px 6px;"></div>
+      </div>
+    </div><!-- /section helpers -->
+
+    <hr class="section-sep">
+
+    <!-- ══ VALIDATION ══ -->
+    <div class="validee-row" id="valideeRow">
+      <input type="checkbox" id="eValidatedByFac" onchange="toggleValideeStyle()">
+      <label class="validee-label" for="eValidatedByFac" data-i18n="rsa_validee">✅ Validée par Animateur</label>
+    </div>
+
+    <!-- ══ ACTIONS ══ -->
+    <div class="editor-actions">
+      <button class="btn btn-primary" onclick="doSave()" data-i18n="r_desc_save">💾 Enregistrer</button>
+      <button class="btn" onclick="goList()" data-i18n="rsa_back">← Retour à la liste</button>
+      <span class="save-stamp" id="eStamp"></span>
+    </div>
+
+  </div><!-- /screenEdit -->
+
+  <footer data-i18n="rsa_footer">Tantramour 2026 — Saisie Ateliers (Descriptions &amp; Logistique)</footer>
+</div><!-- /wrap -->
+
+<div id="toast"></div>
+
+<script src="github-api.js"></script>
+<script src="loader.js"></script>
+<script src="ref_piment.js"></script>
+<script src="ref_resource_types.js"></script>
+<script src="ref_ressources.js"></script>
+<script src="ref_lieux.js"></script>
+<script src="ref_equipements.js"></script>
+<script src="ref_equip_cat.js"></script>
+<script src="ref_consignes_type.js"></script>
+<script>
+// Initialisation par défaut — sera écrasée si logistics.helpers.js se charge correctement
+if (typeof LOGISTICS_HELPERS === 'undefined') window.LOGISTICS_HELPERS = {};
+loadData(['data.js', 'ref_descriptions.js', 'logistics.js', 'logistics.special.js', 'logistics.helpers.js', 'ref_consignes_type.js', 'ref_equipements.js', 'ref_equip_cat.js'], function() {
+
+// ════════════════════════════════════════════
+// CONSTANTES
+// ════════════════════════════════════════════
+var JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+var JOUR_META  = {
+  'Jour 1': { date:'Samedi 29 août',    emoji:'🌅' },
+  'Jour 2': { date:'Dimanche 30 août',  emoji:'☀️' },
+  'Jour 3': { date:'Lundi 31 août',     emoji:'🌿' },
+  'Jour 4': { date:'Mardi 1 sept.',     emoji:'🔥' },
+  'Jour 5': { date:'Mercredi 2 sept.',  emoji:'💧' },
+  'Jour 6': { date:'Jeudi 3 sept.',     emoji:'🌙' },
+  'Jour 7': { date:'Vendredi 4 sept.',  emoji:'✨' },
+};
+
+// ════════════════════════════════════════════
+// ÉTAT
+// ════════════════════════════════════════════
+var currentKey              = '';
+var currentLogId            = '';
+var currentPiment           = 0;
+var currentEquipements      = {}; // { eqId: qty }
+var currentLieu             = ''; // lieu de la salle courante
+var currentType             = ''; // type de l'atelier courant
+var currentConsignesDisabled = {}; // { consId: true } — consignes type désactivées pour cet atelier
+
+// Types avec rangement par défaut 15 min
+var RANGE_DEFAULT_TYPES = [
+  'ATELIERS TANTRA (Matin)', 'ATELIERS TANTRA (Apres-Midi)',
+  'ATELIER ARTISTIQUE (Matin)', 'ATELIER ARTISTIQUE (Apres-Midi)',
+  'CEREMONIE & CONCERT', 'CONFERENCE', 'MEDITATION / YOGA',
+  'DJ Set', 'POOL PARTY', 'TANTRA CAFE', 'LOVE TEMPLE', 'RASSEMBLEMENT'
+];
+function getDefaultRangement(type) {
+  return (type && RANGE_DEFAULT_TYPES.indexOf(type) !== -1) ? 15 : 0;
+}
+
+// Index mémoire descriptions
+var DESCS = {};
+REF_DESCRIPTIONS.forEach(function(d) { DESCS[d.key] = Object.assign({}, d); });
+
+// Ateliers avec animateur
+var AGENDA_ATELIERS = AGENDA.filter(function(e) { return (e.fac1 || e.fac2 || e.fac3 || e.fac4); });
+
+// ════════════════════════════════════════════
+// FILTRES
+// ════════════════════════════════════════════
+function buildFilterOptions() {
+  var joursPresents = new Set();
+  AGENDA_ATELIERS.forEach(function(e) { if (e.jour) joursPresents.add(e.jour); });
+  var selJour = document.getElementById('filterJour');
+  JOUR_ORDER.filter(function(j){ return joursPresents.has(j); }).forEach(function(j) {
+    var meta = JOUR_META[j] || {};
+    var opt = document.createElement('option');
+    opt.value = j;
+    opt.textContent = j + (meta.date ? ' — ' + meta.date : '');
+    selJour.appendChild(opt);
+  });
+
+  var facsSet = new Set();
+  AGENDA_ATELIERS.forEach(function(e) {
+    if (e.fac1) facsSet.add(e.fac1);
+    if (e.fac2) facsSet.add(e.fac2);
+    if (e.fac3) facsSet.add(e.fac3);
+    if (e.fac4) facsSet.add(e.fac4);
+  });
+  var facsSorted = Array.from(facsSet).sort(function(a,b){ return a.localeCompare(b,'fr'); });
+  var selFac = document.getElementById('filterFac');
+  facsSorted.forEach(function(f) {
+    var opt = document.createElement('option');
+    opt.value = f; opt.textContent = f;
+    selFac.appendChild(opt);
+  });
+
+  var typesSet = new Set();
+  AGENDA_ATELIERS.forEach(function(e) { if (e.type) typesSet.add(e.type); });
+  var typesSorted = Array.from(typesSet).sort(function(a,b){ return a.localeCompare(b,'fr'); });
+  var selType = document.getElementById('filterType');
+  typesSorted.forEach(function(t) {
+    var opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    selType.appendChild(opt);
+  });
+}
+
+function getFilteredAteliers() {
+  var fJour = document.getElementById('filterJour').value;
+  var fFac  = document.getElementById('filterFac').value;
+  var fType = document.getElementById('filterType').value;
+
+  var filtered = AGENDA_ATELIERS.filter(function(e) {
+    if (fJour && e.jour !== fJour) return false;
+    if (fFac  && e.fac1 !== fFac && e.fac2 !== fFac && e.fac3 !== fFac && e.fac4 !== fFac) return false;
+    if (fType && e.type !== fType) return false;
+    return true;
+  });
+
+  // Trier : jour → heure → nom
+  filtered.sort(function(a, b) {
+    var ji = JOUR_ORDER.indexOf(a.jour) - JOUR_ORDER.indexOf(b.jour);
+    if (ji !== 0) return ji;
+    var hi = heureMin(a.heure) - heureMin(b.heure);
+    if (hi !== 0) return hi;
+    return (a.atelier||'').localeCompare(b.atelier||'', 'fr');
+  });
+
+  return filtered;
+}
+
+function applyFilters() {
+  renderList(getFilteredAteliers());
+}
+window.applyFilters = applyFilters;
+
+function resetFilters() {
+  document.getElementById('filterJour').value = '';
+  document.getElementById('filterFac').value  = '';
+  document.getElementById('filterType').value = '';
+  applyFilters();
+}
+window.resetFilters = resetFilters;
+
+// ════════════════════════════════════════════
+// RENDU LISTE
+// ════════════════════════════════════════════
+function renderList(ateliers) {
+  var list  = document.getElementById('wsList');
+  var count = document.getElementById('resultsCount');
+  count.innerHTML = I18n.t('r_desc_showing') + ' <strong>' + ateliers.length + '</strong> ' + (ateliers.length > 1 ? I18n.t('r_desc_workshops') : I18n.t('r_desc_workshop'));
+
+  if (!ateliers.length) {
+    list.innerHTML = '<div class="empty">' + I18n.t('r_desc_no_result') + '</div>';
+    return;
+  }
+
+  list.innerHTML = ateliers.map(function(e, idx) {
+    var d      = findDescByKey(e);
+    var logId  = e.logisticId || '';
+    var logEntry = logId && LOGISTICS[logId];
+    var facs   = [e.fac1, e.fac2, e.fac3, e.fac4].filter(Boolean).join(' & ');
+    var meta   = JOUR_META[e.jour] || {};
+    var pimentStr = e.piment > 0 ? '<span style="letter-spacing:-1px">' + '🌶️'.repeat(e.piment) + '</span>' : '';
+
+    // Statut description
+    var hasFr = d && d.descFr && d.descFr.trim();
+    var hasEn = d && d.descEn && d.descEn.trim();
+    var descPillHtml;
+    if (hasFr && hasEn) descPillHtml = '<span class="ws-pill ok">' + I18n.t('rsa_pill_desc_both') + '</span>';
+    else if (hasFr)     descPillHtml = '<span class="ws-pill partial">' + I18n.t('rsa_pill_desc_fr') + '</span>';
+    else if (hasEn)     descPillHtml = '<span class="ws-pill partial">' + I18n.t('rsa_pill_desc_en') + '</span>';
+    else                descPillHtml = '<span class="ws-pill empty">' + I18n.t('rsa_pill_desc_empty') + '</span>';
+
+    // Statut logistique
+    var hasLog = logEntry && (logEntry.text || '').trim().length > 0;
+    var logPillHtml = hasLog
+      ? '<span class="ws-pill ok">' + I18n.t('rsa_pill_log_ok') + '</span>'
+      : '<span class="ws-pill empty">' + I18n.t('rsa_pill_log_empty') + '</span>';
+
+    // Validé
+    var isValidated = (d && d.validatedByFac) || (logEntry && logEntry.validatedByFac);
+    var validPillHtml = isValidated ? '<span class="ws-pill validated">' + I18n.t('rsa_pill_validee') + '</span>' : '';
+
+    return '<div class="ws-card" onclick="selectAtelier(' + idx + ')">' +
+      '<div class="ws-card-left">' +
+        '<div class="ws-card-jour">' +
+          esc(e.jour) + (meta.date ? ' — ' + meta.date : '') +
+          (e.heure ? ' · ' + esc(e.heure) : '') +
+          (e.lieu  ? ' · 📍 ' + esc(e.lieu) : '') +
+        '</div>' +
+        '<div class="ws-card-name">' + esc(e.atelier||'—') + (pimentStr ? ' ' + pimentStr : '') + '</div>' +
+        '<div class="ws-card-meta">' +
+          '<span class="tag tag-type">' + esc(e.type||'') + '</span>' +
+          (facs ? '<span>🎓 ' + esc(facs) + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="ws-card-right">' +
+        descPillHtml + logPillHtml + validPillHtml +
+        '<span style="font-size:18px;color:var(--muted);margin-left:4px">›</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  window._currentList = ateliers;
+}
+
+// ════════════════════════════════════════════
+// SÉLECTION ATELIER
+// ════════════════════════════════════════════
+function findDescByKey(e) {
+  // Chercher par nom d'atelier
+  var nom = (e.atelier||'').trim();
+  return Object.values(DESCS).find(function(d) {
+    return (d.atelier||'').trim() === nom;
+  }) || null;
+}
+
+function selectAtelier(idx) {
+  var e = (window._currentList || [])[idx];
+  if (!e) return;
+
+  // Description
+  var d = findDescByKey(e);
+  if (!d) {
+    var newKey = (e.atelier||'').replace(/[^a-zA-Z0-9]/g,'_').toLowerCase().slice(0,40)
+                  .replace(/_+/g,'_').replace(/^_|_$/g,'');
+    var base = newKey, n = 2;
+    while (DESCS[newKey]) { newKey = base + '_' + n; n++; }
+    d = { key:newKey, atelier:e.atelier, type:e.type, piment:e.piment||0,
+          fac1:e.fac1||'', fac2:e.fac2||'',
+          nomEn:'', descFr:'', descEn:'',
+          consigne:'', consigneEn:'',
+          validatedByFac:false, updatedAt:'' };
+    DESCS[newKey] = d;
+  }
+  currentKey    = d.key;
+  currentLogId  = e.logisticId || '';
+  currentPiment = d.piment !== undefined ? d.piment : (e.piment||0);
+
+  // En-tête jaune
+  var meta = JOUR_META[e.jour] || {};
+  document.getElementById('eJour').textContent  = e.jour + (meta.date ? ' — ' + meta.date : '');
+  document.getElementById('eTitle').textContent = e.atelier || '—';
+
+  // Grille infos
+  var facs    = [e.fac1, e.fac2, e.fac3, e.fac4].filter(Boolean).join(' / ') || '—';
+  var helpers = [e.helper1, e.helper2, e.helper3, e.helper4].filter(Boolean).join(', ') || '—';
+  var duree   = getDureeAtelier(e.heure);
+  var gridData = [
+    ['🆔 ID',                            e.id || '—'],
+    ['📅 ' + I18n.t('r14_grid_jour'),    e.jour + (meta.date ? ' — ' + meta.date : '')],
+    ['📛 ' + I18n.t('col_atelier'),      e.atelier || '—'],
+    ['🕐 ' + I18n.t('r14_grid_heure'),   e.heure ? e.heure + (duree ? ' (' + duree + ')' : '') : '—'],
+    ['📍 ' + I18n.t('r14_grid_lieu'),    e.lieu || '—'],
+    ['🏷 ' + I18n.t('r14_grid_type'),    e.type || '—'],
+    ['🎓 ' + I18n.t('r14_grid_fac'),     facs],
+    ['🤝 ' + I18n.t('col_helpers'),      helpers],
+    ['🌐 ' + I18n.t('r14_grid_trad'),    e.traduction || '—'],
+    ['👼 ' + I18n.t('col_angel'),        e.angel || '—'],
+    ['📌 ' + I18n.t('col_note'),         e.note || '—'],
+  ];
+  document.getElementById('eGrid').innerHTML = gridData.map(function(pair) {
+    return '<div class="ws-hdr-field">' +
+      '<div class="ws-hdr-label">' + pair[0] + '</div>' +
+      '<div class="ws-hdr-value">' + esc(pair[1]) + '</div>' +
+    '</div>';
+  }).join('');
+
+  document.getElementById('bcAtelier').textContent = e.atelier || '—';
+
+  // Champs description
+  document.getElementById('eNomFr').value      = d.atelier   || '';
+  document.getElementById('eNomEn').value      = d.nomEn     || d.atelier || '';
+  buildPimentBtns(currentPiment);
+  document.getElementById('eDescFr').value     = d.descFr    || '';
+  document.getElementById('eDescEn').value     = d.descEn    || '';
+  document.getElementById('eConsigneFr').value = d.consigne  || '';
+  document.getElementById('eConsigneEn').value = d.consigneEn|| '';
+
+  // Champs logistique
+  var logEntry = currentLogId && LOGISTICS[currentLogId];
+  document.getElementById('logEditor').innerHTML = logEntry ? (logEntry.html || '<p></p>') : '<p></p>';
+  (function(){
+    var raw = (logEntry && logEntry.prepDuration !== undefined) ? logEntry.prepDuration : 15;
+    var sel = document.getElementById('ePrepDuration');
+    var allowed = Array.from(sel.options).map(function(o){ return parseInt(o.value, 10); });
+    if (allowed.indexOf(parseInt(raw, 10)) !== -1) { sel.value = String(raw); }
+    else { sel.value = String(allowed.reduce(function(p,c){ return Math.abs(c-raw)<Math.abs(p-raw)?c:p; })); }
+  })();
+  (function(){
+    var rawR = (logEntry && logEntry.rangeDuration !== undefined) ? logEntry.rangeDuration : getDefaultRangement(e.type);
+    var selR = document.getElementById('eRangeDuration');
+    var allowedR = Array.from(selR.options).map(function(o){ return parseInt(o.value, 10); });
+    if (allowedR.indexOf(parseInt(rawR, 10)) !== -1) { selR.value = String(rawR); }
+    else { selR.value = String(allowedR.reduce(function(p,c){ return Math.abs(c-rawR)<Math.abs(p-rawR)?c:p; })); }
+  })();
+
+  var specEntry = currentLogId && typeof LOGISTICS_SPECIAL !== 'undefined' && LOGISTICS_SPECIAL[currentLogId];
+  document.getElementById('logSpecialEditor').innerHTML = specEntry ? (specEntry.html || '<p></p>') : '<p></p>';
+
+  // Équipements — fusion LOGISTICS (logId) + AGENDA (atelier ID) — AGENDA prime
+  var eqLogistics = (currentLogId && LOGISTICS[currentLogId] && LOGISTICS[currentLogId]._equipements) || {};
+  var eqAgenda    = e._equipements || {};
+  currentEquipements = Object.assign({}, eqLogistics, eqAgenda);
+  currentLieu = e.lieu || '';
+  currentType = e.type || '';
+  buildEqCols();
+
+  // Consignes type désactivées — chargées depuis AGENDA
+  currentConsignesDisabled = e._consignesDisabled ? Object.assign({}, e._consignesDisabled) : {};
+  buildConsignesTypeWidgets();
+
+  // Consignes helpers
+  var helpEntry = currentLogId && typeof LOGISTICS_HELPERS !== 'undefined' && LOGISTICS_HELPERS[currentLogId];
+  document.getElementById('helperAvant').innerHTML   = helpEntry ? (helpEntry.avant   || '<p></p>') : '<p></p>';
+  document.getElementById('helperPendant').innerHTML = helpEntry ? (helpEntry.pendant || '<p></p>') : '<p></p>';
+  document.getElementById('helperApres').innerHTML   = helpEntry ? (helpEntry.apres   || '<p></p>') : '<p></p>';
+
+  // Validation unifiée (on utilise validatedByFac de ref_descriptions)
+  var isValidated = !!d.validatedByFac || (logEntry && !!logEntry.validatedByFac);
+  document.getElementById('eValidatedByFac').checked = isValidated;
+  document.getElementById('valideeRow').classList.toggle('checked', isValidated);
+
+  // Horodatage dernière modif
+  var stamps = [d.updatedAt, logEntry && logEntry.updatedAt].filter(Boolean);
+  var lastStamp = stamps.sort().reverse()[0] || '';
+  document.getElementById('eStamp').textContent = lastStamp ? I18n.t('r_desc_last_modif') + ' ' + lastStamp : '';
+  // Note : les anciennes valeurs stockées ne contiennent que la date (YYYY-MM-DD),
+  // les nouvelles contiendront date + heure (YYYY-MM-DD HH:MM)
+
+  showScreen('edit');
+}
+window.selectAtelier = selectAtelier;
+
+// ════════════════════════════════════════════
+// UTILITAIRES
+// ════════════════════════════════════════════
+function getDureeAtelier(heure) {
+  if (!heure) return '';
+  var m = String(heure).replace(/\./g,':').match(/(\d{1,2}):(\d{2})\s*[-–]\s*(\d{1,2}):(\d{2})/);
+  if (!m) return '';
+  var debut = parseInt(m[1])*60 + parseInt(m[2]);
+  var fin   = parseInt(m[3])*60 + parseInt(m[4]);
+  var duree = fin - debut;
+  if (duree <= 0) return '';
+  var h = Math.floor(duree/60);
+  var mn = duree % 60;
+  return h > 0 ? h + 'h' + (mn > 0 ? pad2(mn) : '') : mn + ' min';
+}
+
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+// ════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════
+function showScreen(name) {
+  document.getElementById('screenList').style.display = (name === 'list') ? 'block' : 'none';
+  document.getElementById('screenEdit').style.display = (name === 'edit') ? 'block' : 'none';
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function goList() {
+  showScreen('list');
+  applyFilters();
+}
+window.goList = goList;
+
+// ════════════════════════════════════════════
+// PIMENT
+// ════════════════════════════════════════════
+function buildPimentBtns(selected) {
+  var sel = document.getElementById('ePimentSelect');
+  sel.innerHTML = REF_PIMENT.map(function(p) {
+    return '<option value="' + p.value + '"' + (p.value === selected ? ' selected' : '') + '>' + p.label + '</option>';
+  }).join('');
+  currentPiment = selected;
+}
+function setPiment(val) {
+  currentPiment = val;
+}
+window.setPiment = setPiment;
+
+function toggleValideeStyle() {
+  var checked = document.getElementById('eValidatedByFac').checked;
+  document.getElementById('valideeRow').classList.toggle('checked', checked);
+}
+window.toggleValideeStyle = toggleValideeStyle;
+
+// ════════════════════════════════════════════
+// ÉDITEUR RICH TEXT
+// ════════════════════════════════════════════
+function fmt(editorId, cmd) {
+  document.getElementById(editorId).focus();
+  document.execCommand(cmd, false, null);
+}
+window.fmt = fmt;
+
+// ════════════════════════════════════════════
+// SAUVEGARDE
+// ════════════════════════════════════════════
+async function doSave() {
+  var d = DESCS[currentKey];
+  if (!d) return;
+
+  var now            = new Date();
+  var today          = now.toISOString().slice(0,10) + ' ' + now.toTimeString().slice(0,5);
+  var isValidated    = document.getElementById('eValidatedByFac').checked;
+  var prevPiment     = d.piment !== undefined ? d.piment : 0;
+  var needDataSave   = false;
+
+  // ── Description ──
+  d.atelier         = document.getElementById('eNomFr').value.trim() || d.atelier;
+  d.nomEn           = document.getElementById('eNomEn').value.trim() || d.atelier || '';
+  d.piment          = currentPiment;
+  d.descFr          = document.getElementById('eDescFr').value;
+  d.descEn          = document.getElementById('eDescEn').value;
+  d.consigne        = document.getElementById('eConsigneFr').value;
+  d.consigneEn      = document.getElementById('eConsigneEn').value;
+  d.validatedByFac  = isValidated;
+  d.updatedAt       = today;
+
+  // Sync dans REF_DESCRIPTIONS
+  var orig = REF_DESCRIPTIONS.find(function(x) { return x.key === d.key; });
+  if (orig) {
+    Object.assign(orig, d);
+  } else {
+    REF_DESCRIPTIONS.push(Object.assign({}, d));
+  }
+
+  // Mise à jour piment dans AGENDA
+  var atelierName = (d.atelier || '').trim();
+  AGENDA.forEach(function(e) {
+    if ((e.atelier || '').trim() === atelierName) {
+      e.piment = d.piment;
+    }
+  });
+
+  // ── Logistique ──
+  var e = AGENDA.find(function(a) {
+    return (a.atelier||'').trim() === atelierName;
+  });
+
+  if (e) {
+    // Générer logisticId si nécessaire
+      if (!e.logisticId) {
+        var safeName = atelierName.replace(/[^a-zA-Z0-9]/g,'_').slice(0,30).toUpperCase();
+        var jourKey  = (e.jour||'').replace(/\s+/g,'').toUpperCase();
+        e.logisticId = jourKey + '_' + safeName;
+        currentLogId = e.logisticId;
+        needDataSave = true;
+        // Mettre à jour toutes les entrées AGENDA du même atelier
+        AGENDA.forEach(function(a) {
+          if ((a.atelier||'').trim() === atelierName && !a.logisticId) {
+            a.logisticId = e.logisticId;
+          }
+        });
+      }
+    currentLogId = e.logisticId;
+  }
+
+  if (currentLogId) {
+    var logEl    = document.getElementById('logEditor');
+    var logHtml  = logEl.innerHTML.trim();
+    var logText  = logEl.innerText.trim();
+    var prepDur  = parseInt(document.getElementById('ePrepDuration').value, 10) || 0;
+    var rangeDur = parseInt(document.getElementById('eRangeDuration').value, 10) || 0;
+    var eqData   = Object.keys(currentEquipements).length > 0 ? Object.assign({}, currentEquipements) : undefined;
+    LOGISTICS[currentLogId] = {
+      html: logHtml, text: logText,
+      validatedByFac: isValidated,
+      prepDuration: prepDur,
+      rangeDuration: rangeDur,
+      updatedAt: today
+    };
+    if (eqData) LOGISTICS[currentLogId]._equipements = eqData;
+
+    // Logistique spéciale
+    var specEl   = document.getElementById('logSpecialEditor');
+    var specHtml = specEl.innerHTML.trim();
+    var specText = specEl.innerText.trim();
+    if (specHtml && specHtml !== '<p></p>' && specHtml !== '<br>') {
+      if (typeof LOGISTICS_SPECIAL === 'undefined') window.LOGISTICS_SPECIAL = {};
+      LOGISTICS_SPECIAL[currentLogId] = { html: specHtml, text: specText, updatedAt: today };
+    }
+
+    // Consignes helpers
+    var avantEl   = document.getElementById('helperAvant');
+    var pendantEl = document.getElementById('helperPendant');
+    var apresEl   = document.getElementById('helperApres');
+    if (typeof LOGISTICS_HELPERS === 'undefined') window.LOGISTICS_HELPERS = {};
+    LOGISTICS_HELPERS[currentLogId] = {
+      avant:   avantEl.innerHTML.trim(),
+      pendant: pendantEl.innerHTML.trim(),
+      apres:   apresEl.innerHTML.trim(),
+      updatedAt: today
+    };
+  }
+
+  // Mise à jour horodatage UI
+  document.getElementById('eStamp').textContent = 'Dernière modif. : ' + today;
+
+  try {
+    // Sauvegardes séquentielles pour éviter les conflits de SHA sur GitHub
+    // (les PUT parallèles causent des 409 "does not match" car même SHA utilisé)
+    await saveFile('ref_descriptions.js', buildRefDescJs());
+    await saveFile('logistics.js',         buildLogisticsJs());
+    await saveFile('logistics.special.js', buildLogisticsSpecialJs());
+    await saveFile('logistics.helpers.js', buildLogisticsHelpersJs());
+    await saveFile('ref_equipements.js',   buildRefEquipementsJs());
+    if (d.piment !== prevPiment || needDataSave) {
+      await saveFile('data.js', buildDataJs());
+    }
+    showToast('✔ Enregistré', 'ok');
+  } catch(err) {
+    showToast('❌ ' + err.message, 'err');
+  }
+}
+window.doSave = doSave;
+
+// ════════════════════════════════════════════
+// CONSIGNES TYPE — widgets dynamiques
+// ════════════════════════════════════════════
+function buildConsignesTypeHtml(placement) {
+  if (typeof REF_CONSIGNES_TYPE === 'undefined') return '';
+  var items = REF_CONSIGNES_TYPE.filter(function(c) {
+    if (c.actif === false) return false;
+    if (!c.placements || c.placements.indexOf(placement) === -1) return false;
+    if (c.types && c.types.length > 0 && currentType && c.types.indexOf(currentType) === -1) return false;
+    return true;
+  });
+  if (!items.length) return '';
+  var rows = items.map(function(c) {
+    var isOff = !!currentConsignesDisabled[c.id];
+    return '<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 10px;border-bottom:1px solid var(--border);opacity:' + (isOff ? '0.45' : '1') + '">' +
+      '<input type="checkbox" id="cons-toggle-' + c.id + '" ' + (isOff ? '' : 'checked') +
+        ' title="Activer / désactiver cette consigne pour cet atelier"' +
+        ' onchange="consigneTypeToggleSaisie(\'' + c.id + '\', this.checked)"' +
+        ' style="margin-top:3px;flex-shrink:0;">' +
+      '<div style="flex:1;min-width:0;">' +
+        '<div style="font-size:12px;color:var(--text);' + (isOff ? 'text-decoration:line-through;' : '') + '">' + esc(c.valueFr || '') + '</div>' +
+        (c.valueEn ? '<div style="font-size:11px;color:var(--muted);margin-top:1px;' + (isOff ? 'text-decoration:line-through;' : '') + '">' + esc(c.valueEn) + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('');
+  return '<div class="cons-type-widget" style="border:1px solid #fcd34d;border-radius:7px;overflow:hidden;margin-bottom:10px;background:#fffbeb;">' +
+    '<div style="background:#fef3c7;padding:5px 10px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#92400e;border-bottom:1px solid #fcd34d;">📋 Consignes génériques <span style="font-weight:400;font-style:italic;">(non éditables ici — modifiables dans Master Data)</span></div>' +
+    rows +
+  '</div>';
+}
+
+function buildConsignesTypeWidgets() {
+  var mapping = {
+    'cons-type-logistique': 'Logistique',
+    'cons-type-specifique': 'Spécifique',
+    'cons-type-avant':      'Avant',
+    'cons-type-pendant':    'Pendant',
+    'cons-type-apres':      'Après',
+    'cons-type-participant':'Participant',
+  };
+  Object.keys(mapping).forEach(function(containerId) {
+    var el = document.getElementById(containerId);
+    if (el) el.innerHTML = buildConsignesTypeHtml(mapping[containerId]);
+  });
+}
+window.buildConsignesTypeWidgets = buildConsignesTypeWidgets;
+
+window.consigneTypeToggleSaisie = function(id, checked) {
+  if (!checked) {
+    currentConsignesDisabled[id] = true;
+  } else {
+    delete currentConsignesDisabled[id];
+  }
+  // Propager sur l'entrée AGENDA active
+  var eActive = (window._currentList || []).find(function(e) {
+    return e.logisticId === currentLogId || (currentKey && e.atelier);
+  });
+  // On identifie l'atelier via currentKey (key de desc) → chercher dans AGENDA
+  if (currentKey) {
+    AGENDA.forEach(function(e) {
+      var d = findDescByKey(e);
+      if (d && d.key === currentKey) {
+        if (Object.keys(currentConsignesDisabled).length > 0) {
+          e._consignesDisabled = Object.assign({}, currentConsignesDisabled);
+        } else {
+          delete e._consignesDisabled;
+        }
+      }
+    });
+  }
+  buildConsignesTypeWidgets();
+};
+
+// ════════════════════════════════════════════
+// SÉRIALISATION
+// ════════════════════════════════════════════
+function escJs(s) {
+  return (s||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\r?\n/g,'\\n').replace(/\t/g,'\\t');
+}
+
+function buildRefDescJs() {
+  var allKeys = new Set(REF_DESCRIPTIONS.map(function(d) { return d.key; }));
+  Object.keys(DESCS).forEach(function(k) { allKeys.add(k); });
+  var merged = Array.from(allKeys).map(function(k) {
+    return DESCS[k] || REF_DESCRIPTIONS.find(function(d) { return d.key === k; });
+  }).filter(Boolean);
+
+  var lines = merged.map(function(d) {
+    return '  { key:"'           + escJs(d.key||'') +
+      '", atelier:"'             + escJs(d.atelier||'') +
+      '", nomEn:"'               + escJs(d.nomEn||'') +
+      '", type:"'                + escJs(d.type||'') +
+      '", piment:'               + (d.piment||0) +
+      ', fac1:"'                 + escJs(d.fac1||'') +
+      '", fac2:"'                + escJs(d.fac2||'') +
+      '", descFr:"'              + escJs(d.descFr||'') +
+      '", descEn:"'              + escJs(d.descEn||'') +
+      '", consigne:"'            + escJs(d.consigne||'') +
+      '", consigneEn:"'          + escJs(d.consigneEn||'') +
+      '", validatedByFac:'       + (d.validatedByFac ? 'true' : 'false') +
+      ', updatedAt:"'            + escJs(d.updatedAt||'') + '" }';
+  }).join(',\n');
+
+  return '/**\n * TANTRAMOUR 2026 — Descriptions des Ateliers (FR / EN)\n' +
+    ' * Géré automatiquement par Rapport_Saisie_Ateliers.html\n */\n\n' +
+    'var REF_DESCRIPTIONS = [\n\n' + lines + '\n\n];\n';
+}
+
+function buildLogisticsJs() {
+  var entries = Object.entries(LOGISTICS).map(function(pair) {
+    var id = pair[0], v = pair[1];
+    var prepDur  = (v.prepDuration  !== undefined && v.prepDuration  !== null) ? v.prepDuration  : 15;
+    var rangeDur = (v.rangeDuration !== undefined && v.rangeDuration !== null) ? v.rangeDuration : 0;
+    var eqLine = (v._equipements && Object.keys(v._equipements).length > 0)
+      ? '    _equipements: ' + JSON.stringify(v._equipements) + ',\n'
+      : '';
+    return '  "' + escJs(id) + '": {\n' +
+      '    html: "' + escJs(v.html || '') + '",\n' +
+      '    text: "' + escJs(v.text || '') + '",\n' +
+      '    validatedByFac: ' + (v.validatedByFac ? 'true' : 'false') + ',\n' +
+      '    prepDuration: ' + prepDur + ',\n' +
+      '    rangeDuration: ' + rangeDur + ',\n' +
+      eqLine +
+      '    updatedAt: "' + escJs(v.updatedAt || '') + '"\n' +
+      '  }';
+  }).join(',\n\n');
+  return '/**\n * TANTRAMOUR 2026 — Informations Logistiques\n */\n\nvar LOGISTICS = {\n\n' +
+    entries + (entries ? '\n\n' : '') + '};\n';
+}
+
+function buildLogisticsSpecialJs() {
+  var src = (typeof LOGISTICS_SPECIAL !== 'undefined') ? LOGISTICS_SPECIAL : {};
+  var entries = Object.entries(src).map(function(pair) {
+    var id = pair[0], v = pair[1];
+    return '  "' + escJs(id) + '": {\n' +
+      '    html: "' + escJs(v.html || '') + '",\n' +
+      '    text: "' + escJs(v.text || '') + '",\n' +
+      '    updatedAt: "' + escJs(v.updatedAt || '') + '"\n' +
+      '  }';
+  }).join(',\n\n');
+  return '/**\n * TANTRAMOUR 2026 — Informations Logistiques Spéciales\n */\n\nvar LOGISTICS_SPECIAL = {\n\n' +
+    entries + (entries ? '\n\n' : '') + '};\n';
+}
+
+function buildLogisticsHelpersJs() {
+  var src = (typeof LOGISTICS_HELPERS !== 'undefined') ? LOGISTICS_HELPERS : {};
+  var entries = Object.entries(src).map(function(pair) {
+    var id = pair[0], v = pair[1];
+    return '  "' + escJs(id) + '": {\n' +
+      '    avant: "' + escJs(v.avant || '') + '",\n' +
+      '    pendant: "' + escJs(v.pendant || '') + '",\n' +
+      '    apres: "' + escJs(v.apres || '') + '",\n' +
+      '    updatedAt: "' + escJs(v.updatedAt || '') + '"\n' +
+      '  }';
+  }).join(',\n\n');
+  return '/**\n * TANTRAMOUR 2026 — Consignes Helpers par Atelier\n' +
+    ' * Structure : { avant, pendant, apres, updatedAt }\n */\n\n' +
+    'var LOGISTICS_HELPERS = {\n\n' +
+    entries + (entries ? '\n\n' : '') + '};\n';
+}
+
+// ════════════════════════════════════════════
+// SÉRIALISATION ref_equipements.js
+// ════════════════════════════════════════════
+function buildRefEquipementsJs() {
+  var lines = (typeof REF_EQUIPEMENTS !== 'undefined' ? REF_EQUIPEMENTS : []).map(function(eq) {
+    var stock = (eq.stock === 'N/A') ? '"N/A"' : (parseInt(eq.stock,10) || 0);
+    var cat   = escJs(eq.categorie || 'Divers');
+    return '  { type: "' + escJs(eq.type) + '", categorie: "' + cat + '", id: "' + escJs(eq.id) + '", value: "' + escJs(eq.value) + '", stock: ' + stock + ', description: "' + escJs(eq.description || '') + '", remarque: "' + escJs(eq.remarque || '') + '" }';
+  });
+  return '/**\n * TANTRAMOUR 2026 — Référentiel : Équipements\n' +
+    ' * Chaque entrée : { id, value, type, categorie, stock, description, remarque }\n' +
+    ' *   value       : nom de l\'équipement\n' +
+    ' *   type        : "Hameau" | "Tantramour" | "Animateur" | "Autre" (fournisseur)\n' +
+    ' *   categorie   : nom de la catégorie — géré via ref_equip_cat.js (REF_EQUIP_CAT)\n' +
+    ' *   stock       : nombre (0-1000) ou "N/A"\n' +
+    ' *   description : texte libre\n' +
+    ' *   remarque    : texte libre\n' +
+    ' */\n' +
+    'var REF_EQUIPEMENTS = [\n' + lines.join(',\n') + '\n];\n';
+}
+
+// ════════════════════════════════════════════
+// GESTION DES ÉQUIPEMENTS
+// ════════════════════════════════════════════
+
+// Options de la colonne "categorie" — dynamiques, basées sur REF_EQUIP_CAT (triées par ordre)
+function eqCategorieOptionsList() {
+  return (typeof REF_EQUIP_CAT !== 'undefined' ? REF_EQUIP_CAT : []).slice()
+    .sort(function(a, b) { return (parseInt(a.ordre) || 0) - (parseInt(b.ordre) || 0); })
+    .map(function(c) { return c.value; });
+}
+
+// Remplit les selects du formulaire de création (Fournisseur / Catégorie)
+function populateEqNewSelects() {
+  var typeEl = document.getElementById('eq-new-type');
+  var catEl  = document.getElementById('eq-new-cat');
+  if (typeEl && !typeEl.options.length) {
+    var types = ['Hameau','Tantramour','Animateur','Autre'];
+    typeEl.innerHTML = types.map(function(t) { return '<option value="' + esc(t) + '">' + esc(t) + '</option>'; }).join('');
+  }
+  if (catEl && !catEl.options.length) {
+    catEl.innerHTML = eqCategorieOptionsList().map(function(c) { return '<option value="' + esc(c) + '">' + esc(c) + '</option>'; }).join('');
+  }
+}
+window.populateEqNewSelects = populateEqNewSelects;
+
+// Construit les colonnes (Hameau / Tantramour / Animateur / Autre)
+function buildEqCols() {
+  var container = document.getElementById('eq-cols-container');
+  if (!container) return;
+
+  // Affichage lieu + capacité dans le titre de section et le titre du bloc équipements
+  var lieuRef = currentLieu && (typeof REF_LIEUX !== 'undefined' ? REF_LIEUX : []).find(function(l) { return l.value === currentLieu; });
+  var lieuInfo = '';
+  if (currentLieu) {
+    var nomLieu = lieuRef ? lieuRef.label : currentLieu;
+    var cap = lieuRef && lieuRef.capacite > 0 ? ' — ' + lieuRef.capacite + ' pers.' : '';
+    lieuInfo = ' <span style="font-size:11px;font-weight:400;color:var(--muted);margin-left:8px;">📍 ' + esc(nomLieu) + cap + '</span>';
+  }
+  var eqSectionTitle = document.getElementById('eq-section-title');
+  if (eqSectionTitle) eqSectionTitle.innerHTML = '🔩 4 — Équipements' + lieuInfo;
+  var eqBlockTitle = document.querySelector('#eq-block-main .eq-block-title');
+  if (eqBlockTitle) eqBlockTitle.innerHTML = '🔩 Équipements' + lieuInfo;
+
+  var colonnes = [
+    { type: 'Hameau',     label: 'Stock Hameau'         },
+    { type: 'Tantramour', label: 'Stock Tantramour'      },
+    { type: 'Animateur',  label: 'Apporté par animateur' },
+    { type: 'Autre',      label: 'Autre'                 }
+  ];
+
+  var catOrderRef = eqCategorieOptionsList();
+
+  container.innerHTML = colonnes.map(function(col) {
+    var allItems = (typeof REF_EQUIPEMENTS !== 'undefined' ? REF_EQUIPEMENTS : [])
+      .filter(function(eq) { return eq.type === col.type; })
+      .sort(function(a, b) { return (a.value||'').localeCompare(b.value||'', 'fr', {sensitivity:'base'}); });
+
+    // Grouper par catégorie (ordre dynamique — REF_EQUIP_CAT)
+    var catMap = {};
+    allItems.forEach(function(eq) {
+      var cat = eq.categorie || 'Divers';
+      if (!catMap[cat]) catMap[cat] = [];
+      catMap[cat].push(eq);
+    });
+    var catOrder = catOrderRef.filter(function(c) { return catMap[c]; })
+      .concat(Object.keys(catMap).filter(function(c) { return catOrderRef.indexOf(c) === -1; }).sort());
+
+    var rows = catOrder.map(function(cat) {
+      var catItems = catMap[cat].map(function(eq) {
+        var savedQty = currentEquipements[eq.id] || 0;
+        var sel = savedQty > 0 ? ' selected' : '';
+        return '<div class="eq-item' + sel + '" onclick="eqToggle(\'' + esc(eq.id) + '\', this)">' +
+          '<span class="eq-item-name">' + esc(eq.value) + '</span>' +
+          '<span class="eq-qty-lbl">Qté</span>' +
+          '<input type="number" class="eq-qty" min="0" max="999" value="' + savedQty + '"' +
+          ' onclick="event.stopPropagation()"' +
+          ' oninput="eqQtyChange(\'' + esc(eq.id) + '\', this.value, this.closest(\'.eq-item\'))">' +
+        '</div>';
+      }).join('');
+      return '<div class="eq-cat-header">' + esc(cat) + '</div>' + catItems;
+    }).join('');
+
+    return '<div class="eq-col">' +
+      '<div class="eq-col-header">' + col.label + '</div>' +
+      (rows || '<div style="padding:10px 14px;font-size:12px;color:var(--muted);font-style:italic;">Aucun équipement</div>') +
+    '</div>';
+  }).join('');
+
+  populateEqNewSelects();
+}
+window.buildEqCols = buildEqCols;
+
+// Toggle sélection d'un équipement
+function eqToggle(eqId, itemEl) {
+  var isSelected = itemEl.classList.contains('selected');
+  if (isSelected) {
+    delete currentEquipements[eqId];
+    itemEl.classList.remove('selected');
+    var inp = itemEl.querySelector('.eq-qty');
+    if (inp) inp.value = '0';
+  } else {
+    var current = currentEquipements[eqId] || 0;
+    var newQty = current > 0 ? current : 1;
+    currentEquipements[eqId] = newQty;
+    itemEl.classList.add('selected');
+    var inp = itemEl.querySelector('.eq-qty');
+    if (inp) inp.value = String(newQty);
+  }
+}
+window.eqToggle = eqToggle;
+
+// Mise à jour de la quantité
+function eqQtyChange(eqId, val, itemEl) {
+  var qty = parseInt(val, 10) || 0;
+  if (qty <= 0) {
+    delete currentEquipements[eqId];
+    if (itemEl) itemEl.classList.remove('selected');
+  } else {
+    currentEquipements[eqId] = qty;
+    if (itemEl) itemEl.classList.add('selected');
+  }
+}
+window.eqQtyChange = eqQtyChange;
+
+// Ajouter un nouvel équipement — choix du fournisseur (type) + catégorie
+async function eqDemandeAjouter() {
+  var typeEl = document.getElementById('eq-new-type');
+  var catEl  = document.getElementById('eq-new-cat');
+  var nomEl  = document.getElementById('eq-new-nom');
+  var descEl = document.getElementById('eq-new-desc');
+  var qtyEl  = document.getElementById('eq-new-qty');
+  var type   = (typeEl ? typeEl.value : 'Hameau');
+  var cat    = (catEl  ? catEl.value  : 'Divers');
+  var nom    = (nomEl  ? nomEl.value.trim()  : '');
+  var desc   = (descEl ? descEl.value.trim() : '');
+  var qty    = parseInt(qtyEl ? qtyEl.value : '1', 10) || 1;
+  if (!nom) { showToast('⚠️ Le nom de l\'équipement est obligatoire', 'err'); return; }
+
+  // ID unique format EQ_NEWXX
+  var existingIds = (typeof REF_EQUIPEMENTS !== 'undefined' ? REF_EQUIPEMENTS : []).map(function(e){ return e.id; });
+  var n = 1, newId;
+  do { newId = 'EQ_NEW' + (n < 10 ? '0' : '') + n; n++; } while (existingIds.indexOf(newId) !== -1);
+
+  var newEq = { type: type, categorie: cat, id: newId, value: nom, stock: 0, description: desc, remarque: '' };
+  if (typeof REF_EQUIPEMENTS === 'undefined') window.REF_EQUIPEMENTS = [];
+  REF_EQUIPEMENTS.push(newEq);
+
+  if (qty > 0) currentEquipements[newId] = qty;
+
+  try {
+    await saveFile('ref_equipements.js', buildRefEquipementsJs());
+    showToast('✅ Équipement ajouté !', 'ok');
+    buildEqCols();
+    if (nomEl)  nomEl.value  = '';
+    if (descEl) descEl.value = '';
+    if (qtyEl)  qtyEl.value  = '1';
+  } catch(err) {
+    REF_EQUIPEMENTS.pop();
+    delete currentEquipements[newId];
+    showToast('❌ Sauvegarde impossible : ' + err.message, 'err');
+  }
+}
+window.eqDemandeAjouter = eqDemandeAjouter;
+
+function buildDataJs() {
+  var lines = AGENDA.map(function(e) {
+    return '  {jour:"'       + escJs(e.jour||'') +
+      '",date:"'             + escJs(e.date||'') +
+      '",heure:"'            + escJs(e.heure||'') +
+      '",type:"'             + escJs(e.type||'') +
+      '",atelier:"'          + escJs(e.atelier||'') +
+      '",lieu:"'             + escJs(e.lieu||'') +
+      '",fac1:"'             + escJs(e.fac1||'') +
+      '",fac2:"'             + escJs(e.fac2||'') +
+      '",fac3:"'             + escJs(e.fac3||'') +
+      '",fac4:"'             + escJs(e.fac4||'') +
+      '",meetingRoles:"'     + escJs(e.meetingRoles||'') +
+      '",traduction:"'       + escJs(e.traduction||'') +
+      '",helper1:"'          + escJs(e.helper1||'') +
+      '",helper2:"'          + escJs(e.helper2||'') +
+      '",helper3:"'          + escJs(e.helper3||'') +
+      '",helper4:"'          + escJs(e.helper4||'') +
+      '",angel:"'            + escJs(e.angel||'') +
+      '",note:"'             + escJs(e.note||'') +
+      '",piment:'            + (e.piment||0) +
+      ',logisticId:"'        + escJs(e.logisticId||'') + '"' +
+      (e._consignesDisabled && Object.keys(e._consignesDisabled).length > 0
+        ? ',_consignesDisabled:' + JSON.stringify(e._consignesDisabled)
+        : '') +
+      '}';
+  }).join(',\n');
+
+  var footer = '\n];\n\n' +
+    'function agendaToRaw(entries) {\n' +
+    '  return entries.map(function(e) { return [\n' +
+    '    e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,\n' +
+    '    e.fac1, e.fac2, e.traduction,\n' +
+    '    e.helper1, e.helper2, e.helper3, e.helper4 || \'\',\n' +
+    '    e.angel, e.note, e.logisticId, e.piment || 0,\n' +
+    '    e.fac3 || \'\', e.fac4 || \'\', e.meetingRoles || \'\'\n' +
+    '  ]; });\n}\n';
+
+  return '/**\n * TANTRAMOUR 2026 — Référentiel de données commun\n' +
+    ' * ================================================\n' +
+    ' * Source unique pour les rapports HTML.\n' +
+    ' */\n\nvar AGENDA = [\n\n' + lines + footer;
+}
+
+// ════════════════════════════════════════════
+// API SAVE
+// ════════════════════════════════════════════
+async function saveFile(filename, content) {
+  if (location.protocol === 'file:') {
+    throw new Error('Ouvrez via http://localhost:3000 (lancez start.bat) pour sauvegarder.');
+  }
+  var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (isLocal) {
+    var res = await fetch('http://localhost:3000/save', {
+      method:'POST', headers:{ 'Content-Type':'application/json' },
+      body:JSON.stringify({ filename:filename, content:content })
+    });
+    if (!res.ok) {
+      var err = await res.json().catch(function(){return{};});
+      throw new Error(err.error || 'Erreur serveur ' + res.status);
+    }
+    return;
+  }
+  await githubSaveFile(filename, content);
+}
+
+// ════════════════════════════════════════════
+// UTILITAIRES
+// ════════════════════════════════════════════
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function heureMin(h) {
+  if (!h) return 9999;
+  var m = String(h).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1])*60+parseInt(m[2]) : 9999;
+}
+
+var toastTimer;
+function showToast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { el.className = ''; }, 3000);
+}
+
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+    }).finally(function() { location.reload(true); });
+  } else { location.reload(true); }
+}
+window.hardReload = hardReload;
+
+function toggleMode() {
+  var isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+window.toggleMode = toggleMode;
+
+if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
+  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
+  hardReload();
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+buildFilterOptions();
+applyFilters();
+showScreen('list');
+
+}); // fin loadData
+</script>
+</body>
+</html>
