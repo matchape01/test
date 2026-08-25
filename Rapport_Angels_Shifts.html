@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Planning Shifts Angel</title>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --angel-bg:#fee2e2; --angel-border:#fca5a5; --angel-text:#dc2626;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --angel-bg:#2d0000; --angel-border:#991b1b; --angel-text:#f87171;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
+  .wrap { max-width:1200px; margin:0 auto; padding:24px 20px 80px; }
+
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:20px; font-weight:700; }
+  .logo p  { font-size:26px; font-weight:800; color:var(--angel-text); line-height:1.2; margin-top:2px; }
+  .logo small { font-size:12px; color:var(--muted); display:block; margin-top:2px; }
+  .header-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .btn-ghost { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:6px 14px; font-size:13px; color:var(--text); font-family:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+  .btn-ghost:hover { background:var(--border); }
+
+  /* ── TABLEAU PRINCIPAL ── */
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:12px; margin-bottom:32px; }
+  table { width:100%; border-collapse:collapse; min-width:760px; }
+
+  /* En-têtes colonnes (jours) */
+  thead th { padding:12px 14px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); background:var(--surface); border-bottom:2px solid var(--border); text-align:center; white-space:nowrap; }
+  thead th.th-jour { background:var(--angel-bg); color:var(--angel-text); font-size:12px; border-bottom:2px solid var(--angel-border); }
+  thead th.th-jour .jour-label { font-size:13px; font-weight:800; display:block; }
+  thead th.th-jour .jour-date  { font-size:10px; font-weight:500; opacity:.75; display:block; margin-top:1px; }
+
+  /* Colonne shift (première colonne) */
+  .td-shift { background:var(--surface); border-right:2px solid var(--border); padding:14px 16px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); white-space:nowrap; vertical-align:middle; width:130px; }
+  .shift-icon { font-size:18px; display:block; margin-bottom:4px; }
+  .shift-name { display:block; }
+  .shift-typical { font-size:10px; font-weight:400; color:var(--muted); display:block; margin-top:2px; opacity:.8; }
+
+  /* Cellules angel */
+  td.td-angel { padding:10px 12px; border-bottom:1px solid var(--border); border-right:1px solid var(--border); text-align:center; vertical-align:middle; min-width:130px; }
+  td.td-angel:last-child { border-right:none; }
+  tbody tr:last-child td { border-bottom:none; }
+  tbody tr { border-bottom:1px solid var(--border); }
+
+  .angel-chip { display:inline-flex; flex-direction:column; align-items:center; gap:3px; border-radius:10px; padding:8px 12px; width:100%; }
+  .angel-chip .angel-name { font-size:13px; font-weight:700; line-height:1.2; }
+  .angel-chip .angel-heure { font-size:10px; font-weight:600; opacity:.75; font-variant-numeric:tabular-nums; margin-top:1px; }
+  .angel-chip .angel-dur { font-size:10px; font-weight:700; opacity:.65; }
+
+  .td-empty { color:var(--muted); font-size:12px; font-style:italic; }
+
+  /* ── LÉGENDE ANGELS ── */
+  .legend { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px; align-items:center; }
+  .legend-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-right:4px; }
+  .legend-chip { border-radius:99px; padding:4px 12px; font-size:12px; font-weight:700; border:1px solid; white-space:nowrap; }
+
+  /* ── STATS ── */
+  .stats-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:22px; }
+  .stat-pill { flex:1; min-width:110px; border-radius:8px; padding:12px 14px; border:1px solid var(--border); background:var(--surface); text-align:center; }
+  .stat-pill .num { font-size:24px; font-weight:800; line-height:1; color:var(--angel-text); }
+  .stat-pill .lbl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); font-weight:600; margin-top:3px; }
+
+  /* ── CONTACTS ── */
+  .contacts-section { margin-top:36px; }
+  .contacts-title { font-size:15px; font-weight:700; margin-bottom:14px; display:flex; align-items:center; gap:8px; padding-bottom:10px; border-bottom:2px solid var(--border); }
+  .contacts-grid { display:flex; flex-wrap:wrap; gap:12px; }
+  .contact-card { border:1px solid var(--angel-border); border-radius:10px; padding:14px 18px; background:var(--angel-bg); min-width:200px; flex:1; max-width:260px; }
+  .contact-name { font-size:14px; font-weight:700; color:var(--angel-text); margin-bottom:6px; }
+  .contact-tel { font-size:13px; color:var(--text); font-variant-numeric:tabular-nums; display:flex; align-items:center; gap:6px; }
+  .contact-tel-missing { font-size:12px; color:var(--muted); font-style:italic; }
+
+  footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
+</style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Planning Shifts Angel 👼</p>
+      <small>Vue d'ensemble — Jour 1 › Jour 7</small>
+    </div>
+    <div class="header-actions">
+      <a class="btn-ghost" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="btn-ghost" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <button class="btn-ghost" onclick="hardReload()">🔄 Refresh</button>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+
+  <div class="stats-bar" id="statsBar"></div>
+  <div class="legend" id="legend"></div>
+  <div class="table-wrap" id="tableWrap"></div>
+  <div class="contacts-section" id="contactsSection"></div>
+
+</div>
+
+<script src="ref_jours.js"></script>
+<script src="loader.js"></script>
+<script>
+loadData(['ref_ressources.js', 'data.js'], function() {
+
+// ── Palette de couleurs par angel (générée dynamiquement) ─────────────────────
+var PALETTES = [
+  { bg:'#fce7f3', border:'#f9a8d4', text:'#9d174d' }, // rose
+  { bg:'#e0f2fe', border:'#7dd3fc', text:'#0369a1' }, // bleu
+  { bg:'#dcfce7', border:'#86efac', text:'#166534' }, // vert
+  { bg:'#fef9c3', border:'#fde047', text:'#854d0e' }, // jaune
+  { bg:'#ede9fe', border:'#c4b5fd', text:'#5b21b6' }, // violet
+  { bg:'#ffedd5', border:'#fdba74', text:'#9a3412' }, // orange
+  { bg:'#f0fdf4', border:'#6ee7b7', text:'#065f46' }, // emeraude
+  { bg:'#faf5ff', border:'#d8b4fe', text:'#6b21a8' }, // lavande
+  { bg:'#fff1f2', border:'#fda4af', text:'#9f1239' }, // rouge clair
+  { bg:'#ecfeff', border:'#67e8f9', text:'#155e75' }, // cyan
+];
+var DARK_PALETTES = [
+  { bg:'#3b1030', border:'#9d174d', text:'#f0abca' },
+  { bg:'#0c2d48', border:'#0369a1', text:'#58a6ff' },
+  { bg:'#0a2e1a', border:'#166534', text:'#4ade80' },
+  { bg:'#2d2006', border:'#854d0e', text:'#fbbf24' },
+  { bg:'#1e1b4b', border:'#5b21b6', text:'#a78bfa' },
+  { bg:'#2c1a0e', border:'#9a3412', text:'#fb923c' },
+  { bg:'#022c22', border:'#065f46', text:'#34d399' },
+  { bg:'#2e1065', border:'#6b21a8', text:'#c084fc' },
+  { bg:'#3f0a14', border:'#9f1239', text:'#fda4af' },
+  { bg:'#083344', border:'#155e75', text:'#22d3ee' },
+];
+
+// Extraire tous les SHIFT ANGEL
+var shifts = AGENDA.filter(function(e) { return e.type === 'SHIFT ANGEL'; });
+
+// Ordre des jours
+var JOURS = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+// Détecter les shifts types distincts (par nom d'atelier normalisé)
+// On regroupe par "slot" = nom canonique du shift
+function slotKey(atelier) {
+  var a = (atelier || '').toLowerCase();
+  if (a.indexOf('matin') !== -1 || a.indexOf('am') !== -1)   return 'AM';
+  if (a.indexOf('midi') !== -1  || a.indexOf('pm') !== -1)   return 'PM';
+  if (a.indexOf('soir') !== -1  || a.indexOf('nuit') !== -1) return 'Soir';
+  return atelier; // fallback : nom exact
+}
+
+// Construire le set ordonné des slots (dans l'ordre AM < PM < Soir)
+var SLOT_ORDER = ['AM', 'PM', 'Soir'];
+var slotsPresents = new Set(shifts.map(function(e) { return slotKey(e.atelier); }));
+// Ajouter des slots non standard s'il y en a
+shifts.forEach(function(e) {
+  var k = slotKey(e.atelier);
+  if (SLOT_ORDER.indexOf(k) === -1) SLOT_ORDER.push(k);
+});
+var SLOTS = SLOT_ORDER.filter(function(s) { return slotsPresents.has(s); });
+
+// Construire la map : slot → jour → { angel, heure, atelier }
+var GRID = {};
+SLOTS.forEach(function(s) { GRID[s] = {}; });
+shifts.forEach(function(e) {
+  var s = slotKey(e.atelier);
+  if (!GRID[s]) GRID[s] = {};
+  GRID[s][e.jour] = { angel: e.angel, heure: e.heure, atelier: e.atelier };
+});
+
+// Assigner une couleur par angel
+var angelColors = {};
+var colorIdx = 0;
+var isDark = document.body.classList.contains('dark');
+shifts.forEach(function(e) {
+  if (e.angel && !angelColors[e.angel]) {
+    var pal = isDark ? DARK_PALETTES[colorIdx % DARK_PALETTES.length]
+                     : PALETTES[colorIdx % PALETTES.length];
+    angelColors[e.angel] = pal;
+    colorIdx++;
+  }
+});
+
+function getColors(angel) {
+  return angelColors[angel] || { bg:'var(--surface)', border:'var(--border)', text:'var(--muted)' };
+}
+
+// Durée en minutes → "Xh00"
+function parseMin(str) {
+  if (!str) return null;
+  var m = String(str).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1])*60 + parseInt(m[2]) : null;
+}
+function fmtMin(min) {
+  if (!min) return '';
+  var h = Math.floor(min/60), m = min%60;
+  return h + 'h' + (m ? String(m).padStart(2,'0') : '00');
+}
+function shiftDur(heure) {
+  if (!heure) return '';
+  var norm = String(heure).replace(/\./g,':');
+  var parts = norm.split(/\s*[-–]\s*/);
+  if (parts.length < 2) return '';
+  var s = parseMin(parts[0]), e = parseMin(parts[1]);
+  if (s === null || e === null) return '';
+  if (e < s) e += 24*60;
+  return fmtMin(e - s);
+}
+
+// ── Stats ──────────────────────────────────────────────────────────────────────
+var uniqueAngels = Object.keys(angelColors).length;
+var totalShifts  = shifts.length;
+var jours_couverts = new Set(shifts.map(function(e) { return e.jour; })).size;
+document.getElementById('statsBar').innerHTML =
+  '<div class="stat-pill"><div class="num">' + totalShifts + '</div><div class="lbl">Shifts planifiés</div></div>' +
+  '<div class="stat-pill"><div class="num">' + uniqueAngels + '</div><div class="lbl">Angels uniques</div></div>' +
+  '<div class="stat-pill"><div class="num">' + jours_couverts + '</div><div class="lbl">Jours couverts</div></div>' +
+  '<div class="stat-pill"><div class="num">' + SLOTS.length + '</div><div class="lbl">Slots / jour</div></div>';
+
+// ── Légende ───────────────────────────────────────────────────────────────────
+var legendHtml = '<span class="legend-title">👼 Angels :</span>';
+Object.keys(angelColors).sort().forEach(function(nom) {
+  var c = angelColors[nom];
+  legendHtml += '<span class="legend-chip" style="background:' + c.bg + ';border-color:' + c.border + ';color:' + c.text + '">' + nom + '</span>';
+});
+document.getElementById('legend').innerHTML = legendHtml;
+
+// ── Tableau ───────────────────────────────────────────────────────────────────
+// En-tête : jours filtrés à ceux qui ont au moins un shift
+var joursActifs = JOURS.filter(function(j) {
+  return SLOTS.some(function(s) { return GRID[s][j]; });
+});
+
+// Noms courts pour les labels de jours
+function jourLabel(jour) {
+  var ref = (typeof REF_JOURS !== 'undefined' ? REF_JOURS : []).find(function(r) { return r.value === jour; });
+  if (ref) {
+    // "Jour 3 — Lundi 31 août" → "Jour 3" + "Lun. 31/08"
+    var parts = ref.label.split('—');
+    var num   = parts[0].trim();
+    var date  = parts[1] ? parts[1].trim() : ref.date;
+    // Abréger le nom du jour
+    date = date.replace('Samedi','Sam.').replace('Dimanche','Dim.').replace('Lundi','Lun.')
+               .replace('Mardi','Mar.').replace('Mercredi','Mer.').replace('Jeudi','Jeu.').replace('Vendredi','Ven.');
+    return { num: num, date: date };
+  }
+  return { num: jour, date: '' };
+}
+
+// Labels des slots
+var SLOT_LABELS = {
+  'AM':   { icon:'🌅', name:'Matin (AM)',       hint:'Début matinée' },
+  'PM':   { icon:'☀️',  name:'Après-midi (PM)',  hint:'Après-midi' },
+  'Soir': { icon:'🌙', name:'Soirée / Nuit',     hint:'Soirée' },
+};
+
+var html = '<table>';
+
+// Thead
+html += '<thead><tr>';
+html += '<th>Shift</th>';
+joursActifs.forEach(function(j) {
+  var lb = jourLabel(j);
+  html += '<th class="th-jour"><span class="jour-label">' + lb.num + '</span><span class="jour-date">' + lb.date + '</span></th>';
+});
+html += '</tr></thead>';
+
+// Tbody
+html += '<tbody>';
+SLOTS.forEach(function(slot) {
+  var sl = SLOT_LABELS[slot] || { icon:'👼', name: slot, hint:'' };
+  html += '<tr>';
+  html += '<td class="td-shift"><span class="shift-icon">' + sl.icon + '</span><span class="shift-name">' + sl.name + '</span>';
+  html += '</td>';
+
+  joursActifs.forEach(function(j) {
+    var cell = GRID[slot][j];
+    if (!cell || !cell.angel) {
+      html += '<td class="td-angel td-empty">—</td>';
+      return;
+    }
+    var c   = getColors(cell.angel);
+    var dur = shiftDur(cell.heure);
+    html += '<td class="td-angel" style="padding:8px;">';
+    html += '<div class="angel-chip" style="background:' + c.bg + ';border:1px solid ' + c.border + ';">';
+    html += '<span class="angel-name" style="color:' + c.text + '">👼 ' + cell.angel + '</span>';
+    html += '<span class="angel-heure" style="color:' + c.text + '">' + (cell.heure || '') + '</span>';
+    if (dur) html += '<span class="angel-dur" style="color:' + c.text + '">' + dur + '</span>';
+    html += '</div></td>';
+  });
+
+  html += '</tr>';
+});
+html += '</tbody></table>';
+
+document.getElementById('tableWrap').innerHTML = html;
+
+// ── Contacts Angels ────────────────────────────────────────────────────────────
+// Affiche nom + téléphone de tous les angels (depuis REF_RESSOURCES)
+function buildContacts() {
+  var angels = (typeof REF_RESSOURCES !== 'undefined' ? REF_RESSOURCES : [])
+    .filter(function(r) { return r.roles && r.roles.indexOf('angel') !== -1 && r.value !== 'TEST'; })
+    .sort(function(a, b) { return a.value.localeCompare(b.value); });
+
+  if (!angels.length) return;
+
+  var cards = angels.map(function(r) {
+    var c = angelColors[r.value] || { bg: 'var(--angel-bg)', border: 'var(--angel-border)', text: 'var(--angel-text)' };
+    var telHtml = (r.tel && r.tel.trim())
+      ? '<div class="contact-tel">📞 <a href="tel:' + r.tel.replace(/\s/g,'') + '" style="color:inherit;text-decoration:none;">' + r.tel + '</a></div>'
+      : '<div class="contact-tel-missing">📞 Numéro non renseigné</div>';
+    return '<div class="contact-card" style="border-color:' + c.border + ';background:' + c.bg + ';">' +
+      '<div class="contact-name" style="color:' + c.text + '">👼 ' + r.value + '</div>' +
+      telHtml +
+      '</div>';
+  }).join('');
+
+  document.getElementById('contactsSection').innerHTML =
+    '<div class="contacts-title">📞 Contacts Angels</div>' +
+    '<div class="contacts-grid">' + cards + '</div>';
+}
+buildContacts();
+
+// ── Utilitaires ───────────────────────────────────────────────────────────────
+function toggleMode() {
+  var dark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = dark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+  // Recalculer les couleurs en mode nuit/jour
+  isDark = dark;
+  colorIdx = 0;
+  angelColors = {};
+  shifts.forEach(function(e) {
+    if (e.angel && !angelColors[e.angel]) {
+      var pal = isDark ? DARK_PALETTES[colorIdx % DARK_PALETTES.length]
+                       : PALETTES[colorIdx % PALETTES.length];
+      angelColors[e.angel] = pal;
+      colorIdx++;
+    }
+  });
+  // Re-render légende et tableau
+  var legendHtml2 = '<span class="legend-title">👼 Angels :</span>';
+  Object.keys(angelColors).sort().forEach(function(nom) {
+    var c = angelColors[nom];
+    legendHtml2 += '<span class="legend-chip" style="background:' + c.bg + ';border-color:' + c.border + ';color:' + c.text + '">' + nom + '</span>';
+  });
+  document.getElementById('legend').innerHTML = legendHtml2;
+  document.getElementById('tableWrap').innerHTML = html; // re-inject (colors updated via closure)
+  // Trigger re-render complet
+  buildTable();
+  buildContacts();
+}
+window.toggleMode = toggleMode;
+function hardReload() { location.reload(true); }
+window.hardReload = hardReload;
+
+function buildTable() {
+  var h = '<table>';
+  h += '<thead><tr><th>Shift</th>';
+  joursActifs.forEach(function(j) {
+    var lb = jourLabel(j);
+    h += '<th class="th-jour"><span class="jour-label">' + lb.num + '</span><span class="jour-date">' + lb.date + '</span></th>';
+  });
+  h += '</tr></thead><tbody>';
+  SLOTS.forEach(function(slot) {
+    var sl = SLOT_LABELS[slot] || { icon:'👼', name: slot, hint:'' };
+    h += '<tr><td class="td-shift"><span class="shift-icon">' + sl.icon + '</span><span class="shift-name">' + sl.name + '</span></td>';
+    joursActifs.forEach(function(j) {
+      var cell = GRID[slot][j];
+      if (!cell || !cell.angel) { h += '<td class="td-angel td-empty">—</td>'; return; }
+      var c = getColors(cell.angel);
+      var dur = shiftDur(cell.heure);
+      h += '<td class="td-angel" style="padding:8px;">';
+      h += '<div class="angel-chip" style="background:' + c.bg + ';border:1px solid ' + c.border + ';">';
+      h += '<span class="angel-name" style="color:' + c.text + '">👼 ' + cell.angel + '</span>';
+      h += '<span class="angel-heure" style="color:' + c.text + '">' + (cell.heure || '') + '</span>';
+      if (dur) h += '<span class="angel-dur" style="color:' + c.text + '">' + dur + '</span>';
+      h += '</div></td>';
+    });
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+  document.getElementById('tableWrap').innerHTML = h;
+}
+
+}); // end loadData
+</script>
+</body>
+</html>
