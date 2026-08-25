@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — NEWS</title>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --success:#166534; --success-bg:#dcfce7; --success-bd:#86efac;
+    --danger:#dc2626; --danger-bg:#fef2f2; --danger-bd:#fca5a5;
+    --warn:#b45309; --warn-bg:#fffbeb; --warn-bd:#fcd34d;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); }
+  .wrap { max-width:860px; margin:0 auto; padding:28px 20px 60px; }
+
+  /* ── HEADER ── */
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:32px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:22px; font-weight:800; color:var(--accent); }
+  .logo p  { font-size:12px; color:var(--muted); margin-top:2px; }
+  .header-actions { display:flex; gap:8px; align-items:center; }
+  .btn-back { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; background:var(--surface); border:1px solid var(--border); border-radius:20px; font-size:12px; font-weight:700; color:var(--text); text-decoration:none; font-family:inherit; cursor:pointer; }
+  .btn-back:hover { background:var(--border); }
+
+  /* ── TYPE TABS ── */
+  .type-tabs { display:flex; gap:8px; margin-bottom:20px; flex-wrap:wrap; }
+  .type-tab {
+    cursor:pointer; padding:7px 18px; border-radius:20px; font-size:13px; font-weight:700;
+    border:2px solid var(--border); background:var(--surface); color:var(--muted);
+    font-family:inherit; transition:all .15s;
+  }
+  .type-tab:hover { border-color:var(--accent); color:var(--accent); }
+  .type-tab.active-dt { border-color:#7c3aed; background:#f5f3ff; color:#5b21b6; }
+  .type-tab.active-fv { border-color:#0369a1; background:#e0f2fe; color:#0369a1; }
+
+  /* ── FORM CARD ── */
+  .form-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:28px; }
+  .form-card-title { font-size:15px; font-weight:700; color:var(--text); margin-bottom:18px; padding-bottom:12px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+
+  /* ── TYPE SELECTOR ── */
+  .type-selector { display:flex; gap:10px; margin-bottom:18px; flex-wrap:wrap; }
+  .type-radio { display:none; }
+  .type-label {
+    cursor:pointer; padding:8px 20px; border-radius:8px; font-size:13px; font-weight:700;
+    border:2px solid var(--border); background:var(--bg); color:var(--muted);
+    display:inline-flex; align-items:center; gap:8px; transition:all .15s;
+    user-select:none;
+  }
+  .type-label:hover { border-color:var(--accent); }
+  .type-radio:checked + .type-label[for="typeDT"] { border-color:#7c3aed; background:#f5f3ff; color:#5b21b6; }
+  .type-radio:checked + .type-label[for="typeFV"] { border-color:#0369a1; background:#e0f2fe; color:#0369a1; }
+
+  /* ── RICH EDITOR ── */
+  .editor-wrap { margin-bottom:16px; }
+  .editor-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:6px; display:block; }
+  .editor-toolbar {
+    display:flex; gap:4px; flex-wrap:wrap;
+    padding:6px 8px; background:var(--bg); border:1px solid var(--border);
+    border-bottom:none; border-radius:8px 8px 0 0;
+  }
+  .tb-btn {
+    cursor:pointer; background:none; border:1px solid transparent; border-radius:4px;
+    padding:3px 7px; font-size:13px; color:var(--text); font-family:inherit; line-height:1.4;
+    transition:background .1s, border-color .1s;
+  }
+  .tb-btn:hover { background:var(--border); }
+  .tb-btn.active { background:var(--border); border-color:#aaa; }
+  .tb-sep { width:1px; background:var(--border); margin:2px 3px; align-self:stretch; }
+  .tb-select {
+    background:var(--bg); border:1px solid var(--border); border-radius:4px;
+    padding:2px 6px; font-size:12px; color:var(--text); font-family:inherit; cursor:pointer;
+  }
+  .editor-area {
+    min-height:120px; padding:12px 14px;
+    border:1px solid var(--border); border-radius:0 0 8px 8px;
+    font-size:14px; line-height:1.65; color:var(--text);
+    background:var(--bg); outline:none;
+    overflow-y:auto;
+  }
+  .editor-area:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(59,130,212,.1); }
+  .editor-area[placeholder]:empty::before { content:attr(placeholder); color:#aaa; pointer-events:none; }
+
+  /* ── ACTIONS ── */
+  .form-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; }
+  .btn-save { cursor:pointer; background:var(--accent); color:#fff; border:none; border-radius:8px; padding:10px 24px; font-size:14px; font-weight:700; font-family:inherit; display:inline-flex; align-items:center; gap:8px; }
+  .btn-save:hover { filter:brightness(1.1); }
+  .btn-cancel { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 18px; font-size:14px; color:var(--text); font-family:inherit; }
+  .btn-cancel:hover { background:var(--border); }
+
+  /* ── LIST ── */
+  .list-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; flex-wrap:wrap; gap:8px; }
+  .list-title { font-size:15px; font-weight:700; }
+  .filter-tabs { display:flex; gap:6px; }
+  .filter-tab { cursor:pointer; padding:4px 14px; border-radius:20px; font-size:12px; font-weight:700; border:1px solid var(--border); background:var(--surface); color:var(--muted); font-family:inherit; }
+  .filter-tab.active { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+  .news-list { display:flex; flex-direction:column; gap:10px; }
+  .news-item {
+    background:var(--surface); border:1px solid var(--border); border-radius:10px;
+    padding:14px 16px; display:flex; gap:14px; align-items:flex-start;
+  }
+  .news-item.type-dt { border-left:4px solid #7c3aed; }
+  .news-item.type-fv { border-left:4px solid #0369a1; }
+  .news-item.is-hidden { opacity:.45; background:#f7f8fa; }
+  .news-item.is-hidden .news-item-fr,
+  .news-item.is-hidden .news-item-en { text-decoration:line-through; color:var(--muted); }
+  .news-item.is-priority { border-top:3px solid #f59e0b; }
+  .news-badge {
+    font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.6px;
+    padding:2px 8px; border-radius:10px; white-space:nowrap; flex-shrink:0;
+    margin-top:3px;
+  }
+  .badge-dt { background:#f5f3ff; color:#5b21b6; border:1px solid #c4b5fd; }
+  .badge-fv { background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; }
+  .badge-hidden   { background:#f1f5f9; color:#64748b; border:1px solid #cbd5e1; }
+  .badge-priority { background:#fef3c7; color:#b45309; border:1px solid #fcd34d; }
+  .news-item-body { flex:1; min-width:0; }
+  .news-item-meta { font-size:11px; color:var(--muted); margin-bottom:4px; }
+  .news-item-fr { font-size:13px; color:var(--text); line-height:1.55; }
+  .news-item-en { font-size:12px; color:var(--muted); margin-top:4px; line-height:1.5; font-style:italic; }
+  .news-item-en::before { content:'🇬🇧 '; }
+  .news-item-actions { display:flex; gap:6px; flex-shrink:0; align-items:center; margin-top:2px; flex-wrap:wrap; }
+  .btn-edit { cursor:pointer; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:4px 12px; font-size:12px; color:var(--text); font-family:inherit; }
+  .btn-edit:hover { background:var(--border); }
+  .btn-hide { cursor:pointer; border-radius:6px; padding:4px 10px; font-size:12px; font-family:inherit; border:1px solid #fcd34d; background:#fffbeb; color:#b45309; }
+  .btn-hide:hover { background:#fde68a; }
+  .btn-hide.is-hidden { border:1px solid #86efac; background:#dcfce7; color:#166534; }
+  .btn-hide.is-hidden:hover { background:#bbf7d0; }
+  .btn-prio { cursor:pointer; border-radius:6px; padding:4px 10px; font-size:12px; font-family:inherit; border:1px solid #d1d5db; background:var(--bg); color:var(--muted); }
+  .btn-prio:hover { background:var(--border); }
+  .btn-prio.is-priority { border:1px solid #fcd34d; background:#fef3c7; color:#b45309; font-weight:700; }
+  .btn-prio.is-priority:hover { background:#fde68a; }
+  .btn-del { cursor:pointer; background:var(--danger-bg); border:1px solid var(--danger-bd); border-radius:6px; padding:4px 10px; font-size:12px; color:var(--danger); font-family:inherit; }
+  .btn-del:hover { background:#fee2e2; }
+  .list-empty { text-align:center; color:var(--muted); font-size:13px; padding:32px; border:2px dashed var(--border); border-radius:10px; }
+
+  /* ── TOAST ── */
+  .toast { position:fixed; bottom:24px; right:24px; z-index:999; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:700; display:none; box-shadow:0 4px 20px rgba(0,0,0,.12); max-width:380px; }
+  .toast.show { display:block; animation:toastIn .2s ease; }
+  @keyframes toastIn { from { transform:translateY(8px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+</style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div style="display:inline-block;background:var(--accent);color:#fff;font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:4px;margin-bottom:6px;">Admin — News</div>
+      <h1>📢 NEWS</h1>
+      <p>Tantramour 2026 — Gestion des messages importants</p>
+    </div>
+    <div class="header-actions">
+      <a href="gestion_planning.html" class="btn-back">← Retour</a>
+    </div>
+  </header>
+
+  <!-- FORMULAIRE DE SAISIE / ÉDITION -->
+  <div class="form-card">
+    <div class="form-card-title">
+      <span id="formTitle">✏️ Nouvelle news</span>
+    </div>
+
+    <!-- Sélecteur type -->
+    <div style="margin-bottom:18px;">
+      <div class="editor-label">Destinataire</div>
+      <div class="type-selector">
+        <input type="radio" name="newsType" id="typeDT" value="dreamteam" class="type-radio">
+        <label class="type-label" for="typeDT">🌀 DreamTeam</label>
+        <input type="radio" name="newsType" id="typeFV" value="festivalier" class="type-radio">
+        <label class="type-label" for="typeFV">🎪 Festivalier</label>
+      </div>
+    </div>
+
+    <!-- Éditeur FR -->
+    <div class="editor-wrap">
+      <label class="editor-label">Texte FR 🇫🇷</label>
+      <div class="editor-toolbar" id="tbFr">
+        <select class="tb-select" onchange="execFormat('fontSize',this.value,this);this.value='3'">
+          <option value="3" selected>Normal</option>
+          <option value="1">Petit</option>
+          <option value="4">Grand</option>
+          <option value="5">Très grand</option>
+        </select>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" onclick="execFormat('bold')" title="Gras"><b>G</b></button>
+        <button class="tb-btn" onclick="execFormat('italic')" title="Italique"><i>I</i></button>
+        <button class="tb-btn" onclick="execFormat('underline')" title="Souligné"><u>S</u></button>
+        <button class="tb-btn" onclick="execFormat('strikeThrough')" title="Barré"><s>A</s></button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" onclick="execFormat('justifyLeft')" title="Gauche">⬅</button>
+        <button class="tb-btn" onclick="execFormat('justifyCenter')" title="Centrer">↔</button>
+        <button class="tb-btn" onclick="execFormat('justifyRight')" title="Droite">➡</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" onclick="execFormat('insertUnorderedList')" title="Liste à puces">•≡</button>
+        <button class="tb-btn" onclick="execFormat('insertOrderedList')" title="Liste numérotée">1≡</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" onclick="execFormat('removeFormat')" title="Effacer le formatage">✕</button>
+      </div>
+      <div id="editorFr" class="editor-area" contenteditable="true" placeholder="Saisissez le texte en français…"></div>
+    </div>
+
+    <!-- Éditeur EN -->
+    <div class="editor-wrap">
+      <label class="editor-label">Texte EN 🇬🇧</label>
+      <div class="editor-toolbar" id="tbEn">
+        <select class="tb-select" onchange="execFormat('fontSize',this.value,this);this.value='3'">
+          <option value="3" selected>Normal</option>
+          <option value="1">Petit</option>
+          <option value="4">Grand</option>
+          <option value="5">Très grand</option>
+        </select>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" onclick="execFormatEn('bold')" title="Gras"><b>G</b></button>
+        <button class="tb-btn" onclick="execFormatEn('italic')" title="Italique"><i>I</i></button>
+        <button class="tb-btn" onclick="execFormatEn('underline')" title="Souligné"><u>S</u></button>
+        <button class="tb-btn" onclick="execFormatEn('strikeThrough')" title="Barré"><s>A</s></button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" onclick="execFormatEn('justifyLeft')" title="Gauche">⬅</button>
+        <button class="tb-btn" onclick="execFormatEn('justifyCenter')" title="Centrer">↔</button>
+        <button class="tb-btn" onclick="execFormatEn('justifyRight')" title="Droite">➡</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" onclick="execFormatEn('insertUnorderedList')" title="Liste à puces">•≡</button>
+        <button class="tb-btn" onclick="execFormatEn('insertOrderedList')" title="Liste numérotée">1≡</button>
+        <div class="tb-sep"></div>
+        <button class="tb-btn" onclick="execFormatEn('removeFormat')" title="Effacer le formatage">✕</button>
+      </div>
+      <div id="editorEn" class="editor-area" contenteditable="true" placeholder="Enter text in English…"></div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button class="btn-save" onclick="sauvegarder()">💾 Enregistrer</button>
+      <button class="btn-cancel" id="btnCancel" onclick="annuler()" style="display:none;">✖ Annuler</button>
+    </div>
+  </div>
+
+  <!-- LISTE DES NEWS -->
+  <div>
+    <div class="list-header">
+      <div class="list-title">📋 News enregistrées</div>
+      <div class="filter-tabs">
+        <button class="filter-tab active" id="filterAll"    onclick="setFilter('all')">Toutes</button>
+        <button class="filter-tab" id="filterDT"            onclick="setFilter('dreamteam')">🌀 DreamTeam</button>
+        <button class="filter-tab" id="filterFV"            onclick="setFilter('festivalier')">🎪 Festivaliers</button>
+        <button class="filter-tab" id="filterHidden"        onclick="setFilter('hidden')">🚫 Masquées</button>
+      </div>
+    </div>
+    <div class="news-list" id="newsList"></div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- Scripts -->
+<script src="github-api.js"></script>
+<script src="loader.js"></script>
+<script>
+// ════════════════════════════════════════════════════════════════
+// ÉTAT
+// ════════════════════════════════════════════════════════════════
+var NEWS_SESSION = [];
+var _editId      = null;   // null = nouvelle news
+var _filter      = 'all';
+var _activeEditor = 'fr';  // editeur actif pour les commandes de format
+
+// ════════════════════════════════════════════════════════════════
+// INITIALISATION
+// ════════════════════════════════════════════════════════════════
+loadData(['ref_news.js'], function() {
+  NEWS_SESSION = (typeof REF_NEWS !== 'undefined' && Array.isArray(REF_NEWS))
+    ? REF_NEWS.map(function(n) { return Object.assign({}, n); })
+    : [];
+  // sélectionner DreamTeam par défaut
+  document.getElementById('typeDT').checked = true;
+  renderList();
+});
+
+// ════════════════════════════════════════════════════════════════
+// ÉDITEUR RICHE
+// ════════════════════════════════════════════════════════════════
+// Focaliser l'éditeur actif quand on clique sur la barre d'outils
+document.getElementById('tbFr').addEventListener('mousedown', function() { _activeEditor = 'fr'; });
+document.getElementById('tbEn').addEventListener('mousedown', function() { _activeEditor = 'en'; });
+document.getElementById('editorFr').addEventListener('focus', function() { _activeEditor = 'fr'; });
+document.getElementById('editorEn').addEventListener('focus', function() { _activeEditor = 'en'; });
+
+function execFormat(cmd, val, selEl) {
+  var ed = _activeEditor === 'en' ? document.getElementById('editorEn') : document.getElementById('editorFr');
+  ed.focus();
+  document.execCommand(cmd, false, val || null);
+  if (selEl) setTimeout(function() { selEl.value = '3'; }, 10);
+}
+function execFormatEn(cmd, val) {
+  _activeEditor = 'en';
+  execFormat(cmd, val);
+}
+
+// ════════════════════════════════════════════════════════════════
+// FILTRE LISTE
+// ════════════════════════════════════════════════════════════════
+function setFilter(f) {
+  _filter = f;
+  ['All','DT','FV','Hidden'].forEach(function(k) {
+    document.getElementById('filter'+k).classList.toggle('active',
+      (k==='All'    && f==='all') ||
+      (k==='DT'     && f==='dreamteam') ||
+      (k==='FV'     && f==='festivalier') ||
+      (k==='Hidden' && f==='hidden')
+    );
+  });
+  renderList();
+}
+
+// ════════════════════════════════════════════════════════════════
+// RENDU LISTE
+// ════════════════════════════════════════════════════════════════
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderList() {
+  var list = document.getElementById('newsList');
+  var items = NEWS_SESSION.slice().reverse();
+  if (_filter === 'hidden') {
+    items = items.filter(function(n) { return n.hidden === true; });
+  } else if (_filter !== 'all') {
+    items = items.filter(function(n) { return n.type === _filter; });
+  }
+  if (items.length === 0) {
+    list.innerHTML = '<div class="list-empty">Aucune news' + (_filter!=='all'?' dans cette catégorie':'') + '.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  items.forEach(function(n) {
+    var isDT    = n.type === 'dreamteam';
+    var isHid   = n.hidden === true;
+    var isPrio  = n.priority === true;
+    var div     = document.createElement('div');
+    div.className = 'news-item ' + (isDT ? 'type-dt' : 'type-fv')
+      + (isHid  ? ' is-hidden'  : '')
+      + (isPrio ? ' is-priority' : '');
+    var badgeCls   = isDT ? 'badge-dt' : 'badge-fv';
+    var badgeTxt   = isDT ? '🌀 DreamTeam' : '🎪 Festivalier';
+    var hideBtnCls = isHid  ? 'btn-hide is-hidden'   : 'btn-hide';
+    var hideBtnTxt = isHid  ? '👁 Afficher'           : '🚫 Masquer';
+    var prioBtnCls = isPrio ? 'btn-prio is-priority'  : 'btn-prio';
+    var prioBtnTxt = isPrio ? '⭐ Prioritaire'         : '☆ Priorité';
+    div.innerHTML =
+      '<div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;">' +
+        '<div class="news-badge '+badgeCls+'">'+badgeTxt+'</div>' +
+        (isPrio ? '<div class="news-badge badge-priority">⭐ PRIORITÉ</div>' : '') +
+        (isHid  ? '<div class="news-badge badge-hidden">🚫 MASQUÉE</div>'   : '') +
+      '</div>' +
+      '<div class="news-item-body">' +
+        '<div class="news-item-meta">' + esc(n.publishedAt||'') + (n.author?' — '+esc(n.author):'') + '</div>' +
+        '<div class="news-item-fr">' + (n.fr||'<span style="color:#aaa;font-style:italic;">–</span>') + '</div>' +
+        (n.en ? '<div class="news-item-en">' + n.en + '</div>' : '') +
+      '</div>' +
+      '<div class="news-item-actions">' +
+        '<button class="btn-edit" onclick="editer(\''+n.id+'\')">✏️ Modifier</button>' +
+        '<button class="'+prioBtnCls+'" onclick="togglePriority(\''+n.id+'\')">'+prioBtnTxt+'</button>' +
+        '<button class="'+hideBtnCls+'" onclick="toggleHidden(\''+n.id+'\')">'+hideBtnTxt+'</button>' +
+        '<button class="btn-del"  onclick="supprimer(\''+n.id+'\')">🗑</button>' +
+      '</div>';
+    list.appendChild(div);
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// ÉDITION
+// ════════════════════════════════════════════════════════════════
+function editer(id) {
+  var n = NEWS_SESSION.find(function(x) { return x.id === id; });
+  if (!n) return;
+  _editId = id;
+  document.getElementById('formTitle').textContent = '✏️ Modifier la news' + (n.hidden ? ' 🚫' : '');
+  document.getElementById('editorFr').innerHTML = n.fr || '';
+  document.getElementById('editorEn').innerHTML = n.en || '';
+  var isDT = n.type === 'dreamteam';
+  document.getElementById('typeDT').checked = isDT;
+  document.getElementById('typeFV').checked = !isDT;
+  document.getElementById('btnCancel').style.display = '';
+  document.querySelector('.form-card').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function annuler() {
+  _editId = null;
+  document.getElementById('formTitle').textContent = '✏️ Nouvelle news';
+  document.getElementById('editorFr').innerHTML = '';
+  document.getElementById('editorEn').innerHTML = '';
+  document.getElementById('typeDT').checked = true;
+  document.getElementById('btnCancel').style.display = 'none';
+}
+
+// ════════════════════════════════════════════════════════════════
+// TOGGLE PRIORITY
+// ════════════════════════════════════════════════════════════════
+function togglePriority(id) {
+  var idx = NEWS_SESSION.findIndex(function(n) { return n.id === id; });
+  if (idx === -1) return;
+  var targetType = NEWS_SESSION[idx].type;
+  var willBePrio = !NEWS_SESSION[idx].priority;
+
+  // Règle : 1 seule news prioritaire par type → désactiver l'éventuelle existante
+  if (willBePrio) {
+    NEWS_SESSION.forEach(function(n, i) {
+      if (i !== idx && n.type === targetType && n.priority) {
+        NEWS_SESSION[i].priority = false;
+      }
+    });
+  }
+
+  NEWS_SESSION[idx].priority = willBePrio;
+  sauvegarderFichier(function() {
+    toast(willBePrio
+      ? '⭐ News mise en priorité — elle sera affichée en premier.'
+      : '☆ Priorité retirée.');
+    renderList();
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// TOGGLE HIDDEN
+// ════════════════════════════════════════════════════════════════
+function toggleHidden(id) {
+  var idx = NEWS_SESSION.findIndex(function(n) { return n.id === id; });
+  if (idx === -1) return;
+  NEWS_SESSION[idx].hidden = !NEWS_SESSION[idx].hidden;
+  sauvegarderFichier(function() {
+    var isHid = NEWS_SESSION[idx].hidden;
+    toast(isHid ? '🚫 News masquée — elle n\'apparaîtra plus sur le site.' : '👁 News réactivée — elle est à nouveau visible.');
+    renderList();
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// SUPPRESSION
+// ════════════════════════════════════════════════════════════════
+function supprimer(id) {
+  if (!confirm('Supprimer cette news ?')) return;
+  NEWS_SESSION = NEWS_SESSION.filter(function(n) { return n.id !== id; });
+  if (_editId === id) annuler();
+  sauvegarderFichier(function() {
+    toast('✅ News supprimée et sauvegardée.');
+    renderList();
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// SAUVEGARDE PRINCIPALE
+// ════════════════════════════════════════════════════════════════
+function sauvegarder() {
+  var fr = document.getElementById('editorFr').innerHTML.trim();
+  var en = document.getElementById('editorEn').innerHTML.trim();
+  // Normaliser le contenu vide de l'éditeur
+  if (fr === '<br>' || fr === '<div><br></div>') fr = '';
+  if (en === '<br>' || en === '<div><br></div>') en = '';
+  if (!fr && !en) { toast('⚠️ Saisissez au moins un texte FR ou EN.', true); return; }
+
+  var typeSel = document.querySelector('input[name="newsType"]:checked');
+  var type = typeSel ? typeSel.value : 'dreamteam';
+
+  var now = new Date();
+  var pad = function(n) { return String(n).padStart(2,'0'); };
+  var publishedAt = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())
+    +' '+pad(now.getHours())+':'+pad(now.getMinutes());
+
+  if (_editId) {
+    var idx = NEWS_SESSION.findIndex(function(n) { return n.id === _editId; });
+    if (idx !== -1) {
+      NEWS_SESSION[idx].fr   = fr;
+      NEWS_SESSION[idx].en   = en;
+      NEWS_SESSION[idx].type = type;
+    }
+  } else {
+    NEWS_SESSION.push({
+      id: 'NEWS_' + Date.now(),
+      fr: fr, en: en,
+      type: type,
+      publishedAt: publishedAt,
+      author: 'Admin'
+    });
+  }
+
+  sauvegarderFichier(function() {
+    toast('✅ News enregistrée et publiée !');
+    annuler();
+    renderList();
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// GÉNÉRATION JS + ÉCRITURE FICHIER
+// ════════════════════════════════════════════════════════════════
+function escStr(s) {
+  return String(s||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\r?\n/g,'\\n');
+}
+
+function genNewsJs() {
+  var lines = NEWS_SESSION.map(function(n) {
+    var prioPart   = n.priority ? ',priority:true' : '';
+    var hiddenPart = n.hidden   ? ',hidden:true'   : '';
+    return '  {id:"'+escStr(n.id)+'",type:"'+escStr(n.type||'dreamteam')
+      +'",fr:"'+escStr(n.fr)+'",en:"'+escStr(n.en)
+      +'",publishedAt:"'+escStr(n.publishedAt)+'",author:"'+escStr(n.author||'Admin')+'"'
+      +prioPart+hiddenPart+'}';
+  });
+  return '/**\n'
+    +' * TANTRAMOUR 2026 — News\n'
+    +' * Fichier géré automatiquement par Rapport_News.html\n'
+    +' *\n'
+    +' * Champs :\n'
+    +' *   id          {string}  identifiant unique\n'
+    +' *   type        {string}  "dreamteam" | "festivalier"\n'
+    +' *   priority    {boolean} true = affichée en premier (1 seule par type)\n'
+    +' *   hidden      {boolean} true = masquée (non affichée sur le site)\n'
+    +' *   fr          {string}  texte HTML en français\n'
+    +' *   en          {string}  texte HTML en anglais\n'
+    +' *   publishedAt {string}  "YYYY-MM-DD HH:MM"\n'
+    +' *   author      {string}  auteur\n'
+    +' */\n\n'
+    +'var REF_NEWS = [\n'
+    +lines.join(',\n')
+    +'\n];\n';
+}
+
+// ── Sauvegarde : local (POST /save) ou GitHub Pages (githubSaveFile) ──────────
+async function saveFile(filename, content) {
+  if (location.protocol === 'file:') {
+    throw new Error('Ouvrez via http://localhost:3000 (lancez start.bat) pour sauvegarder.');
+  }
+  var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (isLocal) {
+    var res = await fetch('http://localhost:3000/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: filename, content: content })
+    });
+    if (!res.ok) {
+      var err = await res.json().catch(function() { return {}; });
+      throw new Error(err.error || 'Erreur serveur ' + res.status);
+    }
+    return;
+  }
+  await githubSaveFile(filename, content);
+}
+
+function sauvegarderFichier(cb) {
+  var content = genNewsJs();
+  saveFile('ref_news.js', content)
+    .then(function() { if (cb) cb(); })
+    .catch(function(e) { toast('❌ Sauvegarde impossible : ' + e.message, true); });
+}
+
+// ════════════════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════════════════
+function toast(msg, erreur) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background   = erreur ? '#fef2f2' : '#dcfce7';
+  t.style.color        = erreur ? '#dc2626' : '#166534';
+  t.style.borderColor  = erreur ? '#fca5a5' : '#86efac';
+  t.style.border       = '1px solid ' + (erreur ? '#fca5a5' : '#86efac');
+  t.classList.remove('show');
+  void t.offsetWidth;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 5000);
+}
+
+// Exposer pour les boutons inline
+window.editer          = editer;
+window.supprimer       = supprimer;
+window.setFilter       = setFilter;
+window.toggleHidden    = toggleHidden;
+window.togglePriority  = togglePriority;
+</script>
+</body>
+</html>
