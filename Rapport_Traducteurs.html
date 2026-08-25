@@ -108,7 +108,10 @@
     select { min-width: 100%; }
   }
 </style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
 </head>
+<!-- i18n -->
 <body>
 <div class="wrap">
 
@@ -118,9 +121,10 @@
       <p>Planning Traducteurs</p>
     </div>
     <div class="header-actions">
-      <a class="btn-ghost" href="index.html">🏠 Home</a>
-      <button class="btn-ghost" onclick="hardReload()">🔄 Refresh</button>
-      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+      <a class="btn-ghost" href="index_bis.html">🏠 DreamTeam</a>
+      <button class="btn-ghost" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit">Mode Nuit</span></button>
+      <button class="mode-btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
     </div>
   </header>
 
@@ -134,22 +138,22 @@
   <!-- ── FILTRES ── -->
   <div class="filters">
     <div class="filter-group">
-      <label>Traducteur</label>
+      <label data-i18n="filter_traducteur">Traducteur</label>
       <select id="filterTraducteur" onchange="render()">
-        <option value="">Tous les traducteurs</option>
+        <option value="" data-i18n="filter_tous_trad">Tous les traducteurs</option>
       </select>
     </div>
     <div class="filter-group">
-      <label>Jour</label>
+      <label data-i18n="col_jour">Jour</label>
       <select id="filterJour" onchange="render()">
-        <option value="">Tous les jours</option>
-        <option value="Jour 1">Jour 1 — Sam. 29 août</option>
-        <option value="Jour 2">Jour 2 — Dim. 30 août</option>
-        <option value="Jour 3">Jour 3 — Lun. 31 août</option>
-        <option value="Jour 4">Jour 4 — Mar. 1 sept.</option>
-        <option value="Jour 5">Jour 5 — Mer. 2 sept.</option>
-        <option value="Jour 6">Jour 6 — Jeu. 3 sept.</option>
-        <option value="Jour 7">Jour 7 — Ven. 4 sept.</option>
+        <option value="" data-i18n="filter_tous_jours">Tous les jours</option>
+        <option value="Jour 1" data-i18n="jour1_label">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2" data-i18n="jour2_label">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3" data-i18n="jour3_label">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4" data-i18n="jour4_label">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5" data-i18n="jour5_label">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6" data-i18n="jour6_label">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7" data-i18n="jour7_label">Jour 7 — Ven. 4 sept.</option>
       </select>
     </div>
   </div>
@@ -164,7 +168,6 @@
   <div id="results"></div>
 
 </div>
-<footer><p>Made with IBM Bob</p></footer>
 
 <script src="loader.js"></script>
 <script>
@@ -188,6 +191,20 @@ function fmtMin(mins) {
   const h = Math.floor((mins % 1440) / 60);
   const m = mins % 60;
   return `${h}:${String(m).padStart(2,'0')}`;
+}
+
+function dureeMin(iv) {
+  if (!iv) return '';
+  const d = iv.fin - iv.debut;
+  if (d <= 0) return '';
+  const h = Math.floor(d / 60);
+  const m = d % 60;
+  return h > 0 ? `${h}h${m > 0 ? String(m).padStart(2,'0') : ''}` : `${m} min`;
+}
+
+function dureeFromHeure(heure) {
+  const iv = parseIntervalle(heure);
+  return iv ? dureeMin(iv) : '';
 }
 
 // ════════════════════════════════════════════════
@@ -296,16 +313,29 @@ function renderCards(data) {
   if (!data.length) return `<div class="empty">Aucun résultat pour cette sélection.</div>`;
   return `<div class="role-section">${data.map(a => {
     const nbAteliers = a.shifts.reduce((s,sh) => s + sh.ateliers.length, 0);
-    // Aplatir tous les ateliers triés par jour puis heure
+
+    // Durée totale de traduction = somme des durées de chaque atelier
+    const totalMins = a.shifts.reduce((s, sh) =>
+      s + sh.ateliers.reduce((ss, at) => {
+        const iv = parseIntervalle(at.heure);
+        return ss + (iv ? iv.fin - iv.debut : 0);
+      }, 0), 0);
+    const totalH = Math.floor(totalMins / 60);
+    const totalM = totalMins % 60;
+    const totalStr = totalMins > 0
+      ? `${totalH}h${totalM > 0 ? String(totalM).padStart(2,'0') : ''}`
+      : '—';
+
     const rows = a.shifts.flatMap(sh =>
       sh.ateliers
         .sort((x,y) => x.iv.debut - y.iv.debut)
         .map(at => {
           const facs = [at.fac1, at.fac2].filter(Boolean).join(' & ');
+          const dur  = dureeMin(at.iv);
           return `<div class="shift-row">
           <span class="shift-jour">${sh.jour}</span>
           <span class="shift-date">${sh.date}</span>
-          <span class="shift-heure">${at.heure}</span>
+          <span class="shift-heure">${at.heure}${dur ? ` <span style="font-size:11px;color:var(--muted);font-weight:400">(${dur})</span>` : ''}</span>
           <span class="shift-atelier">
             ${at.atelier}
             ${facs ? `<br><span style="font-size:11px;color:var(--muted);font-style:italic">👤 ${facs}</span>` : ''}
@@ -324,6 +354,7 @@ function renderCards(data) {
         </div>
         <div class="role-stats">
           <strong>${nbAteliers}</strong> atelier${nbAteliers>1?'s':''} couverts
+          <br><span style="font-size:11px;">⏱ Durée totale : <strong>${totalStr}</strong></span>
         </div>
       </div>
       ${rows}
@@ -339,9 +370,10 @@ function renderTable(data) {
       sh.ateliers
         .sort((x,y) => x.iv.debut - y.iv.debut)
         .forEach(at => {
+          const facs = [at.fac1, at.fac2].filter(Boolean).join(' & ');
           rows.push({ nom: a.nom, jour: sh.jour, date: sh.date,
-            shiftDebut: sh.debut, shiftFin: sh.fin,
-            heure: at.heure, atelier: at.atelier, lieu: at.lieu, type: at.type });
+            heure: at.heure, dur: dureeMin(at.iv),
+            facs, atelier: at.atelier, lieu: at.lieu, type: at.type });
         });
     });
   });
@@ -349,16 +381,18 @@ function renderTable(data) {
     <td><span style="color:var(--role-accent);font-weight:700;">${r.nom}</span></td>
     <td>${r.jour}</td>
     <td>${r.date}</td>
-    <td style="white-space:nowrap;font-weight:700;color:var(--role-accent);">${fmtMin(r.shiftDebut)} — ${fmtMin(r.shiftFin % 1440)}</td>
-    <td style="white-space:nowrap;color:var(--accent);font-variant-numeric:tabular-nums;">${r.heure}</td>
+    <td style="white-space:nowrap;color:var(--accent);font-variant-numeric:tabular-nums;">
+      ${r.heure}${r.dur ? ` <span style="font-size:11px;color:var(--muted);font-weight:400">(${r.dur})</span>` : ''}
+    </td>
+    <td style="font-size:12px;color:var(--muted);">${r.facs || '—'}</td>
     <td>${r.atelier}</td>
     <td>${r.lieu ? `<span class="tag-lieu">${r.lieu}</span>` : ''}</td>
     <td><span class="tag">${r.type}</span></td>
   </tr>`).join('');
   return `<div class="table-wrap"><table class="global">
     <thead><tr>
-      <th>Traducteur</th><th>Jour</th><th>Date</th><th>Shift</th>
-      <th>Heure atelier</th><th>Atelier</th><th>Lieu</th><th>Type</th>
+      <th>Traducteur</th><th>Jour</th><th>Date</th>
+      <th>Heure</th><th>Animateur(s)</th><th>Atelier</th><th>Lieu</th><th>Type</th>
     </tr></thead>
     <tbody>${trs}</tbody>
   </table></div>`;
@@ -413,3 +447,6 @@ window.render      = render;
 </script>
 </body>
 </html>
+
+
+
