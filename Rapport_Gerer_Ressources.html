@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -13,8 +13,11 @@
     /* Badges rôles */
     --badge-f-bg:#dcfce7;  --badge-f-tx:#166534;
     --badge-h-bg:#e0f2fe;  --badge-h-tx:#0369a1;
-    --badge-t-bg:#fef9c3;  --badge-t-tx:#854d0e;
-    --badge-a-bg:#fce7f3;  --badge-a-tx:#9d174d;
+    --badge-t-bg:#f5f3ff;  --badge-t-tx:#7c3aed;
+    --badge-a-bg:#fee2e2;  --badge-a-tx:#dc2626;
+    /* Badges langues */
+    --badge-fr-bg:#eff6ff; --badge-fr-tx:#1d4ed8; --badge-fr-bd:#bfdbfe;
+    --badge-en-bg:#f0fdf4; --badge-en-tx:#166534; --badge-en-bd:#86efac;
   }
   .dark {
     --bg:#0d1117; --surface:#161b22; --border:#30363d;
@@ -23,8 +26,10 @@
     --green-bg:#052e16; --green-border:#166534;
     --badge-f-bg:#0a2e1a;  --badge-f-tx:#4ade80;
     --badge-h-bg:#0c2d48;  --badge-h-tx:#58a6ff;
-    --badge-t-bg:#2d2006;  --badge-t-tx:#fbbf24;
-    --badge-a-bg:#3b1030;  --badge-a-tx:#f0abca;
+    --badge-t-bg:#1e1b4b;  --badge-t-tx:#a78bfa;
+    --badge-a-bg:#2d0000;  --badge-a-tx:#f87171;
+    --badge-fr-bg:#0c2d48; --badge-fr-tx:#79a8ff; --badge-fr-bd:#1e4e7a;
+    --badge-en-bg:#052e16; --badge-en-tx:#4ade80; --badge-en-bd:#166534;
   }
   * { box-sizing:border-box; margin:0; padding:0; }
   body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
@@ -78,6 +83,10 @@
   .role-h { background:var(--badge-h-bg); color:var(--badge-h-tx); }
   .role-t { background:var(--badge-t-bg); color:var(--badge-t-tx); }
   .role-a { background:var(--badge-a-bg); color:var(--badge-a-tx); }
+  /* Badges langues */
+  .lang-badge-fr { background:var(--badge-fr-bg); color:var(--badge-fr-tx); border:1px solid var(--badge-fr-bd); }
+  .lang-badge-en { background:var(--badge-en-bg); color:var(--badge-en-tx); border:1px solid var(--badge-en-bd); }
+  .td-langues { display:flex; gap:4px; flex-wrap:wrap; }
   .td-id { font-size:11px; color:var(--muted); font-family:monospace; }
   .td-actions { text-align:right; white-space:nowrap; }
   .btn-icon { cursor:pointer; background:transparent; border:none; font-size:15px; padding:3px 5px; border-radius:4px; color:var(--muted); }
@@ -114,6 +123,17 @@
   .role-chk.checked-h { border-color:var(--badge-h-tx); background:var(--badge-h-bg); }
   .role-chk.checked-t { border-color:var(--badge-t-tx); background:var(--badge-t-bg); }
   .role-chk.checked-a { border-color:var(--badge-a-tx); background:var(--badge-a-bg); }
+  /* rôles additionnels : couleur générique accent */
+  .role-chk.checked-x { border-color:var(--accent); background:#eff6ff; }
+  .dark .role-chk.checked-x { background:#0c2d48; }
+  /* ── CHECKBOXES LANGUES ── */
+  .langues-check { display:flex; gap:14px; flex-wrap:wrap; margin-top:4px; }
+  .lang-chk { display:flex; align-items:center; gap:6px; cursor:pointer; padding:6px 12px; border-radius:6px; border:2px solid var(--border); background:var(--bg); transition:all .15s; user-select:none; }
+  .lang-chk:hover { border-color:var(--accent); }
+  .lang-chk input { width:15px; height:15px; cursor:pointer; accent-color:var(--accent); }
+  .lang-chk .rc-label { font-size:13px; font-weight:600; }
+  .lang-chk.checked-fr { border-color:var(--badge-fr-tx); background:var(--badge-fr-bg); }
+  .lang-chk.checked-en { border-color:var(--badge-en-tx); background:var(--badge-en-bg); }
 
   /* ── ACTIONS ÉDITEUR ── */
   .editor-actions { display:flex; gap:10px; margin-top:22px; flex-wrap:wrap; align-items:center; }
@@ -144,12 +164,38 @@
 
   footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
 
+  /* ── MODALE IMPORT ── */
+  .import-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:9990; align-items:flex-start; justify-content:center; padding:40px 16px; overflow-y:auto; }
+  .import-overlay.show { display:flex; }
+  .import-box { background:var(--bg); border-radius:14px; padding:28px 32px; max-width:700px; width:100%; border:1px solid var(--border); box-shadow:0 12px 40px rgba(0,0,0,.18); }
+  .import-box h3 { font-size:17px; font-weight:700; margin-bottom:6px; }
+  .import-box .import-sub { font-size:13px; color:var(--muted); margin-bottom:20px; }
+  .import-changes { display:flex; flex-direction:column; gap:8px; margin:16px 0; max-height:380px; overflow-y:auto; }
+  .change-row { border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-size:13px; }
+  .change-row.conflict { border-color:#f59e0b; background:#fffbeb; }
+  .dark .change-row.conflict { background:#2d2006; border-color:#d97706; }
+  .change-row.new-val  { border-color:#86efac; background:#f0fdf4; }
+  .dark .change-row.new-val { background:#052e16; border-color:#166534; }
+  .change-name { font-weight:700; margin-bottom:4px; }
+  .change-detail { display:flex; gap:12px; flex-wrap:wrap; font-size:12px; color:var(--muted); align-items:center; }
+  .change-old { text-decoration:line-through; color:#dc2626; }
+  .change-arrow { color:var(--muted); }
+  .change-new { color:#16a34a; font-weight:600; }
+  .change-chk { display:flex; align-items:center; gap:6px; margin-top:6px; }
+  .change-chk input { width:15px; height:15px; accent-color:var(--accent); cursor:pointer; }
+  .change-chk label { font-size:12px; font-weight:600; cursor:pointer; }
+  .import-actions { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+
   /* ── LÉGENDE ── */
   .legend { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
   .legend-item { display:flex; align-items:center; gap:5px; font-size:12px; color:var(--muted); }
   .legend-dot { width:10px; height:10px; border-radius:3px; }
 </style>
+<script src="loader.js"></script>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
 </head>
+<!-- i18n -->
 <body>
 
 <!-- ── CONFIRM DELETE ── -->
@@ -172,35 +218,45 @@
     </div>
     <div class="header-actions">
       <button class="btn btn-add" onclick="openAdd()">＋ Ajouter une ressource</button>
-      <a class="btn" href="index.html">🏠 Home</a>
-      <button class="btn" onclick="hardReload()">🔄 Refresh</button>
-      <button class="btn" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+      <a class="btn" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="btn" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <a class="btn" href="gestion_planning.html" data-i18n="nav_admin">⚙️ Admin</a>
+      <button class="btn" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="btn" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit">Mode Nuit</span></button>
+      <button class="mode-btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
     </div>
   </header>
 
   <!-- LÉGENDE -->
   <div class="legend">
-    <div class="legend-item"><div class="legend-dot" style="background:#166534"></div>Facilitateur</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#166534"></div>Animateur</div>
     <div class="legend-item"><div class="legend-dot" style="background:#0369a1"></div>Helper</div>
     <div class="legend-item"><div class="legend-dot" style="background:#854d0e"></div>Traducteur</div>
     <div class="legend-item"><div class="legend-dot" style="background:#9d174d"></div>Angel</div>
+    <!-- légende dynamique — alimentée par buildRoleMeta() au chargement -->
+    <span id="legendExtra"></span>
   </div>
 
   <!-- TOOLBAR -->
   <div class="toolbar">
     <div class="filter-group">
-      <label>Rôle</label>
+      <label data-i18n="filter_role">Rôle</label>
       <select id="filterRole" onchange="renderTable()">
         <option value="">Tous les rôles</option>
-        <option value="facilitateur">Facilitateur</option>
-        <option value="helper">Helper</option>
-        <option value="traducteur">Traducteur</option>
-        <option value="angel">Angel</option>
+        <!-- options peuplées dynamiquement par buildRoleMeta() -->
       </select>
     </div>
     <div class="filter-group">
       <label>Recherche</label>
       <input type="text" id="filterSearch" placeholder="Nom ou ID…" oninput="renderTable()">
+    </div>
+    <div class="filter-group" style="justify-content:flex-end">
+      <label>&nbsp;</label>
+      <div style="display:flex;gap:8px;">
+        <button class="btn" onclick="exportExcel()">📥 Export Excel</button>
+        <button class="btn" onclick="triggerImport()">📤 Import Excel</button>
+        <input type="file" id="importFileInput" accept=".xlsx" style="display:none" onchange="handleImportFile(this)">
+      </div>
     </div>
   </div>
   <div class="stats" id="stats"></div>
@@ -215,7 +271,11 @@
         <tr>
           <th onclick="sortBy('value')" id="th-value">Nom <span class="sort-icon">↕</span></th>
           <th>Rôles</th>
+          <th>Langues</th>
           <th onclick="sortBy('id')" id="th-id">ID <span class="sort-icon">↕</span></th>
+          <th>📞 Tél.</th>
+          <th>✉️ Email</th>
+          <th>🔗 Lien</th>
           <th></th>
         </tr>
       </thead>
@@ -225,11 +285,21 @@
 </div>
 
 <div class="toast" id="toast"></div>
-<footer><p>Made with IBM Bob</p></footer>
+
+<!-- ── MODALE IMPORT EXCEL ── -->
+<div class="import-overlay" id="importOverlay" onclick="importOverlayClick(event)">
+  <div class="import-box" id="importBox">
+    <h3 id="importTitle">📤 Import Excel — Ressources</h3>
+    <p class="import-sub" id="importSub">Vérifiez les modifications avant d'enregistrer.</p>
+    <div class="import-changes" id="importChanges"></div>
+    <div class="import-actions" id="importActions">
+      <button class="btn-primary" id="importSaveBtn" onclick="applyImport()">✅ Enregistrer les modifications</button>
+      <button class="btn-secondary" onclick="closeImport()">✕ Annuler</button>
+    </div>
+  </div>
+</div>
 
 <!-- ── RÉFÉRENTIELS ── -->
-<script src="ref_resource_types.js"></script>
-<script src="ref_ressources.js"></script>
 <script src="github-api.js"></script>
 
 <script>
@@ -241,23 +311,51 @@ let editingIdx  = null; // index dans data (null = nouveau)
 let pendingDel  = null; // index à supprimer
 let sortCol     = 'value';
 let sortAsc     = true;
+var AGENDA_DATA        = [];  // copie de travail de AGENDA (data.js)
+var DESCRIPTIONS_DATA  = [];  // copie de travail de REF_DESCRIPTIONS
 
 // Init : cloner le référentiel chargé
 function initData() {
   data = REF_RESSOURCES.map(function(r) {
-    return { id: r.id, value: r.value, roles: r.roles.slice() };
+    return { id: r.id, value: r.value, roles: r.roles.slice(), langues: (r.langues || []).slice(), tel: r.tel || '', email: r.email || '' };
   });
 }
 
 // ══════════════════════════════════════════════════════════
 // RENDU TABLE
 // ══════════════════════════════════════════════════════════
-var ROLE_META = {
-  facilitateur: { label:'Facilitateur', cls:'role-f' },
-  helper:       { label:'Helper',       cls:'role-h' },
-  traducteur:   { label:'Traducteur',   cls:'role-t' },
-  angel:        { label:'Angel',        cls:'role-a' },
-};
+// ROLE_META est construit dynamiquement depuis REF_RESOURCE_TYPES
+// Les 4 rôles historiques conservent leurs classes CSS dédiées ;
+// tout rôle supplémentaire reçoit 'role-x' (couleur accent générique).
+var ROLE_FIXED_CLS = { animateur:'role-f', helper:'role-h', traducteur:'role-t', angel:'role-a' };
+var ROLE_META = {};
+
+function buildRoleMeta() {
+  ROLE_META = {};
+  var sel = document.getElementById('filterRole');
+  // Vider les options sauf la première ("Tous les rôles")
+  while (sel.options.length > 1) sel.remove(1);
+
+  var extraLegend = '';
+
+  REF_RESOURCE_TYPES.forEach(function(rt) {
+    var cls = ROLE_FIXED_CLS[rt.value] || 'role-x';
+    ROLE_META[rt.value] = { label: rt.label, cls: cls, icon: rt.icon };
+
+    // Ajouter l'option dans le filtre
+    var opt = document.createElement('option');
+    opt.value = rt.value;
+    opt.textContent = rt.icon + ' ' + rt.label;
+    sel.appendChild(opt);
+
+    // Légende supplémentaire pour les rôles non-historiques
+    if (!ROLE_FIXED_CLS[rt.value]) {
+      extraLegend += '<div class="legend-item"><div class="legend-dot" style="background:var(--accent)"></div>' + rt.label + '</div>';
+    }
+  });
+
+  document.getElementById('legendExtra').innerHTML = extraLegend;
+}
 
 function renderTable() {
   var role   = document.getElementById('filterRole').value;
@@ -300,10 +398,21 @@ function renderTable() {
       var m = ROLE_META[rl];
       return m ? '<span class="role-badge ' + m.cls + '">' + m.label + '</span>' : '';
     }).join('');
+    var langBadges = (r.langues || []).map(function(lg) {
+      var cls = lg === 'FR' ? 'lang-badge-fr' : 'lang-badge-en';
+      return '<span class="role-badge ' + cls + '">' + esc(lg) + '</span>';
+    }).join('');
+    var telHtml   = r.tel   ? '<span style="font-size:12px">' + esc(r.tel)   + '</span>' : '<span style="color:var(--muted);font-size:11px">—</span>';
+    var emailHtml = r.email ? '<span style="font-size:12px">' + esc(r.email) + '</span>' : '<span style="color:var(--muted);font-size:11px">—</span>';
+    var lienHtml  = r.lien  ? '<a href="' + esc(r.lien) + '" target="_blank" rel="noopener" style="font-size:12px;color:var(--accent)" onclick="event.stopPropagation()">🔗 Lien</a>' : '<span style="color:var(--muted);font-size:11px">—</span>';
     return '<tr' + sel + ' onclick="selectRow(' + realIdx + ')" id="row-' + realIdx + '">' +
       '<td class="td-name">' + esc(r.value) + '</td>' +
       '<td><div class="td-roles">' + badges + '</div></td>' +
+      '<td><div class="td-langues">' + (langBadges || '<span style="color:var(--muted);font-size:11px">—</span>') + '</div></td>' +
       '<td class="td-id">' + esc(r.id) + '</td>' +
+      '<td>' + telHtml + '</td>' +
+      '<td>' + emailHtml + '</td>' +
+      '<td>' + lienHtml + '</td>' +
       '<td class="td-actions">' +
         '<button class="btn-icon" title="Éditer" onclick="event.stopPropagation();selectRow(' + realIdx + ')">✏️</button>' +
         '<button class="btn-icon" title="Supprimer" onclick="event.stopPropagation();askDelete(' + realIdx + ')">🗑️</button>' +
@@ -352,22 +461,34 @@ window.closeEditor = closeEditor;
 // ══════════════════════════════════════════════════════════
 // RENDU FORMULAIRE
 // ══════════════════════════════════════════════════════════
-var ALL_ROLES = ['facilitateur','helper','traducteur','angel'];
-var ROLE_ICONS = { facilitateur:'🎓', helper:'🤝', traducteur:'🌐', angel:'👼' };
-
 function renderEditor(isNew) {
-  var r = isNew ? { id:'', value:'', roles:[] } : data[editingIdx];
+  var r = isNew ? { id:'', value:'', roles:[], langues:[] } : data[editingIdx];
   var panel = document.getElementById('editorPanel');
 
-  var chkboxes = ALL_ROLES.map(function(rl) {
+  // Checkboxes rôles (dynamique depuis REF_RESOURCE_TYPES)
+  var chkboxes = REF_RESOURCE_TYPES.map(function(rt) {
+    var rl = rt.value;
     var checked = r.roles.indexOf(rl) !== -1;
-    var m = ROLE_META[rl];
-    var chkSuffix = rl[0]; // f, h, t, a
+    var chkSuffix = ROLE_FIXED_CLS[rl] ? rl[0] : 'x';
     return '<label class="role-chk' + (checked ? ' checked-' + chkSuffix : '') + '" id="lbl-' + rl + '">' +
       '<input type="checkbox" id="chk-' + rl + '" ' + (checked ? 'checked' : '') + ' onchange="onRoleChange(\'' + rl + '\')">' +
-      '<span class="rc-label">' + ROLE_ICONS[rl] + ' ' + m.label + '</span>' +
+      '<span class="rc-label">' + rt.icon + ' ' + rt.label + '</span>' +
     '</label>';
   }).join('');
+
+  // Checkboxes langues (FR / EN)
+  var langues = r.langues || [];
+  var chkFR = langues.indexOf('FR') !== -1;
+  var chkEN = langues.indexOf('EN') !== -1;
+  var langChkboxes =
+    '<label class="lang-chk' + (chkFR ? ' checked-fr' : '') + '" id="lbl-lang-FR">' +
+      '<input type="checkbox" id="chk-lang-FR" ' + (chkFR ? 'checked' : '') + ' onchange="onLangChange(\'FR\')">' +
+      '<span class="rc-label">🇫🇷 Français</span>' +
+    '</label>' +
+    '<label class="lang-chk' + (chkEN ? ' checked-en' : '') + '" id="lbl-lang-EN">' +
+      '<input type="checkbox" id="chk-lang-EN" ' + (chkEN ? 'checked' : '') + ' onchange="onLangChange(\'EN\')">' +
+      '<span class="rc-label">🇬🇧 English</span>' +
+    '</label>';
 
   var badgeHtml = isNew
     ? '<span class="editor-badge new">+ Nouvelle ressource</span>'
@@ -398,6 +519,29 @@ function renderEditor(isNew) {
         '<div class="roles-check" id="roles-check">' + chkboxes + '</div>' +
       '</div>' +
 
+      '<div class="form-group full">' +
+        '<label>🌐 Langues parlées</label>' +
+        '<div class="langues-check" id="langues-check">' + langChkboxes + '</div>' +
+      '</div>' +
+
+      '<div class="form-group">' +
+        '<label>📞 Téléphone</label>' +
+        '<input type="text" id="f-tel" value="' + esc(r.tel || '') + '" placeholder="Ex : +33 6 12 34 56 78">' +
+        '<span class="hint">Affiché dans les rapports Angel / Planning</span>' +
+      '</div>' +
+
+      '<div class="form-group">' +
+        '<label>✉️ Email</label>' +
+        '<input type="text" id="f-email" value="' + esc(r.email || '') + '" placeholder="Ex : prenom@exemple.com">' +
+        '<span class="hint">Adresse email de contact</span>' +
+      '</div>' +
+
+      '<div class="form-group full">' +
+        '<label>🔗 Lien</label>' +
+        '<input type="text" id="f-lien" value="' + esc(r.lien || '') + '" placeholder="Ex : https://www.exemple.com/profil">' +
+        '<span class="hint">URL du site, profil ou page de l\'intervenant</span>' +
+      '</div>' +
+
     '</div>' +
 
     '<div class="editor-actions">' +
@@ -411,11 +555,20 @@ function renderEditor(isNew) {
 function onRoleChange(rl) {
   var chk = document.getElementById('chk-' + rl);
   var lbl = document.getElementById('lbl-' + rl);
-  var sfx = rl[0];
+  var sfx = ROLE_FIXED_CLS[rl] ? rl[0] : 'x';
   if (chk.checked) lbl.classList.add('checked-' + sfx);
   else lbl.classList.remove('checked-' + sfx);
 }
 window.onRoleChange = onRoleChange;
+
+function onLangChange(lg) {
+  var chk = document.getElementById('chk-lang-' + lg);
+  var lbl = document.getElementById('lbl-lang-' + lg);
+  var sfx = lg.toLowerCase(); // 'fr' ou 'en'
+  if (chk.checked) lbl.classList.add('checked-' + sfx);
+  else lbl.classList.remove('checked-' + sfx);
+}
+window.onLangChange = onLangChange;
 
 // ══════════════════════════════════════════════════════════
 // SAUVEGARDE RESSOURCE
@@ -423,10 +576,23 @@ window.onRoleChange = onRoleChange;
 function collectForm() {
   var val   = document.getElementById('f-value').value.trim();
   var id    = document.getElementById('f-id').value.trim().toUpperCase();
-  var roles = ALL_ROLES.filter(function(rl) {
-    return document.getElementById('chk-' + rl).checked;
+  var roles = REF_RESOURCE_TYPES
+    .map(function(rt) { return rt.value; })
+    .filter(function(rl) {
+      var chk = document.getElementById('chk-' + rl);
+      return chk && chk.checked;
+    });
+  var langues = ['FR', 'EN'].filter(function(lg) {
+    var chk = document.getElementById('chk-lang-' + lg);
+    return chk && chk.checked;
   });
-  return { val: val, id: id, roles: roles };
+  var telEl   = document.getElementById('f-tel');
+  var emailEl = document.getElementById('f-email');
+  var lienEl  = document.getElementById('f-lien');
+  var tel     = telEl   ? telEl.value.trim()   : '';
+  var email   = emailEl ? emailEl.value.trim() : '';
+  var lien    = lienEl  ? lienEl.value.trim()  : '';
+  return { val: val, id: id, roles: roles, langues: langues, tel: tel, email: email, lien: lien };
 }
 
 function validateForm(form, isNew) {
@@ -451,25 +617,45 @@ async function saveResource() {
   if (btn) btn.disabled = true;
   if (ind) ind.classList.add('show');
 
+  // Capturer l'ancien nom AVANT modification (pour propagation)
+  var oldName = (!isNew && data[editingIdx]) ? data[editingIdx].value : null;
+  var newName = form.val;
+  var nameChanged = !isNew && oldName && oldName !== newName;
+
   // Appliquer en mémoire
   if (isNew) {
-    data.push({ id: form.id, value: form.val, roles: form.roles });
+    data.push({ id: form.id, value: form.val, roles: form.roles, langues: form.langues, tel: form.tel, email: form.email, lien: form.lien });
     editingIdx = data.length - 1;
   } else {
-    data[editingIdx].value = form.val;
-    data[editingIdx].roles = form.roles;
-    // id = readonly, pas modifiable
+    data[editingIdx].value   = form.val;
+    data[editingIdx].roles   = form.roles;
+    data[editingIdx].langues = form.langues;
+    data[editingIdx].tel     = form.tel;
+    data[editingIdx].email   = form.email;
+    data[editingIdx].lien    = form.lien;
+  }
+
+  // Propager le renommage dans AGENDA et DESCRIPTIONS si nécessaire
+  if (nameChanged) {
+    propagateRename(oldName, newName);
   }
 
   try {
-    await sauvegarder('ref_ressources.js', genererRefRessources());
-    showToast(isNew ? '✅ Ressource ajoutée !' : '✅ Ressource mise à jour !');
+    var saves = [sauvegarder('ref_ressources.js', genererRefRessources())];
+    if (nameChanged) {
+      saves.push(sauvegarder('data.js', buildDataJs()));
+      saves.push(sauvegarder('ref_descriptions.js', buildRefDescJs()));
+    }
+    await Promise.all(saves);
+    var msg = isNew ? '✅ Ressource ajoutée !'
+            : nameChanged ? '✅ Ressource renommée et propagée dans data.js & ref_descriptions.js !'
+            : '✅ Ressource mise à jour !';
+    showToast(msg);
     closeEditor();
     renderTable();
   } catch(err) {
-    // Rollback
     if (isNew) { data.pop(); editingIdx = null; }
-    else { /* la copie en mémoire est déjà dans data — on la relit depuis form original */ }
+    if (nameChanged) { propagateRename(newName, oldName); } // rollback propagation
     showToast('❌ Sauvegarde impossible : ' + err.message, true);
     console.error('[Rapport12] saveResource:', err);
   } finally {
@@ -519,6 +705,93 @@ async function confirmDelete() {
 window.confirmDelete = confirmDelete;
 
 // ══════════════════════════════════════════════════════════
+// PROPAGATION DU RENOMMAGE
+// ══════════════════════════════════════════════════════════
+function propagateRename(oldName, newName) {
+  // Mettre à jour AGENDA_DATA (tous les champs texte qui peuvent contenir un nom)
+  var fields = ['fac1','fac2','fac3','fac4','traduction','helper1','helper2','helper3','helper4','angel'];
+  AGENDA_DATA.forEach(function(e) {
+    fields.forEach(function(f) {
+      if (e[f] === oldName) e[f] = newName;
+    });
+  });
+  // Mettre à jour DESCRIPTIONS_DATA
+  DESCRIPTIONS_DATA.forEach(function(d) {
+    if (d.fac1 === oldName) d.fac1 = newName;
+    if (d.fac2 === oldName) d.fac2 = newName;
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+// SÉRIALISATION data.js
+// ══════════════════════════════════════════════════════════
+function buildDataJs() {
+  var lines = AGENDA_DATA.map(function(e) {
+    var s = '  {';
+    if (e.id)           s += 'id:"'          + escJs(e.id)          + '",';
+    s += 'jour:"'                             + escJs(e.jour||'')    + '"';
+    s += ',date:"'                            + escJs(e.date||'')    + '"';
+    s += ',heure:"'                           + escJs(e.heure||'')   + '"';
+    s += ',type:"'                            + escJs(e.type||'')    + '"';
+    s += ',atelier:"'                         + escJs(e.atelier||'') + '"';
+    s += ',lieu:"'                            + escJs(e.lieu||'')    + '"';
+    s += ',fac1:"'                            + escJs(e.fac1||'')    + '"';
+    s += ',fac2:"'                            + escJs(e.fac2||'')    + '"';
+    s += ',fac3:"'                            + escJs(e.fac3||'')    + '"';
+    s += ',fac4:"'                            + escJs(e.fac4||'')    + '"';
+    s += ',traduction:"'                      + escJs(e.traduction||'') + '"';
+    s += ',helper1:"'                         + escJs(e.helper1||'') + '"';
+    s += ',helper2:"'                         + escJs(e.helper2||'') + '"';
+    s += ',helper3:"'                         + escJs(e.helper3||'') + '"';
+    s += ',helper4:"'                         + escJs(e.helper4||'') + '"';
+    s += ',angel:"'                           + escJs(e.angel||'')   + '"';
+    s += ',note:"'                            + escJs(e.note||'')    + '"';
+    s += ',piment:'                           + (e.piment||0);
+    s += ',colibri:'                          + (e.colibri ? 'true' : 'false');
+    s += ',logisticId:"'                      + escJs(e.logisticId||'') + '"';
+    s += ',meetingRoles:"'                    + escJs(e.meetingRoles||'') + '"';
+    if (e._minRes !== undefined) s += ',_minRes:' + (e._minRes||0);
+    if (e._minTrad !== undefined) s += ',_minTrad:' + (e._minTrad||0);
+    if (e._tradCounts !== undefined) s += ',_tradCounts:' + (e._tradCounts||0);
+    if (e._equipements && Object.keys(e._equipements).length > 0) {
+      s += ',_equipements:' + JSON.stringify(e._equipements);
+    }
+    if (e._consignesDisabled && Object.keys(e._consignesDisabled).length > 0) {
+      s += ',_consignesDisabled:' + JSON.stringify(e._consignesDisabled);
+    }
+    if (e._corecSelected) {
+      var hasSel = Object.keys(e._corecSelected).some(function(pl){ return e._corecSelected[pl] && e._corecSelected[pl].length > 0; });
+      if (hasSel) s += ',_corecSelected:' + JSON.stringify(e._corecSelected);
+    }
+    s += '}';
+    return s;
+  }).join(',\n');
+  return '/**\n * TANTRAMOUR 2026 \u2014 Donn\u00e9es AGENDA\n */\nvar AGENDA = [\n\n' + lines + '\n];\n\nfunction agendaToRaw(entries) {\n  return entries.map(function(e) { return [e.jour,e.date,e.heure,e.type,e.atelier,e.lieu,e.fac1,e.fac2,e.traduction,e.helper1,e.helper2,e.helper3,e.helper4||"",e.angel,e.note,e.logisticId||"",e.piment||0]; });\n}';
+}
+
+// ══════════════════════════════════════════════════════════
+// SÉRIALISATION ref_descriptions.js
+// ══════════════════════════════════════════════════════════
+function buildRefDescJs() {
+  var lines = DESCRIPTIONS_DATA.map(function(d) {
+    return '  { key:"'           + escJs(d.key||'') +
+      '", atelier:"'             + escJs(d.atelier||'') +
+      '", type:"'                + escJs(d.type||'') +
+      '", piment:'               + (d.piment||0) +
+      ', fac1:"'                 + escJs(d.fac1||'') +
+      '", fac2:"'                + escJs(d.fac2||'') +
+      '", descFr:"'              + escJs(d.descFr||'') +
+      '", descEn:"'              + escJs(d.descEn||'') +
+      '", consigne:"'            + escJs(d.consigne||'') +
+      '", validatedByFac:'       + (d.validatedByFac ? 'true' : 'false') +
+      ', updatedAt:"'            + escJs(d.updatedAt||'') + '" }';
+  }).join(',\n');
+  return '/**\n * TANTRAMOUR 2026 \u2014 Descriptions des Ateliers (FR / EN)\n' +
+    ' * G\u00e9r\u00e9 automatiquement par Rapport_Descriptions_Ateliers.html\n */\n\n' +
+    'var REF_DESCRIPTIONS = [\n\n' + lines + '\n\n];\n';
+}
+
+// ══════════════════════════════════════════════════════════
 // SAUVEGARDE → ref_ressources.js
 // ══════════════════════════════════════════════════════════
 async function sauvegarder(filename, content) {
@@ -551,12 +824,20 @@ function genererRefRessources() {
   var sorted = data.slice().sort(function(a, b) { return a.value.localeCompare(b.value); });
 
   var lines = sorted.map(function(r) {
-    var rolesStr = '["' + r.roles.join('", "') + '"]';
+    var rolesStr   = '["' + r.roles.join('", "') + '"]';
+    var langues    = r.langues && r.langues.length ? r.langues : [];
+    var languesStr = '["' + langues.join('", "') + '"]';
     var pad = Math.max(0, 16 - r.id.length);
     return '  { id: "' + escJs(r.id) + '",  ' + ' '.repeat(pad) +
            'value: "' + escJs(r.value) + '",  ' +
            ' '.repeat(Math.max(0, 40 - r.value.length)) +
-           'roles: ' + rolesStr + ' },';
+           'roles: ' + rolesStr + ', ' +
+           ' '.repeat(Math.max(0, 56 - rolesStr.length)) +
+           'langues: ' + languesStr +
+           ', tel: "' + escJs(r.tel || '') + '"' +
+           ', email: "' + escJs(r.email || '') + '"' +
+           ', lien: "' + escJs(r.lien || '') + '"' +
+           ' },';
   }).join('\n');
 
   return (
@@ -569,10 +850,10 @@ function genererRefRessources() {
 ' *   id    : cl\u00e9 unique (stable, ne jamais changer) \u2014 pr\u00e9fixe "R_"\n' +
 ' *   value : nom exact tel qu\'il appara\u00eet dans AGENDA\n' +
 ' *   roles : tableau des r\u00f4les possibles pour cette personne\n' +
-' *           Valeurs accept\u00e9es : "facilitateur" | "helper" | "traducteur" | "angel"\n' +
+' *           Valeurs accept\u00e9es : "animateur" | "helper" | "traducteur" | "angel"\n' +
 ' *\n' +
 ' * \u26a0\ufe0f  Pour les rapports existants, les alias de compatibilit\u00e9 en bas de fichier\n' +
-' *     reconstituent automatiquement REF_FACILITATEURS, REF_HELPERS,\n' +
+' *     reconstituent automatiquement REF_ANIMATEURS, REF_HELPERS,\n' +
 ' *     REF_TRADUCTEURS et REF_ANGELS depuis cette liste.\n' +
 ' */\n' +
 'var REF_RESSOURCES = [\n' +
@@ -583,8 +864,8 @@ lines + '\n' +
 '// \u2500\u2500\u2500 Alias de compatibilit\u00e9 \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n' +
 '// Ces 4 variables reconstituent les anciens r\u00e9f\u00e9rentiels depuis REF_RESSOURCES.\n' +
 '// Les rapports existants continuent de fonctionner sans modification.\n' +
-'var REF_FACILITATEURS = REF_RESSOURCES\n' +
-'  .filter(function(r){ return r.roles.indexOf("facilitateur") !== -1; })\n' +
+'var REF_ANIMATEURS = REF_RESSOURCES\n' +
+'  .filter(function(r){ return r.roles.indexOf("animateur") !== -1; })\n' +
 '  .map(function(r){ return { id: "F_" + r.id.slice(2), value: r.value }; });\n' +
 '\n' +
 'var REF_HELPERS = REF_RESSOURCES\n' +
@@ -618,6 +899,505 @@ function showToast(msg, isError) {
   setTimeout(function() { t.classList.remove('show'); }, isError ? 6000 : 3500);
 }
 
+// ══════════════════════════════════════════════════════════
+// IMPORT EXCEL
+// ══════════════════════════════════════════════════════════
+
+// Pending changes après parsing : [{ idx, name, field, oldVal, newVal, accepted }]
+var _importPending = [];
+
+function triggerImport() {
+  var inp = document.getElementById('importFileInput');
+  inp.value = '';   // reset pour permettre re-sélection du même fichier
+  inp.click();
+}
+window.triggerImport = triggerImport;
+
+function importOverlayClick(e) {
+  if (e.target === document.getElementById('importOverlay')) closeImport();
+}
+window.importOverlayClick = importOverlayClick;
+
+function closeImport() {
+  document.getElementById('importOverlay').classList.remove('show');
+  _importPending = [];
+}
+window.closeImport = closeImport;
+
+// ── Parseur XLSX (SpreadsheetML + deflate) ───────────────────────────────────
+// Async : décompresse via DecompressionStream (disponible Chrome/Edge/Firefox/Safari modernes).
+async function parseXlsx(arrayBuffer) {
+  var bytes = new Uint8Array(arrayBuffer);
+
+  function r16(p) { return bytes[p] | (bytes[p+1] << 8); }
+  function r32(p) { return (bytes[p] | (bytes[p+1]<<8) | (bytes[p+2]<<16) | (bytes[p+3]<<24)) >>> 0; }
+
+  // Décompression deflate-raw via DecompressionStream
+  async function inflate(compBytes) {
+    var ds = new DecompressionStream('deflate-raw');
+    var writer = ds.writable.getWriter();
+    writer.write(compBytes);
+    writer.close();
+    var chunks = [];
+    var reader = ds.readable.getReader();
+    while (true) {
+      var res = await reader.read();
+      if (res.done) break;
+      chunks.push(res.value);
+    }
+    var total = chunks.reduce(function(s,c){ return s+c.length; }, 0);
+    var out = new Uint8Array(total);
+    var off = 0;
+    chunks.forEach(function(c){ out.set(c, off); off += c.length; });
+    return new TextDecoder('utf-8').decode(out);
+  }
+
+  // ── Extraire tous les fichiers du ZIP (stored + deflate) ─────────────────
+  // On collecte d'abord les métadonnées (nom, compression, offsets)
+  var entries = [];
+  var pos = 0;
+  while (pos < bytes.length - 4) {
+    if (bytes[pos]===0x50 && bytes[pos+1]===0x4B && bytes[pos+2]===0x03 && bytes[pos+3]===0x04) {
+      var comp     = r16(pos + 8);
+      var compSize = r32(pos + 18);
+      var nameLen  = r16(pos + 26);
+      var extraLen = r16(pos + 28);
+      var name     = new TextDecoder().decode(bytes.slice(pos+30, pos+30+nameLen));
+      var dataStart= pos + 30 + nameLen + extraLen;
+      entries.push({ name: name, comp: comp, start: dataStart, compSize: compSize });
+      pos = dataStart + compSize;
+    } else { pos++; }
+  }
+
+  // Décompresser en parallèle les fichiers nécessaires
+  var needed = ['xl/workbook.xml','xl/sharedStrings.xml','xl/worksheets/sheet1.xml','xl/worksheets/Sheet1.xml'];
+  var files = {};
+  await Promise.all(entries
+    .filter(function(e){ return needed.indexOf(e.name) !== -1 || e.name.startsWith('xl/worksheets/'); })
+    .map(async function(e) {
+      var raw = bytes.slice(e.start, e.start + e.compSize);
+      if (e.comp === 0) {
+        files[e.name] = new TextDecoder('utf-8').decode(raw);
+      } else if (e.comp === 8) {
+        files[e.name] = await inflate(raw);
+      }
+    })
+  );
+
+  // ── Trouver le chemin de la première feuille via workbook.xml ─────────────
+  var sheetXml = null;
+  var wbXml = files['xl/workbook.xml'];
+  if (wbXml) {
+    // Trouver r:id de la première sheet
+    var sheetM = /<sheet [^>]*r:id="([^"]+)"/.exec(wbXml);
+    if (sheetM) {
+      var rId = sheetM[1];
+      // Lire workbook.xml.rels pour résoudre l'id → fichier
+      var relsEntry = entries.find(function(e){ return e.name === 'xl/_rels/workbook.xml.rels'; });
+      if (relsEntry) {
+        var relsRaw = bytes.slice(relsEntry.start, relsEntry.start + relsEntry.compSize);
+        var relsXml = relsEntry.comp === 0
+          ? new TextDecoder('utf-8').decode(relsRaw)
+          : await inflate(relsRaw);
+        var relRe = new RegExp('Id="' + rId + '"[^>]*Target="([^"]+)"');
+        var relM  = relRe.exec(relsXml);
+        if (relM) {
+          var target = relM[1].replace(/^\/?xl\//, 'xl/').replace(/^worksheets\//, 'xl/worksheets/');
+          // Normaliser : si target est relatif à xl/
+          var sheetPath = target.startsWith('xl/') ? target : 'xl/' + target;
+          sheetXml = files[sheetPath] || files['xl/worksheets/sheet1.xml'] || files['xl/worksheets/Sheet1.xml'];
+        }
+      }
+    }
+  }
+  // Fallback
+  if (!sheetXml) sheetXml = files['xl/worksheets/sheet1.xml'] || files['xl/worksheets/Sheet1.xml'];
+  if (!sheetXml) throw new Error('Feuille introuvable dans le fichier XLSX.');
+
+  // ── Shared strings ────────────────────────────────────────────────────────
+  var sharedStrings = [];
+  var ssXml = files['xl/sharedStrings.xml'];
+  if (ssXml) {
+    var siRe = /<si>([\s\S]*?)<\/si>/g;
+    var siM;
+    while ((siM = siRe.exec(ssXml)) !== null) {
+      var tParts = [];
+      var tRe2 = /<t(?:[^>]*)>([\s\S]*?)<\/t>/g;
+      var tM;
+      while ((tM = tRe2.exec(siM[1])) !== null) tParts.push(tM[1]);
+      sharedStrings.push(tParts.join('').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'"));
+    }
+  }
+
+  // ── Parser lignes / cellules ──────────────────────────────────────────────
+  var rows = [];
+  var rowRe = /<row[^>]*>([\s\S]*?)<\/row>/g;
+  var rowM;
+  while ((rowM = rowRe.exec(sheetXml)) !== null) {
+    var cells = [];
+    var cellRe = /<c r="([A-Z]+)(\d+)"([^>]*)>([\s\S]*?)<\/c>/g;
+    var cellM;
+    while ((cellM = cellRe.exec(rowM[1])) !== null) {
+      var colStr = cellM[1];
+      var colIdx = colStr.split('').reduce(function(acc,ch){ return acc*26+(ch.charCodeAt(0)-64); }, 0) - 1;
+      var attrs = cellM[3];
+      var inner = cellM[4];
+      var val   = '';
+      var vM    = /<v>([\s\S]*?)<\/v>/.exec(inner);
+      var tM2   = /<is>[\s\S]*?<t(?:[^>]*)>([\s\S]*?)<\/t>/.exec(inner);
+      if (tM2) {
+        val = tM2[1].replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'");
+      } else if (vM) {
+        if (attrs.indexOf('t="s"') !== -1) {
+          val = sharedStrings[parseInt(vM[1])] || '';
+        } else {
+          val = vM[1];
+        }
+      }
+      while (cells.length <= colIdx) cells.push('');
+      cells[colIdx] = val;
+    }
+    rows.push(cells);
+  }
+  return rows;
+}
+
+function handleImportFile(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+
+  // Vérification extension
+  if (!file.name.toLowerCase().endsWith('.xlsx')) {
+    showToast('❌ Format invalide — seuls les fichiers .xlsx sont acceptés.', true);
+    return;
+  }
+
+  var reader = new FileReader();
+  reader.onload = async function(e) {
+    var rows;
+    try {
+      rows = await parseXlsx(e.target.result);
+    } catch(err) {
+      showToast('❌ Impossible de lire le fichier : ' + err.message, true);
+      return;
+    }
+
+    if (!rows.length) {
+      showToast('❌ Le fichier est vide.', true);
+      return;
+    }
+
+    // ── Validation de la structure ───────────────────────────────────────
+    var headers = rows[0].map(function(h) { return (h||'').trim().toLowerCase(); });
+    var idxId    = headers.indexOf('id');
+    var idxTel   = headers.indexOf('telephone');
+    var idxEmail = headers.indexOf('email');
+    var idxLien  = headers.indexOf('lien');
+
+    if (idxId === -1 || idxTel === -1 || idxEmail === -1) {
+      showToast('❌ Format incorrect — colonnes requises manquantes : ID, Telephone, Email.', true);
+      return;
+    }
+
+    // ── Calcul des changements ───────────────────────────────────────────
+    var pending = [];
+    var skipped = 0;
+
+    for (var ri = 1; ri < rows.length; ri++) {
+      var row = rows[ri];
+      var id  = (row[idxId] || '').trim();
+      if (!id) continue;
+
+      // Chercher la ressource dans data
+      var idx = data.findIndex(function(r) { return r.id === id; });
+      if (idx === -1) { skipped++; continue; }
+
+      var res     = data[idx];
+      var newTel   = (row[idxTel]   || '').trim();
+      var newEmail = (row[idxEmail] || '').trim();
+      var newLien  = (idxLien !== -1 ? row[idxLien] || '' : '').trim();
+
+      ['tel','email','lien'].forEach(function(field) {
+        var newVal = field === 'tel' ? newTel : field === 'email' ? newEmail : newLien;
+        var oldVal = res[field] || '';
+        if (newVal === oldVal) return;  // rien à faire
+        pending.push({
+          idx:      idx,
+          id:       id,
+          name:     res.value,
+          field:    field,
+          oldVal:   oldVal,
+          newVal:   newVal,
+          conflict: oldVal !== '',      // conflit si une valeur existait déjà
+          accepted: true                // coché par défaut
+        });
+      });
+    }
+
+    if (!pending.length && skipped === 0) {
+      showToast('ℹ️ Aucune modification détectée — les données sont déjà à jour.', false);
+      return;
+    }
+
+    _importPending = pending;
+    renderImportModal(file.name, skipped);
+  };
+  reader.readAsArrayBuffer(file);
+}
+window.handleImportFile = handleImportFile;
+
+function renderImportModal(fileName, skipped) {
+  var nbChanges   = _importPending.length;
+  var nbConflicts = _importPending.filter(function(c){ return c.conflict; }).length;
+
+  document.getElementById('importTitle').textContent = '📤 Import : ' + fileName;
+
+  var sub = nbChanges + ' modification(s) détectée(s)';
+  if (nbConflicts)  sub += ' · ⚠️ ' + nbConflicts + ' conflit(s) (valeur existante)';
+  if (skipped)      sub += ' · ' + skipped + ' ID inconnu(s) ignoré(s)';
+  document.getElementById('importSub').textContent = sub;
+
+  var html = '';
+  if (!nbChanges) {
+    html = '<div style="text-align:center;padding:24px;color:var(--muted);font-style:italic">' +
+           (skipped ? skipped + ' ID inconnu(s) ignoré(s). Aucune modification à appliquer.' : 'Aucune modification.') +
+           '</div>';
+    document.getElementById('importSaveBtn').style.display = 'none';
+  } else {
+    document.getElementById('importSaveBtn').style.display = '';
+    html = _importPending.map(function(c, ci) {
+      var cls   = c.conflict ? 'change-row conflict' : 'change-row new-val';
+      var label = c.field === 'tel' ? '📞 Téléphone' : '✉️ Email';
+      var oldHtml = c.oldVal
+        ? '<span class="change-old">' + esc(c.oldVal) + '</span><span class="change-arrow"> → </span>'
+        : '<span style="color:var(--muted);font-style:italic">vide</span><span class="change-arrow"> → </span>';
+      var newHtml = '<span class="change-new">' + esc(c.newVal) + '</span>';
+      var warning = c.conflict ? '<span style="font-size:11px;color:#d97706;font-weight:600"> ⚠️ Écrase une valeur existante</span>' : '';
+      return '<div class="' + cls + '">' +
+        '<div class="change-name">' + esc(c.name) + ' <span style="font-size:11px;color:var(--muted);font-family:monospace">' + esc(c.id) + '</span></div>' +
+        '<div class="change-detail">' + label + ' : ' + oldHtml + newHtml + warning + '</div>' +
+        '<div class="change-chk">' +
+          '<input type="checkbox" id="chk-imp-' + ci + '" checked onchange="_importPending[' + ci + '].accepted=this.checked">' +
+          '<label for="chk-imp-' + ci + '">Appliquer ce changement</label>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  document.getElementById('importChanges').innerHTML = html;
+  document.getElementById('importOverlay').classList.add('show');
+}
+
+async function applyImport() {
+  var toApply = _importPending.filter(function(c){ return c.accepted; });
+  if (!toApply.length) {
+    showToast('ℹ️ Aucun changement sélectionné.', false);
+    return;
+  }
+
+  toApply.forEach(function(c) {
+    data[c.idx][c.field] = c.newVal;
+  });
+
+  var btn = document.getElementById('importSaveBtn');
+  if (btn) btn.disabled = true;
+
+  try {
+    await sauvegarder('ref_ressources.js', genererRefRessources());
+    showToast('✅ ' + toApply.length + ' modification(s) enregistrée(s) !');
+    closeImport();
+    renderTable();
+  } catch(err) {
+    // rollback mémoire
+    toApply.forEach(function(c) { data[c.idx][c.field] = c.oldVal; });
+    showToast('❌ Sauvegarde impossible : ' + err.message, true);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+window.applyImport = applyImport;
+
+// ══════════════════════════════════════════════════════════
+// EXPORT EXCEL
+// ══════════════════════════════════════════════════════════
+function exportExcel() {
+  // ── Collecter tous les rôles distincts dans l'ordre ─────────────────────
+  var allRoles = [];
+  var rolesSeen = {};
+  // D'abord les rôles connus de REF_RESOURCE_TYPES (ordre stable)
+  if (typeof REF_RESOURCE_TYPES !== 'undefined') {
+    REF_RESOURCE_TYPES.forEach(function(rt) {
+      if (!rolesSeen[rt.value]) { rolesSeen[rt.value] = true; allRoles.push(rt.value); }
+    });
+  }
+  // Puis les rôles présents dans les données mais non listés
+  data.forEach(function(r) {
+    (r.roles || []).forEach(function(rl) {
+      if (!rolesSeen[rl]) { rolesSeen[rl] = true; allRoles.push(rl); }
+    });
+  });
+
+  // ── En-têtes ─────────────────────────────────────────────────────────────
+  var HEADERS = ['ID', 'Nom', 'Telephone', 'Email', 'Lien'].concat(allRoles).concat(['Langues']);
+
+  // ── Trier les ressources alphabétiquement par nom ─────────────────────────
+  var sorted = data.slice().sort(function(a, b) { return a.value.localeCompare(b.value, 'fr'); });
+
+  // ── Helpers XML ──────────────────────────────────────────────────────────
+  function escXml(v) {
+    return String(v == null ? '' : v)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+  }
+  function colLetter(n) {
+    var s = ''; n++;
+    while (n > 0) { n--; s = String.fromCharCode(65 + (n % 26)) + s; n = Math.floor(n / 26); }
+    return s;
+  }
+  function cellS(col, row, val) {
+    return '<c r="' + colLetter(col) + row + '" t="inlineStr"><is><t>' + escXml(val) + '</t></is></c>';
+  }
+  function cellN(col, row, val) {
+    return '<c r="' + colLetter(col) + row + '"><v>' + (parseInt(val) || 0) + '</v></c>';
+  }
+
+  // ── Lignes XML ───────────────────────────────────────────────────────────
+  var rowsXml = '<row r="1">';
+  HEADERS.forEach(function(h, ci) { rowsXml += cellS(ci, 1, h); });
+  rowsXml += '</row>';
+
+  sorted.forEach(function(r, ri) {
+    var rowNum = ri + 2;
+    var ci = 0;
+    rowsXml += '<row r="' + rowNum + '">';
+    rowsXml += cellS(ci++, rowNum, r.id);
+    rowsXml += cellS(ci++, rowNum, r.value);
+    rowsXml += cellS(ci++, rowNum, r.tel   || '');
+    rowsXml += cellS(ci++, rowNum, r.email || '');
+    rowsXml += cellS(ci++, rowNum, r.lien  || '');
+    allRoles.forEach(function(rl) {
+      rowsXml += cellN(ci++, rowNum, r.roles && r.roles.indexOf(rl) !== -1 ? 1 : 0);
+    });
+    rowsXml += cellS(ci++, rowNum, (r.langues || []).join(', '));
+    rowsXml += '</row>';
+  });
+
+  // ── Largeurs colonnes ────────────────────────────────────────────────────
+  var colWidths = HEADERS.map(function(h, ci) {
+    var maxLen = sorted.reduce(function(m, r) {
+      var vals = [r.id, r.value].concat(allRoles.map(function(rl) {
+        return r.roles && r.roles.indexOf(rl) !== -1 ? '1' : '0';
+      })).concat([(r.langues||[]).join(', '), r.tel||'', r.email||'']);
+      return Math.max(m, String(vals[ci] == null ? '' : vals[ci]).length);
+    }, h.length);
+    return Math.min(Math.max(maxLen + 2, 10), 50);
+  });
+  var colsXml = colWidths.map(function(w, ci) {
+    return '<col min="' + (ci+1) + '" max="' + (ci+1) + '" width="' + w + '" customWidth="1"/>';
+  }).join('');
+
+  // ── Assemblage XLSX (SpreadsheetML ZIP) ──────────────────────────────────
+  var sheetXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+    '<sheetViews><sheetView tabSelected="1" workbookViewId="0">' +
+    '<pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/>' +
+    '</sheetView></sheetViews>' +
+    '<cols>' + colsXml + '</cols>' +
+    '<sheetData>' + rowsXml + '</sheetData>' +
+    '<autoFilter ref="A1:' + colLetter(HEADERS.length - 1) + '1"/>' +
+    '</worksheet>';
+
+  var workbookXml = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"' +
+    ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+    '<sheets><sheet name="Ressources" sheetId="1" r:id="rId1"/></sheets></workbook>';
+
+  var relsWb = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+    '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>' +
+    '</Relationships>';
+
+  var relsRoot = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+    '<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>' +
+    '</Relationships>';
+
+  var contentTypes = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+    '<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+    '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+    '<Default Extension="xml" ContentType="application/xml"/>' +
+    '<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+    '<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+    '</Types>';
+
+  // ── ZIP minimaliste ───────────────────────────────────────────────────────
+  function strToBytes(str) { return new TextEncoder().encode(str); }
+  function crc32(bytes) {
+    var table = (function() {
+      var t = new Uint32Array(256);
+      for (var i = 0; i < 256; i++) {
+        var c = i;
+        for (var j = 0; j < 8; j++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+        t[i] = c;
+      }
+      return t;
+    })();
+    var crc = 0xFFFFFFFF;
+    for (var i = 0; i < bytes.length; i++) crc = table[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+  function u16(n) { return [n & 0xFF, (n >> 8) & 0xFF]; }
+  function u32(n) { return [n & 0xFF, (n >> 8) & 0xFF, (n >> 16) & 0xFF, (n >> 24) & 0xFF]; }
+  function makeEntry(name, content) {
+    var nb = strToBytes(name), cb = strToBytes(content);
+    var crc = crc32(cb), sz = cb.length, date = 0x5765, time = 0x0000;
+    var lh = new Uint8Array([0x50,0x4B,0x03,0x04,...u16(20),...u16(0),...u16(0),...u16(time),...u16(date),...u32(crc),...u32(sz),...u32(sz),...u16(nb.length),...u16(0),...nb]);
+    return { name, nb, crc, sz, date, time, lh, cb, localOffset:0 };
+  }
+  function buildZip(entries) {
+    var offset = 0;
+    entries.forEach(function(e) { e.localOffset = offset; offset += e.lh.length + e.cb.length; });
+    var cdParts = entries.map(function(e) {
+      return new Uint8Array([0x50,0x4B,0x01,0x02,...u16(20),...u16(20),...u16(0),...u16(0),...u16(e.time),...u16(e.date),...u32(e.crc),...u32(e.sz),...u32(e.sz),...u16(e.nb.length),...u16(0),...u16(0),...u16(0),...u16(0),...u32(0),...u32(e.localOffset),...e.nb]);
+    });
+    var cdSize = cdParts.reduce(function(s,p){return s+p.length;},0);
+    var eocd  = new Uint8Array([0x50,0x4B,0x05,0x06,...u16(0),...u16(0),...u16(entries.length),...u16(entries.length),...u32(cdSize),...u32(offset),...u16(0)]);
+    var total = offset + cdSize + eocd.length;
+    var buf   = new Uint8Array(total); var pos = 0;
+    entries.forEach(function(e) { buf.set(e.lh,pos);pos+=e.lh.length; buf.set(e.cb,pos);pos+=e.cb.length; });
+    cdParts.forEach(function(p) { buf.set(p,pos);pos+=p.length; });
+    buf.set(eocd,pos);
+    return buf;
+  }
+
+  var entries = [
+    makeEntry('[Content_Types].xml',                contentTypes),
+    makeEntry('_rels/.rels',                         relsRoot),
+    makeEntry('xl/workbook.xml',                     workbookXml),
+    makeEntry('xl/_rels/workbook.xml.rels',           relsWb),
+    makeEntry('xl/worksheets/sheet1.xml',            sheetXml),
+  ];
+  var zipBytes = buildZip(entries);
+
+  // ── Nom du fichier avec date ──────────────────────────────────────────────
+  var today = new Date();
+  var ymd = today.getFullYear() + '-' +
+    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+    String(today.getDate()).padStart(2, '0');
+  var fileName = 'TAF2026_RESOURCES_' + ymd + '.xlsx';
+
+  var blob = new Blob([zipBytes], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = fileName;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+  showToast('✅ Export ' + fileName + ' téléchargé !');
+}
+window.exportExcel = exportExcel;
+
 function hardReload() {
   if ('caches' in window) {
     caches.keys().then(function(keys) {
@@ -634,13 +1414,27 @@ function toggleMode() {
 window.toggleMode = toggleMode;
 
 // ── Démarrage ─────────────────────────────────────────────
-initData();
-renderTable();
-
-if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
-  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
-  hardReload();
-}
+loadData(['ref_resource_types.js', 'ref_ressources.js', 'data.js', 'ref_descriptions.js'], function() {
+  if (typeof REF_RESSOURCES === 'undefined' || typeof REF_RESOURCE_TYPES === 'undefined') {
+    document.getElementById('tableBody').innerHTML =
+      '<tr class="empty-row"><td colspan="7">⚠️ Erreur de chargement des ressources — cliquez sur 🔄 Refresh.</td></tr>';
+    document.getElementById('stats').textContent = 'Données non disponibles.';
+    console.error('[Rapport_Gerer_Ressources] REF_RESSOURCES ou REF_RESOURCE_TYPES introuvable après loadData.');
+    return;
+  }
+  if (typeof AGENDA !== 'undefined') {
+    AGENDA_DATA = AGENDA.map(function(e) { return Object.assign({}, e); });
+  }
+  if (typeof REF_DESCRIPTIONS !== 'undefined') {
+    DESCRIPTIONS_DATA = REF_DESCRIPTIONS.map(function(d) { return Object.assign({}, d); });
+  }
+  initData();
+  buildRoleMeta();
+  renderTable();
+});
 </script>
 </body>
 </html>
+
+
+
