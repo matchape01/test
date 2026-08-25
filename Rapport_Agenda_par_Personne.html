@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tantramour 2026 — Agenda par Personne</title>
+<title>Tantramour 2026 — Planning par Personne</title>
 <style>
   :root {
     --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
@@ -112,55 +112,94 @@
   .empty { text-align: center; padding: 48px; color: var(--muted); }
   footer { margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
 </style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+<style>
+  /* ── BOUTON LOGISTIQUE ── */
+  .log-link { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 4px; background: var(--surface); border: 1px solid var(--border); color: var(--muted); font-size: 13px; cursor: pointer; flex-shrink: 0; transition: background .15s, border-color .15s; }
+  .log-link:hover { background: #eff6ff; border-color: var(--accent); }
+
+  /* ── MODALE LOGISTIQUE ── */
+  .log-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 9999; align-items: flex-end; justify-content: center; }
+  .log-modal-overlay.open { display: flex; }
+  .log-modal { background: var(--bg); border-radius: 16px 16px 0 0; width: 100%; max-width: 600px; max-height: 85vh; display: flex; flex-direction: column; animation: slideUp .22s ease; }
+  @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .log-modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 10px auto 0; flex-shrink: 0; }
+  .log-modal-head { padding: 12px 16px 12px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+  .log-modal-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
+  .log-modal-meta { display: flex; flex-direction: column; gap: 5px; }
+  .log-meta-row { display: flex; gap: 6px; align-items: flex-start; flex-wrap: wrap; font-size: 12px; }
+  .log-meta-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); min-width: 64px; flex-shrink: 0; padding-top: 2px; }
+  .log-meta-val { color: var(--text); flex: 1; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .log-modal-body { padding: 14px 16px; overflow-y: auto; flex: 1; }
+  .log-modal-content { font-size: 13px; line-height: 1.7; color: var(--text); }
+  .log-modal-content p  { margin-bottom: 6px; }
+  .log-modal-content ul { padding-left: 18px; margin-bottom: 6px; }
+  .log-modal-content ol { padding-left: 18px; margin-bottom: 6px; }
+  .log-modal-content li { margin-bottom: 2px; }
+  .log-modal-empty { font-size: 13px; color: var(--muted); font-style: italic; text-align: center; padding: 20px 0; }
+  .log-modal-foot { padding: 12px 16px; border-top: 1px solid var(--border); flex-shrink: 0; display: flex; justify-content: center; }
+  .btn-close-modal { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 9px 28px; font-size: 13px; font-weight: 600; color: var(--text); font-family: inherit; }
+  .btn-close-modal:hover { background: var(--border); }
+  /* Pills mini pour la modale */
+  .pill-sm { display: inline-flex; align-items: center; border-radius: 99px; padding: 1px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .pill-sm-f  { background: var(--badge-f); color: var(--badge-ft); }
+  .pill-sm-h  { background: var(--badge-h); color: var(--badge-ht); }
+  .pill-sm-t  { background: var(--tag-bg);  color: var(--tag-text); }
+  .pill-sm-a  { background: var(--badge-a); color: var(--badge-at); }
+  .tag-lieu-modal { background: var(--surface); color: var(--muted); border: 1px solid var(--border); border-radius: 4px; padding: 1px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+</style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div class="logo">
       <h1>Tantramour 2026</h1>
-      <p>Agenda par Personne</p>
+      <p data-i18n="r2_title">Planning par Personne</p>
     </div>
     <div class="header-actions">
-      <a class="mode-btn" href="index.html">🏠 Home</a>
-      <button class="mode-btn" onclick="hardReload()">🔄 Refresh</button>
-      <button class="mode-btn" id="viewBtn" onclick="toggleView()">📱 Vue Mobile</button>
-      <button class="mode-btn" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+      <a class="mode-btn" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="mode-btn" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <button class="mode-btn" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="mode-btn" id="viewBtn" onclick="toggleView()">📱 <span data-i18n="nav_vue_mobile" id="viewBtnText">Vue Mobile</span></button>
+      <button class="mode-btn" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit" id="modeBtnText">Mode Nuit</span></button>
+      <button class="mode-btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
     </div>
   </header>
   <div class="filters">
     <div class="filter-group">
-      <label>Personne</label>
+      <label data-i18n="filter_personne">Personne</label>
       <select id="filterPerson" onchange="render()">
-        <option value="">Toutes les personnes</option>
+        <option value="" data-i18n="filter_toutes_pers">Toutes les personnes</option>
       </select>
     </div>
     <div class="filter-group">
-      <label>Jour / Date</label>
+      <label data-i18n="filter_jour_date">Jour / Date</label>
       <select id="filterJour" onchange="render()">
-        <option value="">Tous les jours</option>
-        <option value="Jour 1">Jour 1 — Sam. 29 août</option>
-        <option value="Jour 2">Jour 2 — Dim. 30 août</option>
-        <option value="Jour 3">Jour 3 — Lun. 31 août</option>
-        <option value="Jour 4">Jour 4 — Mar. 1 sept.</option>
-        <option value="Jour 5">Jour 5 — Mer. 2 sept.</option>
-        <option value="Jour 6">Jour 6 — Jeu. 3 sept.</option>
-        <option value="Jour 7">Jour 7 — Ven. 4 sept.</option>
+        <option value="" data-i18n="filter_tous_jours">Tous les jours</option>
+        <option value="Jour 1" data-i18n="jour1_label">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2" data-i18n="jour2_label">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3" data-i18n="jour3_label">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4" data-i18n="jour4_label">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5" data-i18n="jour5_label">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6" data-i18n="jour6_label">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7" data-i18n="jour7_label">Jour 7 — Ven. 4 sept.</option>
       </select>
     </div>
     <div class="filter-group">
-      <label>Rôle</label>
+      <label data-i18n="filter_role">Rôle</label>
       <select id="filterRole" onchange="render()">
-        <option value="">Tous les rôles</option>
-          <option value="F">Facilitateur</option>
-          <option value="H">Helper</option>
-          <option value="A">Angel</option>
-          <option value="T">Traducteur</option>
+        <option value="" data-i18n="role_tous">Tous les rôles</option>
+          <option value="F" data-i18n="role_animateur">Animateur</option>
+          <option value="H" data-i18n="role_helper">Helper</option>
+          <option value="A" data-i18n="role_angel">Angel</option>
+          <option value="T" data-i18n="role_traducteur">Traducteur</option>
       </select>
     </div>
     <div class="filter-group">
-      <label>Type d'atelier</label>
+      <label data-i18n="filter_type_atelier">Type d'atelier</label>
       <select id="filterType" onchange="render()">
-        <option value="">Tous les types</option>
+        <option value="" data-i18n="filter_tous_types">Tous les types</option>
       </select>
     </div>
   </div>
@@ -169,18 +208,18 @@
     <table>
       <thead>
         <tr>
-          <th onclick="sortBy(0)">Jour<span class="sort-icon" id="si0">⇅</span></th>
-          <th onclick="sortBy(1)">Date<span class="sort-icon" id="si1">⇅</span></th>
-          <th onclick="sortBy(2)">Heure<span class="sort-icon" id="si2">⇅</span></th>
-          <th onclick="sortBy(3)">Type d'atelier<span class="sort-icon" id="si3">⇅</span></th>
-          <th onclick="sortBy(4)">Atelier<span class="sort-icon" id="si4">⇅</span></th>
-          <th style="cursor:default;text-align:center">🌶️</th>
-          <th onclick="sortBy(5)">Lieu<span class="sort-icon" id="si5">⇅</span></th>
-          <th onclick="sortBy(6)">Rôle<span class="sort-icon" id="si6">⇅</span></th>
-          <th onclick="sortBy(7)">Facilitateur(s)<span class="sort-icon" id="si7">⇅</span></th>
-          <th onclick="sortBy(8)">Traducteur<span class="sort-icon" id="si8">⇅</span></th>
-          <th onclick="sortBy(9)">Helper(s)<span class="sort-icon" id="si9">⇅</span></th>
-          <th onclick="sortBy(10)">Angel<span class="sort-icon" id="si10">⇅</span></th>
+          <th onclick="sortBy(0)"><span data-i18n="col_jour">Jour</span><span class="sort-icon" id="si0">⇅</span></th>
+          <th onclick="sortBy(1)"><span data-i18n="col_date">Date</span><span class="sort-icon" id="si1">⇅</span></th>
+          <th onclick="sortBy(2)"><span data-i18n="col_heure">Heure</span><span class="sort-icon" id="si2">⇅</span></th>
+          <th onclick="sortBy(3)"><span data-i18n="filter_type_atelier">Type d'atelier</span><span class="sort-icon" id="si3">⇅</span></th>
+          <th onclick="sortBy(4)"><span data-i18n="col_atelier">Atelier</span><span class="sort-icon" id="si4">⇅</span></th>
+          <th style="cursor:default;text-align:center" data-i18n-title="col_piment">🌶️</th>
+          <th onclick="sortBy(5)"><span data-i18n="col_lieu">Lieu</span><span class="sort-icon" id="si5">⇅</span></th>
+          <th onclick="sortBy(6)"><span data-i18n="filter_role">Rôle</span><span class="sort-icon" id="si6">⇅</span></th>
+          <th onclick="sortBy(7)"><span data-i18n="col_animateur">Animateur(s)</span><span class="sort-icon" id="si7">⇅</span></th>
+          <th onclick="sortBy(8)"><span data-i18n="col_traducteur_long">Traducteur</span><span class="sort-icon" id="si8">⇅</span></th>
+          <th onclick="sortBy(9)"><span data-i18n="col_helpers">Helper(s)</span><span class="sort-icon" id="si9">⇅</span></th>
+          <th onclick="sortBy(10)"><span data-i18n="col_angel">Angel</span><span class="sort-icon" id="si10">⇅</span></th>
         </tr>
       </thead>
       <tbody id="tbody"></tbody>
@@ -188,12 +227,32 @@
   </div>
   <div class="card-list" id="cardView"></div>
 </div>
-<footer><p>Made with IBM Bob</p></footer>
 <script src="loader.js"></script>
+
+<!-- ── MODALE LOGISTIQUE ── -->
+<div class="log-modal-overlay" id="logModalOverlay" onclick="closeLogModal(event)">
+  <div class="log-modal" id="logModal">
+    <div class="log-modal-handle"></div>
+    <div class="log-modal-head">
+      <div class="log-modal-title" id="logModalTitle"></div>
+      <div class="log-modal-meta" id="logModalMeta"></div>
+    </div>
+    <div class="log-modal-body">
+      <div id="logModalContent"></div>
+    </div>
+    <div class="log-modal-foot">
+      <button class="btn-close-modal" onclick="closeLogModal()">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
 <script>
-loadData(['data.js'], function() {
+loadData(['data.js', 'logistics.js', 'logistics.special.js'], function() {
 const RAW = agendaToRaw(AGENDA);
-const DATA = RAW.map(r => { while(r.length<14) r.push(""); return r; });
+const DATA = RAW.map((r, i) => { while(r.length<19) r.push(""); r._agendaIdx = i; return r; });
+
+// Index global pour la modale : DATA[i] → entrée AGENDA correspondante
+// Chaque entrée r porte r._agendaIdx = index dans AGENDA
 
 function heureEnMinutes(h) {
   if (!h) return 9999;
@@ -210,10 +269,21 @@ function addPerson(name, role) {
   personRoleMap[n].add(role);
 }
 DATA.forEach(r => {
-  addPerson(r[6],'F'); addPerson(r[7],'F');
+  addPerson(r[6],'F'); addPerson(r[7],'F'); addPerson(r[17],'F'); addPerson(r[18],'F');
   addPerson(r[8],'T');
-  addPerson(r[9],'H'); addPerson(r[10],'H'); addPerson(r[11],'H');
-  addPerson(r[12],'A');
+  addPerson(r[9],'H'); addPerson(r[10],'H'); addPerson(r[11],'H'); addPerson(r[12],'H');
+  addPerson(r[13],'A');
+  // REUNION : ajouter toutes les personnes des rôles meetingRoles
+  if (r[3] === 'REUNION' && r[19]) {
+    const meetRoles = r[19].split(',').map(s=>s.trim()).filter(Boolean);
+    if (meetRoles.length && typeof REF_RESSOURCES !== 'undefined') {
+      REF_RESSOURCES.forEach(res => {
+        if (!res.value) return;
+        if (!meetRoles.some(mr => res.roles && res.roles.indexOf(mr) !== -1)) return;
+        addPerson(res.value, 'M');
+      });
+    }
+  }
 });
 
 const persons = Object.keys(personRoleMap).sort((a,b)=>a.localeCompare(b,'fr'));
@@ -230,17 +300,28 @@ function getMatches(person, role) {
   const results = [];
   DATA.forEach(r => {
     const roles = [];
-    if (r[6]===person||r[7]===person) roles.push('F');
+    if (r[6]===person||r[7]===person||r[17]===person||r[18]===person) roles.push('F');
     if (r[8]===person) roles.push('T');
-    if (r[9]===person||r[10]===person||r[11]===person) roles.push('H');
-    if (r[12]===person) roles.push('A');
+    if (r[9]===person||r[10]===person||r[11]===person||r[12]===person) roles.push('H');
+    if (r[13]===person) roles.push('A');
+    // REUNION : vérifier si la personne est concernée via meetingRoles
+    if (r[3] === 'REUNION' && r[19] && person) {
+      const meetRoles = r[19].split(',').map(s=>s.trim()).filter(Boolean);
+      if (meetRoles.length && typeof REF_RESSOURCES !== 'undefined') {
+        const res = REF_RESSOURCES.find(res => res.value === person);
+        if (res && meetRoles.some(mr => res.roles && res.roles.indexOf(mr) !== -1)) {
+          if (!roles.includes('M')) roles.push('M');
+        }
+      }
+    }
     // Si "Toutes les personnes" : inclure toutes les lignes qui ont au moins un rôle renseigné
     if (!person) {
       const allRoles = [];
-      if (r[6]||r[7]) allRoles.push('F');
+      if (r[6]||r[7]||r[17]||r[18]) allRoles.push('F');
       if (r[8]) allRoles.push('T');
-      if (r[9]||r[10]||r[11]) allRoles.push('H');
-      if (r[12]) allRoles.push('A');
+      if (r[9]||r[10]||r[11]||r[12]) allRoles.push('H');
+      if (r[13]) allRoles.push('A');
+      // REUNION pour "Toutes les personnes" : skip (trop de lignes) — seulement quand une personne est sélectionnée
       if (!allRoles.length) return;
       if (role && !allRoles.includes(role)) return;
       results.push({r, roles: role ? [role] : allRoles});
@@ -262,7 +343,7 @@ function getVal(item, col) {
     case 7: return [r[6],r[7]].filter(Boolean).join('/');
     case 8: return r[8];
     case 9: return [r[9],r[10],r[11]].filter(Boolean).join('/');
-    case 10: return r[12];
+    case 10: return r[13];
   }
   return '';
 }
@@ -301,21 +382,21 @@ function renderTable(matches) {
   if (!matches.length) { tb.innerHTML=`<tr><td colspan="12" class="empty">Aucun résultat</td></tr>`; return; }
   tb.innerHTML = matches.map(({r,roles})=>{
     const roleHtml = roles.map(ro=>{
-      const label = ro==='F'?'Facilitateur':ro==='H'?'Helper':ro==='A'?'Angel':'Traducteur';
+      const label = ro==='F'?'Animateur':ro==='H'?'Helper':ro==='A'?'Angel':'Traducteur';
       return `<span class="role-badge role-${ro}">${label}</span>`;
     }).join(' ');
     return `<tr>
       <td>${r[0]}</td><td>${r[1]}</td>
       <td style="white-space:nowrap">${r[2]}</td>
       <td><span class="tag">${r[3]}</span></td>
-      <td>${r[4]}${r[13]?'<span style="color:#e53e3e;font-weight:700;margin-left:3px">*</span>':''}</td>
-      <td style="text-align:center;letter-spacing:-1px">${'🌶️'.repeat(r[15]||0)}</td>
+      <td>${r[4]}${r[14]?'<span style="color:#e53e3e;font-weight:700;margin-left:3px">*</span>':''}</td>
+      <td style="text-align:center;letter-spacing:-1px">${'🌶️'.repeat(r[16]||0)}</td>
       <td>${r[5]}</td>
       <td>${roleHtml}</td>
       <td>${pills([r[6],r[7]],'pill-f')}</td>
       <td>${r[8]?`<span class="pill pill-t">${r[8]}</span>`:''}</td>
-      <td>${pills([r[9],r[10],r[11]],'pill-h')}</td>
-      <td>${r[12]?`<span class="pill pill-a">${r[12]}</span>`:''}</td>
+      <td>${pills([r[9],r[10],r[11],r[12]],'pill-h')}</td>
+      <td>${r[13]?`<span class="pill pill-a">${r[13]}</span>`:''}</td>
     </tr>`;
   }).join('');
 }
@@ -323,29 +404,34 @@ function renderTable(matches) {
 // Rendu d'une carte simple (1 atelier)
 function cardHtml({r, roles}) {
   const roleHtml = roles.map(ro => {
-    const lbl = ro==='F'?'Facilitateur':ro==='H'?'Helper':ro==='A'?'Angel':'Traducteur';
+    const lbl = ro==='F'?'Animateur':ro==='H'?'Helper':ro==='A'?'Angel':'Traducteur';
     const cls = ro==='F'?'role-F':ro==='H'?'role-H':ro==='A'?'role-A':'role-T';
     return `<span class="role-badge ${cls}">${lbl}</span>`;
   }).join(' ');
   const facs = pills([r[6],r[7]],'pill-f');
-  const helpers = pills([r[9],r[10],r[11]],'pill-h');
-  const angel = r[12] ? `<span class="pill pill-a">${r[12]}</span>` : '';
+  const helpers = pills([r[9],r[10],r[11],r[12]],'pill-h');
+  const angel = r[13] ? `<span class="pill pill-a">${r[13]}</span>` : '';
   const trad = r[8] ? `<span class="pill pill-t">${r[8]}</span>` : '';
   const lieu = r[5] ? `<span class="tag">${r[5]}</span>` : '';
-  const piment = (r[15]||0) > 0 ? `<span style="letter-spacing:-1px;font-size:13px">${'🌶️'.repeat(r[15])}</span>` : '';
+  const piment = (r[16]||0) > 0 ? `<span style="letter-spacing:-1px;font-size:13px">${'🌶️'.repeat(r[16])}</span>` : '';
+  const agendaIdx = r._agendaIdx !== undefined ? r._agendaIdx : -1;
+  const logBtn = agendaIdx >= 0
+    ? `<button class="log-link" onclick="openLogModal(${agendaIdx})" title="Voir la fiche logistique">📋</button>`
+    : '';
   return `<div class="card">
     <div class="card-header">
-      <div class="card-heure">${r[2]||''}</div>
+      <div class="card-heure">${r[2]||''}${logBtn ? '<br>' + logBtn : ''}</div>
       <div class="card-title">${r[4]||'—'}${piment ? ' '+piment : ''}</div>
     </div>
     <div class="card-meta">
       <span class="tag">${r[3]||''}</span>${lieu ? ' '+lieu : ''}
     </div>
     <div class="card-rows">
-      <div class="card-row"><span class="card-label">Rôle</span><span class="card-value">${roleHtml}${r[13]?`<span style="color:#e53e3e;font-weight:600;font-size:11px;margin-left:8px;border:1px solid #e53e3e;border-radius:4px;padding:1px 6px">${r[13]}</span>`:''}</span></div>
-      ${facs ? `<div class="card-row"><span class="card-label">Facilitateur</span><span class="card-value">${facs}</span></div>` : ''}
+      <div class="card-row"><span class="card-label">Rôle</span><span class="card-value">${roleHtml}${r[14]?`<span style="color:#e53e3e;font-weight:600;font-size:11px;margin-left:8px;border:1px solid #e53e3e;border-radius:4px;padding:1px 6px">${r[14]}</span>`:''}</span></div>
+      ${facs ? `<div class="card-row"><span class="card-label">Animateur</span><span class="card-value">${facs}</span></div>` : ''}
       ${trad ? `<div class="card-row"><span class="card-label">Traducteur</span><span class="card-value">${trad}</span></div>` : ''}
       ${helpers ? `<div class="card-row"><span class="card-label">Helper(s)</span><span class="card-value">${helpers}</span></div>` : ''}
+      ${(()=>{ const logId=r[15]; const logE=logId&&typeof LOGISTICS!=='undefined'?LOGISTICS[logId]:null; const pd=logE&&typeof logE.prepDuration==='number'?logE.prepDuration:0; if(pd>0) return `<div class="card-row"><span class="card-label">⏱ Prép.</span><span class="card-value"><strong style="background:#ffe066;color:#7a5c00;padding:2px 8px;border-radius:4px;border:1.5px solid #e6b800;font-size:13px;">⏱ ${pd} min</strong></span></div>`; return `<div class="card-row"><span class="card-label">⏱ Prép.</span><span class="card-value" style="font-size:12px;color:var(--muted)">0 min</span></div>`; })()}
       ${angel ? `<div class="card-row"><span class="card-label">Angel</span><span class="card-value">${angel}</span></div>` : ''}
     </div>
   </div>`;
@@ -355,7 +441,7 @@ function cardHtml({r, roles}) {
 function cardGroupedHtml(groupKey, items) {
   const { heure, roles } = groupKey;
   const roleHtml = roles.map(ro => {
-    const lbl = ro==='F'?'Facilitateur':ro==='H'?'Helper':ro==='A'?'Angel':'Traducteur';
+    const lbl = ro==='F'?'Animateur':ro==='H'?'Helper':ro==='A'?'Angel':'Traducteur';
     const cls = ro==='F'?'role-F':ro==='H'?'role-H':ro==='A'?'role-A':'role-T';
     return `<span class="role-badge ${cls}">${lbl}</span>`;
   }).join(' ');
@@ -390,8 +476,8 @@ function groupByPersonThenDay(matches) {
     item.roles.forEach(ro => {
       if (ro==='F') { if(r[6]) persons.add(r[6]); if(r[7]) persons.add(r[7]); }
       if (ro==='T') { if(r[8]) persons.add(r[8]); }
-      if (ro==='H') { if(r[9]) persons.add(r[9]); if(r[10]) persons.add(r[10]); if(r[11]) persons.add(r[11]); }
-      if (ro==='A') { if(r[12]) persons.add(r[12]); }
+      if (ro==='H') { if(r[9]) persons.add(r[9]); if(r[10]) persons.add(r[10]); if(r[11]) persons.add(r[11]); if(r[12]) persons.add(r[12]); }
+      if (ro==='A') { if(r[13]) persons.add(r[13]); }
     });
     // Si filtre personne spécifique → une seule personne
     const filterVal = document.getElementById('filterPerson').value;
@@ -526,6 +612,73 @@ window.toggleView    = toggleView;
 window.setView       = setView;
 window.sortBy        = sortBy;
 window.render        = render;
+
+// ════════════════════════════════════════════════════════
+// MODALE LOGISTIQUE
+// ════════════════════════════════════════════════════════
+function esc(v) { return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function openLogModal(agendaIdx) {
+  var e = AGENDA[agendaIdx];
+  if (!e) return;
+
+  // ── TITRE ──
+  var pimentHtml = e.piment > 0
+    ? '<span style="letter-spacing:-1px;font-size:12px">' + '🌶️'.repeat(e.piment) + '</span>' : '';
+  document.getElementById('logModalTitle').innerHTML =
+    esc(e.atelier||'—') + (pimentHtml ? ' ' + pimentHtml : '');
+
+  // ── META ──
+  function metaRow(lbl, html) {
+    return '<div class="log-meta-row"><span class="log-meta-lbl">' + lbl + '</span>' +
+           '<span class="log-meta-val">' + html + '</span></div>';
+  }
+  function pill(txt, cls) {
+    return txt ? '<span class="pill-sm ' + cls + '">' + esc(txt) + '</span>' : '';
+  }
+
+  var facs    = [pill(e.fac1,'pill-sm-f'), pill(e.fac2,'pill-sm-f'), pill(e.fac3,'pill-sm-f'), pill(e.fac4,'pill-sm-f')].filter(Boolean).join(' ');
+  var helpers = [pill(e.helper1,'pill-sm-h'), pill(e.helper2,'pill-sm-h'), pill(e.helper3,'pill-sm-h'), pill(e.helper4,'pill-sm-h')].filter(Boolean).join(' ');
+  var trad    = pill(e.traduction, 'pill-sm-t');
+  var angel   = pill(e.angel, 'pill-sm-a');
+
+  var meta = '';
+  meta += metaRow('📅 Date',   esc(e.jour) + ' — ' + esc(e.date));
+  meta += metaRow('🕐 Heure',  esc(e.heure||'—'));
+  if (e.lieu)  meta += metaRow('📍 Lieu',    '<span class="tag-lieu-modal">' + esc(e.lieu) + '</span>');
+  if (facs)    meta += metaRow('🎓 Anim.',   facs);
+  if (helpers) meta += metaRow('🤝 Helpers', helpers);
+  if (trad)    meta += metaRow('🌐 Trad.',   trad);
+  if (angel)   meta += metaRow('👼 Angel',   angel);
+  if (e.note)  meta += metaRow('📝 Note',    '<span style="color:var(--muted);font-size:12px">' + esc(e.note) + '</span>');
+  document.getElementById('logModalMeta').innerHTML = meta;
+
+  // ── CONTENU LOGISTIQUE ──
+  var logId = e.logisticId;
+  var logHtml = (logId && typeof LOGISTICS !== 'undefined' && LOGISTICS[logId] && LOGISTICS[logId].html)
+    ? '<div class="log-modal-content">' + LOGISTICS[logId].html + '</div>'
+    : '<div class="log-modal-empty">Aucune information logistique pour cet atelier.</div>';
+  // ── CONTENU LOGISTIQUE SPÉCIAL ──
+  var specEntry = logId && typeof LOGISTICS_SPECIAL !== 'undefined' ? LOGISTICS_SPECIAL[logId] : null;
+  if (specEntry && specEntry.html) {
+    logHtml += '<div style="margin-top:12px;padding-top:10px;border-top:1px solid #e5e7eb">' +
+      '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#7c5cd8;margin-bottom:6px">⭐ Informations Logistiques Spéciales</div>' +
+      '<div class="log-modal-content" style="background:#f5f3ff;border-radius:6px;padding:8px 10px">' + specEntry.html + '</div>' +
+    '</div>';
+  }
+  document.getElementById('logModalContent').innerHTML = logHtml;
+
+  document.getElementById('logModalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+window.openLogModal = openLogModal;
+
+function closeLogModal(evt) {
+  if (evt && evt.target !== document.getElementById('logModalOverlay')) return;
+  document.getElementById('logModalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+window.closeLogModal = closeLogModal;
 
 }); // fin loadData
 </script>
