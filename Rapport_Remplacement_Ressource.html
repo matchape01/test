@@ -1,0 +1,917 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Remplacement de Ressource</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --header-bg: #f0f4fb;
+    --green: #166534; --green-bg: #dcfce7; --green-border: #86efac;
+    --orange: #c2410c; --orange-bg: #fff7ed; --orange-border: #fdba74;
+    --red: #dc2626; --red-bg: #fef2f2; --red-border: #fca5a5;
+    --yellow-bg: #fefce8; --yellow-border: #fde047; --yellow-text: #854d0e;
+    --badge-f-bg: #dcfce7; --badge-f-tx: #166534;
+    --badge-h-bg: #e0f2fe; --badge-h-tx: #0369a1;
+    --badge-t-bg: #fef9c3; --badge-t-tx: #854d0e;
+    --badge-a-bg: #fce7f3; --badge-a-tx: #9d174d;
+    --row-alt: #f7f8fa;
+  }
+  .dark {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --header-bg: #1c2333;
+    --green-bg: #052e16; --green-border: #166534;
+    --orange-bg: #1c1000; --orange-border: #92400e;
+    --red-bg: #2d0a0a; --red-border: #991b1b;
+    --yellow-bg: #1c1500; --yellow-border: #854d0e; --yellow-text: #fde047;
+    --badge-f-bg: #0a2e1a; --badge-f-tx: #4ade80;
+    --badge-h-bg: #0c2d48; --badge-h-tx: #58a6ff;
+    --badge-t-bg: #2d2006; --badge-t-tx: #fbbf24;
+    --badge-a-bg: #3b1030; --badge-a-tx: #f0abca;
+    --row-alt: #161b22;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  /* ── HEADER ── */
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+  .logo h1 { font-size: 20px; font-weight: 700; }
+  .logo p  { font-size: 26px; font-weight: 800; color: var(--red); line-height: 1.2; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn-ghost { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* ── ÉTAPE 1 — Sélection personne ── */
+  .step-box { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px 28px; margin-bottom: 28px; }
+  .step-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--muted); margin-bottom: 6px; }
+  .step-title { font-size: 18px; font-weight: 800; margin-bottom: 16px; color: var(--text); }
+
+  .search-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-end; }
+  .fg { display: flex; flex-direction: column; gap: 4px; }
+  .fg label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+  .fg select, .fg input[type="text"] {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+    padding: 8px 11px; font-size: 14px; color: var(--text); font-family: inherit;
+  }
+  .fg select:focus, .fg input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .fg select { min-width: 260px; cursor: pointer; }
+
+  .btn-primary { cursor: pointer; background: var(--red); color: #fff; border: none; border-radius: 8px; padding: 9px 24px; font-size: 14px; font-weight: 700; font-family: inherit; display: inline-flex; align-items: center; gap: 7px; }
+  .btn-primary:hover { filter: brightness(.9); }
+  .btn-primary:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+  .btn-success { cursor: pointer; background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); border-radius: 8px; padding: 9px 24px; font-size: 14px; font-weight: 700; font-family: inherit; display: inline-flex; align-items: center; gap: 7px; }
+  .btn-success:hover { filter: brightness(.95); }
+  .btn-success:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+  .btn-sec { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 9px 20px; font-size: 14px; color: var(--text); font-family: inherit; display: inline-flex; align-items: center; gap: 7px; }
+  .btn-sec:hover { background: var(--border); }
+
+  /* ── ABSENT BANNER ── */
+  .absent-banner {
+    display: flex; align-items: center; gap: 14px;
+    background: var(--red-bg); border: 1px solid var(--red-border);
+    border-radius: 10px; padding: 14px 20px; margin-bottom: 24px;
+  }
+  .absent-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--red); color: #fff;
+    font-size: 16px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .absent-name { font-size: 17px; font-weight: 800; color: var(--red); }
+  .absent-sub  { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+  /* ── FILTRES JOURS ── */
+  .day-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .day-btn {
+    cursor: pointer; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    border: 2px solid var(--border); background: var(--surface); color: var(--muted); font-family: inherit;
+    transition: all .15s;
+  }
+  .day-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .day-btn.active { border-color: var(--red); background: var(--red-bg); color: var(--red); }
+
+  /* ── SECTION TITRE ── */
+  .section-sep { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); padding-bottom: 8px; border-bottom: 1px solid var(--border); margin: 24px 0 14px; display: flex; align-items: center; gap: 8px; }
+  .count-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; background: var(--red); color: #fff; border-radius: 99px; font-size: 11px; font-weight: 700; padding: 0 6px; }
+
+  /* ── CARTE REMPLACEMENT ── */
+  .replacement-card {
+    border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+    margin-bottom: 14px; transition: border-color .15s;
+  }
+  .replacement-card.validated { border-color: var(--green-border); }
+  .replacement-card.skipped   { opacity: .55; }
+
+  .card-header {
+    background: var(--surface); padding: 12px 16px;
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    border-bottom: 1px solid var(--border);
+  }
+  .card-day    { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--accent); min-width: 52px; }
+  .card-time   { font-size: 12px; font-weight: 700; color: var(--muted); min-width: 120px; font-variant-numeric: tabular-nums; }
+  .card-name   { font-size: 14px; font-weight: 700; flex: 1; }
+  .card-lieu   { font-size: 12px; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 1px 8px; }
+  .role-badge  { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px; white-space: nowrap; }
+  .rb-h { background: var(--badge-h-bg); color: var(--badge-h-tx); }
+  .rb-a { background: var(--badge-a-bg); color: var(--badge-a-tx); }
+  .rb-t { background: var(--badge-t-bg); color: var(--badge-t-tx); }
+  .rb-f { background: var(--badge-f-bg); color: var(--badge-f-tx); }
+
+  .card-body { padding: 14px 16px; background: var(--bg); }
+  .repl-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+  .repl-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); min-width: 80px; flex-shrink: 0; }
+
+  /* Sélecteur de remplacement */
+  .repl-select-wrap { flex: 1; min-width: 200px; position: relative; }
+  .repl-select {
+    width: 100%; background: var(--bg); border: 2px solid var(--border);
+    border-radius: 6px; padding: 7px 10px; font-size: 13px;
+    color: var(--text); font-family: inherit; cursor: pointer;
+    appearance: none; -webkit-appearance: none;
+  }
+  .repl-select:focus { outline: none; border-color: var(--accent); }
+  .repl-select.good { border-color: var(--green-border); background: var(--green-bg); color: var(--green); font-weight: 700; }
+  .repl-select.warn { border-color: var(--orange-border); background: var(--orange-bg); color: var(--orange); }
+  .repl-select.none { border-color: var(--red-border); background: var(--red-bg); color: var(--red); }
+
+  /* Score bar */
+  .score-bar-wrap { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+  .score-bar-track { flex: 1; height: 4px; background: var(--border); border-radius: 2px; }
+  .score-bar-fill { height: 4px; border-radius: 2px; transition: width .3s; }
+  .score-bar-fill.best   { background: #16a34a; }
+  .score-bar-fill.good   { background: #3b82d4; }
+  .score-bar-fill.medium { background: #f59e0b; }
+  .score-bar-fill.low    { background: #dc2626; }
+  .score-label { font-size: 11px; font-weight: 700; color: var(--muted); min-width: 70px; text-align: right; }
+
+  /* Option badges dans le select — via optgroup */
+  select option.opt-best   { font-weight: 700; }
+
+  /* Infos charge */
+  .charge-info { font-size: 11px; color: var(--muted); margin-top: 4px; display: flex; gap: 12px; flex-wrap: wrap; }
+  .charge-info span { display: flex; align-items: center; gap: 4px; }
+  .charge-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .charge-dot.low    { background: #16a34a; }
+  .charge-dot.medium { background: #f59e0b; }
+  .charge-dot.high   { background: #dc2626; }
+  .charge-dot.crit   { background: #7c3aed; }
+
+  /* Conflit badge */
+  .conflict-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 4px; background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+
+  /* Actions de la carte */
+  .card-actions { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+  .btn-validate { cursor: pointer; background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); border-radius: 6px; padding: 6px 14px; font-size: 12px; font-weight: 700; font-family: inherit; }
+  .btn-validate:hover { filter: brightness(.95); }
+  .btn-validate:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+  .btn-skip    { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 12px; color: var(--muted); font-family: inherit; }
+  .btn-skip:hover { background: var(--border); }
+  .validated-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--green); padding: 5px 10px; background: var(--green-bg); border: 1px solid var(--green-border); border-radius: 6px; }
+  .skipped-badge   { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--muted); padding: 5px 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; }
+
+  /* ── BARRE DE VALIDATION GLOBALE ── */
+  .validate-bar {
+    position: sticky; bottom: 0; left: 0; right: 0;
+    background: var(--bg); border-top: 2px solid var(--green-border);
+    padding: 14px 20px; display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap; z-index: 100;
+    box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+  }
+  .validate-bar-info { font-size: 13px; color: var(--muted); }
+  .validate-bar-info strong { color: var(--text); }
+
+  /* ── RÉSUMÉ FINAL ── */
+  .summary-box { border: 2px solid var(--green-border); background: var(--green-bg); border-radius: 12px; padding: 20px 24px; margin-bottom: 28px; }
+  .summary-box h2 { font-size: 17px; font-weight: 800; color: var(--green); margin-bottom: 12px; }
+  .summary-row { display: flex; align-items: center; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--green-border); font-size: 13px; flex-wrap: wrap; }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-old { text-decoration: line-through; color: var(--muted); }
+  .summary-arrow { color: var(--green); font-size: 16px; }
+  .summary-new { font-weight: 700; color: var(--green); }
+
+  /* ── TOAST ── */
+  #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(60px); background: #1f2328; color: #fff; border-radius: 8px; padding: 12px 22px; font-size: 13px; font-weight: 700; z-index: 10000; opacity: 0; transition: transform .3s, opacity .3s; white-space: nowrap; }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  #toast.ok  { background: #166534; }
+  #toast.err { background: #dc2626; }
+
+  .empty { text-align: center; padding: 48px 20px; color: var(--muted); border: 2px dashed var(--border); border-radius: 10px; }
+  .empty-ok { border-color: var(--green-border); background: var(--green-bg); color: var(--green); }
+
+  footer { margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+</style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+</head>
+<!-- i18n -->
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Remplacement de Ressource</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn-ghost" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="btn-ghost" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <a class="btn-ghost" href="gestion_planning.html" data-i18n="nav_admin">⚙️ Admin</a>
+      <button class="btn-ghost" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit">Mode Nuit</span></button>
+      <button class="mode-btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
+    </div>
+  </header>
+
+  <!-- ── ÉTAPE 1 — Sélection de la personne absente ── -->
+  <div class="step-box" id="step1Box">
+    <div class="step-label">Étape 1</div>
+    <div class="step-title">Qui est indisponible ?</div>
+    <div class="search-row">
+      <div class="fg">
+        <label>Rôle concerné</label>
+        <select id="selRole" onchange="onRoleChange()">
+          <option value="">Tous les rôles</option>
+          <option value="helper">🤝 Helper</option>
+          <option value="angel">👼 Angel</option>
+          <option value="traducteur">🌐 Traducteur</option>
+          <option value="animateur">🎓 Animateur</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label>Personne absente</label>
+        <select id="selAbsent" onchange="onAbsentChange()">
+          <option value="">— Choisissez une personne —</option>
+        </select>
+      </div>
+      <button class="btn-primary" id="btnAnalyse" onclick="runAnalysis()" disabled>
+        🔍 Analyser et proposer des remplaçants
+      </button>
+    </div>
+  </div>
+
+  <!-- ── ZONE DE RÉSULTATS ── -->
+  <div id="resultsZone" style="display:none">
+
+    <!-- Bannière personne absente -->
+    <div class="absent-banner" id="absentBanner"></div>
+
+    <!-- Filtre jours -->
+    <div class="day-filters" id="dayFilters"></div>
+
+    <!-- Récap résumé (après validation) -->
+    <div id="summaryZone" style="display:none"></div>
+
+    <!-- Liste des remplacements proposés -->
+    <div id="replacementList"></div>
+
+    <!-- Barre de validation globale -->
+    <div class="validate-bar" id="validateBar">
+      <div class="validate-bar-info" id="validateBarInfo"></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <button class="btn-sec" onclick="resetAnalysis()">↩ Recommencer</button>
+        <button class="btn-success" id="btnSaveAll" onclick="saveAll()" disabled>
+          💾 Sauvegarder les remplacements validés
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div><!-- /wrap -->
+
+<div id="toast"></div>
+
+<!-- ── SCRIPTS ── -->
+<script src="ref_resource_types.js"></script>
+<script src="ref_ressources.js"></script>
+<script src="github-api.js"></script>
+<script src="loader.js"></script>
+<script>
+loadData(['data.js'], function() {
+
+// ════════════════════════════════════════════════════════════════
+// UTILITAIRES
+// ════════════════════════════════════════════════════════════════
+const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+function parseMinutes(str) {
+  if (!str) return null;
+  const s = String(str).replace(/\./g, ':').trim();
+  const m = s.match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : null;
+}
+
+function parseInterval(heure) {
+  if (!heure) return null;
+  const norm = String(heure).replace(/\./g, ':').replace(/[–—]/g, '-');
+  const m = norm.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+  if (!m) return null;
+  const start = parseInt(m[1]) * 60 + parseInt(m[2]);
+  let   end   = parseInt(m[3]) * 60 + parseInt(m[4]);
+  if (end <= start) end += 1440;
+  return [start, end];
+}
+
+function durationMin(heure) {
+  const iv = parseInterval(heure);
+  return iv ? iv[1] - iv[0] : 0;
+}
+
+function overlaps(ivA, ivB) {
+  if (!ivA || !ivB) return false;
+  return ivA[0] < ivB[1] && ivB[0] < ivA[1];
+}
+
+function initials(nom) {
+  return (nom || '').split(' ').filter(Boolean).slice(0, 2).map(w => w[0].toUpperCase()).join('');
+}
+
+// Roles fields in AGENDA
+const ROLE_FIELDS = {
+  helper:      ['helper1', 'helper2', 'helper3', 'helper4'],
+  angel:       ['angel'],
+  traducteur:  ['traduction'],
+  animateur:['fac1', 'fac2'],
+};
+const ROLE_LABEL = { helper:'Helper', angel:'Angel', traducteur:'Traducteur', animateur:'Animateur' };
+const ROLE_CLS   = { helper:'rb-h', angel:'rb-a', traducteur:'rb-t', animateur:'rb-f' };
+
+// ════════════════════════════════════════════════════════════════
+// MODE NUIT
+// ════════════════════════════════════════════════════════════════
+function toggleMode() {
+  const dark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = dark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+function hardReload() { location.reload(true); }
+window.toggleMode = toggleMode;
+window.hardReload = hardReload;
+
+// ════════════════════════════════════════════════════════════════
+// POPULATION DU SÉLECTEUR ABSENT
+// ════════════════════════════════════════════════════════════════
+function onRoleChange() {
+  const role = document.getElementById('selRole').value;
+  populateAbsentSelect(role);
+  document.getElementById('btnAnalyse').disabled = true;
+}
+window.onRoleChange = onRoleChange;
+
+function onAbsentChange() {
+  document.getElementById('btnAnalyse').disabled =
+    !document.getElementById('selAbsent').value;
+}
+window.onAbsentChange = onAbsentChange;
+
+function populateAbsentSelect(roleFilter) {
+  const sel = document.getElementById('selAbsent');
+  sel.innerHTML = '<option value="">— Choisissez une personne —</option>';
+
+  // Extraire toutes les personnes présentes dans AGENDA
+  const present = new Map(); // nom -> Set<role>
+  AGENDA.forEach(e => {
+    function addPerson(nom, role) {
+      if (!nom || !nom.trim()) return;
+      if (!present.has(nom)) present.set(nom, new Set());
+      present.get(nom).add(role);
+    }
+    if (e.fac1)       addPerson(e.fac1, 'animateur');
+    if (e.fac2)       addPerson(e.fac2, 'animateur');
+    if (e.traduction) addPerson(e.traduction, 'traducteur');
+    if (e.helper1)    addPerson(e.helper1, 'helper');
+    if (e.helper2)    addPerson(e.helper2, 'helper');
+    if (e.helper3)    addPerson(e.helper3, 'helper');
+    if (e.helper4)    addPerson(e.helper4, 'helper');
+    if (e.angel)      addPerson(e.angel, 'angel');
+  });
+
+  const sorted = [...present.entries()]
+    .filter(([, roles]) => roleFilter ? roles.has(roleFilter) : true)
+    .sort((a, b) => a[0].localeCompare(b[0]));
+
+  sorted.forEach(([nom]) => {
+    const o = document.createElement('option');
+    o.value = nom; o.textContent = nom;
+    sel.appendChild(o);
+  });
+}
+
+// Init sans filtre
+populateAbsentSelect('');
+
+// ════════════════════════════════════════════════════════════════
+// ÉTAT GLOBAL
+// ════════════════════════════════════════════════════════════════
+let absentName   = '';
+let absentRole   = '';      // rôle filtré ou '' pour tous
+let assignments  = [];      // [{ idx, role, field, slot, currentAssignee, proposals }]
+let decisions    = {};      // { key: { chosen: nom|null, validated: bool, skipped: bool } }
+let activeJour   = '';      // filtre jour actif
+
+// ════════════════════════════════════════════════════════════════
+// ANALYSE : trouver les créneaux et proposer des remplaçants
+// ════════════════════════════════════════════════════════════════
+function runAnalysis() {
+  absentName = document.getElementById('selAbsent').value;
+  absentRole = document.getElementById('selRole').value;
+  if (!absentName) return;
+
+  assignments = [];
+  decisions   = {};
+
+  // 1 — Trouver tous les créneaux où la personne est assignée
+  AGENDA.forEach((e, idx) => {
+    const allRoles = ['animateur', 'helper', 'angel', 'traducteur'];
+    allRoles.forEach(role => {
+      if (absentRole && role !== absentRole) return;
+      const fields = ROLE_FIELDS[role];
+      fields.forEach(field => {
+        if (e[field] === absentName) {
+          const key = idx + '_' + role + '_' + field;
+          const proposals = computeProposals(e, idx, role, field);
+          assignments.push({ idx, role, field, entry: e, proposals });
+          decisions[key] = { chosen: proposals[0] ? proposals[0].nom : null, validated: false, skipped: false };
+        }
+      });
+    });
+  });
+
+  if (!assignments.length) {
+    showToast('Aucun créneau trouvé pour ' + absentName, 'err');
+    return;
+  }
+
+  document.getElementById('step1Box').style.display = 'none';
+  document.getElementById('resultsZone').style.display = '';
+  renderAbsentBanner();
+  renderDayFilters();
+  renderReplacements();
+  updateValidateBar();
+}
+window.runAnalysis = runAnalysis;
+
+// ════════════════════════════════════════════════════════════════
+// ALGORITHME DE PROPOSITION
+// ════════════════════════════════════════════════════════════════
+
+// Calcule la charge (en minutes) de chaque personne sur tout l'AGENDA (rôle donné)
+function buildWorkloadMap(role) {
+  const map = new Map(); // nom -> minutes totales
+  const fields = ROLE_FIELDS[role];
+  AGENDA.forEach(e => {
+    fields.forEach(f => {
+      const nom = e[f];
+      if (!nom || !nom.trim()) return;
+      const dur = durationMin(e.heure);
+      map.set(nom, (map.get(nom) || 0) + dur);
+    });
+  });
+  return map;
+}
+
+// Vérifie si une personne a un conflit sur un créneau donné
+// (elle est déjà assignée à un autre atelier qui se chevauche)
+function hasConflict(nom, targetEntry, targetIdx) {
+  const targetIv = parseInterval(targetEntry.heure);
+  if (!targetIv) return false;
+
+  const allRoles = ['animateur', 'helper', 'angel', 'traducteur'];
+  return AGENDA.some((e, idx) => {
+    if (idx === targetIdx) return false; // ignorer l'atelier cible lui-même
+    if (e.jour !== targetEntry.jour) return false;
+    const iv = parseInterval(e.heure);
+    if (!overlaps(iv, targetIv)) return false;
+    return allRoles.some(role => ROLE_FIELDS[role].some(f => e[f] === nom));
+  });
+}
+
+// Déjà assigné à cet atelier (dans un autre rôle) ?
+function alreadyInEntry(nom, entry) {
+  return ['fac1','fac2','traduction','helper1','helper2','helper3','helper4','angel']
+    .some(f => entry[f] === nom);
+}
+
+function computeProposals(entry, idx, role, field) {
+  const workload = buildWorkloadMap(role);
+
+  // Candidats : personnes ayant ce rôle dans REF_RESSOURCES
+  const candidates = REF_RESSOURCES.filter(r => r.roles.includes(role));
+
+  // Valeurs moyennes pour le score de charge
+  const allLoads = [...workload.values()];
+  const avgLoad  = allLoads.length ? allLoads.reduce((a, b) => a + b, 0) / allLoads.length : 0;
+  const maxLoad  = allLoads.length ? Math.max(...allLoads) : 1;
+
+  return candidates
+    .map(r => {
+      const nom = r.value;
+      if (nom === absentName) return null; // l'absent lui-même
+      if (alreadyInEntry(nom, entry) && entry[field] !== absentName) return null; // déjà dans cet atelier sous un autre rôle
+
+      const conflict = hasConflict(nom, entry, idx);
+      const load     = workload.get(nom) || 0;
+
+      // Score 0-100 : plus c'est élevé, mieux c'est
+      // Règle 1 : conflit → score 0 (non viable)
+      if (conflict) return null;
+
+      // Score basé sur la charge : on préfère quelqu'un qui travaille moins
+      const loadScore = maxLoad > 0 ? Math.max(0, 100 - (load / maxLoad) * 80) : 100;
+
+      // Bonus : déjà assigné ce jour mais pas en conflit → +10 (mobilisation déjà faite)
+      const sameDay  = AGENDA.some(e => e.jour === entry.jour && ROLE_FIELDS[role].some(f => e[f] === nom));
+      const bonus    = sameDay ? 10 : 0;
+
+      const score = Math.round(Math.min(100, loadScore + bonus));
+      return { nom, score, load, conflict: false };
+    })
+    .filter(Boolean)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 8); // max 8 candidats
+}
+
+// ════════════════════════════════════════════════════════════════
+// RENDU
+// ════════════════════════════════════════════════════════════════
+
+function renderAbsentBanner() {
+  const nb = assignments.length;
+  const roles = [...new Set(assignments.map(a => ROLE_LABEL[a.role]))].join(', ');
+  document.getElementById('absentBanner').innerHTML = `
+    <div class="absent-avatar">${initials(absentName)}</div>
+    <div>
+      <div class="absent-name">🚫 ${absentName}</div>
+      <div class="absent-sub">${nb} créneau${nb > 1 ? 'x' : ''} à remplacer · Rôle${nb > 1 ? 's' : ''} : ${roles || absentRole || 'Tous'}</div>
+    </div>
+  `;
+}
+
+function renderDayFilters() {
+  const jours = [...new Set(assignments.map(a => a.entry.jour))]
+    .sort((a, b) => JOUR_ORDER.indexOf(a) - JOUR_ORDER.indexOf(b));
+
+  const wrap = document.getElementById('dayFilters');
+  let html = `<button class="day-btn${activeJour===''?' active':''}" onclick="filterDay('')">Tous les jours</button>`;
+  jours.forEach(j => {
+    html += `<button class="day-btn${activeJour===j?' active':''}" onclick="filterDay('${j}')">${j}</button>`;
+  });
+  wrap.innerHTML = html;
+}
+
+function filterDay(jour) {
+  activeJour = jour;
+  renderDayFilters();
+  renderReplacements();
+}
+window.filterDay = filterDay;
+
+function scoreClass(s) {
+  if (s >= 75) return 'best';
+  if (s >= 50) return 'good';
+  if (s >= 25) return 'medium';
+  return 'low';
+}
+function scoreLabel(s) {
+  if (s >= 75) return '🌟 Idéal';
+  if (s >= 50) return '✅ Bon';
+  if (s >= 25) return '⚠️ Passable';
+  return '⛔ Faible';
+}
+
+function renderReplacements() {
+  const list = document.getElementById('replacementList');
+
+  const filtered = assignments.filter(a => !activeJour || a.entry.jour === activeJour);
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty">Aucun créneau pour ce filtre.</div>';
+    return;
+  }
+
+  // Grouper par jour
+  const byDay = {};
+  filtered.forEach(a => {
+    if (!byDay[a.entry.jour]) byDay[a.entry.jour] = [];
+    byDay[a.entry.jour].push(a);
+  });
+
+  let html = '';
+  JOUR_ORDER.forEach(jour => {
+    if (!byDay[jour]) return;
+    const items = byDay[jour];
+    html += `<div class="section-sep">${jour} — ${items[0].entry.date} <span class="count-pill">${items.length}</span></div>`;
+    items.forEach(a => {
+      html += renderCard(a);
+    });
+  });
+
+  list.innerHTML = html;
+  updateValidateBar();
+}
+
+function renderCard(a) {
+  const key = a.idx + '_' + a.role + '_' + a.field;
+  const dec = decisions[key] || {};
+  const isValidated = dec.validated;
+  const isSkipped   = dec.skipped;
+
+  const entry = a.entry;
+  const proposals = a.proposals;
+
+  let cardClass = 'replacement-card';
+  if (isValidated) cardClass += ' validated';
+  if (isSkipped)   cardClass += ' skipped';
+
+  // Sélecteur de candidats
+  let selectHtml = `<select class="repl-select${proposals.length === 0 ? ' none' : ''}" id="sel_${key}" onchange="onSelectChange('${key}')">`;
+  if (proposals.length === 0) {
+    selectHtml += `<option value="">⛔ Aucun remplaçant disponible</option>`;
+  } else {
+    selectHtml += `<option value="">— Choisir un remplaçant —</option>`;
+    proposals.forEach((p, i) => {
+      const h = Math.floor(p.load / 60);
+      const m = p.load % 60;
+      const loadStr = h > 0 ? `${h}h${m > 0 ? m + 'min' : ''}` : `${m}min`;
+      const label = `${p.nom}  [${scoreLabel(p.score)} — charge: ${loadStr}]`;
+      selectHtml += `<option value="${p.nom}" ${dec.chosen === p.nom ? 'selected' : ''} class="${i === 0 ? 'opt-best' : ''}">${label}</option>`;
+    });
+  }
+  selectHtml += `</select>`;
+
+  // Barre de score pour la proposition choisie
+  let scoreBarHtml = '';
+  if (dec.chosen) {
+    const chosen = proposals.find(p => p.nom === dec.chosen);
+    if (chosen) {
+      const cls = scoreClass(chosen.score);
+      scoreBarHtml = `
+        <div class="score-bar-wrap">
+          <div class="score-bar-track"><div class="score-bar-fill ${cls}" style="width:${chosen.score}%"></div></div>
+          <div class="score-label">${scoreLabel(chosen.score)} (${chosen.score}/100)</div>
+        </div>`;
+    }
+  }
+
+  // Info charge du remplaçant choisi
+  let chargeHtml = '';
+  if (dec.chosen) {
+    const chosen = proposals.find(p => p.nom === dec.chosen);
+    if (chosen) {
+      const h = Math.floor(chosen.load / 60);
+      const m = chosen.load % 60;
+      const loadStr = h > 0 ? `${h}h${m > 0 ? m + 'min' : ''}` : (m > 0 ? `${m}min` : '0');
+      const cls = chosen.load < 120 ? 'low' : chosen.load < 240 ? 'medium' : chosen.load < 360 ? 'high' : 'crit';
+      chargeHtml = `
+        <div class="charge-info">
+          <span><div class="charge-dot ${cls}"></div> Charge actuelle : ${loadStr} (tous ateliers confondus)</span>
+        </div>`;
+    }
+  }
+
+  // Boutons d'action
+  let actionsHtml = '';
+  if (isValidated) {
+    actionsHtml = `<span class="validated-badge">✅ Validé → ${dec.chosen}</span>
+      <button class="btn-skip" onclick="undoValidate('${key}')">Annuler</button>`;
+  } else if (isSkipped) {
+    actionsHtml = `<span class="skipped-badge">⏭ Ignoré</span>
+      <button class="btn-skip" onclick="undoSkip('${key}')">Réactiver</button>`;
+  } else {
+    actionsHtml = `
+      <button class="btn-validate" id="btnv_${key}" onclick="validateCard('${key}')" ${!dec.chosen ? 'disabled' : ''}>
+        ✅ Valider ce remplacement
+      </button>
+      <button class="btn-skip" onclick="skipCard('${key}')">⏭ Ignorer ce créneau</button>`;
+  }
+
+  return `
+  <div class="replacement-card ${isValidated ? 'validated' : ''} ${isSkipped ? 'skipped' : ''}" id="card_${key}">
+    <div class="card-header">
+      <div class="card-day">${entry.jour}</div>
+      <div class="card-time">${entry.heure || '?'}</div>
+      <div class="card-name">${entry.atelier}</div>
+      ${entry.lieu ? `<div class="card-lieu">${entry.lieu}</div>` : ''}
+      <span class="role-badge ${ROLE_CLS[a.role]}">${ROLE_LABEL[a.role]}</span>
+    </div>
+    <div class="card-body">
+      <div class="repl-row">
+        <div class="repl-label">Actuel</div>
+        <div style="font-size:13px;font-weight:700;color:var(--red);text-decoration:line-through;">${a.entry[a.field]}</div>
+      </div>
+      <div class="repl-row">
+        <div class="repl-label">Remplaçant</div>
+        <div class="repl-select-wrap">
+          ${selectHtml}
+          ${scoreBarHtml}
+          ${chargeHtml}
+        </div>
+      </div>
+      <div class="card-actions">
+        ${actionsHtml}
+      </div>
+    </div>
+  </div>`;
+}
+
+function onSelectChange(key) {
+  const val = document.getElementById('sel_' + key).value;
+  decisions[key].chosen = val || null;
+  // Mettre à jour dynamiquement la carte
+  const assignment = assignments.find(a => a.idx + '_' + a.role + '_' + a.field === key);
+  if (assignment) {
+    const card = document.getElementById('card_' + key);
+    if (card) card.outerHTML = renderCard(assignment);
+    // Re-bind après remplacement DOM
+  }
+  updateValidateBar();
+}
+window.onSelectChange = onSelectChange;
+
+function validateCard(key) {
+  if (!decisions[key].chosen) return;
+  decisions[key].validated = true;
+  decisions[key].skipped   = false;
+  refreshCard(key);
+  updateValidateBar();
+}
+window.validateCard = validateCard;
+
+function skipCard(key) {
+  decisions[key].skipped   = true;
+  decisions[key].validated = false;
+  refreshCard(key);
+  updateValidateBar();
+}
+window.skipCard = skipCard;
+
+function undoValidate(key) {
+  decisions[key].validated = false;
+  refreshCard(key);
+  updateValidateBar();
+}
+window.undoValidate = undoValidate;
+
+function undoSkip(key) {
+  decisions[key].skipped = false;
+  refreshCard(key);
+  updateValidateBar();
+}
+window.undoSkip = undoSkip;
+
+function refreshCard(key) {
+  const assignment = assignments.find(a => a.idx + '_' + a.role + '_' + a.field === key);
+  if (!assignment) return;
+  const card = document.getElementById('card_' + key);
+  if (!card) return;
+  const tmp = document.createElement('div');
+  tmp.innerHTML = renderCard(assignment);
+  card.replaceWith(tmp.firstElementChild);
+}
+
+// ════════════════════════════════════════════════════════════════
+// BARRE DE VALIDATION
+// ════════════════════════════════════════════════════════════════
+function updateValidateBar() {
+  const total      = assignments.length;
+  const validated  = Object.values(decisions).filter(d => d.validated).length;
+  const skipped    = Object.values(decisions).filter(d => d.skipped).length;
+  const pending    = total - validated - skipped;
+
+  document.getElementById('validateBarInfo').innerHTML =
+    `<strong>${validated}</strong> validé${validated>1?'s':''} · ` +
+    `<strong>${skipped}</strong> ignoré${skipped>1?'s':''} · ` +
+    `<strong>${pending}</strong> en attente`;
+
+  document.getElementById('btnSaveAll').disabled = (validated === 0);
+}
+
+// ════════════════════════════════════════════════════════════════
+// SAUVEGARDE
+// ════════════════════════════════════════════════════════════════
+async function saveAll() {
+  const toSave = assignments.filter(a => {
+    const key = a.idx + '_' + a.role + '_' + a.field;
+    return decisions[key] && decisions[key].validated;
+  });
+  if (!toSave.length) return;
+
+  // Appliquer les changements sur une copie de AGENDA
+  const agendaCopy = AGENDA.map(e => Object.assign({}, e));
+  toSave.forEach(a => {
+    const key     = a.idx + '_' + a.role + '_' + a.field;
+    const newName = decisions[key].chosen;
+    agendaCopy[a.idx][a.field] = newName;
+  });
+
+  // Générer le contenu de data.js
+  const lines = agendaCopy.map(e =>
+    '  {jour:' + JSON.stringify(e.jour) +
+    ',date:' + JSON.stringify(e.date) +
+    ',heure:' + JSON.stringify(e.heure) +
+    ',type:' + JSON.stringify(e.type) +
+    ',atelier:' + JSON.stringify(e.atelier) +
+    ',lieu:' + JSON.stringify(e.lieu || '') +
+    ',fac1:' + JSON.stringify(e.fac1 || '') +
+    ',fac2:' + JSON.stringify(e.fac2 || '') +
+    ',traduction:' + JSON.stringify(e.traduction || '') +
+    ',helper1:' + JSON.stringify(e.helper1 || '') +
+    ',helper2:' + JSON.stringify(e.helper2 || '') +
+    ',helper3:' + JSON.stringify(e.helper3 || '') +
+    ',helper4:' + JSON.stringify(e.helper4 || '') +
+    ',angel:' + JSON.stringify(e.angel || '') +
+    ',note:' + JSON.stringify(e.note || '') +
+    ',piment:' + (e.piment || 0) +
+    ',logisticId:' + JSON.stringify(e.logisticId || '') + '}'
+  );
+
+  const content =
+    '/**\n' +
+    ' * TANTRAMOUR 2026 — Référentiel de données commun\n' +
+    ' * Mis à jour automatiquement — Remplacement de ' + absentName + '\n' +
+    ' */\n\nvar AGENDA = [\n' +
+    lines.join(',\n') +
+    '\n];\n\n' +
+    'function agendaToRaw(entries) {\n' +
+    '  return entries.map(function(e) { return [\n' +
+    '    e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,\n' +
+    '    e.fac1, e.fac2, e.traduction,\n' +
+    '    e.helper1, e.helper2, e.helper3, e.helper4 || \'\',\n' +
+    '    e.angel, e.note, e.logisticId, e.piment || 0\n' +
+    '  ]; });\n}\n';
+
+  document.getElementById('btnSaveAll').disabled = true;
+  document.getElementById('btnSaveAll').textContent = '⏳ Sauvegarde…';
+
+  try {
+    await githubSaveFile('data.js', content);
+    showToast('✅ data.js sauvegardé avec succès !', 'ok');
+    renderSummary(toSave);
+  } catch(e) {
+    showToast('❌ Erreur : ' + e.message, 'err');
+    document.getElementById('btnSaveAll').disabled = false;
+    document.getElementById('btnSaveAll').textContent = '💾 Sauvegarder les remplacements validés';
+  }
+}
+window.saveAll = saveAll;
+
+function renderSummary(saved) {
+  const zone = document.getElementById('summaryZone');
+  let rows = saved.map(a => {
+    const key = a.idx + '_' + a.role + '_' + a.field;
+    const newName = decisions[key].chosen;
+    return `<div class="summary-row">
+      <span class="role-badge ${ROLE_CLS[a.role]}">${ROLE_LABEL[a.role]}</span>
+      <span style="font-size:12px;color:var(--muted)">${a.entry.jour} — ${a.entry.heure}</span>
+      <span style="font-size:13px;font-weight:600;flex:1">${a.entry.atelier}</span>
+      <span class="summary-old">${absentName}</span>
+      <span class="summary-arrow">→</span>
+      <span class="summary-new">${newName}</span>
+    </div>`;
+  }).join('');
+
+  zone.innerHTML = `
+    <div class="summary-box">
+      <h2>✅ ${saved.length} remplacement${saved.length > 1 ? 's' : ''} sauvegardé${saved.length > 1 ? 's' : ''}</h2>
+      ${rows}
+    </div>`;
+  zone.style.display = '';
+  zone.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ════════════════════════════════════════════════════════════════
+// RESET
+// ════════════════════════════════════════════════════════════════
+function resetAnalysis() {
+  absentName = ''; absentRole = '';
+  assignments = []; decisions = {}; activeJour = '';
+  document.getElementById('step1Box').style.display = '';
+  document.getElementById('resultsZone').style.display = 'none';
+  document.getElementById('summaryZone').style.display = 'none';
+  document.getElementById('selAbsent').value = '';
+  document.getElementById('selRole').value = '';
+  document.getElementById('btnAnalyse').disabled = true;
+  populateAbsentSelect('');
+}
+window.resetAnalysis = resetAnalysis;
+
+// ════════════════════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════════════════════
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.className = ''; }, 3500);
+}
+
+}); // end loadData
+</script>
+</body>
+</html>
+
+
+
