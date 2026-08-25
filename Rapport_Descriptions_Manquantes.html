@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Descriptions manquantes</title>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --green:#16a34a; --green-bg:#dcfce7; --green-border:#86efac;
+    --orange:#d97706; --orange-bg:#fef3c7; --orange-border:#fcd34d;
+    --red:#dc2626; --red-bg:#fee2e2; --red-border:#fca5a5;
+    --tag-bg:#eef2ff; --tag-text:#3b5bdb;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --green-bg:#052e16; --green-border:#166534;
+    --orange-bg:#2d1a00; --orange-border:#92400e;
+    --red-bg:#2d0a0a; --red-border:#991b1b;
+    --tag-bg:#1c2a4a; --tag-text:#79a8ff;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
+  .wrap { max-width:960px; margin:0 auto; padding:24px 20px 80px; }
+
+  /* ── HEADER ── */
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:19px; font-weight:700; }
+  .logo p  { font-size:22px; font-weight:800; color:var(--orange); line-height:1.2; margin-top:2px; }
+  .header-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 14px; font-size:13px; color:var(--text); font-family:inherit; display:inline-flex; align-items:center; gap:6px; text-decoration:none; transition:background .15s; }
+  .btn:hover { background:var(--border); }
+
+  /* ── STATS ── */
+  .stats-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:22px; }
+  .stat-pill { flex:1; min-width:110px; border-radius:8px; padding:12px 14px; border:1px solid var(--border); background:var(--surface); text-align:center; }
+  .stat-pill .num { font-size:26px; font-weight:800; line-height:1; color:var(--accent); }
+  .stat-pill .lbl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); font-weight:600; margin-top:3px; }
+  .stat-pill.ok  { border-color:var(--green-border); background:var(--green-bg); }
+  .stat-pill.ok .num  { color:var(--green); }
+  .stat-pill.warn { border-color:var(--orange-border); background:var(--orange-bg); }
+  .stat-pill.warn .num { color:var(--orange); }
+  .stat-pill.err  { border-color:var(--red-border); background:var(--red-bg); }
+  .stat-pill.err .num  { color:var(--red); }
+
+  /* ── FILTRES ── */
+  .filters { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; align-items:flex-end; }
+  .fg { display:flex; flex-direction:column; gap:4px; }
+  .fg label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); }
+  .fg select { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:13px; color:var(--text); font-family:inherit; cursor:pointer; min-width:160px; }
+
+  /* ── SÉPARATEUR DE JOUR ── */
+  .day-sep { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); padding-bottom:8px; border-bottom:2px solid var(--border); margin:24px 0 14px; display:flex; align-items:center; gap:8px; }
+  .day-count { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; background:var(--orange); color:#fff; border-radius:99px; font-size:11px; font-weight:700; padding:0 6px; }
+
+  /* ── CARTES ── */
+  .card-list { display:flex; flex-direction:column; gap:10px; }
+  .ws-card { border-radius:10px; border:1px solid var(--border); overflow:hidden; }
+  .ws-card.miss-fr  { border-color:var(--orange-border); }
+  .ws-card.miss-en  { border-color:var(--accent); }
+  .ws-card.miss-both { border-color:var(--red-border); }
+
+  .ws-header { display:flex; align-items:center; gap:12px; padding:12px 16px; flex-wrap:wrap; }
+  .ws-card.miss-both .ws-header { background:var(--red-bg); }
+  .ws-card.miss-fr   .ws-header { background:var(--orange-bg); }
+  .ws-card.miss-en   .ws-header { background:#eff6ff; }
+  .dark .ws-card.miss-en .ws-header { background:#0c1a3a; }
+
+  .ws-type-badge { font-size:11px; font-weight:700; padding:2px 8px; border-radius:4px; background:var(--tag-bg); color:var(--tag-text); white-space:nowrap; }
+  .ws-name { font-size:14px; font-weight:700; flex:1; min-width:0; }
+  .ws-meta { font-size:12px; color:var(--muted); white-space:nowrap; }
+
+  .ws-body { padding:10px 16px 14px; background:var(--bg); border-top:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+  .ws-info { font-size:12px; color:var(--muted); display:flex; gap:12px; flex-wrap:wrap; }
+  .ws-actions { display:flex; gap:8px; }
+
+  .pill { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:3px 9px; border-radius:99px; white-space:nowrap; }
+  .pill-miss  { background:var(--red-bg);    color:var(--red);    border:1px solid var(--red-border); }
+  .pill-ok    { background:var(--green-bg);  color:var(--green);  border:1px solid var(--green-border); }
+  .pill-warn  { background:var(--orange-bg); color:var(--orange); border:1px solid var(--orange-border); }
+  .pill-info  { background:#eff6ff;           color:#1d4ed8;        border:1px solid #bfdbfe; }
+  .pill-validee { background:var(--green-bg); color:var(--green); border:1px solid var(--green-border); }
+
+  .edit-link { display:inline-flex; align-items:center; gap:5px; font-size:12px; font-weight:600; padding:5px 12px; border-radius:6px; border:1px solid var(--border); background:var(--accent); color:#fff; text-decoration:none; cursor:pointer; font-family:inherit; transition:filter .15s; }
+  .edit-link:hover { filter:brightness(1.1); }
+
+  .empty { text-align:center; padding:48px 20px; color:var(--muted); font-style:italic; border:2px dashed var(--border); border-radius:12px; }
+
+  footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>📋 <span data-i18n="rdm_title">Descriptions manquantes</span></p>
+    </div>
+    <div class="header-actions" id="headerActions">
+      <a class="btn" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="btn" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <a class="btn" href="gestion_planning.html" data-i18n="nav_admin">⚙️ Admin</a>
+      <button class="btn" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="btn" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit">Mode Nuit</span></button>
+    </div>
+  </header>
+
+  <!-- ── STATS ── -->
+  <div class="stats-bar">
+    <div class="stat-pill"><div class="num" id="statTotal">—</div><div class="lbl" data-i18n="rdm_stat_total">Ateliers publics</div></div>
+    <div class="stat-pill ok"><div class="num" id="statOk">—</div><div class="lbl" data-i18n="rdm_stat_ok">FR + EN ✓</div></div>
+    <div class="stat-pill warn"><div class="num" id="statPartial">—</div><div class="lbl" data-i18n="rdm_stat_partial">Partielle</div></div>
+    <div class="stat-pill err"><div class="num" id="statNone">—</div><div class="lbl" data-i18n="rdm_stat_none">Aucune</div></div>
+    <div class="stat-pill ok"><div class="num" id="statValidated">—</div><div class="lbl" data-i18n="rdm_stat_validated">Validées Fac</div></div>
+  </div>
+
+  <!-- ── FILTRES ── -->
+  <div class="filters">
+    <div class="fg">
+      <label data-i18n="col_jour">Jour</label>
+      <select id="filterJour" onchange="render()">
+        <option value="" data-i18n="filter_tous_jours">Tous les jours</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label data-i18n="col_animateur">Animateur(s)</label>
+      <select id="filterFac" onchange="render()">
+        <option value="" data-i18n="filter_tous_fac">Tous les animateurs</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label data-i18n="col_type">Type</label>
+      <select id="filterType" onchange="render()">
+        <option value="" data-i18n="filter_tous_types">Tous les types</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label data-i18n="rdm_filter_status">Statut</label>
+      <select id="filterStatus" onchange="render()">
+        <option value=""     data-i18n="rdm_status_all">Tous</option>
+        <option value="none" data-i18n="rdm_status_none">Aucune description</option>
+        <option value="miss-fr" data-i18n="rdm_status_miss_fr">FR manquante</option>
+        <option value="miss-en" data-i18n="rdm_status_miss_en">EN manquante</option>
+        <option value="not-validated" data-i18n="rdm_status_not_validated">Non validée Fac</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ── LISTE ── -->
+  <div id="cardList"></div>
+
+</div>
+
+<footer data-i18n="rdm_footer">Tantramour 2026 — Suivi des descriptions</footer>
+
+<script src="loader.js"></script>
+<script>
+loadData(['data.js', 'ref_descriptions.js', 'ref_types.js'], function() {
+
+// ══════════════════════════════════════
+// CONFIG — types publics uniquement
+// ══════════════════════════════════════
+var TYPES_PUBLICS = (
+  typeof REF_TYPES !== 'undefined'
+    ? REF_TYPES.filter(function(t) {
+        return ['REPAS & PAUSE', 'PREPA & LOGISTICS', "REUNION D'EQUIPE", 'SHIFT ANGEL', 'TEST'].indexOf(t.value) === -1;
+      }).map(function(t) {
+        return t.value;
+      })
+    : [
+        'MEDITATION / YOGA',
+        'ATELIER ARTISTIQUE (Matin)', 'ATELIER ARTISTIQUE (Apres-Midi)',
+        'ATELIERS TANTRA (Matin)', 'ATELIERS TANTRA (Apres-Midi)',
+        'CEREMONIE & CONCERT',
+        'DJ Set', 'POOL PARTY',
+        'LOVE TEMPLE', 'SUPPORT EMOTIONNEL',
+        'TANTRA CAFE & CONFERENCE', 'RASSEMBLEMENT'
+      ]
+);
+var JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+var JOUR_META = {
+  'Jour 1':{ date:'Samedi 29 août',   emoji:'🌅' },
+  'Jour 2':{ date:'Dimanche 30 août', emoji:'☀️' },
+  'Jour 3':{ date:'Lundi 31 août',    emoji:'🌿' },
+  'Jour 4':{ date:'Mardi 1 sept.',    emoji:'🔥' },
+  'Jour 5':{ date:'Mercredi 2 sept.', emoji:'💧' },
+  'Jour 6':{ date:'Jeudi 3 sept.',    emoji:'🌙' },
+  'Jour 7':{ date:'Vendredi 4 sept.', emoji:'✨' },
+};
+
+// ══════════════════════════════════════
+// DONNÉES
+// ══════════════════════════════════════
+// Index des descriptions par nom d'atelier
+var DESC_INDEX = {};
+REF_DESCRIPTIONS.forEach(function(d) {
+  if (d.atelier) DESC_INDEX[(d.atelier||'').trim()] = d;
+});
+
+// Ateliers publics dédupliqués (1 par nom unique)
+var seen = new Set();
+var ATELIERS = [];
+AGENDA.filter(function(e) {
+  return (e.fac1 || e.fac2) && TYPES_PUBLICS.indexOf(e.type) !== -1;
+}).forEach(function(e) {
+  var nom = (e.atelier||'').trim();
+  if (!nom || seen.has(nom)) return;
+  seen.add(nom);
+  ATELIERS.push(e);
+});
+
+// Tri : jour → heure
+ATELIERS.sort(function(a, b) {
+  var ji = JOUR_ORDER.indexOf(a.jour) - JOUR_ORDER.indexOf(b.jour);
+  if (ji !== 0) return ji;
+  return heureMin(a.heure) - heureMin(b.heure);
+});
+
+// ══════════════════════════════════════
+// STATUT D'UN ATELIER
+// ══════════════════════════════════════
+function getStatus(e) {
+  var d = DESC_INDEX[(e.atelier||'').trim()] || null;
+  var hasFr = d && d.descFr && d.descFr.trim();
+  var hasEn = d && d.descEn && d.descEn.trim();
+  var validated = d && d.validatedByFac;
+  return { d:d, hasFr:!!hasFr, hasEn:!!hasEn, validated:!!validated };
+}
+
+// ══════════════════════════════════════
+// STATS GLOBALES
+// ══════════════════════════════════════
+function updateStats() {
+  var total = ATELIERS.length, ok = 0, partial = 0, none = 0, validated = 0;
+  ATELIERS.forEach(function(e) {
+    var s = getStatus(e);
+    if (s.hasFr && s.hasEn) ok++;
+    else if (s.hasFr || s.hasEn) partial++;
+    else none++;
+    if (s.validated) validated++;
+  });
+  document.getElementById('statTotal').textContent     = total;
+  document.getElementById('statOk').textContent        = ok;
+  document.getElementById('statPartial').textContent   = partial;
+  document.getElementById('statNone').textContent      = none;
+  document.getElementById('statValidated').textContent = validated;
+}
+
+// ══════════════════════════════════════
+// PEUPLEMENT DES FILTRES
+// ══════════════════════════════════════
+function buildFilters() {
+  var joursPresents = new Set(), typesPresents = new Set(), facsPresents = new Set();
+  ATELIERS.forEach(function(e) {
+    if (e.jour)  joursPresents.add(e.jour);
+    if (e.type)  typesPresents.add(e.type);
+    if (e.fac1)  facsPresents.add(e.fac1);
+    if (e.fac2)  facsPresents.add(e.fac2);
+  });
+
+  var selJour = document.getElementById('filterJour');
+  JOUR_ORDER.filter(function(j){ return joursPresents.has(j); }).forEach(function(j) {
+    var meta = JOUR_META[j] || {};
+    var o = document.createElement('option');
+    o.value = j;
+    o.textContent = j + (meta.date ? ' — ' + meta.date : '');
+    selJour.appendChild(o);
+  });
+
+  var selFac = document.getElementById('filterFac');
+  Array.from(facsPresents).sort(function(a,b){ return a.localeCompare(b,'fr'); }).forEach(function(f) {
+    var o = document.createElement('option');
+    o.value = f; o.textContent = f;
+    selFac.appendChild(o);
+  });
+
+  var selType = document.getElementById('filterType');
+  Array.from(typesPresents).sort().forEach(function(t) {
+    var o = document.createElement('option');
+    o.value = t; o.textContent = t;
+    selType.appendChild(o);
+  });
+}
+
+// ══════════════════════════════════════
+// RENDU
+// ══════════════════════════════════════
+function render() {
+  var fJour   = document.getElementById('filterJour').value;
+  var fFac    = document.getElementById('filterFac').value;
+  var fType   = document.getElementById('filterType').value;
+  var fStatus = document.getElementById('filterStatus').value;
+
+  var filtered = ATELIERS.filter(function(e) {
+    if (fJour && e.jour !== fJour) return false;
+    if (fFac  && e.fac1 !== fFac && e.fac2 !== fFac) return false;
+    if (fType && e.type !== fType) return false;
+    var s = getStatus(e);
+    if (fStatus === 'none'          && (s.hasFr || s.hasEn)) return false;
+    if (fStatus === 'miss-fr'       && s.hasFr)               return false;
+    if (fStatus === 'miss-en'       && s.hasEn)               return false;
+    if (fStatus === 'not-validated' && s.validated)            return false;
+    return true;
+  });
+
+  var container = document.getElementById('cardList');
+
+  if (!filtered.length) {
+    container.innerHTML = '<div class="empty">' + I18n.t('rdm_empty') + '</div>';
+    return;
+  }
+
+  // Grouper par jour
+  var byJour = {};
+  filtered.forEach(function(e) {
+    var j = e.jour || '?';
+    if (!byJour[j]) byJour[j] = [];
+    byJour[j].push(e);
+  });
+
+  var html = '';
+  JOUR_ORDER.forEach(function(jour) {
+    if (!byJour[jour]) return;
+    var items = byJour[jour];
+    var meta = JOUR_META[jour] || {};
+    html += '<div class="day-sep">' +
+      esc(jour) + (meta.date ? ' — ' + esc(meta.date) : '') +
+      ' <span class="day-count">' + items.length + '</span>' +
+    '</div>';
+    html += '<div class="card-list">' +
+      items.map(function(e) { return renderCard(e, AGENDA.indexOf(e)); }).join('') +
+    '</div>';
+  });
+
+  container.innerHTML = html;
+}
+window.render = render;
+
+function renderCard(e, agendaIdx) {
+  var s = getStatus(e);
+  var facs = [e.fac1, e.fac2].filter(Boolean).join(' & ');
+
+  // Classe de la carte
+  var cls = 'miss-both';
+  if (s.hasFr && s.hasEn)  cls = '';        // complet — ne devrait pas apparaître si filtre actif
+  else if (s.hasFr)         cls = 'miss-en';
+  else if (s.hasEn)         cls = 'miss-fr';
+  else                      cls = 'miss-both';
+
+  // Pills de statut
+  var pills = '';
+  pills += s.hasFr
+    ? '<span class="pill pill-ok">🇫🇷 FR ✓</span>'
+    : '<span class="pill pill-miss">🇫🇷 FR ' + I18n.t('rdm_missing') + '</span>';
+  pills += s.hasEn
+    ? '<span class="pill pill-ok">🇬🇧 EN ✓</span>'
+    : '<span class="pill pill-miss">🇬🇧 EN ' + I18n.t('rdm_missing') + '</span>';
+  if (s.validated)
+    pills += '<span class="pill pill-validee">✔ ' + I18n.t('r_desc_validee_fac') + '</span>';
+
+  // URL vers Éditer un atelier avec pré-sélection de l'entrée courante
+  var editUrl = 'Rapport_Editer_Atelier.html?idx=' + agendaIdx;
+
+  return '<div class="ws-card' + (cls ? ' ' + cls : '') + '">' +
+    '<div class="ws-header">' +
+      '<span class="ws-type-badge">' + esc(e.type||'') + '</span>' +
+      '<span class="ws-name">' + esc(e.atelier||'—') + (e.piment > 0 ? ' <span style="letter-spacing:-1px">' + '🌶️'.repeat(e.piment) + '</span>' : '') + '</span>' +
+      '<span class="ws-meta">' + (e.heure ? esc(e.heure) : '') + '</span>' +
+    '</div>' +
+    '<div class="ws-body">' +
+      '<div class="ws-info">' +
+        (e.lieu  ? '<span>📍 ' + I18n.t('rp_lieu') + ' : ' + esc(e.lieu)  + '</span>' : '') +
+        (facs    ? '<span>🎓 ' + esc(facs)    + '</span>' : '') +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">' +
+        pills +
+        '<a class="edit-link" href="' + editUrl + '" target="_blank" rel="noopener">✏️ ' + I18n.t('rdm_edit_btn') + '</a>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+// ══════════════════════════════════════
+// UTILITAIRES
+// ══════════════════════════════════════
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function heureMin(h) {
+  if (!h) return 9999;
+  var m = String(h).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1])*60+parseInt(m[2]) : 9999;
+}
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(function(k){ return Promise.all(k.map(function(x){ return caches.delete(x); })); })
+      .finally(function(){ location.reload(true); });
+  } else { location.reload(true); }
+}
+window.hardReload = hardReload;
+function toggleMode() {
+  var isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? I18n.t('nav_mode_jour') : I18n.t('nav_mode_nuit');
+}
+window.toggleMode = toggleMode;
+
+// ══════════════════════════════════════
+// INIT
+// ══════════════════════════════════════
+buildFilters();
+updateStats();
+render();
+
+// Bouton FR/EN
+if (typeof I18n !== 'undefined') {
+  I18n.renderToggleBtn('headerActions', 'btn');
+}
+
+// Re-render au changement de langue
+document.addEventListener('tm_lang_changed', function() {
+  render();
+  var isDark = document.body.classList.contains('dark');
+  document.getElementById('modeBtn').textContent = isDark ? I18n.t('nav_mode_jour') : I18n.t('nav_mode_nuit');
+});
+
+}); // fin loadData
+</script>
+</body>
+</html>
