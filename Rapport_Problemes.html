@@ -1,0 +1,667 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Problèmes de planning</title>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --header-bg:#f0f4fb; --row-alt:#f7f8fa;
+    --tag-bg:#eef2ff; --tag-text:#3b5bdb;
+    --green:#16a34a; --green-bg:#dcfce7; --green-border:#86efac;
+    --orange:#d97706; --orange-bg:#fef3c7; --orange-border:#fcd34d;
+    --red:#dc2626; --red-bg:#fee2e2; --red-border:#fca5a5;
+    --badge-h:#e0f2fe; --badge-ht:#0369a1;
+    --badge-a:#fee2e2; --badge-at:#dc2626;
+    --badge-f:#dcfce7; --badge-ft:#166534;
+    --badge-t:#f5f3ff; --badge-tt:#7c3aed;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --header-bg:#1c2333; --row-alt:#161b22;
+    --tag-bg:#1c2a4a; --tag-text:#79a8ff;
+    --green-bg:#052e16; --green-border:#166534;
+    --orange-bg:#2d1a00; --orange-border:#92400e;
+    --red-bg:#2d0a0a; --red-border:#991b1b;
+    --badge-h:#0c2d48; --badge-ht:#58a6ff;
+    --badge-a:#2d0000; --badge-at:#f87171;
+    --badge-f:#0a2e1a; --badge-ft:#4ade80;
+    --badge-t:#1e1b4b; --badge-tt:#a78bfa;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
+  .wrap { max-width:1100px; margin:0 auto; padding:24px 20px 80px; }
+
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:20px; font-weight:700; }
+  .logo p  { font-size:26px; font-weight:800; color:var(--red); line-height:1.2; margin-top:2px; }
+  .logo small { font-size:12px; color:var(--muted); display:block; margin-top:2px; }
+  .header-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .btn-ghost { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:6px 14px; font-size:13px; color:var(--text); font-family:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+  .btn-ghost:hover { background:var(--border); }
+
+  /* ── STATS ── */
+  .stats-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:22px; }
+  .stat-pill { flex:1; min-width:120px; border-radius:8px; padding:12px 14px; border:1px solid var(--border); background:var(--surface); text-align:center; }
+  .stat-pill .num { font-size:26px; font-weight:800; line-height:1; }
+  .stat-pill .lbl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); font-weight:600; margin-top:3px; }
+  .stat-pill.ok .num { color:var(--green); }
+  .stat-pill.ok { border-color:var(--green-border); background:var(--green-bg); }
+  .stat-pill.warn .num { color:var(--orange); }
+  .stat-pill.warn { border-color:var(--orange-border); background:var(--orange-bg); }
+  .stat-pill.err .num { color:var(--red); }
+  .stat-pill.err { border-color:var(--red-border); background:var(--red-bg); }
+  .stat-pill.info .num { color:var(--accent); }
+
+  /* ── FILTRES ── */
+  .filters { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; align-items:flex-end; }
+  .fg { display:flex; flex-direction:column; gap:4px; }
+  .fg label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); }
+  .fg select { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:13px; color:var(--text); font-family:inherit; cursor:pointer; min-width:160px; }
+
+  /* ── SÉPARATEUR DE JOUR ── */
+  .day-sep { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); padding-bottom:8px; border-bottom:2px solid var(--border); margin:24px 0 14px; display:flex; align-items:center; gap:8px; }
+  .day-count { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; background:var(--red); color:#fff; border-radius:99px; font-size:11px; font-weight:700; padding:0 6px; }
+
+  /* ── CARTES PROBLÈME ── */
+  .problem-list { display:flex; flex-direction:column; gap:12px; }
+  .pb-card { border-radius:10px; overflow:hidden; border:1px solid var(--border); }
+  .pb-card.cas1 { border-color:var(--orange-border); }
+  .pb-card.cas2 { border-color:var(--red-border); }
+  .pb-card.cas12 { border-color:#a855f7; }
+
+  .pb-header { display:flex; align-items:center; gap:12px; padding:12px 16px; flex-wrap:wrap; }
+  .pb-card.cas1  .pb-header { background:var(--orange-bg); }
+  .pb-card.cas2  .pb-header { background:var(--red-bg); }
+  .pb-card.cas12 .pb-header { background:#f3e8ff; }
+  .dark .pb-card.cas12 .pb-header { background:#2e1065; }
+
+  .pb-jour  { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--accent); min-width:52px; }
+  .pb-heure { font-size:12px; color:var(--muted); min-width:120px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .pb-title { font-size:14px; font-weight:800; flex:1; min-width:0; }
+  .pb-lieu  { font-size:11px; color:var(--muted); background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:1px 8px; white-space:nowrap; }
+
+  .pb-badges { display:flex; gap:5px; flex-wrap:wrap; margin-left:auto; align-items:center; }
+  .cas-badge { font-size:10px; font-weight:700; padding:2px 8px; border-radius:99px; white-space:nowrap; }
+  .cas-badge.b1 { background:var(--orange-bg); color:var(--orange); border:1px solid var(--orange-border); }
+  .cas-badge.b2 { background:var(--red-bg);    color:var(--red);    border:1px solid var(--red-border); }
+
+  .pb-body { padding:14px 16px; background:var(--bg); display:flex; flex-direction:column; gap:10px; }
+  .info-row { display:flex; align-items:flex-start; gap:10px; flex-wrap:wrap; }
+  .info-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); min-width:90px; padding-top:3px; flex-shrink:0; }
+  .pills-wrap { display:flex; flex-wrap:wrap; gap:5px; align-items:center; }
+  .pill { display:inline-flex; align-items:center; gap:4px; border-radius:99px; padding:2px 9px; font-size:12px; font-weight:600; white-space:nowrap; }
+  .pill-f { background:var(--badge-f); color:var(--badge-ft); }
+  .pill-h { background:var(--badge-h); color:var(--badge-ht); }
+  .pill-t { background:var(--badge-t); color:var(--badge-tt); }
+  .pill-a { background:var(--badge-a); color:var(--badge-at); }
+  .pill-en { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; }
+  .pill-missing { background:var(--red-bg); color:var(--red); border:1px solid var(--red-border); font-weight:700; }
+
+  .problem-desc { font-size:13px; display:flex; flex-direction:column; gap:4px; }
+  .problem-item { display:flex; align-items:flex-start; gap:7px; font-size:12px; }
+  .problem-icon { flex-shrink:0; }
+
+  /* ── BOUTON ÉDITION ── */
+  .btn-edit-card { cursor:pointer; background:var(--accent); color:#fff; border:none; border-radius:6px; padding:7px 16px; font-size:13px; font-weight:700; font-family:inherit; display:inline-flex; align-items:center; gap:6px; margin-top:4px; align-self:flex-start; }
+  .btn-edit-card:hover { filter:brightness(1.08); }
+
+  /* ── ÉDITEUR INLINE ── */
+  .inline-editor { border-top:1px solid var(--border); background:var(--surface); padding:18px 16px; display:none; flex-direction:column; gap:14px; }
+  .inline-editor.open { display:flex; }
+  .editor-title-sm { font-size:13px; font-weight:700; color:var(--text); padding-bottom:8px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; }
+  @media(max-width:600px) { .form-grid { grid-template-columns:1fr; } }
+  .form-group { display:flex; flex-direction:column; gap:4px; }
+  .form-group label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); }
+  .form-group select { background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:13px; color:var(--text); font-family:inherit; width:100%; }
+  .form-group select:focus { outline:none; border-color:var(--accent); box-shadow:0 0 0 3px rgba(59,130,212,.12); }
+  .editor-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .btn-save { cursor:pointer; background:var(--green); color:#fff; border:none; border-radius:6px; padding:8px 18px; font-size:13px; font-weight:700; font-family:inherit; display:inline-flex; align-items:center; gap:6px; }
+  .btn-save:hover { filter:brightness(1.08); }
+  .btn-save:disabled { opacity:.45; cursor:not-allowed; filter:none; }
+  .btn-cancel { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:8px 16px; font-size:13px; color:var(--text); font-family:inherit; }
+  .btn-cancel:hover { background:var(--border); }
+  .saving-row { font-size:12px; color:var(--muted); display:none; align-items:center; gap:6px; }
+  .saving-row.show { display:flex; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .spinner { width:13px; height:13px; border:2px solid var(--border); border-top-color:var(--accent); border-radius:50%; animation:spin .7s linear infinite; }
+
+  .empty { text-align:center; padding:48px; color:var(--muted); border:2px dashed var(--border); border-radius:10px; }
+  .empty-ok { border-color:var(--green-border); background:var(--green-bg); color:var(--green); font-weight:700; font-size:16px; }
+
+  #toast { position:fixed; bottom:80px; left:50%; transform:translateX(-50%) translateY(60px); background:#1f2328; color:#fff; border-radius:8px; padding:12px 22px; font-size:13px; font-weight:700; z-index:10000; opacity:0; transition:transform .3s,opacity .3s; white-space:nowrap; }
+  #toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+  #toast.ok  { background:#166534; }
+  #toast.err { background:#dc2626; }
+
+  footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
+</style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+</head>
+<!-- i18n -->
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Problèmes de planning</p>
+      <small>Ateliers sans traducteur (anglophone) · Ateliers sans ressource suffisante</small>
+    </div>
+    <div class="header-actions">
+      <a class="btn-ghost" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="btn-ghost" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <a class="btn-ghost" href="gestion_planning.html" data-i18n="nav_admin">⚙️ Admin</a>
+      <button class="btn-ghost" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit">Mode Nuit</span></button>
+      <button class="mode-btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
+    </div>
+  </header>
+
+  <div class="stats-bar" id="statsBar"></div>
+
+  <div class="filters">
+    <div class="fg">
+      <label data-i18n="col_jour">Jour</label>
+      <select id="filterJour" onchange="render()">
+        <option value="" data-i18n="filter_tous_jours">Tous les jours</option>
+        <option value="Jour 1" data-i18n="jour1_label">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2" data-i18n="jour2_label">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3" data-i18n="jour3_label">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4" data-i18n="jour4_label">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5" data-i18n="jour5_label">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6" data-i18n="jour6_label">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7" data-i18n="jour7_label">Jour 7 — Ven. 4 sept.</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Type de problème</label>
+      <select id="filterCas" onchange="render()">
+        <option value="">Tous les problèmes</option>
+        <option value="cas1">🌐 Cas 1 — Anglophone sans traducteur</option>
+        <option value="cas2">🤝 Cas 2 — Ressources insuffisantes</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label data-i18n="filter_type_atelier">Type d'atelier</label>
+      <select id="filterType" onchange="render()">
+        <option value="" data-i18n="filter_tous_types">Tous les types</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="results"></div>
+
+</div>
+
+<div id="toast"></div>
+
+<script src="ref_heures.js"></script>
+<script src="ref_jours.js"></script>
+<script src="ref_lieux.js"></script>
+<script src="ref_types.js"></script>
+<script src="ref_notes.js"></script>
+<script src="ref_piment.js"></script>
+<script src="ref_resource_types.js"></script>
+<script src="ref_ressources.js"></script>
+<script src="github-api.js"></script>
+<script src="loader.js"></script>
+<script>
+loadData(['data.js'], function() {
+
+// ════════════════════════════════════════════════════════════════
+// CONSTANTES
+// ════════════════════════════════════════════════════════════════
+const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+// ── Règles de ressources lues depuis REF_TYPES ───────────────────────────────
+// Un type est "exclu" (pas de vérification) si minRes === 0 ET minHelpers === 0
+// Un type est soumis à vérification si minRes > 0 ou minHelpers > 0
+function getTypeRule(type) {
+  if (typeof REF_TYPES === 'undefined') return null;
+  return REF_TYPES.find(function(t) { return t.value === type; }) || null;
+}
+
+// Types d'ateliers exclus de la vérification (minRes = 0 dans REF_TYPES)
+const TYPES_EXCLUS = new Set(
+  (typeof REF_TYPES !== 'undefined' ? REF_TYPES : [])
+    .filter(function(t) { return !t.minRes && !t.minHelpers; })
+    .map(function(t) { return t.value; })
+);
+
+// Index des ressources par nom
+const RES_MAP = {};
+(REF_RESSOURCES || []).forEach(r => { RES_MAP[r.value] = r; });
+
+function hasRole(nom, role) {
+  const r = RES_MAP[nom];
+  return r && r.roles && r.roles.indexOf(role) !== -1;
+}
+function isAnglophone(nom) { return hasRole(nom, 'anglophone'); }
+function isTraducteur(nom) { return hasRole(nom, 'traducteur'); }
+
+// ════════════════════════════════════════════════════════════════
+// RÈGLES DE DÉTECTION
+// ════════════════════════════════════════════════════════════════
+
+// Compte les ressources d'accompagnement d'un atelier selon les règles du type.
+function compterRessources(e, rule, isAnglo) {
+  const slots = [e.helper1, e.helper2, e.helper3, e.helper4];
+  // Le traducteur compte dans le total si : type tradCounts=1 OU animateur anglophone
+  if (isAnglo || (rule && rule.tradCounts)) slots.push(e.traduction);
+  return slots.filter(v => v && v.trim() !== '').length;
+}
+
+function analyserAtelier(e, idx) {
+  if (TYPES_EXCLUS.has(e.type)) return null;
+  // Ignorer les ateliers sans animateur (ateliers fantômes / angel-only)
+  if (!e.fac1 && !e.fac2) return null;
+
+  const rule = getTypeRule(e.type);
+  // Ignorer si pas de règle ou minRes = 0 et minHelpers = 0
+  if (!rule || (!rule.minRes && !rule.minHelpers)) return null;
+
+  // Règles custom par atelier (éditées dans Rapport_Editer_Atelier) prennent le dessus
+  const minRes    = (e._minRes     !== undefined) ? e._minRes     : (rule.minRes     || 0);
+  const minHelpers= (e._minHelpers !== undefined) ? e._minHelpers : (rule.minHelpers || 0);
+  const minTradRule = (e._minTrad  !== undefined) ? e._minTrad    : (rule.minTrad    || 0);
+  const tradCountsRule = (e._tradCounts !== undefined) ? e._tradCounts : (rule.tradCounts || 0);
+
+  const angloFacs    = [e.fac1, e.fac2].filter(isAnglophone);
+  const isAnglo      = angloFacs.length > 0;
+  const tradRequired = isAnglo && !!minTradRule;
+  const hasTrad      = !!(e.traduction && e.traduction.trim());
+  // Passer une règle synthétique avec les valeurs effectives
+  const effectiveRule = Object.assign({}, rule, { tradCounts: tradCountsRule });
+  const nbRes        = compterRessources(e, effectiveRule, tradRequired);
+  const nbHelpers    = [e.helper1, e.helper2, e.helper3, e.helper4].filter(v => v && v.trim()).length;
+
+  const cas1 = tradRequired && !hasTrad;                                  // Anglophone sans traducteur
+  const cas2 = (minRes > 0 && nbRes < minRes) || (minHelpers > 0 && nbHelpers < minHelpers); // Ressources insuffisantes
+
+  if (!cas1 && !cas2) return null;
+
+  return { idx, entry: e, angloFacs, isAnglo, tradRequired, hasTrad, nbRes, minRes, nbHelpers, minHelpers, rule, cas1, cas2 };
+}
+
+// ════════════════════════════════════════════════════════════════
+// LISTE DES PROBLÈMES
+// ════════════════════════════════════════════════════════════════
+let PROBLEMS = AGENDA
+  .map((e, i) => analyserAtelier(e, i))
+  .filter(Boolean);
+
+// Peupler filtre Type
+function peuplerFiltreType() {
+  const typesPresents = new Set(PROBLEMS.map(p => p.entry.type));
+  const selType = document.getElementById('filterType');
+  const current = selType.value;
+  // Vider les options dynamiques (garder la première "Tous les types")
+  while (selType.options.length > 1) selType.remove(1);
+  [...typesPresents].sort().forEach(t => {
+    const o = document.createElement('option'); o.value = t; o.text = t; selType.appendChild(o);
+  });
+  // Restaurer la sélection si elle existe encore
+  if ([...typesPresents].includes(current)) selType.value = current;
+}
+peuplerFiltreType();
+
+// ════════════════════════════════════════════════════════════════
+// ÉTAT ÉDITEUR
+// ════════════════════════════════════════════════════════════════
+let openEditor = null;  // idx de l'atelier en cours d'édition
+let editData   = {};    // copie modifiable
+
+// ════════════════════════════════════════════════════════════════
+// FILTRAGE
+// ════════════════════════════════════════════════════════════════
+function getFiltered() {
+  const jour = document.getElementById('filterJour').value;
+  const cas  = document.getElementById('filterCas').value;
+  const type = document.getElementById('filterType').value;
+  return PROBLEMS.filter(p => {
+    if (jour && p.entry.jour !== jour) return false;
+    if (type && p.entry.type !== type) return false;
+    if (cas === 'cas1' && !p.cas1) return false;
+    if (cas === 'cas2' && !p.cas2) return false;
+    return true;
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// RENDU
+// ════════════════════════════════════════════════════════════════
+function render() {
+  const filtered = getFiltered();
+
+  // Stats globales
+  const total = PROBLEMS.length;
+  const nCas1 = PROBLEMS.filter(p => p.cas1).length;
+  const nCas2 = PROBLEMS.filter(p => p.cas2).length;
+  const nOk   = AGENDA.filter((e, i) => !TYPES_EXCLUS.has(e.type) && (e.fac1 || e.fac2) && !analyserAtelier(e, i)).length;
+
+  document.getElementById('statsBar').innerHTML =
+    `<div class="stat-pill err"><div class="num">${total}</div><div class="lbl">Problèmes détectés</div></div>` +
+    `<div class="stat-pill warn"><div class="num">${nCas1}</div><div class="lbl">🌐 Sans traducteur</div></div>` +
+    `<div class="stat-pill warn"><div class="num">${nCas2}</div><div class="lbl">🤝 Ressources insuffisantes</div></div>` +
+    `<div class="stat-pill ok"><div class="num">${nOk}</div><div class="lbl">✅ Sans problème</div></div>`;
+
+  if (!filtered.length) {
+    document.getElementById('results').innerHTML =
+      `<div class="empty empty-ok">✅ Aucun problème dans la sélection actuelle.</div>`;
+    return;
+  }
+
+  // Grouper par jour
+  const byDay = {};
+  filtered.forEach(p => {
+    if (!byDay[p.entry.jour]) byDay[p.entry.jour] = [];
+    byDay[p.entry.jour].push(p);
+  });
+
+  let html = '';
+  JOUR_ORDER.forEach(jour => {
+    if (!byDay[jour]) return;
+    const items = byDay[jour];
+    html += `<div class="day-sep">${jour} — ${items[0].entry.date} <span class="day-count">${items.length}</span></div>`;
+    html += `<div class="problem-list">`;
+    items.forEach(p => { html += renderCard(p); });
+    html += `</div>`;
+  });
+
+  document.getElementById('results').innerHTML = html;
+
+  // Ré-ouvrir l'éditeur si un atelier était en cours d'édition
+  if (openEditor !== null) {
+    const el = document.getElementById('editor_' + openEditor);
+    if (el) {
+      el.classList.add('open');
+      populateEditor(openEditor);
+    }
+  }
+}
+
+function renderCard(p) {
+  const e = p.entry;
+  const casCls = (p.cas1 && p.cas2) ? 'cas12' : p.cas1 ? 'cas1' : 'cas2';
+
+  // Badges problèmes
+  let badges = '';
+  if (p.cas1) badges += `<span class="cas-badge b1">🌐 Sans traducteur</span>`;
+  if (p.cas2) badges += `<span class="cas-badge b2">🤝 ${p.nbRes}/${p.minRes} ressource${p.minRes>1?'s':''}</span>`;
+
+  // Pills animateurs
+  const facsHtml = [e.fac1, e.fac2].filter(Boolean).map(nom => {
+    const en = isAnglophone(nom);
+    return `<span class="pill ${en ? 'pill-en' : 'pill-f'}">${en ? '🇬🇧 ' : ''}${esc(nom)}</span>`;
+  }).join('');
+
+  // Pills helpers
+  const helpers = [e.helper1, e.helper2, e.helper3, e.helper4].filter(Boolean);
+  const helpersHtml = helpers.length
+    ? helpers.map(n => `<span class="pill ${isTraducteur(n) ? 'pill-t' : 'pill-h'}">${esc(n)}</span>`).join('')
+    : `<span class="pill pill-missing">Aucun helper</span>`;
+
+  // Traducteur
+  const tradHtml = e.traduction
+    ? `<span class="pill pill-t">🌐 ${esc(e.traduction)}</span>`
+    : `<span class="pill pill-missing">⚠️ Aucun traducteur</span>`;
+
+  // Problèmes textuels
+  let issues = '';
+  if (p.cas1) issues += `<div class="problem-item"><span class="problem-icon">🌐</span><span>Atelier animé par un animateur anglophone (${p.angloFacs.map(esc).join(', ')}) — aucun traducteur assigné dans le champ <strong>Traduction</strong>.</span></div>`;
+  if (p.cas2) {
+    const parts = [];
+    if (p.minRes   > 0) parts.push(`total min : <strong>${p.minRes}</strong> (actuellement ${p.nbRes})`);
+    if (p.minHelpers > 0) parts.push(`helpers min : <strong>${p.minHelpers}</strong> (actuellement ${p.nbHelpers})`);
+    issues += `<div class="problem-item"><span class="problem-icon">⚠️</span><span>Ressources insuffisantes — ${parts.join(' · ')} pour ce type d'atelier.</span></div>`;
+  }
+
+  return `<div class="pb-card ${casCls}" id="pbcard_${p.idx}">
+    <div class="pb-header">
+      <span class="pb-jour">${esc(e.jour)}</span>
+      <span class="pb-heure">${esc(e.heure)}</span>
+      <span class="pb-title">${esc(e.atelier)}</span>
+      ${e.lieu ? `<span class="pb-lieu">${esc(e.lieu)}</span>` : ''}
+      <div class="pb-badges">${badges}</div>
+    </div>
+    <div class="pb-body">
+      <div class="info-row">
+        <span class="info-label">🎓 Animateurs</span>
+        <div class="pills-wrap">${facsHtml}</div>
+      </div>
+      <div class="info-row">
+        <span class="info-label">🤝 Helpers</span>
+        <div class="pills-wrap">${helpersHtml}</div>
+      </div>
+      <div class="info-row">
+        <span class="info-label">🌐 Traducteur</span>
+        <div class="pills-wrap">${tradHtml}</div>
+      </div>
+      <div class="problem-desc">${issues}</div>
+      <button class="btn-edit-card" onclick="toggleEditor(${p.idx})">✏️ Corriger cet atelier</button>
+    </div>
+    <div class="inline-editor" id="editor_${p.idx}">
+      <div class="editor-title-sm">✏️ Édition rapide — <em>${esc(e.atelier)}</em></div>
+      <div class="form-grid" id="editform_${p.idx}"></div>
+      <div class="editor-actions">
+        <button class="btn-save" onclick="saveAtelier(${p.idx})" id="btnsave_${p.idx}">💾 Sauvegarder</button>
+        <button class="btn-cancel" onclick="toggleEditor(${p.idx})">Annuler</button>
+        <div class="saving-row" id="saving_${p.idx}"><div class="spinner"></div> Sauvegarde…</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════════════════════
+// ÉDITEUR INLINE
+// ════════════════════════════════════════════════════════════════
+function buildPersonSelect(id, refArr, val) {
+  const opts = `<option value="">— aucun —</option>` +
+    refArr.map(r => `<option value="${esc(r.value)}"${r.value === val ? ' selected' : ''}>${esc(r.value)}</option>`).join('');
+  return `<select id="${id}" onchange="onEditField('${id}', ${AGENDA.indexOf(AGENDA.find((_,i) => i === parseInt(id.split('_')[1])))})">${opts}</select>`;
+}
+
+function buildSelectGeneric(id, options, val) {
+  const opts = `<option value="">— aucun —</option>` +
+    options.map(v => `<option value="${esc(v)}"${v === val ? ' selected' : ''}>${esc(v)}</option>`).join('');
+  return `<select id="${id}">${opts}</select>`;
+}
+
+function toggleEditor(idx) {
+  const el = document.getElementById('editor_' + idx);
+  if (!el) return;
+  const isOpen = el.classList.contains('open');
+  // Fermer tout éditeur ouvert
+  document.querySelectorAll('.inline-editor.open').forEach(e => e.classList.remove('open'));
+  if (isOpen) { openEditor = null; return; }
+  openEditor = idx;
+  el.classList.add('open');
+  populateEditor(idx);
+}
+window.toggleEditor = toggleEditor;
+
+function populateEditor(idx) {
+  const e = AGENDA[idx];
+  editData[idx] = Object.assign({}, e);
+  const container = document.getElementById('editform_' + idx);
+  if (!container) return;
+
+  const traducteurs = (REF_RESSOURCES || []).filter(r => r.roles && r.roles.indexOf('traducteur') !== -1);
+  const helpers     = (REF_RESSOURCES || []).filter(r => r.roles && r.roles.indexOf('helper')     !== -1);
+
+  container.innerHTML = `
+    <div class="form-group">
+      <label data-i18n="filter_traducteur">Traducteur</label>
+      <select id="ef_trad_${idx}" onchange="onEF(${idx},'traduction',this.value)">
+        <option value="">— aucun —</option>
+        ${traducteurs.map(r => `<option value="${esc(r.value)}"${r.value === e.traduction ? ' selected' : ''}>${esc(r.value)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Helper 1</label>
+      <select id="ef_h1_${idx}" onchange="onEF(${idx},'helper1',this.value)">
+        <option value="">— aucun —</option>
+        ${helpers.map(r => `<option value="${esc(r.value)}"${r.value === e.helper1 ? ' selected' : ''}>${esc(r.value)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Helper 2</label>
+      <select id="ef_h2_${idx}" onchange="onEF(${idx},'helper2',this.value)">
+        <option value="">— aucun —</option>
+        ${helpers.map(r => `<option value="${esc(r.value)}"${r.value === e.helper2 ? ' selected' : ''}>${esc(r.value)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Helper 3</label>
+      <select id="ef_h3_${idx}" onchange="onEF(${idx},'helper3',this.value)">
+        <option value="">— aucun —</option>
+        ${helpers.map(r => `<option value="${esc(r.value)}"${r.value === e.helper3 ? ' selected' : ''}>${esc(r.value)}</option>`).join('')}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Helper 4</label>
+      <select id="ef_h4_${idx}" onchange="onEF(${idx},'helper4',this.value)">
+        <option value="">— aucun —</option>
+        ${helpers.map(r => `<option value="${esc(r.value)}"${r.value === e.helper4 ? ' selected' : ''}>${esc(r.value)}</option>`).join('')}
+      </select>
+    </div>
+  `;
+}
+
+function onEF(idx, field, val) {
+  if (!editData[idx]) editData[idx] = Object.assign({}, AGENDA[idx]);
+  editData[idx][field] = val;
+}
+window.onEF = onEF;
+
+// ════════════════════════════════════════════════════════════════
+// SAUVEGARDE
+// ════════════════════════════════════════════════════════════════
+function escJs(v) {
+  return (v || '').replace(/\\/g, '\\\\').replace(/"/g, '\\"').replace(/\r\n/g, '\\n').replace(/\r/g, '\\n').replace(/\n/g, '\\n');
+}
+
+function genererDataJs() {
+  const header =
+`/**
+ * TANTRAMOUR 2026 — Référentiel de données commun
+ * ================================================
+ * Structure de chaque entrée :
+ *   jour, date, heure, type, atelier, lieu,
+ *   fac1, fac2, traduction, helper1, helper2, helper3, helper4,
+ *   angel, note, piment, logisticId
+ */
+
+var AGENDA = [`;
+
+  const lines = AGENDA.map((e, i) => {
+    const prev = AGENDA[i - 1];
+    let section = '';
+    if (!prev || prev.jour !== e.jour) {
+      section = `\n  // ─── ${e.jour} — ${e.date} ───\n`;
+    }
+    const line = `  {jour:"${escJs(e.jour)}",date:"${escJs(e.date)}",heure:"${escJs(e.heure)}",type:"${escJs(e.type)}",atelier:"${escJs(e.atelier)}",lieu:"${escJs(e.lieu||'')}",fac1:"${escJs(e.fac1||'')}",fac2:"${escJs(e.fac2||'')}",traduction:"${escJs(e.traduction||'')}",helper1:"${escJs(e.helper1||'')}",helper2:"${escJs(e.helper2||'')}",helper3:"${escJs(e.helper3||'')}",helper4:"${escJs(e.helper4||'')}",angel:"${escJs(e.angel||'')}",note:"${escJs(e.note||'')}",piment:${e.piment||0},logisticId:"${escJs(e.logisticId||'')}"},`;
+    return section + line;
+  }).join('\n');
+
+  return header + '\n' + lines + `
+];
+
+function agendaToRaw(entries) {
+  return entries.map(function(e) { return [
+    e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,
+    e.fac1, e.fac2, e.traduction,
+    e.helper1, e.helper2, e.helper3, e.helper4 || '',
+    e.angel, e.note, e.logisticId || '', e.piment || 0
+  ]; });
+}`;
+}
+
+async function sauvegarderDataJs(content) {
+  if (location.protocol === 'file:') {
+    throw new Error('Ouvrez via http://localhost:3000 (lancez start.bat) pour sauvegarder.');
+  }
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (isLocal) {
+    const res = await fetch('http://localhost:3000/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: 'data.js', content })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `Serveur local : erreur ${res.status}`);
+    }
+    return;
+  }
+  await githubSaveFile('data.js', content);
+}
+
+async function saveAtelier(idx) {
+  const patch = editData[idx];
+  if (!patch) return;
+
+  const btn  = document.getElementById('btnsave_' + idx);
+  const spin = document.getElementById('saving_' + idx);
+  btn.disabled = true;
+  spin.classList.add('show');
+
+  // Snapshot pour rollback
+  const original = Object.assign({}, AGENDA[idx]);
+
+  // Appliquer en mémoire
+  Object.assign(AGENDA[idx], patch);
+
+  try {
+    await sauvegarderDataJs(genererDataJs());
+
+    // Recharger la liste des problèmes depuis le nouvel état AGENDA
+    PROBLEMS = AGENDA.map((e, i) => analyserAtelier(e, i)).filter(Boolean);
+    peuplerFiltreType();
+    openEditor = null;
+    render();
+    showToast('✅ Atelier mis à jour !', 'ok');
+  } catch(err) {
+    // Rollback
+    Object.assign(AGENDA[idx], original);
+    showToast('❌ ' + err.message, 'err');
+    btn.disabled = false;
+    spin.classList.remove('show');
+  }
+}
+window.saveAtelier = saveAtelier;
+
+// ════════════════════════════════════════════════════════════════
+// UTILITAIRES
+// ════════════════════════════════════════════════════════════════
+function esc(v) {
+  return String(v || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(t._t); t._t = setTimeout(() => { t.className = ''; }, 3500);
+}
+function toggleMode() {
+  const dark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = dark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+function hardReload() { location.reload(true); }
+window.toggleMode = toggleMode;
+window.hardReload = hardReload;
+
+render();
+
+}); // end loadData
+</script>
+</body>
+</html>
+
+
+
