@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -115,6 +115,8 @@
   .rbadge-h   { background: var(--badge-h-bg); color: var(--badge-h-tx); }
   .rbadge-t   { background: var(--badge-t-bg); color: var(--badge-t-tx); }
   .rbadge-a   { background: var(--badge-a-bg); color: var(--badge-a-tx); }
+  .rbadge-m   { background: #ede9fe; color: #5b21b6; }
+  .dark .rbadge-m { background: #2d1a5e; color: #c4b5fd; }
   .role-stats { margin-left: auto; font-size: 12px; color: var(--muted); text-align: right; }
   .role-stats strong { color: var(--role-accent); font-size: 15px; transition: color .2s; }
 
@@ -153,11 +155,127 @@
 
   footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
 
+  /* ── MODALE LOGISTIQUE ── */
+  .log-modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,.55); z-index: 9000;
+    align-items: flex-end; justify-content: center;
+    padding: 0;
+  }
+  .log-modal-overlay.open { display: flex; }
+  .log-modal {
+    background: var(--bg); width: 100%; max-width: 480px;
+    max-height: 92vh; border-radius: 18px 18px 0 0;
+    display: flex; flex-direction: column;
+    box-shadow: 0 -4px 32px rgba(0,0,0,.18);
+    overflow: hidden;
+    animation: slideUp .25s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .log-modal-handle { width: 40px; height: 4px; background: var(--border); border-radius: 2px; margin: 10px auto 0; flex-shrink: 0; }
+  .log-modal-head {
+    padding: 14px 16px 12px; border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .log-modal-title { font-size: 15px; font-weight: 800; color: var(--text); margin-bottom: 8px; line-height: 1.3; }
+  .log-modal-meta { display: flex; flex-direction: column; gap: 5px; }
+  .log-meta-row { display: flex; gap: 6px; align-items: flex-start; flex-wrap: wrap; font-size: 12px; }
+  .log-meta-lbl { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); min-width: 64px; flex-shrink: 0; padding-top: 2px; }
+  .log-meta-val { color: var(--text); flex: 1; display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .log-modal-body { padding: 14px 16px; overflow-y: auto; flex: 1; }
+  .log-modal-content { font-size: 13px; line-height: 1.7; color: var(--text); }
+  .log-modal-content p  { margin-bottom: 6px; }
+  .log-modal-content ul { padding-left: 18px; margin-bottom: 6px; }
+  .log-modal-content ol { padding-left: 18px; margin-bottom: 6px; }
+  .log-modal-content li { margin-bottom: 2px; }
+  .log-modal-empty { font-size: 13px; color: var(--muted); font-style: italic; text-align: center; padding: 20px 0; }
+  .log-modal-foot {
+    padding: 12px 16px; border-top: 1px solid var(--border);
+    flex-shrink: 0; text-align: center;
+  }
+  .btn-close-modal {
+    cursor: pointer; background: var(--surface); border: 2px solid var(--border);
+    border-radius: 8px; padding: 10px 40px; font-size: 14px; font-weight: 700;
+    color: var(--text); font-family: inherit; width: 100%;
+  }
+  .btn-close-modal:hover { background: var(--border); }
+  /* Pills mini pour la modale */
+  .pill-sm { display: inline-flex; align-items: center; border-radius: 99px; padding: 1px 7px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .pill-sm-f  { background: var(--badge-f-bg); color: var(--badge-f-tx); }
+  .pill-sm-h  { background: var(--badge-h-bg); color: var(--badge-h-tx); }
+  .pill-sm-t  { background: var(--badge-t-bg); color: var(--badge-t-tx); }
+  .pill-sm-a  { background: var(--badge-a-bg); color: var(--badge-a-tx); }
+  .pill-sm-en { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
   @media (max-width: 600px) {
+    /* ── Général ── */
+    .wrap { padding: 12px 12px 60px; }
     select { min-width: 100%; }
+    .filters { gap: 8px; }
+
+    /* ── Header ── */
+    .logo p { font-size: 20px; }
+    .header-actions { gap: 6px; }
+    .btn-ghost { padding: 5px 10px; font-size: 12px; }
+
+    /* ── Stats cards : 3 par ligne ── */
+    .summary { gap: 8px; }
+    .sum-card { min-width: calc(33% - 6px); padding: 10px 12px; }
+    .sum-num  { font-size: 22px; }
+
+    /* ── Onglets rôle : défilables horizontalement ── */
+    .role-tabs { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 4px; -webkit-overflow-scrolling: touch; }
+    .role-tab  { flex-shrink: 0; padding: 6px 12px; font-size: 12px; }
+
+    /* ── Vue bascule ── */
+    .view-toggle { gap: 6px; }
+    .vbtn { font-size: 12px; padding: 5px 10px; }
+
+    /* ── Ligne atelier : layout vertical ── */
+    .shift-row {
+      flex-wrap: wrap;
+      gap: 0;
+      padding: 10px 14px;
+      position: relative;
+    }
+    /* Masquer les éléments non essentiels */
+    .shift-jour { display: none; }
     .shift-date { display: none; }
+
+    /* Ligne 1 : heure + badge rôle (toute la largeur) */
+    .shift-heure {
+      font-size: 12px; min-width: 0;
+      order: 1; flex-shrink: 0;
+    }
+    .shift-role  { order: 2; flex-shrink: 0; margin-left: 6px; }
+
+    /* Espace flexible pour pousser 📋 à droite sur ligne 1 */
+    .shift-row > span:last-child { /* bouton 📋 */
+      order: 3; margin-left: auto;
+    }
+
+    /* Ligne 2 : nom de l'atelier (pleine largeur) */
+    .shift-atelier {
+      order: 4; width: 100%; font-size: 13px; font-weight: 600;
+      margin-top: 3px;
+    }
+
+    /* Ligne 3 : lieu + type */
+    .shift-lieu  { order: 5; margin-top: 4px; }
+    .shift-row > span:nth-last-child(2) { /* tag type */
+      order: 6; margin-top: 4px; margin-left: 6px;
+    }
+
+    /* ── En-tête bloc personne ── */
+    .role-header { padding: 12px 14px; }
+    .role-name   { font-size: 15px; }
+    .role-avatar { width: 36px; height: 36px; font-size: 13px; }
+    .role-stats  { font-size: 11px; }
+    .role-stats strong { font-size: 13px; }
   }
 </style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
 </head>
 <body>
 <div class="wrap">
@@ -165,89 +283,109 @@
   <header>
     <div class="logo">
       <h1>Tantramour 2026</h1>
-      <p id="pageTitle">Mon Planning (My Planning)</p>
+      <p data-i18n="r3_title">Mon Planning (My Planning)</p>
     </div>
     <div class="header-actions">
-      <a class="btn-ghost" href="index.html">🏠 Home</a>
-      <button class="btn-ghost" onclick="hardReload()">🔄 Refresh</button>
-      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+      <a class="btn-ghost" href="index_bis.html">🏠 <span data-i18n="nav_home">Home</span></a>
+      <button class="btn-ghost" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit" id="modeBtnText">Mode Nuit</span></button>
+      <button class="btn-ghost tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
     </div>
   </header>
 
   <!-- ── STATS ── -->
   <div class="summary">
-    <div class="sum-card"><div class="sum-num" id="sumPersonnes">—</div><div class="sum-label">Personnes</div></div>
-    <div class="sum-card"><div class="sum-num" id="sumAteliers">—</div><div class="sum-label">Interventions</div></div>
-    <div class="sum-card"><div class="sum-num" id="sumFacs">—</div><div class="sum-label">Facilitateurs</div></div>
-    <div class="sum-card"><div class="sum-num" id="sumHelpers">—</div><div class="sum-label">Helpers</div></div>
-    <div class="sum-card"><div class="sum-num" id="sumTrads">—</div><div class="sum-label">Traducteurs</div></div>
-    <div class="sum-card"><div class="sum-num" id="sumAngels">—</div><div class="sum-label">Angels</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumPersonnes">—</div><div class="sum-label" data-i18n="filter_personne">Personnes</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumAteliers">—</div><div class="sum-label" data-i18n="col_atelier">Ateliers</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumFacs">—</div><div class="sum-label" data-i18n="r3_tab_fac">Animateurs</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumHelpers">—</div><div class="sum-label" data-i18n="r3_tab_helpers">Helpers</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumTrads">—</div><div class="sum-label" data-i18n="r3_tab_traducteurs">Traducteurs</div></div>
+    <div class="sum-card"><div class="sum-num" id="sumAngels">—</div><div class="sum-label" data-i18n="r3_tab_angels">Angels</div></div>
   </div>
 
   <!-- ── ONGLETS RÔLE ── -->
   <div class="role-tabs" id="roleTabs">
-    <button class="role-tab active-all" id="tab-all"   onclick="setRole('')"             >🌐 Combiné (tous rôles)</button>
-    <button class="role-tab"            id="tab-f"     onclick="setRole('F')"            >🎓 Facilitateurs</button>
-    <button class="role-tab"            id="tab-h"     onclick="setRole('H')"            >🤝 Helpers</button>
-    <button class="role-tab"            id="tab-t"     onclick="setRole('T')"            >🌐 Traducteurs</button>
-    <button class="role-tab"            id="tab-a"     onclick="setRole('A')"            >👼 Angels</button>
+    <button class="role-tab active-all" id="tab-all"   onclick="setRole('')">🌐 <span data-i18n="r3_tab_tous">Combiné (tous rôles)</span></button>
+    <button class="role-tab"            id="tab-f"     onclick="setRole('F')">🎓 <span data-i18n="r3_tab_fac">Animateurs</span></button>
+    <button class="role-tab"            id="tab-h"     onclick="setRole('H')">🤝 <span data-i18n="r3_tab_helpers">Helpers</span></button>
+    <button class="role-tab"            id="tab-t"     onclick="setRole('T')">🌐 <span data-i18n="r3_tab_traducteurs">Traducteurs</span></button>
+    <button class="role-tab"            id="tab-a"     onclick="setRole('A')">👼 <span data-i18n="r3_tab_angels">Angels</span></button>
   </div>
 
   <!-- ── FILTRES ── -->
   <div class="filters">
     <div class="filter-group">
-      <label>Recherche</label>
+      <label data-i18n="msg_rechercher">Recherche</label>
       <div class="search-wrap">
         <span class="search-icon">🔍</span>
-        <input type="text" id="filterSearch" placeholder="Nom de la personne…" oninput="onSearch()">
+        <input type="text" id="filterSearch" data-i18n-placeholder="filter_personne" placeholder="Nom de la personne…" oninput="onSearch()">
         <button class="search-clear" id="searchClear" onclick="clearSearch()" title="Effacer">✕</button>
       </div>
     </div>
     <div class="filter-group">
-      <label>Personne</label>
+      <label data-i18n="filter_personne">Personne</label>
       <select id="filterPerson" onchange="render()">
-        <option value="">Toutes les personnes</option>
+        <option value="" data-i18n="filter_toutes_pers">Toutes les personnes</option>
       </select>
     </div>
     <div class="filter-group">
-      <label>Jour</label>
+      <label data-i18n="col_jour">Jour</label>
       <select id="filterJour" onchange="render()">
-        <option value="">Tous les jours</option>
-        <option value="Jour 1">Jour 1 — Sam. 29 août</option>
-        <option value="Jour 2">Jour 2 — Dim. 30 août</option>
-        <option value="Jour 3">Jour 3 — Lun. 31 août</option>
-        <option value="Jour 4">Jour 4 — Mar. 1 sept.</option>
-        <option value="Jour 5">Jour 5 — Mer. 2 sept.</option>
-        <option value="Jour 6">Jour 6 — Jeu. 3 sept.</option>
-        <option value="Jour 7">Jour 7 — Ven. 4 sept.</option>
+        <option value="" data-i18n="filter_tous_jours">Tous les jours</option>
+        <option value="Jour 1" data-i18n="jour1_label">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2" data-i18n="jour2_label">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3" data-i18n="jour3_label">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4" data-i18n="jour4_label">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5" data-i18n="jour5_label">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6" data-i18n="jour6_label">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7" data-i18n="jour7_label">Jour 7 — Ven. 4 sept.</option>
       </select>
     </div>
   </div>
 
   <!-- ── BASCULE VUE ── -->
   <div class="view-toggle">
-    <button class="vbtn active" id="vbtnCards" onclick="setView('cards')">👤 Vue par Personne</button>
-    <button class="vbtn"        id="vbtnTable" onclick="setView('table')">📋 Vue Tableau</button>
+    <button class="vbtn active" id="vbtnCards" onclick="setView('cards')">👤 <span data-i18n="r3_vue_cartes">Vue par Personne</span></button>
+    <button class="vbtn"        id="vbtnTable" onclick="setView('table')">📋 <span data-i18n="r3_vue_tableau">Vue Tableau</span></button>
   </div>
 
   <div class="stats" id="stats"></div>
   <div id="results"></div>
 
 </div>
-<footer><p>Made with IBM Bob</p></footer>
 
+<!-- ── MODALE LOGISTIQUE ── -->
+<div class="log-modal-overlay" id="logModalOverlay" onclick="closeLogModal(event)">
+  <div class="log-modal" id="logModal">
+    <div class="log-modal-handle"></div>
+    <div class="log-modal-head">
+      <div class="log-modal-title" id="logModalTitle"></div>
+      <div class="log-modal-meta" id="logModalMeta"></div>
+    </div>
+    <div class="log-modal-body">
+      <div id="logModalContent"></div>
+    </div>
+    <div class="log-modal-foot">
+      <button class="btn-close-modal" onclick="closeLogModal()">✕ CLOSE</button>
+    </div>
+  </div>
+</div>
+
+<script src="ref_resource_types.js"></script>
+<script src="ref_ressources.js"></script>
 <script src="loader.js"></script>
 <script>
-loadData(['data.js'], function() {
+loadData(['data.js', 'logistics.js', 'logistics.special.js'], function() {
 
 // ════════════════════════════════════════════════════════
 // CONFIGURATION
 // ════════════════════════════════════════════════════════
 const ROLE_META = {
-  'F': { label: 'Facilitateur', icon: '🎓', cls: 'rbadge-f', tabCls: 'active-f', bodyCls: 'role-f' },
-  'H': { label: 'Helper',       icon: '🤝', cls: 'rbadge-h', tabCls: 'active-h', bodyCls: 'role-h' },
-  'T': { label: 'Traducteur',   icon: '🌐', cls: 'rbadge-t', tabCls: 'active-t', bodyCls: 'role-t' },
-  'A': { label: 'Angel',        icon: '👼', cls: 'rbadge-a', tabCls: 'active-a', bodyCls: 'role-a' },
+  'F': { label: function(){ return (typeof I18n !== 'undefined' && I18n.getLang() === 'en') ? 'Teacher' : 'Animateur'; }, icon: '🎓', cls: 'rbadge-f', tabCls: 'active-f', bodyCls: 'role-f' },
+  'H': { label: function(){ return 'Helper'; },       icon: '🤝', cls: 'rbadge-h', tabCls: 'active-h', bodyCls: 'role-h' },
+  'T': { label: function(){ return (typeof I18n !== 'undefined' && I18n.getLang() === 'en') ? 'Translator' : 'Traducteur'; },   icon: '🌐', cls: 'rbadge-t', tabCls: 'active-t', bodyCls: 'role-t' },
+  'A': { label: function(){ return 'Angel'; },        icon: '👼', cls: 'rbadge-a', tabCls: 'active-a', bodyCls: 'role-a' },
+  'M': { label: function(){ return 'Réunion'; },      icon: '👥', cls: 'rbadge-m', tabCls: 'active-m', bodyCls: 'role-m' },
 };
 const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
 
@@ -279,19 +417,40 @@ function construireData() {
     const base = {
       atelier: e.atelier, jour: e.jour, date: e.date,
       heure: e.heure, lieu: e.lieu||'', type: e.type,
-      fac1: e.fac1||'', fac2: e.fac2||'', piment: e.piment||0
+      fac1: e.fac1||'', fac2: e.fac2||'', fac3: e.fac3||'', fac4: e.fac4||'', piment: e.piment||0,
+      traduction: e.traduction||'', helper1: e.helper1||'',
+      helper2: e.helper2||'', helper3: e.helper3||'', helper4: e.helper4||'',
+      angel: e.angel||'', note: e.note||'',
+      logisticId: e.logisticId||'', meetingRoles: e.meetingRoles||''
     };
-    // Facilitateurs
+    // Animateurs
     if (e.fac1) addEntry(e.fac1, 'F', base);
     if (e.fac2) addEntry(e.fac2, 'F', base);
+    if (e.fac3) addEntry(e.fac3, 'F', base);
+    if (e.fac4) addEntry(e.fac4, 'F', base);
     // Traducteur
     if (e.traduction) addEntry(e.traduction, 'T', base);
     // Helpers
     if (e.helper1) addEntry(e.helper1, 'H', base);
     if (e.helper2) addEntry(e.helper2, 'H', base);
     if (e.helper3) addEntry(e.helper3, 'H', base);
+    if (e.helper4) addEntry(e.helper4, 'H', base);
     // Angel
     if (e.angel) addEntry(e.angel, 'A', base);
+    // REUNION : diffuser à toutes les personnes des rôles sélectionnés
+    if (e.type === 'REUNION' && e.meetingRoles) {
+      var roles = e.meetingRoles.split(',').map(function(r) { return r.trim(); }).filter(Boolean);
+      if (roles.length && typeof REF_RESSOURCES !== 'undefined') {
+        REF_RESSOURCES.forEach(function(res) {
+          if (!res.value) return;
+          var hasRole = roles.some(function(r) { return res.roles && res.roles.indexOf(r) !== -1; });
+          if (!hasRole) return;
+          // Éviter les doublons si cette personne est déjà dans fac1..fac4 / helpers / etc.
+          const alreadyAdded = [e.fac1,e.fac2,e.fac3,e.fac4,e.traduction,e.helper1,e.helper2,e.helper3,e.helper4,e.angel].indexOf(res.value) !== -1;
+          if (!alreadyAdded) addEntry(res.value, 'M', base);
+        });
+      }
+    }
   });
 
   // Trier chaque personne par jour puis heure
@@ -308,6 +467,12 @@ function construireData() {
 }
 
 const ALL_DATA = construireData();
+
+// Tableau plat de toutes les entrées pour la modale (indexé)
+var MODAL_ENTRIES = [];
+ALL_DATA.forEach(function(p) {
+  p.entries.forEach(function(e) { e._midx = MODAL_ENTRIES.length; MODAL_ENTRIES.push(e); });
+});
 
 // ════════════════════════════════════════════════════════
 // STATS GLOBALES
@@ -406,7 +571,8 @@ function initiales(nom) {
 function roleBadgeHtml(role) {
   var m = ROLE_META[role];
   if (!m) return '';
-  return '<span class="role-badge ' + m.cls + '">' + m.icon + ' ' + m.label + '</span>';
+  var label = typeof m.label === 'function' ? m.label() : m.label;
+  return '<span class="role-badge ' + m.cls + '">' + m.icon + ' ' + label + '</span>';
 }
 
 function rolesBadgesHtml(entry) {
@@ -429,14 +595,13 @@ function renderCards(data) {
     var rolesHtml = Object.keys(rolesSet).map(roleBadgeHtml).join(' ');
 
     var rows = p.entries.map(function(e) {
-      var facs = [e.fac1, e.fac2].filter(Boolean);
+      var facs = [e.fac1, e.fac2, e.fac3, e.fac4].filter(Boolean);
       var facsHtml = facs.length && e.role !== 'F'
         ? '<br><span style="font-size:11px;color:var(--muted);font-style:italic">🎓 ' + facs.join(' & ') + '</span>'
         : '';
       var pimentHtml = e.piment > 0
         ? '<span style="letter-spacing:-1px;font-size:11px;margin-left:4px">' + '🌶️'.repeat(e.piment) + '</span>'
         : '';
-      var logUrl = 'Rapport_Logistique_par_Atelier.html?jour=' + encodeURIComponent(e.jour) + '&atelier=' + encodeURIComponent(e.heure + '|||' + e.atelier);
       return '<div class="shift-row">' +
         '<span class="shift-jour">' + e.jour + '</span>' +
         '<span class="shift-date">' + e.date + '</span>' +
@@ -445,7 +610,7 @@ function renderCards(data) {
         '<span class="shift-atelier">' + (e.atelier||'—') + pimentHtml + facsHtml + '</span>' +
         '<span class="shift-lieu">' + (e.lieu ? '<span class="tag-lieu">' + e.lieu + '</span>' : '<span style="color:var(--muted);font-size:11px">—</span>') + '</span>' +
         '<span><span class="tag">' + (e.type||'') + '</span></span>' +
-        '<span><a class="log-link" href="' + logUrl + '" target="_blank" rel="noopener" title="Voir la fiche logistique">📋</a></span>' +
+        '<span><button class="log-link" onclick="openLogModal(' + e._midx + ')" title="Voir la fiche logistique">📋</button></span>' +
       '</div>';
     }).join('');
 
@@ -472,8 +637,7 @@ function renderTable(data) {
   var trs = '';
   data.forEach(function(p) {
     p.entries.forEach(function(e) {
-      var facs = [e.fac1, e.fac2].filter(Boolean).join(' & ');
-      var logUrl = 'Rapport_Logistique_par_Atelier.html?jour=' + encodeURIComponent(e.jour) + '&atelier=' + encodeURIComponent(e.heure + '|||' + e.atelier);
+      var facs = [e.fac1, e.fac2, e.fac3, e.fac4].filter(Boolean).join(' & ');
       trs += '<tr>' +
         '<td style="font-weight:700">' + p.nom + '</td>' +
         '<td>' + e.jour + '</td>' +
@@ -484,7 +648,7 @@ function renderTable(data) {
         '<td>' + (e.lieu ? '<span class="tag-lieu">' + e.lieu + '</span>' : '') + '</td>' +
         '<td><span class="tag">' + (e.type||'') + '</span></td>' +
         '<td style="color:var(--muted);font-size:12px">' + (facs||'—') + '</td>' +
-        '<td><a class="log-link" href="' + logUrl + '" target="_blank" rel="noopener" title="Voir la fiche logistique">📋</a></td>' +
+        '<td><button class="log-link" onclick="openLogModal(' + e._midx + ')" title="Voir la fiche logistique">📋</button></td>' +
       '</tr>';
     });
   });
@@ -492,7 +656,7 @@ function renderTable(data) {
   return '<div class="table-wrap"><table class="global">' +
     '<thead><tr>' +
       '<th>Personne</th><th>Jour</th><th>Date</th><th>Heure</th>' +
-      '<th>Rôle</th><th>Atelier</th><th>Lieu</th><th>Type</th><th>Facilitateur(s)</th><th></th>' +
+      '<th>Rôle</th><th>Atelier</th><th>Lieu</th><th>Type</th><th>' + ((typeof I18n !== 'undefined' && I18n.getLang() === 'en') ? 'Teacher(s)' : 'Animateur(s)') + '</th><th></th>' +
     '</tr></thead>' +
     '<tbody>' + trs + '</tbody>' +
   '</table></div>';
@@ -505,7 +669,9 @@ function render() {
   var data = getFiltered();
   var nbInterventions = data.reduce(function(s,p){return s+p.entries.length;},0);
 
-  var roleLabel = currentRole ? (ROLE_META[currentRole].icon + ' ' + ROLE_META[currentRole].label + 's') : 'Toutes interventions';
+  var currentMeta = currentRole ? ROLE_META[currentRole] : null;
+  var currentLabel = currentMeta ? (typeof currentMeta.label === 'function' ? currentMeta.label() : currentMeta.label) : '';
+  var roleLabel = currentRole ? (currentMeta.icon + ' ' + currentLabel + 's') : 'Toutes interventions';
   document.getElementById('stats').innerHTML =
     '<span>' + data.length + '</span> personne' + (data.length>1?'s':'') +
     ' · <span>' + nbInterventions + '</span> intervention' + (nbInterventions>1?'s':'') +
@@ -580,6 +746,95 @@ if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + lo
 
 // Démarrage : vue combinée par défaut
 render();
+
+// ════════════════════════════════════════════════════════
+// MODALE LOGISTIQUE
+// ════════════════════════════════════════════════════════
+var RES_MAP_MP = {};
+(typeof REF_RESSOURCES !== 'undefined' ? REF_RESSOURCES : []).forEach(function(r) {
+  RES_MAP_MP[r.value] = r;
+});
+function isAnglophoneMP(nom) {
+  var r = RES_MAP_MP[nom];
+  return r && r.roles && r.roles.indexOf('anglophone') !== -1;
+}
+
+function esc(v) { return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function openLogModal(midx) {
+  var e = MODAL_ENTRIES[midx];
+  if (!e) return;
+
+  // ── EN-TÊTE : titre ───────────────────────────────────────────
+  var isAnglo = isAnglophoneMP(e.fac1) || isAnglophoneMP(e.fac2) || isAnglophoneMP(e.fac3) || isAnglophoneMP(e.fac4);
+  var pimentHtml = e.piment > 0
+    ? '<span style="letter-spacing:-1px;font-size:12px">' + '🌶️'.repeat(e.piment) + '</span>' : '';
+  document.getElementById('logModalTitle').innerHTML =
+    esc(e.atelier||'—') +
+    (isAnglo ? ' <span style="font-size:13px">🇬🇧</span>' : '') +
+    (pimentHtml ? ' ' + pimentHtml : '');
+
+  // ── META ──────────────────────────────────────────────────────
+  function metaRow(lbl, html) {
+    return '<div class="log-meta-row"><span class="log-meta-lbl">' + lbl + '</span>' +
+           '<span class="log-meta-val">' + html + '</span></div>';
+  }
+  function pill(txt, cls) {
+    return txt ? '<span class="pill-sm ' + cls + '">' + esc(txt) + '</span>' : '';
+  }
+
+  var facs = [pill(e.fac1,'pill-sm-f'), pill(e.fac2,'pill-sm-f'), pill(e.fac3,'pill-sm-f'), pill(e.fac4,'pill-sm-f')].filter(Boolean).join(' ');
+  var helpers = [pill(e.helper1,'pill-sm-h'), pill(e.helper2,'pill-sm-h'), pill(e.helper3,'pill-sm-h'), pill(e.helper4,'pill-sm-h')].filter(Boolean).join(' ');
+  var trad   = pill(e.traduction, 'pill-sm-t');
+  var angel  = pill(e.angel, 'pill-sm-a');
+
+  var meta = '';
+  meta += metaRow('📅 Date',   esc(e.jour) + ' — ' + esc(e.date));
+  meta += metaRow('🕐 Heure',  esc(e.heure||'—'));
+  if (e.lieu)  meta += metaRow('📍 Lieu',   '<span class="tag-lieu">' + esc(e.lieu) + '</span>');
+  if (facs)    meta += metaRow('🎓 Anim.',  facs);
+  if (helpers) meta += metaRow('🤝 Helpers', helpers);
+  var _logEntryPrep = e.logisticId && typeof LOGISTICS !== 'undefined' ? LOGISTICS[e.logisticId] : null;
+  var _prepDur = _logEntryPrep && _logEntryPrep.prepDuration !== undefined ? _logEntryPrep.prepDuration : null;
+  if (_prepDur !== null) meta += metaRow('⏱ Prép.', '<span style="font-size:12px;color:var(--muted)">' + _prepDur + ' min</span>');
+  if (trad)    meta += metaRow('🌐 Trad.',  trad);
+  if (angel)   meta += metaRow('👼 Angel',  angel);
+  if (e.note)  meta += metaRow('📝 Note',   '<span style="color:var(--muted);font-size:12px">' + esc(e.note) + '</span>');
+
+  document.getElementById('logModalMeta').innerHTML = meta;
+
+  // ── CONTENU LOGISTIQUE ────────────────────────────────────────
+  var logHtml = '';
+  var logId = e.logisticId;
+  if (logId && typeof LOGISTICS !== 'undefined' && LOGISTICS[logId] && LOGISTICS[logId].html) {
+    logHtml = '<div class="log-modal-content">' + LOGISTICS[logId].html + '</div>';
+  } else {
+    logHtml = '<div class="log-modal-empty">Aucune information logistique pour cet atelier.</div>';
+  }
+  // ── CONTENU LOGISTIQUE SPÉCIAL ────────────────────────────────
+  var specEntry = logId && typeof LOGISTICS_SPECIAL !== 'undefined' ? LOGISTICS_SPECIAL[logId] : null;
+  var specText  = specEntry ? (specEntry.text || '').trim() : '';
+  if (specEntry && specText) {
+    logHtml += '<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border)">' +
+      '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#7c5cd8;margin-bottom:6px">⭐ Informations Logistiques Spéciales</div>' +
+      '<div class="log-modal-content" style="background:#f5f3ff;border-radius:6px;padding:8px 10px">' + specEntry.html + '</div>' +
+    '</div>';
+  }
+  document.getElementById('logModalContent').innerHTML = logHtml;
+
+  // Ouvrir
+  document.getElementById('logModalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+window.openLogModal = openLogModal;
+
+function closeLogModal(evt) {
+  // Ferme uniquement si clic sur l'overlay (pas sur la modale elle-même) ou sans argument
+  if (evt && evt.target !== document.getElementById('logModalOverlay')) return;
+  document.getElementById('logModalOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+window.closeLogModal = closeLogModal;
 
 }); // fin loadData
 </script>
