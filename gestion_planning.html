@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — ADMIN - Gestion Planning</title>
+<style>
+  :root {
+    --bg: #dbeafe; --surface: #ffffff; --border: #bfdbfe;
+    --text: #1f2328; --muted: #57606a; --accent: #1d4ed8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
+    font-size: 15px; line-height: 1.6;
+    background: var(--bg); color: var(--text);
+    min-height: 100vh;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 60px; }
+
+  /* ── BARRE LANGUE (fixée en haut à droite) ── */
+  .lang-bar {
+    position: fixed; top: 14px; right: 18px; z-index: 999;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 20px;
+    font-size: 12px; font-weight: 700; color: var(--text);
+    text-decoration: none; font-family: inherit;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    transition: background .15s, border-color .15s;
+    white-space: nowrap;
+  }
+  .back-btn:hover { background: var(--bg); border-color: var(--accent); color: var(--accent); }
+  .lang-bar .tm-lang-btn {
+    cursor: pointer;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    font-family: inherit;
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    transition: background .15s, border-color .15s;
+  }
+  .lang-bar .tm-lang-btn:hover {
+    background: var(--bg);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── EN-TÊTE ── */
+  .logo { margin-bottom: 40px; }
+  .logo h1 { font-size: 26px; font-weight: 700; letter-spacing: .2px; }
+  .logo p  { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  /* ── GROUPE ── */
+  .group { margin-bottom: 32px; }
+  .group-label {
+    font-size: 15px; font-weight: 700;
+    color: var(--text);
+    padding-bottom: 10px; margin-bottom: 2px;
+    border-bottom: 2px solid var(--border);
+  }
+  .group-label span {
+    display: inline-block; margin-right: 8px; font-size: 17px; vertical-align: middle;
+  }
+
+  /* ── GRILLE 2 colonnes ── */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  @media (max-width: 540px) { .grid { grid-template-columns: 1fr; } }
+
+  /* ── CARTE ── */
+  .card {
+    display: flex; align-items: center; gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--surface);
+    text-decoration: none; color: inherit;
+    transition: border-color .15s, background .15s;
+    cursor: pointer;
+  }
+  .card:hover { border-color: var(--accent); background: #f7f9ff; }
+  .card-icon {
+    font-size: 22px; flex-shrink: 0;
+    width: 42px; height: 42px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  }
+  .card-body { flex: 1; min-width: 0; text-align: left; }
+  .card-title { font-size: 14px; font-weight: 700; margin-bottom: 1px; }
+  .card-desc  { font-size: 12px; color: var(--muted); line-height: 1.4; }
+  .card-arrow { font-size: 16px; color: var(--muted); flex-shrink: 0; }
+
+  /* ── FOOTER ── */
+  footer {
+    margin-top: 48px; padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 10px;
+    font-size: 12px; color: var(--muted);
+  }
+  .footer-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 12px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    font-size: 12px; font-weight: 600; color: var(--text);
+    text-decoration: none; cursor: pointer; font-family: inherit;
+  }
+  .footer-btn:hover { background: var(--border); }
+
+</style>
+<script src="loader.js"></script>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+</head>
+<body>
+
+<!-- ── MODALE MOT DE PASSE ── -->
+<div id="pwOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:12px;padding:36px 32px;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);font-family:-apple-system,'Segoe UI',system-ui,sans-serif;">
+    <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#57606a;margin-bottom:6px;" id="pwTarget"></p>
+    <p style="font-size:17px;font-weight:700;color:#1f2328;margin-bottom:20px;" data-i18n="pw_acces_restreint">🔒 Accès restreint</p>
+    <input id="pwInput" type="password" data-i18n-placeholder="pw_placeholder" placeholder="Mot de passe" autocomplete="off"
+      style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:15px;outline:none;margin-bottom:8px;"
+      onkeydown="if(event.key==='Enter')checkPw()" />
+    <p id="pwError" style="font-size:12px;color:#dc2626;min-height:18px;margin-bottom:12px;"></p>
+    <div style="display:flex;gap:10px;">
+      <button onclick="closePw()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#f7f8fa;font-size:14px;cursor:pointer;" data-i18n="pw_annuler">Annuler</button>
+      <button onclick="checkPw()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#3b82d4;color:#fff;font-size:14px;font-weight:600;cursor:pointer;" data-i18n="pw_ouvrir">Ouvrir</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── BOUTON LANGUE + RETOUR (haut droite) ── -->
+<div class="lang-bar">
+  <a href="index.html" class="back-btn" data-i18n="nav_accueil">🏠 Accueil</a>
+  <a href="index_bis.html" class="back-btn">← DreamTeam</a>
+  <button class="tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
+</div>
+
+<div class="wrap">
+
+  <div class="logo">
+    <div style="display:inline-block;background:var(--accent);color:#fff;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:4px 12px;border-radius:4px;margin-bottom:10px;">Page Référents</div>
+    <h1 style="font-size:36px;font-weight:800;letter-spacing:-.5px;color:var(--accent);">ADMIN — Gestion Planning</h1>
+    <p style="font-size:13px;color:var(--muted);margin-top:6px;">Tantramour 2026 — 29 août › 4 septembre 2026</p>
+  </div>
+
+  <!-- CONTENEUR DES SECTIONS DYNAMIQUES -->
+  <div id="dynamicSectionsContainer"></div>
+
+  <footer>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button onclick="openPw('Rapport_Gestion_Affichage.html','🎛️ Gestion Affichage')" class="footer-btn" style="background:#1e3a8a;color:#fff;border-color:#1e3a8a;font-weight:700;">🎛️ <span data-i18n="card_gestion_affichage_title">Gestion Affichage</span></button>
+      <a href="user-manual.html" class="footer-btn">📖 <span data-i18n="nav_manuel">Manuel</span></a>
+      <a href="Rapport_Regles.html" class="footer-btn">📐 <span data-i18n="nav_regles">Règles</span></a>
+      <button onclick="openPw('Admin.html','⚙️ Admin')" class="footer-btn">⚙️ <span data-i18n="nav_admin">Admin</span></button>
+      <button onclick="openPw('MasterData.html','🗂 Master Data')" class="footer-btn">🗂 <span data-i18n="nav_masterdata">Master Data</span></button>
+    </div>
+  </footer>
+
+  <!-- ══════════════════════════════════
+       OLD REPORTS
+  ══════════════════════════════════ -->
+  <div class="group" style="margin-top:40px;">
+    <div class="group-label" style="color:var(--muted);border-color:var(--border);"><span>🗄️</span>Old Reports</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+      <a href="Rapport_Agenda_par_Personne.html" class="footer-btn">👤 Planning par Personne</a>
+      <a href="Rapport_Mon_Planning.html" class="footer-btn">🗓️ Mon Planning</a>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const PW = '007';
+let _dest = '';
+
+// Ajoute un timestamp à l'URL pour forcer un rechargement sans cache
+function withTs(url) {
+  return url + (url.indexOf('?') === -1 ? '?' : '&') + 'v=' + Date.now();
+}
+
+// Configuration des icônes et clés par section
+var SECTION_META = {
+  "DreamTeam":               { icon: "📆", key: "home_group_general",   defaultLabel: "DREAMTEAM" },
+  "Gestion planning":        { icon: "📊", key: "home_group_planning",  defaultLabel: "Gestion planning" },
+  "Logistique":              { icon: "📦", key: "home_group_logistique", defaultLabel: "Logistique" },
+  "Contrôle & Vérification": { icon: "🔍", key: "home_group_controle",   defaultLabel: "Contrôle & Vérification" },
+  "Admin":                   { icon: "⚙️", key: "home_group_admin",      defaultLabel: "Admin" }
+};
+
+var SECTIONS_ORDER = [
+  "DreamTeam",
+  "Gestion planning",
+  "Logistique",
+  "Contrôle & Vérification",
+  "Admin"
+];
+
+function renderDynamicSections() {
+  var container = document.getElementById('dynamicSectionsContainer');
+  if (!container) return;
+
+  var reports = (typeof REF_DISPLAY_REPORTS !== 'undefined' && Array.isArray(REF_DISPLAY_REPORTS))
+    ? REF_DISPLAY_REPORTS
+    : [];
+
+  var _t = (typeof I18n !== 'undefined') ? function(k){ return I18n.t(k); } : function(k){ return k; };
+
+  var html = '';
+
+  SECTIONS_ORDER.forEach(function(secName) {
+    var secReports = reports.filter(function(r) {
+      return r.section === secName && r.active !== false;
+    });
+
+    if (secReports.length === 0) return;
+
+    // Trier selon .order
+    secReports.sort(function(a, b) {
+      return (a.order || 999) - (b.order || 999);
+    });
+
+    var meta = SECTION_META[secName] || { icon: "📁", key: "", defaultLabel: secName };
+    var secLabel = meta.key ? _t(meta.key) : meta.defaultLabel;
+
+    html += '<div class="group">';
+    html += '  <div class="group-label"><span>' + meta.icon + '</span><span ' + (meta.key ? 'data-i18n="' + meta.key + '"' : '') + '>' + esc(secLabel) + '</span></div>';
+    html += '  <div class="grid">';
+
+    secReports.forEach(function(r) {
+      var title = (r.titleKey && _t(r.titleKey) !== r.titleKey) ? _t(r.titleKey) : (r.title || r.titleKey || '');
+      var desc  = (r.descKey && _t(r.descKey) !== r.descKey) ? _t(r.descKey) : (r.desc || r.descKey || '');
+      var icon  = r.icon || '📄';
+      var cardStyle  = r.cardStyle || '';
+      var iconStyle  = r.iconStyle || '';
+      var titleStyle = r.titleStyle || '';
+      var descStyle  = r.descStyle || '';
+      var arrowStyle = r.arrowStyle || '';
+      var isProtected = !!r.isProtected;
+
+      var dataI18nTitle = r.titleKey ? ' data-i18n="' + esc(r.titleKey) + '"' : '';
+      var dataI18nDesc  = r.descKey  ? ' data-i18n="' + esc(r.descKey)  + '"' : '';
+
+      if (isProtected) {
+        html += '<button class="card" onclick="openPw(\'' + esc(r.url) + '\',\'' + esc(icon + ' ' + title) + '\')" style="' + esc(cardStyle) + '">';
+        html += '  <div class="card-icon" style="' + esc(iconStyle) + '">' + icon + '</div>';
+        html += '  <div class="card-body">';
+        html += '    <div class="card-title" style="' + esc(titleStyle) + '"' + dataI18nTitle + '>' + esc(title) + '</div>';
+        html += '    <div class="card-desc" style="' + esc(descStyle) + '"' + dataI18nDesc + '>' + esc(desc) + '</div>';
+        html += '  </div>';
+        html += '  <div class="card-arrow" style="' + esc(arrowStyle) + '">🔒</div>';
+        html += '</button>';
+      } else {
+        html += '<a class="card" href="' + esc(r.url) + '" style="' + esc(cardStyle) + '">';
+        html += '  <div class="card-icon" style="' + esc(iconStyle) + '">' + icon + '</div>';
+        html += '  <div class="card-body">';
+        html += '    <div class="card-title" style="' + esc(titleStyle) + '"' + dataI18nTitle + '>' + esc(title) + '</div>';
+        html += '    <div class="card-desc" style="' + esc(descStyle) + '"' + dataI18nDesc + '>' + esc(desc) + '</div>';
+        html += '  </div>';
+        html += '  <div class="card-arrow" style="' + esc(arrowStyle) + '">›</div>';
+        html += '</a>';
+      }
+    });
+
+    html += '  </div>';
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+
+  // Intercepter les clics sur les balises <a> générées pour ajouter withTs
+  container.querySelectorAll('a.card[href]').forEach(function(a) {
+    var base = a.getAttribute('href');
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      location.href = withTs(base);
+    });
+  });
+}
+
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// Charger et rendre dynamiquement
+loadData(['ref_display_reports.js'], function() {
+  renderDynamicSections();
+});
+
+function openPw(url, label) {
+  _dest = url;
+  document.getElementById('pwTarget').textContent = label;
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').textContent = '';
+  const ov = document.getElementById('pwOverlay');
+  ov.style.display = 'flex';
+  setTimeout(() => document.getElementById('pwInput').focus(), 50);
+}
+
+function closePw() {
+  document.getElementById('pwOverlay').style.display = 'none';
+}
+
+var _pwLocked = false;
+function checkPw() {
+  if (_pwLocked) return;
+  var inp = document.getElementById('pwInput');
+  if (inp.value === PW) {
+    closePw();
+    location.href = withTs(_dest);
+  } else {
+    var err = document.getElementById('pwError');
+    var btns = document.querySelectorAll('#pwOverlay button');
+    inp.value = '';
+    inp.style.borderColor = '#dc2626';
+    _pwLocked = true;
+    inp.disabled = true;
+    btns.forEach(function(b) { b.disabled = true; });
+    var remaining = 3;
+    err.textContent = '❌ Incorrect — réessayez dans ' + remaining + 's';
+    var countdown = setInterval(function() {
+      remaining--;
+      if (remaining > 0) {
+        err.textContent = '❌ Incorrect — réessayez dans ' + remaining + 's';
+      } else {
+        clearInterval(countdown);
+        _pwLocked = false;
+        inp.disabled = false;
+        btns.forEach(function(b) { b.disabled = false; });
+        inp.style.borderColor = '';
+        err.textContent = '';
+        inp.focus();
+      }
+    }, 1000);
+  }
+}
+
+document.getElementById('pwOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closePw();
+});
+</script>
+</body>
+</html>
