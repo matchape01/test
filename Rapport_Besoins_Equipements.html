@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Besoins Équipements</title>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --header-bg:#f0f4fb; --row-alt:#f7f8fa;
+    --tag-bg:#eef2ff; --tag-text:#3b5bdb;
+    --green:#16a34a; --green-bg:#dcfce7; --green-border:#86efac;
+    --orange:#ca8a04; --orange-bg:#fef9c3;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --header-bg:#1c2333; --row-alt:#161b22;
+    --tag-bg:#1c2a4a; --tag-text:#79a8ff;
+    --green:#4ade80; --green-bg:#052e16; --green-border:#166534;
+    --orange-bg:#2a1f00;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
+  .wrap { max-width:1400px; margin:0 auto; padding:24px 20px 80px; }
+
+  /* ── HEADER ── */
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:18px; font-weight:700; }
+  .logo p  { font-size:22px; font-weight:800; color:var(--accent); line-height:1.2; margin-top:2px; }
+  .header-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 14px; font-size:13px; color:var(--text); font-family:inherit; display:inline-flex; align-items:center; gap:6px; text-decoration:none; transition:background .15s; white-space:nowrap; }
+  .btn:hover { background:var(--border); }
+  .btn-primary { background:var(--accent); color:#fff; border-color:var(--accent); font-weight:600; }
+  .btn-primary:hover { filter:brightness(1.1); }
+  .btn-primary:disabled { opacity:.55; cursor:wait; }
+  .btn-export { background:#166534; color:#fff; border-color:#166534; font-weight:600; }
+  .btn-export:hover { filter:brightness(1.1); }
+
+  /* ── STATS BAR ── */
+  .stats-bar { display:flex; gap:16px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+  .stat-chip { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:8px 14px; font-size:13px; display:flex; flex-direction:column; align-items:center; min-width:100px; }
+  .stat-chip-val { font-size:20px; font-weight:800; color:var(--accent); }
+  .stat-chip-lbl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); font-weight:600; }
+
+  /* ── FILTRES ── */
+  .filters-panel { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 18px; margin-bottom:18px; }
+  .filters-title { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:12px; }
+  .filters-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; align-items:flex-end; }
+  .filter-group { display:flex; flex-direction:column; gap:4px; }
+  .filter-label { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+  .filter-select, .filter-input { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:13px; color:var(--text); font-family:inherit; cursor:pointer; }
+  .filter-select:focus, .filter-input:focus { outline:2px solid var(--accent); outline-offset:1px; border-color:var(--accent); }
+  .filter-reset-row { display:flex; gap:8px; align-items:flex-end; grid-column:1/-1; }
+
+  /* ── TABLE WRAPPER ── */
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:10px; }
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  thead th { background:var(--header-bg); padding:9px 12px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); border-bottom:2px solid var(--border); text-align:left; white-space:nowrap; cursor:pointer; user-select:none; position:sticky; top:0; z-index:2; }
+  thead th:hover { color:var(--accent); }
+  thead th .sort-arrow { margin-left:4px; opacity:.4; }
+  thead th.sorted .sort-arrow { opacity:1; color:var(--accent); }
+  tbody tr { border-bottom:1px solid var(--border); transition:background .1s; }
+  tbody tr:last-child { border-bottom:none; }
+  tbody tr:nth-child(even) { background:var(--row-alt); }
+  tbody tr:hover { background:#eff6ff; }
+  .dark tbody tr:hover { background:#0c2d48; }
+  tbody td { padding:8px 12px; vertical-align:middle; }
+  td.num { font-variant-numeric:tabular-nums; text-align:center; font-weight:700; }
+  td.bold { font-weight:600; }
+
+  /* ── BADGES ── */
+  .badge { display:inline-flex; align-items:center; border-radius:4px; padding:2px 7px; font-size:11px; font-weight:600; white-space:nowrap; }
+  .badge-type { background:var(--tag-bg); color:var(--tag-text); }
+  .badge-cat  { background:#fef3c7; color:#92400e; }
+  .dark .badge-cat { background:#2a1f00; color:#fbbf24; }
+  .badge-eq-type-h { background:#e0f2fe; color:#0369a1; }
+  .dark .badge-eq-type-h { background:#0c2d48; color:#58a6ff; }
+  .badge-eq-type-t { background:#f5f3ff; color:#6d28d9; }
+  .dark .badge-eq-type-t { background:#1e1438; color:#a78bfa; }
+  .badge-eq-type-a { background:#dcfce7; color:#166534; }
+  .dark .badge-eq-type-a { background:#052e16; color:#4ade80; }
+  .badge-eq-type-n { background:#fce7f3; color:#9d174d; }
+  .dark .badge-eq-type-n { background:#3b1030; color:#f0abca; }
+  .badge-eq-type-x { background:var(--surface); color:var(--muted); border:1px solid var(--border); }
+  .prep-time { font-size:11px; font-weight:700; color:#b45309; background:#fef9c3; border-radius:4px; padding:2px 7px; white-space:nowrap; }
+  .dark .prep-time { color:#fbbf24; background:#2a1f00; }
+
+  /* ── VIDE ── */
+  .empty { text-align:center; padding:48px; color:var(--muted); font-style:italic; }
+
+  /* ── RÉSULTATS ── */
+  .results-bar { display:flex; align-items:center; justify-content:space-between; margin-bottom:10px; flex-wrap:wrap; gap:8px; }
+  .results-count { font-size:13px; color:var(--muted); }
+  .results-count strong { color:var(--text); }
+
+  /* ── TOAST ── */
+  #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:#1f2328; color:#fff; border-radius:8px; padding:12px 22px; font-size:13px; font-weight:600; z-index:10000; transition:transform .3s,opacity .3s; opacity:0; white-space:nowrap; }
+  #toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+  #toast.ok  { background:#166534; }
+  #toast.err { background:#dc2626; }
+
+  footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ── HEADER ── -->
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>🔩 Besoins Équipements</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="index.html">🏠 Accueil</a>
+      <a class="btn" href="index_bis.html">🌀 DreamTeam</a>
+      <a class="btn" href="gestion_planning.html">⚙️ Admin</a>
+      <button class="btn" onclick="hardReload()">🔄 Refresh</button>
+      <button class="btn btn-export" id="btnExport" onclick="exportExcel()">📥 Export Excel</button>
+      <button class="btn" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+    </div>
+  </header>
+
+  <!-- ── STATS ── -->
+  <div class="stats-bar" id="statsBar"></div>
+
+  <!-- ── FILTRES ── -->
+  <div class="filters-panel">
+    <div class="filters-title">🔍 Filtres</div>
+    <div class="filters-grid">
+
+      <div class="filter-group">
+        <div class="filter-label">📅 Jour</div>
+        <select class="filter-select" id="fJour" onchange="applyFilters()">
+          <option value="">Tous les jours</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">📍 Lieu</div>
+        <select class="filter-select" id="fLieu" onchange="applyFilters()">
+          <option value="">Tous les lieux</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">🏷 Type d'atelier</div>
+        <select class="filter-select" id="fTypeAtelier" onchange="applyFilters()">
+          <option value="">Tous les types</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">🎓 Animateur</div>
+        <select class="filter-select" id="fAnimateur" onchange="applyFilters()">
+          <option value="">Tous les animateurs</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">🔩 Type d'équipement</div>
+        <select class="filter-select" id="fTypeEq" onchange="applyFilters()">
+          <option value="">Tous les types</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">📂 Catégorie équipement</div>
+        <select class="filter-select" id="fCatEq" onchange="applyFilters()">
+          <option value="">Toutes les catégories</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">🔎 Nom d'atelier</div>
+        <input class="filter-input" id="fAtelier" type="text" placeholder="Rechercher un atelier…" oninput="applyFilters()">
+      </div>
+
+      <div class="filter-group">
+        <div class="filter-label">🔎 Nom d'équipement</div>
+        <input class="filter-input" id="fEquipement" type="text" placeholder="Rechercher un équipement…" oninput="applyFilters()">
+      </div>
+
+      <div class="filter-group" style="justify-content:flex-end;">
+        <div class="filter-label">&nbsp;</div>
+        <button class="btn" onclick="resetFilters()">✕ Réinitialiser</button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── RÉSULTATS + TABLE ── -->
+  <div class="results-bar">
+    <div class="results-count" id="resultsCount"></div>
+  </div>
+
+  <div class="table-wrap">
+    <table id="mainTable">
+      <thead>
+        <tr>
+          <th onclick="sortBy(0)" data-col="0">📅 Date<span class="sort-arrow">▲</span></th>
+          <th onclick="sortBy(1)" data-col="1">⏰ Horaire<span class="sort-arrow">▲</span></th>
+          <th onclick="sortBy(2)" data-col="2">🕐 Heure prépa<span class="sort-arrow">▲</span></th>
+          <th onclick="sortBy(3)" data-col="3">📍 Lieu<span class="sort-arrow">▲</span></th>
+          <th onclick="sortBy(4)" data-col="4">🎭 Atelier<span class="sort-arrow">▲</span></th>
+          <th onclick="sortBy(5)" data-col="5">🎓 Animateur(s)<span class="sort-arrow">▲</span></th>
+          <th onclick="sortBy(6)" data-col="6">🏷 Type atelier<span class="sort-arrow">▲</span></th>
+          <th onclick="sortBy(7)" data-col="7">🔩 Type équip.<span class="sort-arrow">▲</span></th>
+          <th onclick="sortBy(8)" data-col="8">📂 Catégorie<span class="sort-arrow">▲</span></th>
+          <th onclick="sortBy(9)" data-col="9">🛠 Équipement<span class="sort-arrow">▲</span></th>
+          <th onclick="sortBy(10)" data-col="10">🔢 Qté<span class="sort-arrow">▲</span></th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+
+</div><!-- /wrap -->
+
+<div id="toast"></div>
+<footer>Tantramour 2026 — Besoins Équipements</footer>
+
+<!-- ── SCRIPTS ── -->
+<script src="ref_equipements.js"></script>
+<script src="ref_jours.js"></script>
+<script src="loader.js"></script>
+<script>
+loadData(['data.js', 'logistics.js', 'ref_equipements.js'], function() {
+
+// ════════════════════════════════════════════════════
+// CONSTANTES
+// ════════════════════════════════════════════════════
+var JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+var JOUR_META = {
+  'Jour 1': 'Sam. 29 août',
+  'Jour 2': 'Dim. 30 août',
+  'Jour 3': 'Lun. 31 août',
+  'Jour 4': 'Mar. 1 sept.',
+  'Jour 5': 'Mer. 2 sept.',
+  'Jour 6': 'Jeu. 3 sept.',
+  'Jour 7': 'Ven. 4 sept.',
+};
+
+// Index équipements par id
+var EQ_INDEX = {};
+(typeof REF_EQUIPEMENTS !== 'undefined' ? REF_EQUIPEMENTS : []).forEach(function(eq) {
+  EQ_INDEX[eq.id] = eq;
+});
+
+// Libellé type équipement
+var EQ_TYPE_LABELS = {
+  'Hameau':     'Hameau',
+  'Tantramour': 'Dreamteam',
+  'Animateur':  'Animateur',
+  'NEW':        'NEW',
+  'Autre':      'Autre',
+};
+
+// ════════════════════════════════════════════════════
+// CONSTRUIRE LES LIGNES DE DONNÉES
+// ════════════════════════════════════════════════════
+// Chaque ligne = 1 équipement × 1 atelier
+var ALL_ROWS = [];
+
+AGENDA.forEach(function(e) {
+  // Récupérer les équipements depuis LOGISTICS[logId]._equipements
+  var eqs = null;
+  if (e.logisticId && typeof LOGISTICS !== 'undefined' && LOGISTICS[e.logisticId] && LOGISTICS[e.logisticId]._equipements) {
+    eqs = LOGISTICS[e.logisticId]._equipements;
+  }
+  // Fallback : depuis AGENDA._equipements (data.js)
+  if (!eqs && e._equipements && Object.keys(e._equipements).length > 0) {
+    eqs = e._equipements;
+  }
+  if (!eqs || Object.keys(eqs).length === 0) return;
+
+  var facs = [e.fac1, e.fac2, e.fac3, e.fac4].filter(Boolean).join(', ');
+  var jourLabel = (JOUR_META[e.jour] || e.jour);
+  var prepDur = (e.logisticId && typeof LOGISTICS !== 'undefined' && LOGISTICS[e.logisticId])
+    ? (LOGISTICS[e.logisticId].prepDuration || 0)
+    : 0;
+
+  // Calculer heure de début de préparation
+  var heurePrepa = calcHeurePrepa(e.heure, prepDur);
+
+  Object.keys(eqs).forEach(function(eqId) {
+    var qty = eqs[eqId];
+    if (!qty || qty <= 0) return;
+    var eq = EQ_INDEX[eqId];
+    if (!eq) {
+      // Équipement inconnu (supprimé du ref) — afficher quand même
+      eq = { id: eqId, value: eqId, type: '?', categorie: '?', description: '' };
+    }
+    ALL_ROWS.push({
+      jour:        e.jour,
+      jourLabel:   jourLabel,
+      jourOrder:   JOUR_ORDER.indexOf(e.jour),
+      horaire:     e.heure || '',
+      heureMin:    heureEnMinutes(e.heure),
+      heurePrepa:  heurePrepa,
+      lieu:        e.lieu || '',
+      atelier:     e.atelier || '',
+      facs:        facs,
+      typeAtelier: e.type || '',
+      typeEq:      eq.type || '',
+      categorieEq: eq.categorie || '',
+      nomEq:       eq.value || '',
+      qty:         qty,
+      prepDur:     prepDur,
+    });
+  });
+});
+
+// ════════════════════════════════════════════════════
+// UTILITAIRES HEURE
+// ════════════════════════════════════════════════════
+function heureEnMinutes(h) {
+  if (!h) return 9999;
+  var m = String(h).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : 9999;
+}
+
+function calcHeurePrepa(heureSlot, prepMin) {
+  if (!heureSlot || !prepMin) return '';
+  var m = String(heureSlot).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  if (!m) return '';
+  var debut = parseInt(m[1]) * 60 + parseInt(m[2]);
+  var prepa = debut - prepMin;
+  if (prepa < 0) prepa += 24 * 60;
+  var hh = Math.floor(prepa / 60);
+  var mm = prepa % 60;
+  return pad2(hh) + ':' + pad2(mm);
+}
+
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+// ════════════════════════════════════════════════════
+// ÉTAT FILTRES / TRI
+// ════════════════════════════════════════════════════
+var _sortCol = 0;
+var _sortAsc = true;
+var _filtered = [];
+
+// ════════════════════════════════════════════════════
+// PEUPLER LES FILTRES
+// ════════════════════════════════════════════════════
+function buildFilters() {
+  // Jours présents (ordre canonique)
+  var joursPresents = new Set(ALL_ROWS.map(function(r) { return r.jour; }));
+  var selJour = document.getElementById('fJour');
+  JOUR_ORDER.filter(function(j){ return joursPresents.has(j); }).forEach(function(j) {
+    var o = document.createElement('option');
+    o.value = j; o.textContent = j + ' — ' + (JOUR_META[j] || j);
+    selJour.appendChild(o);
+  });
+
+  // Lieux
+  var lieux = Array.from(new Set(ALL_ROWS.map(function(r){ return r.lieu; }).filter(Boolean))).sort(function(a,b){ return a.localeCompare(b,'fr'); });
+  var selLieu = document.getElementById('fLieu');
+  lieux.forEach(function(l) {
+    var o = document.createElement('option'); o.value = l; o.textContent = l; selLieu.appendChild(o);
+  });
+
+  // Types ateliers
+  var types = Array.from(new Set(ALL_ROWS.map(function(r){ return r.typeAtelier; }).filter(Boolean))).sort(function(a,b){ return a.localeCompare(b,'fr'); });
+  var selTA = document.getElementById('fTypeAtelier');
+  types.forEach(function(t) {
+    var o = document.createElement('option'); o.value = t; o.textContent = t; selTA.appendChild(o);
+  });
+
+  // Animateurs
+  var animsSet = new Set();
+  AGENDA.forEach(function(e) {
+    [e.fac1, e.fac2, e.fac3, e.fac4].filter(Boolean).forEach(function(f){ animsSet.add(f); });
+  });
+  var anims = Array.from(animsSet).sort(function(a,b){ return a.localeCompare(b,'fr'); });
+  var selAnim = document.getElementById('fAnimateur');
+  anims.forEach(function(a) {
+    var o = document.createElement('option'); o.value = a; o.textContent = a; selAnim.appendChild(o);
+  });
+
+  // Types équipements
+  var typesEq = Array.from(new Set(ALL_ROWS.map(function(r){ return r.typeEq; }).filter(Boolean))).sort(function(a,b){ return a.localeCompare(b,'fr'); });
+  var selTE = document.getElementById('fTypeEq');
+  typesEq.forEach(function(t) {
+    var o = document.createElement('option'); o.value = t; o.textContent = EQ_TYPE_LABELS[t] || t; selTE.appendChild(o);
+  });
+
+  // Catégories équipements
+  var cats = Array.from(new Set(ALL_ROWS.map(function(r){ return r.categorieEq; }).filter(Boolean))).sort(function(a,b){ return a.localeCompare(b,'fr'); });
+  var selCat = document.getElementById('fCatEq');
+  cats.forEach(function(c) {
+    var o = document.createElement('option'); o.value = c; o.textContent = c; selCat.appendChild(o);
+  });
+}
+
+// ════════════════════════════════════════════════════
+// FILTRER
+// ════════════════════════════════════════════════════
+function getFiltered() {
+  var fJour    = document.getElementById('fJour').value;
+  var fLieu    = document.getElementById('fLieu').value;
+  var fTA      = document.getElementById('fTypeAtelier').value;
+  var fAnim    = document.getElementById('fAnimateur').value;
+  var fTE      = document.getElementById('fTypeEq').value;
+  var fCat     = document.getElementById('fCatEq').value;
+  var fAtelier = document.getElementById('fAtelier').value.trim().toLowerCase();
+  var fEq      = document.getElementById('fEquipement').value.trim().toLowerCase();
+
+  return ALL_ROWS.filter(function(r) {
+    if (fJour    && r.jour !== fJour)                  return false;
+    if (fLieu    && r.lieu !== fLieu)                  return false;
+    if (fTA      && r.typeAtelier !== fTA)             return false;
+    if (fTE      && r.typeEq !== fTE)                  return false;
+    if (fCat     && r.categorieEq !== fCat)            return false;
+    if (fAnim    && !r.facs.includes(fAnim))           return false;
+    if (fAtelier && !r.atelier.toLowerCase().includes(fAtelier)) return false;
+    if (fEq      && !r.nomEq.toLowerCase().includes(fEq))        return false;
+    return true;
+  });
+}
+
+// ════════════════════════════════════════════════════
+// TRI
+// ════════════════════════════════════════════════════
+var SORT_KEYS = ['jourOrder','heureMin','heurePrepa','lieu','atelier','facs','typeAtelier','typeEq','categorieEq','nomEq','qty'];
+
+function sortBy(col) {
+  if (_sortCol === col) { _sortAsc = !_sortAsc; }
+  else { _sortCol = col; _sortAsc = true; }
+  renderTable();
+}
+window.sortBy = sortBy;
+
+function sortRows(rows) {
+  var key = SORT_KEYS[_sortCol] || 'jourOrder';
+  return rows.slice().sort(function(a, b) {
+    var av = a[key], bv = b[key];
+    if (typeof av === 'number' && typeof bv === 'number') return _sortAsc ? av - bv : bv - av;
+    var cmp = String(av||'').localeCompare(String(bv||''), 'fr');
+    return _sortAsc ? cmp : -cmp;
+  });
+}
+
+// ════════════════════════════════════════════════════
+// RENDU
+// ════════════════════════════════════════════════════
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function eqTypeBadge(t) {
+  var cls = { 'Hameau':'badge-eq-type-h', 'Tantramour':'badge-eq-type-t', 'Animateur':'badge-eq-type-a', 'NEW':'badge-eq-type-n' }[t] || 'badge-eq-type-x';
+  return '<span class="badge ' + cls + '">' + esc(EQ_TYPE_LABELS[t] || t) + '</span>';
+}
+
+function renderTable() {
+  _filtered = getFiltered();
+  var sorted = sortRows(_filtered);
+
+  // Mettre à jour les flèches de tri
+  document.querySelectorAll('thead th').forEach(function(th) {
+    var col = parseInt(th.getAttribute('data-col') || '-1', 10);
+    var arrow = th.querySelector('.sort-arrow');
+    th.classList.toggle('sorted', col === _sortCol);
+    if (arrow) arrow.textContent = (col === _sortCol) ? (_sortAsc ? '▲' : '▼') : '▲';
+  });
+
+  // Stats
+  var ateliersUniq = new Set(sorted.map(function(r){ return r.jour + '|' + r.atelier; })).size;
+  var eqsUniq = new Set(sorted.map(function(r){ return r.nomEq; })).size;
+  document.getElementById('statsBar').innerHTML =
+    chip(sorted.length, 'lignes') +
+    chip(ateliersUniq, 'ateliers') +
+    chip(eqsUniq, 'équipements') +
+    chip(new Set(sorted.map(function(r){ return r.lieu; })).size, 'lieux');
+
+  // Count
+  var cnt = document.getElementById('resultsCount');
+  cnt.innerHTML = 'Affichage de <strong>' + sorted.length + '</strong> ligne' + (sorted.length !== 1 ? 's' : '');
+
+  if (!sorted.length) {
+    document.getElementById('tableBody').innerHTML = '<tr><td colspan="11" class="empty">Aucun équipement trouvé avec ces filtres.</td></tr>';
+    return;
+  }
+
+  var html = sorted.map(function(r) {
+    var prepCell = r.heurePrepa
+      ? '<span class="prep-time">' + esc(r.heurePrepa) + '</span>'
+        + (r.prepDur ? '<span style="font-size:10px;color:var(--muted);margin-left:4px;">(-' + r.prepDur + 'min)</span>' : '')
+      : '<span style="color:var(--muted);font-size:11px;">—</span>';
+
+    return '<tr>' +
+      '<td class="bold">' + esc(r.jour) + '<br><span style="font-size:11px;color:var(--muted);">' + esc(r.jourLabel) + '</span></td>' +
+      '<td style="font-variant-numeric:tabular-nums;font-weight:600;">' + esc(r.horaire || '—') + '</td>' +
+      '<td>' + prepCell + '</td>' +
+      '<td><span style="font-weight:600;">' + esc(r.lieu || '—') + '</span></td>' +
+      '<td>' + esc(r.atelier || '—') + '</td>' +
+      '<td style="font-size:12px;color:var(--muted);">' + esc(r.facs || '—') + '</td>' +
+      '<td><span class="badge badge-type">' + esc(r.typeAtelier || '—') + '</span></td>' +
+      '<td>' + eqTypeBadge(r.typeEq) + '</td>' +
+      '<td><span class="badge badge-cat">' + esc(r.categorieEq || '—') + '</span></td>' +
+      '<td class="bold">' + esc(r.nomEq) + '</td>' +
+      '<td class="num">' + esc(r.qty) + '</td>' +
+    '</tr>';
+  }).join('');
+
+  document.getElementById('tableBody').innerHTML = html;
+}
+
+function chip(val, lbl) {
+  return '<div class="stat-chip"><div class="stat-chip-val">' + val + '</div><div class="stat-chip-lbl">' + lbl + '</div></div>';
+}
+
+// ════════════════════════════════════════════════════
+// FILTRES — RESET
+// ════════════════════════════════════════════════════
+function applyFilters() { renderTable(); }
+window.applyFilters = applyFilters;
+
+function resetFilters() {
+  ['fJour','fLieu','fTypeAtelier','fAnimateur','fTypeEq','fCatEq'].forEach(function(id) {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('fAtelier').value = '';
+  document.getElementById('fEquipement').value = '';
+  renderTable();
+}
+window.resetFilters = resetFilters;
+
+// ════════════════════════════════════════════════════
+// EXPORT EXCEL
+// ════════════════════════════════════════════════════
+async function exportExcel() {
+  var btn = document.getElementById('btnExport');
+  btn.disabled = true;
+  btn.textContent = '⏳ Export…';
+  try {
+    var wb = new ExcelJS.Workbook();
+    wb.creator = 'Tantramour 2026';
+    wb.created = new Date();
+
+    var ws = wb.addWorksheet('Besoins Équipements', {
+      views: [{ state: 'frozen', ySplit: 1 }]
+    });
+
+    // En-têtes
+    var headers = [
+      'Jour', 'Date', 'Horaire', 'Heure Prépa', 'Durée Prépa (min)',
+      'Lieu', 'Atelier', 'Animateur(s)', 'Type Atelier',
+      'Type Équipement', 'Catégorie Équipement', 'Équipement', 'Quantité'
+    ];
+    ws.addRow(headers);
+
+    // Style en-tête
+    var headerRow = ws.getRow(1);
+    headerRow.eachCell(function(cell) {
+      cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FF1D4ED8'} };
+      cell.font = { bold:true, color:{argb:'FFFFFFFF'}, size:11 };
+      cell.alignment = { vertical:'middle', horizontal:'center', wrapText:true };
+      cell.border = {
+        bottom: { style:'medium', color:{argb:'FFFFFFFF'} }
+      };
+    });
+    headerRow.height = 28;
+
+    // Lignes de données (ordre courant filtré)
+    var sorted = sortRows(_filtered);
+    sorted.forEach(function(r, idx) {
+      var row = ws.addRow([
+        r.jour,
+        r.jourLabel,
+        r.horaire,
+        r.heurePrepa,
+        r.prepDur || '',
+        r.lieu,
+        r.atelier,
+        r.facs,
+        r.typeAtelier,
+        EQ_TYPE_LABELS[r.typeEq] || r.typeEq,
+        r.categorieEq,
+        r.nomEq,
+        r.qty
+      ]);
+      // Alternance couleur
+      if (idx % 2 === 1) {
+        row.eachCell(function(cell) {
+          cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFF7F8FA'} };
+        });
+      }
+      // Quantité en gras
+      row.getCell(13).font = { bold:true };
+      row.getCell(13).alignment = { horizontal:'center' };
+    });
+
+    // Largeurs colonnes
+    [16, 16, 12, 12, 14, 14, 32, 28, 24, 16, 22, 28, 8].forEach(function(w, i) {
+      ws.getColumn(i + 1).width = w;
+    });
+
+    // Auto-filtre sur toute la plage
+    ws.autoFilter = { from: 'A1', to: 'M1' };
+
+    // Feuille résumé par équipement
+    var wsSummary = wb.addWorksheet('Résumé par Équipement');
+    wsSummary.addRow(['Équipement', 'Type', 'Catégorie', 'Quantité Totale', 'Nb Ateliers']);
+    var summRow = wsSummary.getRow(1);
+    summRow.eachCell(function(cell) {
+      cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FF059669'} };
+      cell.font = { bold:true, color:{argb:'FFFFFFFF'}, size:11 };
+      cell.alignment = { vertical:'middle', horizontal:'center' };
+    });
+    summRow.height = 26;
+
+    // Agréger par équipement
+    var summMap = {};
+    sorted.forEach(function(r) {
+      var key = r.nomEq;
+      if (!summMap[key]) summMap[key] = { nom:r.nomEq, type:EQ_TYPE_LABELS[r.typeEq]||r.typeEq, cat:r.categorieEq, total:0, ateliers:new Set() };
+      summMap[key].total += r.qty;
+      summMap[key].ateliers.add(r.jour + '|' + r.atelier);
+    });
+    Object.values(summMap).sort(function(a,b){ return b.total - a.total; }).forEach(function(s, idx) {
+      var row = wsSummary.addRow([s.nom, s.type, s.cat, s.total, s.ateliers.size]);
+      if (idx % 2 === 1) {
+        row.eachCell(function(cell) {
+          cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFF7F8FA'} };
+        });
+      }
+      row.getCell(4).font = { bold:true };
+      row.getCell(4).alignment = { horizontal:'center' };
+      row.getCell(5).alignment = { horizontal:'center' };
+    });
+    [30, 16, 24, 16, 14].forEach(function(w, i) { wsSummary.getColumn(i+1).width = w; });
+    wsSummary.autoFilter = { from:'A1', to:'E1' };
+
+    // Générer et télécharger
+    var buf = await wb.xlsx.writeBuffer();
+    var blob = new Blob([buf], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'Besoins_Equipements_TM2026_' + new Date().toISOString().slice(0,10) + '.xlsx';
+    a.click();
+    URL.revokeObjectURL(a.href);
+    showToast('✅ Export Excel réussi !', 'ok');
+  } catch(err) {
+    showToast('❌ Erreur export : ' + err.message, 'err');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '📥 Export Excel';
+  }
+}
+window.exportExcel = exportExcel;
+
+// ════════════════════════════════════════════════════
+// UTILITAIRES UI
+// ════════════════════════════════════════════════════
+var toastTimer;
+function showToast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { el.className = ''; }, 3500);
+}
+
+function toggleMode() {
+  var isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+window.toggleMode = toggleMode;
+
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+    }).finally(function(){ location.reload(true); });
+  } else { location.reload(true); }
+}
+window.hardReload = hardReload;
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+buildFilters();
+renderTable();
+
+}); // fin loadData
+</script>
+</body>
+</html>
