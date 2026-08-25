@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Transform & Upload</title>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --success:#166534; --success-bg:#dcfce7; --success-bd:#86efac;
+    --danger:#dc2626; --danger-bg:#fef2f2; --danger-bd:#fca5a5;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); }
+  .wrap { max-width:900px; margin:0 auto; padding:28px 20px 60px; }
+
+  header { display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:32px; flex-wrap:wrap; gap:12px; }
+  .logo-badge { display:inline-block; background:var(--accent); color:#fff; font-size:10px; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; padding:3px 10px; border-radius:4px; margin-bottom:6px; }
+  .logo h1 { font-size:22px; font-weight:800; color:var(--accent); }
+  .logo p { font-size:12px; color:var(--muted); margin-top:2px; }
+  .btn-back { display:inline-flex; align-items:center; gap:6px; padding:6px 14px; background:var(--surface); border:1px solid var(--border); border-radius:20px; font-size:12px; font-weight:700; color:var(--text); text-decoration:none; }
+  .btn-back:hover { background:var(--border); }
+
+  /* ── SECTION CARD ── */
+  .section-card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:22px 24px; margin-bottom:20px; }
+  .section-title { font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+
+  /* ── DROP ZONE ── */
+  .drop-zone {
+    border: 2px dashed var(--border); border-radius:10px;
+    padding:32px 20px; text-align:center; cursor:pointer;
+    transition:border-color .15s, background .15s;
+    background:var(--bg);
+  }
+  .drop-zone:hover, .drop-zone.drag-over { border-color:var(--accent); background:#f0f7ff; }
+  .drop-zone-icon { font-size:32px; margin-bottom:8px; }
+  .drop-zone-label { font-size:14px; font-weight:600; color:var(--text); margin-bottom:4px; }
+  .drop-zone-sub { font-size:12px; color:var(--muted); }
+  .drop-zone input[type=file] { display:none; }
+
+  /* ── FILE LIST ── */
+  .file-list { margin-top:14px; display:flex; flex-direction:column; gap:8px; }
+  .file-item {
+    display:flex; align-items:center; gap:10px;
+    background:var(--bg); border:1px solid var(--border); border-radius:8px;
+    padding:10px 14px;
+  }
+  .file-item-icon { font-size:18px; flex-shrink:0; }
+  .file-item-info { flex:1; min-width:0; }
+  .file-item-name { font-size:13px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .file-item-meta { font-size:11px; color:var(--muted); margin-top:1px; }
+  .file-item-status { font-size:11px; font-weight:700; flex-shrink:0; }
+  .status-ok   { color:var(--success); }
+  .status-warn { color:#b45309; }
+  .status-err  { color:var(--danger); }
+  .btn-remove { cursor:pointer; background:none; border:none; color:var(--muted); font-size:16px; padding:2px 4px; border-radius:4px; flex-shrink:0; }
+  .btn-remove:hover { color:var(--danger); background:var(--danger-bg); }
+
+  /* ── PREVIEW TABLE ── */
+  .preview-wrap { overflow-x:auto; margin-top:14px; border:1px solid var(--border); border-radius:8px; }
+  .preview-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .preview-table th { background:var(--surface); color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.4px; padding:8px 12px; border-bottom:1px solid var(--border); white-space:nowrap; text-align:left; }
+  .preview-table td { padding:7px 12px; border-bottom:1px solid var(--border); vertical-align:top; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .preview-table tr:last-child td { border-bottom:none; }
+  .preview-table tr:nth-child(even) td { background:#fafafa; }
+  .cell-empty { color:#ccc; font-style:italic; }
+
+  /* ── ACTIONS ── */
+  .actions { display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+  .btn-generate { cursor:pointer; background:var(--accent); color:#fff; border:none; border-radius:8px; padding:11px 28px; font-size:14px; font-weight:700; font-family:inherit; display:inline-flex; align-items:center; gap:8px; }
+  .btn-generate:hover { filter:brightness(1.1); }
+  .btn-generate:disabled { opacity:.4; cursor:not-allowed; filter:none; }
+  .btn-clear { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:11px 18px; font-size:13px; color:var(--text); font-family:inherit; }
+  .btn-clear:hover { background:var(--border); }
+
+  /* ── RESULT ── */
+  .result-box { display:none; margin-top:20px; background:var(--success-bg); border:1px solid var(--success-bd); border-radius:10px; padding:16px 20px; }
+  .result-box.visible { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+  .result-filename { font-size:14px; font-weight:700; color:var(--success); }
+  .result-meta { font-size:12px; color:#4b5563; margin-top:2px; }
+  .btn-download { cursor:pointer; background:var(--success); color:#fff; border:none; border-radius:8px; padding:9px 20px; font-size:13px; font-weight:700; font-family:inherit; display:inline-flex; align-items:center; gap:7px; flex-shrink:0; }
+  .btn-download:hover { filter:brightness(1.1); }
+
+  /* ── TOAST ── */
+  .toast { position:fixed; bottom:24px; right:24px; z-index:999; padding:12px 20px; border-radius:10px; font-size:13px; font-weight:700; display:none; box-shadow:0 4px 20px rgba(0,0,0,.12); max-width:400px; }
+  .toast.show { display:block; animation:toastIn .2s ease; }
+  @keyframes toastIn { from { transform:translateY(8px); opacity:0; } to { transform:translateY(0); opacity:1; } }
+
+  /* ── STATS ── */
+  .stats-row { display:flex; gap:16px; flex-wrap:wrap; margin-bottom:14px; }
+  .stat-pill { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:6px 14px; font-size:12px; color:var(--muted); }
+  .stat-pill b { color:var(--text); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo">
+      <div class="logo-badge">Tantramour 2026 — Admin</div>
+      <h1>🔄 Transform & Upload</h1>
+      <p>Conversion des fiches animateurs → fichier logistique consolidé</p>
+    </div>
+    <a href="gestion_planning.html" class="btn-back">← Retour</a>
+  </header>
+
+  <!-- ÉTAPE 1 : Sélection des fichiers sources -->
+  <div class="section-card">
+    <div class="section-title">📂 Étape 1 — Fichiers sources (.xlsx)</div>
+
+    <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+      <div class="drop-zone-icon">📄</div>
+      <div class="drop-zone-label">Glisser-déposer les fichiers ici</div>
+      <div class="drop-zone-sub">ou cliquer pour sélectionner · Formats acceptés : .xlsx</div>
+      <input type="file" id="fileInput" accept=".xlsx" multiple>
+    </div>
+
+    <div class="file-list" id="fileList"></div>
+  </div>
+
+  <!-- ÉTAPE 2 : Prévisualisation -->
+  <div class="section-card" id="previewSection" style="display:none;">
+    <div class="section-title">👁 Étape 2 — Prévisualisation des données extraites</div>
+    <div class="stats-row" id="statsRow"></div>
+    <div class="preview-wrap">
+      <table class="preview-table" id="previewTable">
+        <thead id="previewHead"></thead>
+        <tbody id="previewBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ÉTAPE 3 : Génération -->
+  <div class="section-card">
+    <div class="section-title">💾 Étape 3 — Générer le fichier destination</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">
+      Le fichier sera nommé <code style="background:var(--border);padding:1px 6px;border-radius:4px;">Tantramour-Upload_Logistic_YYYY-MM-DD_HH-MM.xlsx</code>
+      et téléchargé dans votre navigateur.
+    </p>
+    <div class="actions">
+      <button class="btn-generate" id="btnGenerate" onclick="generer()" disabled>
+        ⬇️ Générer &amp; Télécharger
+      </button>
+      <button class="btn-clear" onclick="toutEffacer()">✕ Tout effacer</button>
+    </div>
+
+    <div class="result-box" id="resultBox">
+      <div>
+        <div class="result-filename" id="resultFilename"></div>
+        <div class="result-meta" id="resultMeta"></div>
+      </div>
+      <button class="btn-download" id="btnDownload">⬇️ Re-télécharger</button>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- SheetJS CDN -->
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<script>
+// ══════════════════════════════════════════════════════════════
+// MAPPING : label source (colonne B) → colonne destination
+// L'ordre des entrées définit l'ordre des colonnes de sortie.
+// ══════════════════════════════════════════════════════════════
+var DEST_COLUMNS = [
+  'ID',
+  'Atelier (FR)',
+  'Animateur 1',
+  'Animateur 2',
+  'Animateur 3',
+  'Animateur 4',
+  'Type',
+  'Date (DD/MM/YYYY)',
+  'Jour',
+  'Heure de début',
+  'Heure de fin',
+  'Lieu',
+  'Piment',
+  'Note',
+  'Workshop name (ENG)',
+  'Description (FR)',
+  'Description (ENG)',
+  'Instructions participants (FR)',
+  'Participant instructions (ENG)',
+  'Estimation préparation',
+  'Informations logistiques',
+  'Besoins logistiques spécifiques',
+  'Consignes HELPER – AVANT',
+  'Consignes HELPER – PENDANT',
+  'Consignes HELPER – APRES',
+  'Commentaire'
+];
+
+// Mapping : morceau de label source (colonne B) → colonne destination
+// Utilise un matching "contains" pour être robuste aux variations d'espaces/accents
+var SOURCE_MAP = [
+  { match: 'ID',                                dest: 'ID' },
+  { match: '[FR] Nom Atelier',                  dest: 'Atelier (FR)' },
+  { match: 'Animateur 1',                       dest: 'Animateur 1' },
+  { match: 'Animateur 2',                       dest: 'Animateur 2' },
+  { match: 'Animateur 3',                       dest: 'Animateur 3' },
+  { match: 'Animateur 4',                       dest: 'Animateur 4' },
+  { match: "Type d'atelier",                    dest: 'Type' },
+  { match: 'Date',                              dest: 'Date (DD/MM/YYYY)' },
+  { match: 'Jour',                              dest: 'Jour' },
+  { match: 'Heure de début',                    dest: 'Heure de début' },
+  { match: 'Heure de fin',                      dest: 'Heure de fin' },
+  { match: 'Lieu',                              dest: 'Lieu' },
+  { match: 'Piment',                            dest: 'Piment' },
+  { match: 'Note pour participants',            dest: 'Note' },
+  { match: '[ENG] Workshop name',               dest: 'Workshop name (ENG)' },
+  { match: '[FR] Description',                  dest: 'Description (FR)' },
+  { match: '[ENG] Description',                 dest: 'Description (ENG)' },
+  { match: '[FR] Instructions pour participants', dest: 'Instructions participants (FR)' },
+  { match: '[ENG] Instructions for participant',  dest: 'Participant instructions (ENG)' },
+  { match: 'Estimation',                        dest: 'Estimation préparation' },
+  { match: 'Besoins logistiques\n',             dest: 'Informations logistiques' },
+  { match: 'Besoins logistiques spécifiques',   dest: 'Besoins logistiques spécifiques' },
+  { match: 'AVANT',                             dest: 'Consignes HELPER – AVANT' },
+  { match: 'PENDANT',                           dest: 'Consignes HELPER – PENDANT' },
+  { match: 'APRES',                             dest: 'Consignes HELPER – APRES' },
+  { match: 'Commentaires',                      dest: 'Commentaire' },
+];
+
+// ══════════════════════════════════════════════════════════════
+// ÉTAT
+// ══════════════════════════════════════════════════════════════
+var _files   = [];   // { file, name, sheets: [{sheetName, rows}], status }
+var _rows    = [];   // lignes extraites et mappées, prêtes pour export
+var _lastBlob = null;
+var _lastFilename = '';
+
+// ══════════════════════════════════════════════════════════════
+// DROP ZONE
+// ══════════════════════════════════════════════════════════════
+var dropZone = document.getElementById('dropZone');
+var fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('dragover',  function(e) { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', function()  { dropZone.classList.remove('drag-over'); });
+dropZone.addEventListener('drop', function(e) {
+  e.preventDefault();
+  dropZone.classList.remove('drag-over');
+  handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener('change', function() { handleFiles(fileInput.files); fileInput.value=''; });
+
+function handleFiles(fileList) {
+  Array.from(fileList).forEach(function(f) {
+    if (!f.name.endsWith('.xlsx')) { toast('⚠️ Fichier ignoré (non .xlsx) : ' + f.name, true); return; }
+    // Éviter les doublons
+    if (_files.some(function(x) { return x.name === f.name; })) {
+      toast('⚠️ Déjà chargé : ' + f.name, true); return;
+    }
+    _files.push({ file:f, name:f.name, sheets:[], status:'loading' });
+    readXlsx(f, _files.length - 1);
+  });
+  renderFileList();
+}
+
+// ══════════════════════════════════════════════════════════════
+// LECTURE XLSX → extraction des données
+// ══════════════════════════════════════════════════════════════
+function readXlsx(file, idx) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      var wb = XLSX.read(e.target.result, { type:'array', cellDates:true });
+      var dataSheets = wb.SheetNames.filter(function(n) {
+        return n !== 'INSTRUCTIONS_READ ME';
+      });
+
+      if (dataSheets.length === 0) {
+        _files[idx].status = 'warn';
+        _files[idx].statusMsg = 'Aucune feuille de données (hors INSTRUCTIONS)';
+        renderFileList(); renderPreview(); return;
+      }
+
+      _files[idx].sheets = dataSheets.map(function(sName) {
+        var ws   = wb.Sheets[sName];
+        var data = XLSX.utils.sheet_to_json(ws, { header:1, defval:null, blankrows:false });
+        return { sheetName:sName, rawData:data };
+      });
+      _files[idx].status = 'ok';
+      _files[idx].statusMsg = dataSheets.length + ' atelier(s) trouvé(s)';
+    } catch(err) {
+      _files[idx].status = 'err';
+      _files[idx].statusMsg = 'Erreur lecture : ' + err.message;
+    }
+    renderFileList();
+    buildAllRows();
+    renderPreview();
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+// ══════════════════════════════════════════════════════════════
+// MAPPING : colonne B (label) → valeur colonne C
+// ══════════════════════════════════════════════════════════════
+function extractSheetRow(rawData) {
+  // rawData = tableau de lignes [[col0,col1,col2,...], ...]
+  // Structure source : col B = label (index 1), col C = valeur (index 2)
+  // On cherche les lignes où col B commence après la ligne de légende (~ligne 8+)
+
+  var labelMap = {}; // label → valeur
+  rawData.forEach(function(row) {
+    var label = row[1];
+    var val   = row[2];
+    if (label && String(label).trim()) {
+      labelMap[String(label).trim()] = (val !== null && val !== undefined) ? val : null;
+    }
+  });
+
+  // Résoudre le mapping
+  var destRow = {};
+  DEST_COLUMNS.forEach(function(col) { destRow[col] = null; });
+
+  SOURCE_MAP.forEach(function(m) {
+    // Cherche un label qui contient m.match
+    var found = null;
+    Object.keys(labelMap).forEach(function(lbl) {
+      if (found === null && lbl.indexOf(m.match) !== -1) {
+        found = labelMap[lbl];
+      }
+    });
+    if (found !== null && m.dest) {
+      destRow[m.dest] = found;
+    }
+  });
+
+  // Formater les heures (SheetJS les retourne comme dates Excel)
+  ['Heure de début', 'Heure de fin'].forEach(function(col) {
+    var v = destRow[col];
+    if (v instanceof Date) {
+      var hh = String(v.getUTCHours()).padStart(2,'0');
+      var mm = String(v.getUTCMinutes()).padStart(2,'0');
+      destRow[col] = hh + ':' + mm;
+    }
+  });
+
+  return destRow;
+}
+
+function buildAllRows() {
+  _rows = [];
+  _files.forEach(function(f) {
+    if (f.status !== 'ok') return;
+    f.sheets.forEach(function(s) {
+      var row = extractSheetRow(s.rawData);
+      row['_source'] = f.name + ' › ' + s.sheetName;
+      _rows.push(row);
+    });
+  });
+  document.getElementById('btnGenerate').disabled = (_rows.length === 0);
+}
+
+// ══════════════════════════════════════════════════════════════
+// RENDU LISTE FICHIERS
+// ══════════════════════════════════════════════════════════════
+function fmtSize(b) {
+  if (b < 1024) return b + ' o';
+  if (b < 1024*1024) return (b/1024).toFixed(1) + ' Ko';
+  return (b/1024/1024).toFixed(1) + ' Mo';
+}
+
+function renderFileList() {
+  var list = document.getElementById('fileList');
+  if (_files.length === 0) { list.innerHTML = ''; return; }
+  list.innerHTML = '';
+  _files.forEach(function(f, i) {
+    var statusCls = f.status === 'ok' ? 'status-ok' : f.status === 'warn' ? 'status-warn' : f.status === 'err' ? 'status-err' : 'status-warn';
+    var statusTxt = f.status === 'ok'  ? '✅ ' + (f.statusMsg||'OK')
+                  : f.status === 'warn'? '⚠️ ' + (f.statusMsg||'')
+                  : f.status === 'err' ? '❌ ' + (f.statusMsg||'Erreur')
+                  :                      '⏳ Lecture…';
+    var div = document.createElement('div');
+    div.className = 'file-item';
+    div.innerHTML =
+      '<div class="file-item-icon">📄</div>' +
+      '<div class="file-item-info">' +
+        '<div class="file-item-name" title="'+esc(f.name)+'">'+esc(f.name)+'</div>' +
+        '<div class="file-item-meta">'+fmtSize(f.file.size)+'</div>' +
+      '</div>' +
+      '<div class="file-item-status '+statusCls+'">'+statusTxt+'</div>' +
+      '<button class="btn-remove" onclick="retirerFichier('+i+')" title="Retirer">✕</button>';
+    list.appendChild(div);
+  });
+}
+
+function retirerFichier(i) {
+  _files.splice(i, 1);
+  buildAllRows();
+  renderFileList();
+  renderPreview();
+  window.retirerFichier = retirerFichier; // réexposer après rebuild
+}
+window.retirerFichier = retirerFichier;
+
+// ══════════════════════════════════════════════════════════════
+// PRÉVISUALISATION
+// ══════════════════════════════════════════════════════════════
+var PREVIEW_COLS = ['ID','Atelier (FR)','Type','Date (DD/MM/YYYY)','Heure de début','Heure de fin','Lieu','Animateur 1','_source'];
+var PREVIEW_LABELS = { '_source': 'Source' };
+
+function renderPreview() {
+  var section = document.getElementById('previewSection');
+  if (_rows.length === 0) { section.style.display = 'none'; return; }
+  section.style.display = '';
+
+  // Stats
+  var statsRow = document.getElementById('statsRow');
+  var nbFiles = _files.filter(function(f){ return f.status==='ok'; }).length;
+  statsRow.innerHTML =
+    '<div class="stat-pill"><b>'+nbFiles+'</b> fichier(s) chargé(s)</div>' +
+    '<div class="stat-pill"><b>'+_rows.length+'</b> atelier(s) extrait(s)</div>' +
+    '<div class="stat-pill"><b>'+DEST_COLUMNS.length+'</b> colonnes destination</div>';
+
+  // Tableau préview
+  var head = document.getElementById('previewHead');
+  var body = document.getElementById('previewBody');
+
+  head.innerHTML = '<tr>' + PREVIEW_COLS.map(function(c) {
+    return '<th>' + esc(PREVIEW_LABELS[c]||c) + '</th>';
+  }).join('') + '</tr>';
+
+  body.innerHTML = '';
+  _rows.forEach(function(row) {
+    var tr = document.createElement('tr');
+    tr.innerHTML = PREVIEW_COLS.map(function(c) {
+      var v = row[c];
+      if (v === null || v === undefined || v === '') return '<td class="cell-empty">–</td>';
+      return '<td title="'+esc(String(v))+'">'+esc(String(v))+'</td>';
+    }).join('');
+    body.appendChild(tr);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// GÉNÉRATION DU FICHIER DESTINATION
+// ══════════════════════════════════════════════════════════════
+function generer() {
+  if (_rows.length === 0) { toast('⚠️ Aucune donnée à exporter.', true); return; }
+
+  // Nom du fichier
+  var now = new Date();
+  var pad = function(n){ return String(n).padStart(2,'0'); };
+  var ts  = now.getFullYear()+'-'+pad(now.getMonth()+1)+'-'+pad(now.getDate())
+           +'_'+pad(now.getHours())+'-'+pad(now.getMinutes());
+  var filename = 'Tantramour-Upload_Logistic_'+ts+'.xlsx';
+
+  // Construire les données : entête + lignes
+  var wsData = [DEST_COLUMNS.slice()];  // ligne d'entête
+  _rows.forEach(function(row) {
+    var line = DEST_COLUMNS.map(function(col) {
+      var v = row[col];
+      return (v !== null && v !== undefined) ? v : '';
+    });
+    wsData.push(line);
+  });
+
+  // Créer le workbook
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.aoa_to_sheet(wsData);
+
+  // Largeurs de colonnes auto
+  var colWidths = DEST_COLUMNS.map(function(col, ci) {
+    var max = col.length;
+    _rows.forEach(function(row) {
+      var v = row[col];
+      if (v) { var l = String(v).split('\n')[0].length; if (l > max) max = l; }
+    });
+    return { wch: Math.min(max + 4, 60) };
+  });
+  ws['!cols'] = colWidths;
+
+  XLSX.utils.book_append_sheet(wb, ws, 'DESTINATION');
+
+  // Générer le blob
+  var wbout = XLSX.write(wb, { bookType:'xlsx', type:'array' });
+  var blob  = new Blob([wbout], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  _lastBlob     = blob;
+  _lastFilename = filename;
+
+  // Téléchargement navigateur
+  triggerDownload(blob, filename);
+
+  // Sauvegarder dans IMPORT via serveur local
+  saveToImport(blob, filename);
+
+  // Afficher le résultat
+  document.getElementById('resultFilename').textContent = '✅ ' + filename;
+  document.getElementById('resultMeta').textContent = _rows.length + ' atelier(s) · ' + DEST_COLUMNS.length + ' colonnes';
+  document.getElementById('btnDownload').onclick = function() { triggerDownload(_lastBlob, _lastFilename); };
+  var box = document.getElementById('resultBox');
+  box.classList.add('visible');
+
+  toast('✅ Fichier généré : ' + filename);
+}
+
+function triggerDownload(blob, filename) {
+  var url = URL.createObjectURL(blob);
+  var a   = document.createElement('a');
+  a.href  = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(function() { URL.revokeObjectURL(url); a.remove(); }, 1000);
+}
+
+// Sauvegarde via serveur Python local (POST /save-binary ou /save)
+function saveToImport(blob, filename) {
+  var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (!isLocal) return; // en production, seul le téléchargement navigateur est disponible
+
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    // Convertit en base64 pour POST JSON
+    var b64 = btoa(e.target.result);
+    fetch('http://localhost:3000/save-import', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ filename: filename, content_b64: b64 })
+    })
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (d.ok) toast('💾 Sauvegardé dans IMPORT/' + filename);
+      else      toast('⚠️ Téléchargé mais non sauvegardé dans IMPORT : ' + (d.error||''), true);
+    })
+    .catch(function(){ toast('⚠️ Téléchargé. Serveur local non disponible pour IMPORT.', true); });
+  };
+  reader.readAsBinaryString(blob);
+}
+
+// ══════════════════════════════════════════════════════════════
+// UTILITAIRES
+// ══════════════════════════════════════════════════════════════
+function toutEffacer() {
+  _files = []; _rows = []; _lastBlob = null; _lastFilename = '';
+  document.getElementById('fileList').innerHTML = '';
+  document.getElementById('previewSection').style.display = 'none';
+  document.getElementById('resultBox').classList.remove('visible');
+  document.getElementById('btnGenerate').disabled = true;
+}
+
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toast(msg, erreur) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.cssText = [
+    'position:fixed','bottom:24px','right:24px','z-index:999',
+    'padding:12px 20px','border-radius:10px','font-size:13px','font-weight:700',
+    'box-shadow:0 4px 20px rgba(0,0,0,.12)','max-width:400px',
+    'background:'+(erreur?'#fef2f2':'#dcfce7'),
+    'color:'+(erreur?'#dc2626':'#166534'),
+    'border:1px solid '+(erreur?'#fca5a5':'#86efac')
+  ].join(';');
+  t.classList.remove('show');
+  void t.offsetWidth;
+  t.classList.add('show');
+  setTimeout(function(){ t.classList.remove('show'); }, 5000);
+}
+</script>
+</body>
+</html>
