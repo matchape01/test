@@ -107,7 +107,40 @@
   .placeholder small { font-size: 12px; }
 
   footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+
+  /* ── MODULE NEWS ── */
+  .news-module { margin-top: 32px; }
+  .news-module-title {
+    font-size: 15px; font-weight: 700; color: var(--text);
+    padding-bottom: 10px; margin-bottom: 16px;
+    border-bottom: 2px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .news-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 12px; }
+  @media (max-width: 600px) { .news-form-row { grid-template-columns: 1fr; } }
+  .news-form-group { display: flex; flex-direction: column; gap: 5px; }
+  .news-form-group label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+  .news-form-group textarea { resize: vertical; min-height: 70px; width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 13px; background: var(--bg); color: var(--text); font-family: inherit; line-height: 1.55; }
+  .news-form-group textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px rgba(59,130,212,.12); }
+  .news-list { margin-top: 20px; }
+  .news-item {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 12px 16px; margin-bottom: 10px;
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .news-item-body { flex: 1; min-width: 0; }
+  .news-item-meta { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .news-item-text { font-size: 13px; color: var(--text); line-height: 1.5; }
+  .news-item-en { font-size: 12px; color: var(--muted); margin-top: 3px; font-style: italic; }
+  .news-item-actions { display: flex; gap: 6px; flex-shrink: 0; align-items: center; }
+  .btn-news-edit { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 5px; padding: 4px 10px; font-size: 12px; color: var(--text); font-family: inherit; }
+  .btn-news-edit:hover { background: var(--border); }
+  .btn-news-del { cursor: pointer; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 5px; padding: 4px 10px; font-size: 12px; color: #dc2626; font-family: inherit; }
+  .btn-news-del:hover { background: #fee2e2; }
+  .news-empty { text-align: center; color: var(--muted); font-size: 13px; padding: 20px; }
 </style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
 </head>
 <body>
 <script>
@@ -125,12 +158,13 @@
   <header>
     <div class="logo">
       <h1>Tantramour 2026</h1>
-      <p>Admin — Édition des ateliers</p>
+      <p data-i18n="admin_title">Admin — Édition des ateliers</p>
     </div>
     <div class="header-actions">
-      <button class="btn btn-primary" onclick="ouvrirNouvelAtelier()" style="font-size:13px;padding:7px 14px;">➕ Nouvel atelier</button>
-      <a class="btn-ghost" href="index.html">🏠 Home</a>
-      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+      <button class="btn btn-primary" onclick="ouvrirNouvelAtelier()" style="font-size:13px;padding:7px 14px;">➕ <span data-i18n="msg_ajouter">Ajouter</span></button>
+      <a class="btn-ghost" href="index_bis.html">🏠 <span data-i18n="nav_home">Home</span></a>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit" id="modeBtnText">Mode Nuit</span></button>
+      <button class="btn-ghost tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
     </div>
   </header>
 
@@ -205,13 +239,13 @@
           <input type="text" id="fAtelier" placeholder="Titre de l'atelier">
         </div>
 
-        <!-- Facilitateurs -->
+        <!-- Animateurs -->
         <div class="form-group">
-          <label>Facilitateur 1 <span class="role-f">F</span></label>
+          <label>Animateur 1 <span class="role-f">F</span></label>
           <select id="fFac1" class="form-select"><option value="">— Aucun —</option></select>
         </div>
         <div class="form-group">
-          <label>Facilitateur 2 <span class="role-f">F</span></label>
+          <label>Animateur 2 <span class="role-f">F</span></label>
           <select id="fFac2" class="form-select"><option value="">— Aucun —</option></select>
         </div>
 
@@ -234,11 +268,14 @@
           <label>Helper 3 <span class="role-h">H</span></label>
           <select id="fHelper3" class="form-select"><option value="">— Aucun —</option></select>
         </div>
+        <div class="form-group">
+          <label>Helper 4 <span class="role-h">H</span></label>
+          <select id="fHelper4" class="form-select"><option value="">— Aucun —</option></select>
+        </div>
 
         <!-- Angel -->
-        <div class="form-group">
-          <label>Angel <span class="role-a">A</span></label>
-          <select id="fAngel" class="form-select"><option value="">— Aucun —</option></select>
+        <div class="form-group" id="angelGroup">
+          <!-- Rempli dynamiquement par updateAngelField() -->
         </div>
 
         <!-- Note -->
@@ -269,6 +306,22 @@
           </div>
         </div>
 
+        <!-- Logistique Spéciale -->
+        <div class="form-group full">
+          <label style="color:#7c5cd8">⭐ Informations Logistiques Spéciales</label>
+          <div class="editor-toolbar" style="border-color:#c4b5fd">
+            <button onclick="fmtSpecial('bold')" title="Gras"><b>B</b></button>
+            <button onclick="fmtSpecial('italic')" title="Italique"><i>I</i></button>
+            <button onclick="fmtSpecial('underline')" title="Souligné"><u>U</u></button>
+            <div class="sep"></div>
+            <button onclick="fmtSpecial('insertUnorderedList')" title="Liste à puces">• Liste</button>
+            <button onclick="fmtSpecial('insertOrderedList')"   title="Liste numérotée">1. Liste</button>
+            <div class="sep"></div>
+            <button onclick="fmtSpecial('removeFormat')" title="Effacer la mise en forme">✕ Format</button>
+          </div>
+          <div id="fLogisticSpecialEditor" contenteditable="true" spellcheck="true" style="border-color:#c4b5fd;background:#f5f3ff"></div>
+        </div>
+
       </div>
     </div>
 
@@ -278,6 +331,35 @@
       <button class="btn btn-cancel" id="btnAnnuler" onclick="annulerChangements()">✖ Annuler</button>
       <button class="btn btn-danger" id="btnAnnulerNew" onclick="hideEdit()" style="display:none;">✖ Abandonner</button>
     </div>
+  </div>
+</div>
+
+<!-- ── MODULE NEWS ── -->
+<div class="wrap news-module" id="newsModuleWrap" style="display:none;">
+  <div class="news-module-title">📢 Gérer les News</div>
+
+  <div class="edit-card">
+    <div class="edit-card-title" id="newsFormTitle">✏️ Nouvelle news</div>
+    <div class="news-form-row">
+      <div class="news-form-group">
+        <label>Texte FR 🇫🇷</label>
+        <textarea id="nFr" placeholder="Texte en français…"></textarea>
+      </div>
+      <div class="news-form-group">
+        <label>Texte EN 🇬🇧</label>
+        <textarea id="nEn" placeholder="Text in English…"></textarea>
+      </div>
+    </div>
+    <div class="actions-bar">
+      <button class="btn btn-primary" onclick="publierNews()">📢 Publier</button>
+      <button class="btn btn-cancel" onclick="annulerEditionNews()">✖ Annuler</button>
+    </div>
+  </div>
+
+  <div class="news-list" id="newsList"></div>
+
+  <div class="actions-bar" style="margin-top:16px;">
+    <button class="btn btn-save-now" onclick="sauvegarderNews()">💾 Sauvegarder ref_news.js</button>
   </div>
 </div>
 
@@ -298,7 +380,6 @@
 <!-- ── TOAST ── -->
 <div class="toast" id="toast"></div>
 
-<footer><p>Made with IBM Bob</p></footer>
 
 <!-- ── RÉFÉRENTIELS + DONNÉES (via loader pour bypass cache GitHub Pages) ── -->
 <script src="github-api.js"></script>
@@ -307,7 +388,8 @@
 loadData([
   'ref_jours.js','ref_lieux.js','ref_types.js',
   'ref_resource_types.js','ref_ressources.js','ref_notes.js',
-  'logistics.js','data.js'
+  'logistics.js','logistics.special.js','data.js',
+  'ref_news.js'
 ], function() {
 // ════════════════════════════════════════════════
 // RÉFÉRENTIELS → SELECTS
@@ -326,13 +408,14 @@ populateSelect('selJour',   REF_JOURS,         'value', 'label');
 populateSelect('fJour',     REF_JOURS,         'value', 'label');
 populateSelect('fLieu',     REF_LIEUX,         'value', 'label');
 populateSelect('fType',     REF_TYPES,         'value', 'label');
-populateSelect('fFac1',       REF_FACILITATEURS, 'value', 'value');
-populateSelect('fFac2',       REF_FACILITATEURS, 'value', 'value');
+populateSelect('fFac1',       REF_ANIMATEURS, 'value', 'value');
+populateSelect('fFac2',       REF_ANIMATEURS, 'value', 'value');
 populateSelect('fTraduction', REF_TRADUCTEURS,   'value', 'value');
 populateSelect('fHelper1',    REF_HELPERS,       'value', 'value');
 populateSelect('fHelper2',    REF_HELPERS,       'value', 'value');
 populateSelect('fHelper3',    REF_HELPERS,       'value', 'value');
-populateSelect('fAngel',      REF_ANGELS,        'value', 'value');
+populateSelect('fHelper4',    REF_HELPERS,       'value', 'value');
+// fAngel sera peuplé dynamiquement — non pré-peuplé ici
 populateSelect('fNote',       REF_NOTES,         'value', 'value');
 
 // ════════════════════════════════════════════════
@@ -432,15 +515,19 @@ function chargerFormulaire(e) {
   setSelectVal('fFac2',       e.fac2       || '');
   setSelectVal('fTraduction', e.traduction || '');
   setSelectVal('fHelper1',    e.helper1    || '');
-  setSelectVal('fHelper2', e.helper2 || '');
-  setSelectVal('fHelper3', e.helper3 || '');
-  setSelectVal('fAngel',   e.angel   || '');
+  setSelectVal('fHelper2',    e.helper2    || '');
+  setSelectVal('fHelper3',    e.helper3    || '');
+  setSelectVal('fHelper4',    e.helper4    || '');
   setSelectVal('fNote', e.note || '');
+  updateAngelField(e.type, e.heure, e.jour, e.angel);
   // Charger le contenu logistique depuis LOGISTICS via logisticId
   const logId = e.logisticId || '';
   const logEntry = logId ? (LOGISTICS[logId] || null) : null;
   document.getElementById('fLogisticEditor').innerHTML = logEntry ? logEntry.html : '';
   document.getElementById('fLogisticId').textContent = logId || '(aucun)';
+  // Charger le contenu logistique spécial
+  const logSpecialEntry = logId && typeof LOGISTICS_SPECIAL !== 'undefined' ? (LOGISTICS_SPECIAL[logId] || null) : null;
+  document.getElementById('fLogisticSpecialEditor').innerHTML = logSpecialEntry ? logSpecialEntry.html : '';
 
   document.getElementById('editCardTitle').textContent =
     (e.heure ? e.heure + '  —  ' : '') + (e.atelier || 'Nouvel atelier');
@@ -454,7 +541,7 @@ function ouvrirNouvelAtelier() {
   currentIndex = null;
   // Vider le formulaire
   chargerFormulaire({ jour:'', date:'', heure:'', lieu:'', type:'', atelier:'',
-    fac1:'', fac2:'', traduction:'', helper1:'', helper2:'', helper3:'',
+    fac1:'', fac2:'', traduction:'', helper1:'', helper2:'', helper3:'', helper4:'',
     angel:'', note:'', logisticId:'' });
   document.getElementById('editCardTitle').textContent = 'Nouvel atelier';
   document.getElementById('editBadge').textContent     = 'NOUVEAU';
@@ -476,6 +563,10 @@ function fmtH(tag) {
   document.getElementById('fLogisticEditor').focus();
   document.execCommand('formatBlock', false, tag);
 }
+function fmtSpecial(cmd) {
+  document.getElementById('fLogisticSpecialEditor').focus();
+  document.execCommand(cmd, false, null);
+}
 
 // Génère un logisticId stable à partir du jour + atelier
 function genLogisticId(jour, atelier) {
@@ -494,6 +585,9 @@ function lireFormulaire() {
   const existingId = document.getElementById('fLogisticId').textContent.trim();
   const validId = (existingId && existingId !== '(aucun)') ? existingId : '';
   const logisticId = hasContent ? (validId || genLogisticId(jour, atelier)) : '';
+  // Contenu logistique spécial
+  const editorSpecialHtml = document.getElementById('fLogisticSpecialEditor').innerHTML.trim();
+  const hasSpecialContent = editorSpecialHtml && editorSpecialHtml !== '<br>' && editorSpecialHtml !== '<p><br></p>';
   return {
     jour, atelier,
     date:       document.getElementById('fDate').value.trim(),
@@ -506,17 +600,93 @@ function lireFormulaire() {
     helper1:    document.getElementById('fHelper1').value.trim(),
     helper2:    document.getElementById('fHelper2').value.trim(),
     helper3:    document.getElementById('fHelper3').value.trim(),
-    angel:      document.getElementById('fAngel').value.trim(),
+    helper4:    document.getElementById('fHelper4').value.trim(),
+    angel:      (document.getElementById('fType').value === 'ANGEL'
+                  ? (document.getElementById('fAngel') ? document.getElementById('fAngel').value.trim() : '')
+                  : resolveAngel(document.getElementById('fJour').value, document.getElementById('fHeure').value)),
     note:       document.getElementById('fNote').value.trim(),
     logisticId,
     _logisticHtml: hasContent ? editorHtml : '',
+    _logisticSpecialHtml: hasSpecialContent ? editorSpecialHtml : '',
   };
 }
 
-// Mise à jour automatique de la Date quand le Jour change
+// ════════════════════════════════════════════════
+// LOGIQUE ANGEL — résolution dynamique
+// ════════════════════════════════════════════════
+
+// Parse une heure "HH:MM" ou "H:MM" en minutes depuis minuit
+function parseHM(s) {
+  if (!s) return null;
+  const norm = String(s).replace(/\./g, ':').trim();
+  const m = norm.match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : null;
+}
+
+// Retourne le nom de l'angel dont le shift ANGEL chevauche (jour + heure)
+function resolveAngel(jour, heure) {
+  if (!jour || !heure) return '';
+  const norm = String(heure).replace(/\./g, ':').replace(/[–\u2013\u2014]/g, '-');
+  const parts = norm.split(/\s*-+\s*/);
+  const debut = parseHM(parts[0]);
+  let fin = parts[1] ? parseHM(parts[1]) : null;
+  if (debut === null) return '';
+  if (fin !== null && fin <= debut) fin += 24 * 60;
+  // Chercher le shift ANGEL du même jour qui couvre le milieu de l'atelier
+  const milieu = fin !== null ? (debut + fin) / 2 : debut + 1;
+  const shifts = SESSION.filter(s => s.type === 'ANGEL' && s.jour === jour && s.angel);
+  for (const s of shifts) {
+    const sn = String(s.heure).replace(/\./g, ':').replace(/[–\u2013\u2014]/g, '-');
+    const sp = sn.split(/\s*-+\s*/);
+    const sd = parseHM(sp[0]);
+    let sf = sp[1] ? parseHM(sp[1]) : null;
+    if (sd === null) continue;
+    if (sf !== null && sf <= sd) sf += 24 * 60;
+    if (sf === null) sf = sd + 180; // fallback 3h
+    if (milieu >= sd && milieu <= sf) return s.angel;
+  }
+  return '';
+}
+
+// Met à jour le groupe Angel selon le type de l'atelier
+function updateAngelField(type, heure, jour, storedAngel) {
+  const grp = document.getElementById('angelGroup');
+  if (!grp) return;
+  if (type === 'ANGEL') {
+    // Mode éditable : select peuplé avec REF_ANGELS
+    grp.innerHTML = `<label>Angel <span class="role-a">A</span></label>
+      <select id="fAngel" class="form-select"><option value="">— Aucun —</option></select>`;
+    populateSelect('fAngel', REF_ANGELS, 'value', 'value');
+    setSelectVal('fAngel', storedAngel || '');
+  } else {
+    // Mode lecture seule : affiche l'angel calculé
+    const resolved = resolveAngel(jour || document.getElementById('fJour').value,
+                                  heure || document.getElementById('fHeure').value);
+    grp.innerHTML = `<label>Angel <span class="role-a">A</span>
+        <span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:4px">(calculé automatiquement)</span></label>
+      <div style="padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--muted);font-size:13px;min-height:34px" id="fAngelReadonly">
+        ${resolved ? `<span class="pill pill-a" style="font-size:12px">${resolved}</span>` : '<em>Aucun shift Angel sur cette période</em>'}
+      </div>`;
+  }
+}
+
+// Recalculer l'angel quand le type ou l'heure change
+document.getElementById('fType').addEventListener('change', function() {
+  updateAngelField(this.value, document.getElementById('fHeure').value, document.getElementById('fJour').value, '');
+});
+document.getElementById('fHeure').addEventListener('change', function() {
+  const type = document.getElementById('fType').value;
+  if (type !== 'ANGEL') {
+    updateAngelField(type, this.value, document.getElementById('fJour').value, '');
+  }
+});
 document.getElementById('fJour').addEventListener('change', function() {
   const ref = REF_JOURS.find(j => j.value === this.value);
   if (ref) document.getElementById('fDate').value = ref.date;
+  const type = document.getElementById('fType').value;
+  if (type !== 'ANGEL') {
+    updateAngelField(type, document.getElementById('fHeure').value, this.value, '');
+  }
 });
 
 function hideEdit() {
@@ -593,11 +763,21 @@ async function confirmerValidation() {
   } else if (!e.logisticId) {
     // Si on a effacé le contenu, on peut laisser l'ancienne entrée — elle sera simplement non référencée
   }
+  // Mettre à jour LOGISTICS_SPECIAL en mémoire si du contenu spécial existe
+  if (e.logisticId && e._logisticSpecialHtml) {
+    if (typeof LOGISTICS_SPECIAL === 'undefined') window.LOGISTICS_SPECIAL = {};
+    LOGISTICS_SPECIAL[e.logisticId] = {
+      html: e._logisticSpecialHtml,
+      text: e._logisticSpecialHtml.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim(),
+      updatedAt: new Date().toISOString().slice(0,10)
+    };
+  }
 
-  // Sauvegarder les deux fichiers
-  const ok1 = await sauverFichier('data.js',     genererDataJs());
-  const ok2 = await sauverFichier('logistics.js', genererLogisticsJs());
-  if (ok1 && ok2) afficherToast('✅ data.js & logistics.js mis à jour — rechargez les rapports.');
+  // Sauvegarder les fichiers
+  const ok1 = await sauverFichier('data.js',              genererDataJs());
+  const ok2 = await sauverFichier('logistics.js',         genererLogisticsJs());
+  const ok3 = await sauverFichier('logistics.special.js', genererLogisticsSpecialJs());
+  if (ok1 && ok2 && ok3) afficherToast('✅ data.js, logistics.js & logistics.special.js mis à jour — rechargez les rapports.');
 }
 
 // ════════════════════════════════════════════════
@@ -633,12 +813,13 @@ function genererDataJs() {
  *   type       {string}  catégorie (ex: "ATELIERS TANTRA (AM)")
  *   atelier    {string}  nom de l'atelier / activité
  *   lieu       {string}  salle / espace (ex: "SHIVA", "CHENREZIG" …)
- *   fac1       {string}  Facilitateur principal
- *   fac2       {string}  Facilitateur secondaire
+ *   fac1       {string}  Animateur principal
+ *   fac2       {string}  Animateur secondaire
  *   traduction {string}  Langue / traducteur
  *   helper1    {string}  Helper 1
  *   helper2    {string}  Helper 2
  *   helper3    {string}  Helper 3
+ *   helper4    {string}  Helper 4
  *   angel      {string}  Angel
  *   note       {string}  Note logistique (ex: "Shift Colibri", "Atelier + long")
  */
@@ -653,7 +834,7 @@ const AGENDA = [`;
       const dateLabel = ref ? ref.date : e.date;
       section = `\n  // ─── ${e.jour} — ${dateLabel} ${'─'.repeat(Math.max(0, 60 - e.jour.length - dateLabel.length))}\n`;
     }
-    const line = `  {jour:"${esc(e.jour)}",date:"${esc(e.date)}",heure:"${esc(e.heure)}",type:"${esc(e.type)}",atelier:"${esc(e.atelier)}",lieu:"${esc(e.lieu)}",fac1:"${esc(e.fac1)}",fac2:"${esc(e.fac2)}",traduction:"${esc(e.traduction)}",helper1:"${esc(e.helper1)}",helper2:"${esc(e.helper2)}",helper3:"${esc(e.helper3)}",angel:"${esc(e.angel)}",note:"${esc(e.note)}",logisticId:"${esc(e.logisticId||'')}"},`;
+    const line = `  {jour:"${esc(e.jour)}",date:"${esc(e.date)}",heure:"${esc(e.heure)}",type:"${esc(e.type)}",atelier:"${esc(e.atelier)}",lieu:"${esc(e.lieu)}",fac1:"${esc(e.fac1)}",fac2:"${esc(e.fac2)}",traduction:"${esc(e.traduction)}",helper1:"${esc(e.helper1)}",helper2:"${esc(e.helper2)}",helper3:"${esc(e.helper3)}",helper4:"${esc(e.helper4||'')}",angel:"${esc(e.angel)}",note:"${esc(e.note)}",logisticId:"${esc(e.logisticId||'')}"},`;
     return section + line;
   }).join('\n');
 
@@ -661,17 +842,17 @@ const AGENDA = [`;
 ];
 
 /**
- * Convertit un objet AGENDA en tableau positionnel [14 colonnes]
+ * Convertit un objet AGENDA en tableau positionnel [15 colonnes]
  * identique au format RAW utilisé par les rapports.
  * Indice : [0]jour [1]date [2]heure [3]type [4]atelier [5]lieu
  *          [6]fac1 [7]fac2 [8]traduction [9]helper1 [10]helper2
- *          [11]helper3 [12]angel [13]note
+ *          [11]helper3 [12]helper4 [13]angel [14]note
  */
 function agendaToRaw(entries) {
   return entries.map(e => [
     e.jour, e.date, e.heure, e.type, e.atelier, e.lieu,
     e.fac1, e.fac2, e.traduction,
-    e.helper1, e.helper2, e.helper3,
+    e.helper1, e.helper2, e.helper3, e.helper4 || '',
     e.angel, e.note
   ]);
 }`;
@@ -703,6 +884,29 @@ function genererLogisticsJs() {
  */
 
 const LOGISTICS = {
+
+${entries}
+
+};
+`;
+}
+
+function genererLogisticsSpecialJs() {
+  const today = new Date().toISOString().slice(0,10);
+  const src = (typeof LOGISTICS_SPECIAL !== 'undefined') ? LOGISTICS_SPECIAL : {};
+  const entries = Object.entries(src).map(([id, entry]) => {
+    return `  "${escHtml(id)}": {\n    html: \`${escHtml(entry.html||'')}\`,\n    text: \`${escHtml(entry.text||'')}\`,\n    updatedAt: "${entry.updatedAt || today}"\n  }`;
+  }).join(',\n\n');
+  return `/**
+ * TANTRAMOUR 2026 — Informations Logistiques Spéciales (Supplémentaires)
+ * =======================================================================
+ * Fichier géré automatiquement par Admin.html.
+ * Ne pas modifier manuellement.
+ *
+ * Chaque entrée : { html, text, updatedAt }
+ */
+
+var LOGISTICS_SPECIAL = {
 
 ${entries}
 
@@ -745,6 +949,157 @@ window.fmt                 = fmt;
 window.fmtH                = fmtH;
 window.onJourChange        = onJourChange;
 window.onAtelierChange     = onAtelierChange;
+
+// ════════════════════════════════════════════════
+// MODULE NEWS
+// ════════════════════════════════════════════════
+
+// SESSION News en mémoire (copie de REF_NEWS)
+var NEWS_SESSION = (typeof REF_NEWS !== 'undefined' && Array.isArray(REF_NEWS))
+  ? REF_NEWS.map(function(n) { return Object.assign({}, n); })
+  : [];
+var _newsEditId = null; // null = nouvelle news, sinon id de la news en édition
+
+// Afficher le module
+document.getElementById('newsModuleWrap').style.display = '';
+
+// Rendu de la liste
+function renderNewsList() {
+  var list = document.getElementById('newsList');
+  if (NEWS_SESSION.length === 0) {
+    list.innerHTML = '<div class="news-empty">Aucune news pour l\'instant.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  // Afficher du plus récent au plus ancien
+  var sorted = NEWS_SESSION.slice().reverse();
+  sorted.forEach(function(n) {
+    var item = document.createElement('div');
+    item.className = 'news-item';
+    item.innerHTML =
+      '<div class="news-item-body">' +
+        '<div class="news-item-meta">' + (n.publishedAt || '') + (n.author ? ' — ' + n.author : '') + '</div>' +
+        '<div class="news-item-text">' + escHtmlText(n.fr || '') + '</div>' +
+        (n.en ? '<div class="news-item-en">' + escHtmlText(n.en) + '</div>' : '') +
+      '</div>' +
+      '<div class="news-item-actions">' +
+        '<button class="btn-news-edit" onclick="editerNews(\'' + n.id + '\')">✏️ Modifier</button>' +
+        '<button class="btn-news-del" onclick="supprimerNews(\'' + n.id + '\')">🗑</button>' +
+      '</div>';
+    list.appendChild(item);
+  });
+}
+
+function escHtmlText(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function genNewsId() {
+  // Format : NEWS_<timestamp>
+  return 'NEWS_' + Date.now();
+}
+
+function viderFormulaireNews() {
+  document.getElementById('nFr').value = '';
+  document.getElementById('nEn').value = '';
+  document.getElementById('newsFormTitle').textContent = '✏️ Nouvelle news';
+  _newsEditId = null;
+}
+
+function editerNews(id) {
+  var news = NEWS_SESSION.find(function(n) { return n.id === id; });
+  if (!news) return;
+  _newsEditId = id;
+  document.getElementById('nFr').value = news.fr || '';
+  document.getElementById('nEn').value = news.en || '';
+  document.getElementById('newsFormTitle').textContent = '✏️ Modifier : ' + (news.publishedAt || id);
+  document.getElementById('nFr').focus();
+  document.getElementById('newsModuleWrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function annulerEditionNews() {
+  viderFormulaireNews();
+}
+
+function supprimerNews(id) {
+  if (!confirm('Supprimer cette news ?')) return;
+  NEWS_SESSION = NEWS_SESSION.filter(function(n) { return n.id !== id; });
+  renderNewsList();
+}
+
+function publierNews() {
+  var fr = document.getElementById('nFr').value.trim();
+  var en = document.getElementById('nEn').value.trim();
+  if (!fr && !en) { afficherToast('⚠️ Le texte FR ou EN est obligatoire.', true); return; }
+
+  var now = new Date();
+  var pad = function(n) { return String(n).padStart(2, '0'); };
+  var publishedAt = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate())
+    + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+
+  if (_newsEditId) {
+    // Mise à jour
+    var idx = NEWS_SESSION.findIndex(function(n) { return n.id === _newsEditId; });
+    if (idx !== -1) {
+      NEWS_SESSION[idx].fr = fr;
+      NEWS_SESSION[idx].en = en;
+    }
+  } else {
+    // Nouvelle news
+    NEWS_SESSION.push({ id: genNewsId(), fr: fr, en: en, publishedAt: publishedAt, author: 'Admin' });
+  }
+  viderFormulaireNews();
+  renderNewsList();
+  afficherToast('✅ News ajoutée — pensez à cliquer 💾 Sauvegarder.');
+}
+
+function escNewsStr(s) {
+  return String(s||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\r?\n/g,'\\n');
+}
+
+function genNewsJs() {
+  var header =
+'/**\n' +
+' * TANTRAMOUR 2026 — News de la DreamTeam\n' +
+' * =======================================\n' +
+' * Fichier géré automatiquement par Admin.html.\n' +
+' * Ne pas modifier manuellement.\n' +
+' *\n' +
+' * Structure :\n' +
+' *   id          {string}  identifiant unique (ex: "NEWS_001")\n' +
+' *   fr          {string}  texte en français\n' +
+' *   en          {string}  texte en anglais\n' +
+' *   publishedAt {string}  date/heure de publication "YYYY-MM-DD HH:MM"\n' +
+' *   author      {string}  auteur de la news\n' +
+' */\n\n' +
+'var REF_NEWS = [\n';
+
+  var lines = NEWS_SESSION.map(function(n) {
+    return '  {id:"' + escNewsStr(n.id) + '",fr:"' + escNewsStr(n.fr) + '",en:"' + escNewsStr(n.en) + '",publishedAt:"' + escNewsStr(n.publishedAt) + '",author:"' + escNewsStr(n.author||'Admin') + '"}';
+  });
+
+  return header + lines.join(',\n') + '\n];\n';
+}
+
+async function sauvegarderNews() {
+  const content = genNewsJs();
+  try {
+    await githubSaveFile('ref_news.js', content);
+    afficherToast('✅ ref_news.js sauvegardé sur GitHub.');
+  } catch(e) {
+    afficherToast('❌ Sauvegarde impossible : ' + e.message, true);
+  }
+}
+
+// Exposer les fonctions news dans window
+window.publierNews        = publierNews;
+window.annulerEditionNews = annulerEditionNews;
+window.editerNews         = editerNews;
+window.supprimerNews      = supprimerNews;
+window.sauvegarderNews    = sauvegarderNews;
+
+// Afficher la liste initiale
+renderNewsList();
 
 }); // fin loadData
 </script>
