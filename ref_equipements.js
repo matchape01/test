@@ -65,5 +65,5 @@ var REF_EQUIPEMENTS = [
   { type: "Hameau", categorie: "Mobilier & aménagement", id: "EQ_NEW011", value: "Grande table pliante #1 (122 cm)", stock: 58, description: "Grande table pliante #1 (122 cm)", remarque: "Table grise pliante  (122cm/60cm/74cm hauteur)" },
   { type: "Tantramour", categorie: "Ambiance & décoration", id: "EQ_NEW02", value: "Encens", stock: 0, description: "Encens", remarque: "" },
   { type: "Tantramour", categorie: "Animation", id: "EQ_NEW03", value: "Masque", stock: 0, description: "Masque", remarque: "" },
-  { type: "Hameau", categorie: "Pratique", id: "EQ_EQVDS", value: "Equipement Test Vera", stock: "N/A", description: "Equipement Test Vera", remarque: "?" },
+  { type: "Hameau", categorie: "Divers", id: "EQ_NEW04", value: "VERA", stock: 0, description: "VERA", remarque: "" }
 ];
