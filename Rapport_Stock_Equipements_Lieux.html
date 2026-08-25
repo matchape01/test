@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Stock & Besoins Équipements par Lieu</title>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#0f766e; --accent-hover:#115e59;
+    --header-bg:#f0fdfa; --row-alt:#f8fafc;
+    --tag-bg:#eef2ff; --tag-text:#3b5bdb;
+    --ok:#16a34a; --ok-bg:#dcfce7; --ok-border:#86efac;
+    --warn:#ca8a04; --warn-bg:#fef9c3; --warn-border:#fef08a;
+    --danger:#dc2626; --danger-bg:#fee2e2; --danger-border:#fca5a5;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#2dd4bf; --accent-hover:#5eead4;
+    --header-bg:#042f2e; --row-alt:#161b22;
+    --tag-bg:#1c2a4a; --tag-text:#79a8ff;
+    --ok:#4ade80; --ok-bg:#052e16; --ok-border:#166534;
+    --warn:#facc15; --warn-bg:#2a1f00; --warn-border:#713f12;
+    --danger:#f87171; --danger-bg:#3b1010; --danger-border:#991b1b;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:13px; line-height:1.5; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
+  .wrap { max-width:1440px; margin:0 auto; padding:24px 20px 80px; }
+
+  /* ── HEADER ── */
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:20px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:18px; font-weight:700; }
+  .logo p  { font-size:22px; font-weight:800; color:var(--accent); line-height:1.2; margin-top:2px; }
+  .header-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:6px 12px; font-size:12px; font-weight:600; color:var(--text); font-family:inherit; display:inline-flex; align-items:center; gap:5px; text-decoration:none; transition:all .15s; white-space:nowrap; }
+  .btn:hover { background:var(--border); }
+  .btn-export { background:#166534; color:#fff; border-color:#166534; }
+  .btn-export:hover { filter:brightness(1.1); }
+
+  /* ── TABS ── */
+  .tabs { display:flex; gap:8px; margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:8px; flex-wrap:wrap; }
+  .tab-btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:8px 16px; font-size:13px; font-weight:600; color:var(--muted); font-family:inherit; transition:all .15s; }
+  .tab-btn:hover { color:var(--text); border-color:var(--text); }
+  .tab-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+
+  /* ── STATS BAR ── */
+  .stats-bar { display:flex; gap:12px; align-items:center; margin-bottom:16px; flex-wrap:wrap; }
+  .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 16px; min-width:120px; display:flex; flex-direction:column; align-items:center; }
+  .stat-val { font-size:20px; font-weight:800; color:var(--accent); }
+  .stat-lbl { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); }
+
+  /* ── FILTRES ── */
+  .filters-panel { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:12px 16px; margin-bottom:16px; }
+  .filters-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; align-items:flex-end; }
+  .filter-group { display:flex; flex-direction:column; gap:3px; }
+  .filter-label { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+  .filter-select, .filter-input { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:6px 10px; font-size:12px; color:var(--text); font-family:inherit; outline:none; }
+  .filter-select:focus, .filter-input:focus { border-color:var(--accent); }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x:auto; border:1px solid var(--border); border-radius:8px; background:var(--bg); margin-bottom:20px; }
+  table { width:100%; border-collapse:collapse; font-size:12px; }
+  thead th { background:var(--header-bg); padding:8px 10px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); border-bottom:2px solid var(--border); text-align:left; white-space:nowrap; cursor:pointer; user-select:none; }
+  thead th:hover { color:var(--accent); }
+  thead th.num, tbody td.num { text-align:center; font-variant-numeric:tabular-nums; }
+  tbody tr { border-bottom:1px solid var(--border); }
+  tbody tr:nth-child(even) { background:var(--row-alt); }
+  tbody tr:hover { background:rgba(15,118,110,.06); }
+  .dark tbody tr:hover { background:rgba(45,212,191,.08); }
+  tbody td { padding:7px 10px; vertical-align:middle; }
+
+  /* ── BADGES & STATUS ── */
+  .badge { display:inline-flex; align-items:center; gap:3px; padding:2px 6px; border-radius:4px; font-size:10px; font-weight:700; white-space:nowrap; }
+  .badge-h { background:#e0f2fe; color:#0369a1; }
+  .dark .badge-h { background:#0c2d48; color:#58a6ff; }
+  .badge-t { background:#f5f3ff; color:#6d28d9; }
+  .dark .badge-t { background:#1e1438; color:#a78bfa; }
+  .badge-a { background:#dcfce7; color:#166534; }
+  .dark .badge-a { background:#052e16; color:#4ade80; }
+  .badge-x { background:var(--surface); color:var(--muted); border:1px solid var(--border); }
+
+  .status-ok { color:var(--ok); font-weight:700; }
+  .status-warn { color:var(--warn); font-weight:700; }
+  .status-danger { color:var(--danger); font-weight:800; background:var(--danger-bg); border:1px solid var(--danger-border); padding:2px 6px; border-radius:4px; display:inline-block; }
+
+  .bar-container { width:100%; max-width:140px; background:var(--surface); border:1px solid var(--border); height:12px; border-radius:6px; overflow:hidden; position:relative; margin:0 auto; }
+  .bar-fill { height:100%; transition:width .3s; }
+  .bar-fill.ok { background:var(--ok); }
+  .bar-fill.warn { background:var(--warn); }
+  .bar-fill.danger { background:var(--danger); }
+
+  .empty { text-align:center; padding:36px; color:var(--muted); font-style:italic; }
+
+  /* ── DETAILS ROW ── */
+  .details-row td { background:var(--surface) !important; padding:12px 16px; border-bottom:2px solid var(--border); }
+  .details-table { width:100%; background:var(--bg); border:1px solid var(--border); border-radius:6px; }
+  .details-table th { background:var(--surface); padding:6px 10px; font-size:10px; }
+  .details-table td { padding:6px 10px; font-size:11px; }
+
+  footer { margin-top:40px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:11px; color:var(--muted); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <!-- ── HEADER ── -->
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>🏛️ Stock &amp; Besoins Équipements par Lieu</p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="index.html">🏠 Accueil</a>
+      <a class="btn" href="gestion_planning.html">⚙️ Admin</a>
+      <a class="btn" href="Rapport_Besoins_Equipements.html">🔩 Besoins Ateliers</a>
+      <button class="btn btn-export" onclick="exportExcel()">📥 Export Excel</button>
+      <button class="btn" onclick="document.body.classList.toggle('dark')">🌙 Mode Nuit</button>
+    </div>
+  </header>
+
+  <!-- ── STATS BAR ── -->
+  <div class="stats-bar" id="statsBar"></div>
+
+  <!-- ── ONGLETS DE VUE ── -->
+  <div class="tabs">
+    <button class="tab-btn active" id="tabSynthese" onclick="switchTab('synthese')">📊 Vue Synthèse (Stock vs Max demandé par Lieu)</button>
+    <button class="tab-btn" id="tabParLieu" onclick="switchTab('par_lieu')">🏛️ Vue Détaillée par Lieu / Salle</button>
+    <button class="tab-btn" id="tabConflits" onclick="switchTab('conflits')">⚠️ Alertes &amp; Conflits Simultanés</button>
+  </div>
+
+  <!-- ── FILTRES ── -->
+  <div class="filters-panel">
+    <div class="filters-grid">
+      <div class="filter-group">
+        <label class="filter-label">Recherche</label>
+        <input type="text" class="filter-input" id="fSearch" placeholder="Nom équipement, ID..." oninput="render()">
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Fournisseur</label>
+        <select class="filter-select" id="fType" onchange="render()">
+          <option value="">Tous les fournisseurs</option>
+          <option value="Hameau">Hameau</option>
+          <option value="Tantramour">Dreamteam</option>
+          <option value="Animateur">Animateur</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">Catégorie</label>
+        <select class="filter-select" id="fCat" onchange="render()"><option value="">Toutes les catégories</option></select>
+      </div>
+      <div class="filter-group" id="groupFilterLieu">
+        <label class="filter-label">Lieu / Salle</label>
+        <select class="filter-select" id="fLieu" onchange="render()"><option value="">Tous les lieux</option></select>
+      </div>
+      <div class="filter-group">
+        <label class="filter-label">État Stock</label>
+        <select class="filter-select" id="fStockState" onchange="render()">
+          <option value="">Tous les états</option>
+          <option value="deficit">⚠️ En dépassement / Conflit</option>
+          <option value="used">Utilisé dans les ateliers</option>
+          <option value="unused">Non utilisé</option>
+        </select>
+      </div>
+      <div class="filter-group" style="flex-direction:row;gap:6px;">
+        <button class="btn" style="width:100%" onclick="resetFilters()">✕ Réinitialiser</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CONTENU DU TABLEAU ── -->
+  <div class="table-wrap">
+    <div id="tableContent"></div>
+  </div>
+
+  <footer>Tantramour 2026 — Gestion Logistique &amp; Matériel</footer>
+</div>
+
+<!-- SCRIPTS DONNEES -->
+<script src="ref_lieux.js"></script>
+<script src="ref_jours.js"></script>
+<script src="loader.js"></script>
+
+<script>
+var CURRENT_TAB = 'synthese';
+var SORT = { col: 'nomEq', dir: 1 };
+var OPEN_ROWS = {};
+
+loadData(['data.js', 'logistics.js', 'ref_equipements.js', 'ref_equip_cat.js'], function() {
+
+  // ══════════════════════════════════════════════════════════════════
+  // CALCUL DES DONNEES
+  // ══════════════════════════════════════════════════════════════════
+  var JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+  function parseHeureMin(h) {
+    if (!h) return null;
+    var m = String(h).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+    return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : null;
+  }
+
+  function parsePlage(h) {
+    if (!h) return { start: 0, end: 0 };
+    var parts = h.split('-');
+    var s = parseHeureMin(parts[0]) || 0;
+    var e = parts[1] ? (parseHeureMin(parts[1]) || s + 120) : s + 120;
+    return { start: s, end: e };
+  }
+
+  // 1. Initialiser le dictionnaire des équipements
+  var EQ_MAP = {};
+  (typeof REF_EQUIPEMENTS !== 'undefined' ? REF_EQUIPEMENTS : []).forEach(function(eq) {
+    var st = eq.stock;
+    var stockNum = (st !== 'N/A' && st !== '' && st !== null && !isNaN(Number(st))) ? Number(st) : null;
+    EQ_MAP[eq.id] = {
+      id: eq.id,
+      value: eq.value || eq.id,
+      type: eq.type || 'Autre',
+      categorie: eq.categorie || 'Divers',
+      stock: stockNum,
+      stockRaw: eq.stock,
+      description: eq.description || '',
+      remarque: eq.remarque || '',
+      demandes: [],       // Liste de toutes les affectations { jour, horaire, lieu, atelier, facs, qty, start, end }
+      lieuxMax: {},       // { lieu: maxQtyDansCetteSalle }
+      lieuxTotal: {},     // { lieu: sommeQtyAteliers }
+      globalMaxInstant: 0 // Pic simultané max dans tout le festival au même moment
+    };
+  });
+
+  // 2. Parcourir AGENDA et LOGISTICS pour peupler les demandes
+  AGENDA.forEach(function(e) {
+    var eqs = null;
+    if (e.logisticId && typeof LOGISTICS !== 'undefined' && LOGISTICS[e.logisticId] && LOGISTICS[e.logisticId]._equipements) {
+      eqs = LOGISTICS[e.logisticId]._equipements;
+    }
+    if (!eqs && e._equipements && Object.keys(e._equipements).length > 0) {
+      eqs = e._equipements;
+    }
+    if (!eqs) return;
+
+    var plage = parsePlage(e.heure);
+    var facs = [e.fac1, e.fac2, e.fac3, e.fac4].filter(Boolean).join(', ');
+    var lieu = e.lieu || 'Non spécifié';
+
+    Object.keys(eqs).forEach(function(eqId) {
+      var qty = parseInt(eqs[eqId], 10);
+      if (!qty || qty <= 0) return;
+
+      if (!EQ_MAP[eqId]) {
+        EQ_MAP[eqId] = {
+          id: eqId,
+          value: eqId,
+          type: 'Autre',
+          categorie: 'Divers',
+          stock: null,
+          stockRaw: 'N/A',
+          description: '',
+          remarque: '',
+          demandes: [],
+          lieuxMax: {},
+          lieuxTotal: {},
+          globalMaxInstant: 0
+        };
+      }
+
+      EQ_MAP[eqId].demandes.push({
+        jour: e.jour || '',
+        horaire: e.heure || '',
+        start: plage.start,
+        end: plage.end,
+        lieu: lieu,
+        atelier: e.atelier || '',
+        facs: facs,
+        qty: qty
+      });
+
+      // Calcul max par lieu
+      EQ_MAP[eqId].lieuxMax[lieu] = Math.max(EQ_MAP[eqId].lieuxMax[lieu] || 0, qty);
+      EQ_MAP[eqId].lieuxTotal[lieu] = (EQ_MAP[eqId].lieuxTotal[lieu] || 0) + qty;
+    });
+  });
+
+  // 3. Calculer le pic simultané (conflit de créneau horaire) pour chaque équipement
+  Object.keys(EQ_MAP).forEach(function(eqId) {
+    var item = EQ_MAP[eqId];
+    if (item.demandes.length === 0) return;
+
+    // Regrouper par jour
+    var byJour = {};
+    item.demandes.forEach(function(d) {
+      if (!byJour[d.jour]) byJour[d.jour] = [];
+      byJour[d.jour].push(d);
+    });
+
+    var maxGlobal = 0;
+    Object.keys(byJour).forEach(function(j) {
+      var events = byJour[j];
+      // Pour chaque moment de début d'un atelier ce jour-là, calculer la somme des équipements en cours d'utilisation
+      events.forEach(function(target) {
+        var t = target.start + 1; // Un instant T pendant l'atelier
+        var currentUse = 0;
+        events.forEach(function(ev) {
+          if (ev.start <= t && ev.end >= t) {
+            currentUse += ev.qty;
+          }
+        });
+        if (currentUse > maxGlobal) maxGlobal = currentUse;
+      });
+    });
+
+    item.globalMaxInstant = maxGlobal;
+  });
+
+  // Exposer les données AVANT d'appeler render() et initFilterOptions()
+  window.EQ_DATA = EQ_MAP;
+
+  // Initialiser les options des filtres Catégorie et Lieux
+  initFilterOptions();
+
+  // Rendu initial
+  render();
+});
+
+// ══════════════════════════════════════════════════════════════════
+// GESTION DES FILTRES & TABS
+// ══════════════════════════════════════════════════════════════════
+function initFilterOptions() {
+  // Catégories
+  var catSel = document.getElementById('fCat');
+  var cats = new Set();
+  (typeof REF_EQUIP_CAT !== 'undefined' ? REF_EQUIP_CAT : []).forEach(function(c) { cats.add(c.value); });
+  Object.keys(window.EQ_DATA || {}).forEach(function(k) { cats.add(window.EQ_DATA[k].categorie); });
+  cats.forEach(function(c) {
+    if (c) catSel.innerHTML += '<option value="' + esc(c) + '">' + esc(c) + '</option>';
+  });
+
+  // Lieux
+  var lieuSel = document.getElementById('fLieu');
+  var lieux = new Set();
+  (typeof REF_LIEUX !== 'undefined' ? REF_LIEUX : []).forEach(function(l) { lieux.add(l.value); });
+  Object.keys(window.EQ_DATA || {}).forEach(function(k) {
+    Object.keys(window.EQ_DATA[k].lieuxMax || {}).forEach(function(l) { lieux.add(l); });
+  });
+  lieux.forEach(function(l) {
+    if (l) lieuSel.innerHTML += '<option value="' + esc(l) + '">' + esc(l) + '</option>';
+  });
+}
+
+function switchTab(tab) {
+  CURRENT_TAB = tab;
+  document.getElementById('tabSynthese').classList.toggle('active', tab === 'synthese');
+  document.getElementById('tabParLieu').classList.toggle('active', tab === 'par_lieu');
+  document.getElementById('tabConflits').classList.toggle('active', tab === 'conflits');
+
+  var groupLieu = document.getElementById('groupFilterLieu');
+  if (groupLieu) groupLieu.style.display = (tab === 'synthese') ? 'none' : 'flex';
+
+  render();
+}
+
+function resetFilters() {
+  document.getElementById('fSearch').value = '';
+  document.getElementById('fType').value = '';
+  document.getElementById('fCat').value = '';
+  document.getElementById('fLieu').value = '';
+  document.getElementById('fStockState').value = '';
+  render();
+}
+
+function sortBy(col) {
+  if (SORT.col === col) {
+    SORT.dir = -SORT.dir;
+  } else {
+    SORT.col = col;
+    SORT.dir = 1;
+  }
+  render();
+}
+
+function toggleRow(rowId) {
+  OPEN_ROWS[rowId] = !OPEN_ROWS[rowId];
+  render();
+}
+
+// ══════════════════════════════════════════════════════════════════
+// RENDU PRINCIPAL
+// ══════════════════════════════════════════════════════════════════
+function render() {
+  if (!window.EQ_DATA) return;
+
+  var q = (document.getElementById('fSearch').value || '').toLowerCase().trim();
+  var fType = document.getElementById('fType').value;
+  var fCat = document.getElementById('fCat').value;
+  var fLieu = document.getElementById('fLieu').value;
+  var fState = document.getElementById('fStockState').value;
+
+  var list = Object.keys(window.EQ_DATA).map(function(k) { return window.EQ_DATA[k]; });
+
+  // Filtrage
+  var filtered = list.filter(function(item) {
+    if (q && item.value.toLowerCase().indexOf(q) === -1 && item.id.toLowerCase().indexOf(q) === -1) return false;
+    if (fType && item.type !== fType) return false;
+    if (fCat && item.categorie !== fCat) return false;
+    if (fLieu && CURRENT_TAB !== 'synthese' && !item.lieuxMax[fLieu]) return false;
+
+    var isDeficit = (item.stock !== null && item.globalMaxInstant > item.stock);
+    var isUsed = item.demandes.length > 0;
+
+    if (fState === 'deficit' && !isDeficit) return false;
+    if (fState === 'used' && !isUsed) return false;
+    if (fState === 'unused' && isUsed) return false;
+
+    if (CURRENT_TAB === 'conflits' && !isDeficit) return false;
+
+    return true;
+  });
+
+  // Tri
+  filtered.sort(function(a, b) {
+    var va = a[SORT.col], vb = b[SORT.col];
+    if (va === undefined || va === null) va = (SORT.dir === 1 ? 'zzzz' : -9999);
+    if (vb === undefined || vb === null) vb = (SORT.dir === 1 ? 'zzzz' : -9999);
+    if (typeof va === 'number' && typeof vb === 'number') return SORT.dir * (va - vb);
+    return SORT.dir * String(va).localeCompare(String(vb), 'fr', { numeric: true });
+  });
+
+  // Calcul Stats
+  var totalEquip = list.length;
+  var totalDeficit = list.filter(function(i){ return i.stock !== null && i.globalMaxInstant > i.stock; }).length;
+  var totalUsed = list.filter(function(i){ return i.demandes.length > 0; }).length;
+
+  document.getElementById('statsBar').innerHTML =
+    '<div class="stat-card"><span class="stat-val">' + totalEquip + '</span><span class="stat-lbl">Équipements répertoriés</span></div>' +
+    '<div class="stat-card"><span class="stat-val" style="color:var(--ok)">' + totalUsed + '</span><span class="stat-lbl">Utilisés dans planning</span></div>' +
+    '<div class="stat-card"><span class="stat-val" style="color:' + (totalDeficit > 0 ? 'var(--danger)' : 'var(--ok)') + '">' + totalDeficit + '</span><span class="stat-lbl">Alertes Dépassement</span></div>' +
+    '<div class="stat-card"><span class="stat-val" style="color:var(--accent)">' + filtered.length + '</span><span class="stat-lbl">Lignes affichées</span></div>';
+
+  var container = document.getElementById('tableContent');
+
+  if (filtered.length === 0) {
+    container.innerHTML = '<div class="empty">Aucun équipement ne correspond aux filtres sélectionnés.</div>';
+    return;
+  }
+
+  // Obtenir la liste distincte de tous les lieux existants pour la vue Synthèse
+  var allLieux = [];
+  (typeof REF_LIEUX !== 'undefined' ? REF_LIEUX : []).forEach(function(l) { allLieux.push(l.value); });
+
+  if (CURRENT_TAB === 'synthese') {
+    renderSynthese(filtered, allLieux, container);
+  } else if (CURRENT_TAB === 'par_lieu') {
+    renderParLieu(filtered, fLieu, container);
+  } else if (CURRENT_TAB === 'conflits') {
+    renderConflits(filtered, container);
+  }
+}
+
+// ── VUE 1 : SYNTHÈSE GLOBALE ──
+function renderSynthese(items, allLieux, container) {
+  var html = '<table><thead><tr>' +
+    '<th onclick="sortBy(\'value\')">Équipement ' + sortIcon('value') + '</th>' +
+    '<th onclick="sortBy(\'type\')">Type ' + sortIcon('type') + '</th>' +
+    '<th onclick="sortBy(\'categorie\')">Catégorie ' + sortIcon('categorie') + '</th>' +
+    '<th class="num" onclick="sortBy(\'stock\')">Stock Global ' + sortIcon('stock') + '</th>' +
+    '<th class="num" onclick="sortBy(\'globalMaxInstant\')">Pic Simultané ' + sortIcon('globalMaxInstant') + '</th>' +
+    '<th class="num">Statut &amp; Jauge</th>' +
+    '<th style="text-align:center;">Répartition Max par Salle</th>' +
+    '<th>Actions</th>' +
+  '</tr></thead><tbody>';
+
+  items.forEach(function(item) {
+    var isDeficit = (item.stock !== null && item.globalMaxInstant > item.stock);
+    var pct = item.stock && item.stock > 0 ? Math.min(100, Math.round((item.globalMaxInstant / item.stock) * 100)) : (item.globalMaxInstant > 0 ? 100 : 0);
+    var barClass = isDeficit ? 'danger' : (pct >= 85 ? 'warn' : 'ok');
+
+    var typeBadge = badgeType(item.type);
+    var stockDisp = item.stock !== null ? '<strong>' + item.stock + '</strong>' : '<span style="color:var(--muted)">N/A</span>';
+    var maxDisp = item.globalMaxInstant > 0 ? '<strong>' + item.globalMaxInstant + '</strong>' : '<span style="color:var(--muted)">0</span>';
+
+    // Badges des salles
+    var sallesPills = Object.keys(item.lieuxMax).map(function(l) {
+      return '<span class="badge badge-x" style="font-size:11px;margin:2px;">📍 ' + esc(l) + ': <strong>' + item.lieuxMax[l] + '</strong></span>';
+    }).join(' ') || '<span style="color:var(--muted);font-style:italic;">Aucune demande</span>';
+
+    var isOpen = !!OPEN_ROWS[item.id];
+
+    html += '<tr>' +
+      '<td style="font-weight:700;">' + esc(item.value) + '<br><small style="font-family:monospace;color:var(--muted);font-weight:normal;">' + esc(item.id) + '</small></td>' +
+      '<td>' + typeBadge + '</td>' +
+      '<td><span class="badge badge-cat">' + esc(item.categorie) + '</span></td>' +
+      '<td class="num">' + stockDisp + '</td>' +
+      '<td class="num">' + (isDeficit ? '<span class="status-danger">⚠️ ' + item.globalMaxInstant + '</span>' : maxDisp) + '</td>' +
+      '<td class="num">' +
+        (item.stock !== null ?
+          '<div class="bar-container" title="' + pct + '% utilisé"><div class="bar-fill ' + barClass + '" style="width:' + pct + '%;"></div></div><small style="font-size:10px;color:var(--muted);">' + (isDeficit ? 'Déficit de ' + (item.globalMaxInstant - item.stock) : pct + '%') + '</small>' :
+          '<span style="color:var(--muted);font-size:11px;">Illimité</span>') +
+      '</td>' +
+      '<td>' + sallesPills + '</td>' +
+      '<td>' +
+        (item.demandes.length > 0 ? '<button class="btn" style="padding:3px 8px;font-size:11px;" onclick="toggleRow(\'' + esc(item.id) + '\')">' + (isOpen ? '▲ Masquer' : '▼ Détails (' + item.demandes.length + ')') + '</button>' : '') +
+      '</td>' +
+    '</tr>';
+
+    if (isOpen) {
+      html += renderDetailDemandesRow(item, 8);
+    }
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// ── VUE 2 : DÉTAILLÉE PAR LIEU ──
+function renderParLieu(items, filterLieu, container) {
+  var html = '<table><thead><tr>' +
+    '<th>Lieu / Salle</th>' +
+    '<th>Équipement</th>' +
+    '<th>Fournisseur</th>' +
+    '<th>Catégorie</th>' +
+    '<th class="num">Besoin Max dans ce Lieu</th>' +
+    '<th class="num">Stock Global</th>' +
+    '<th class="num">Pic Global Festival</th>' +
+    '<th>Ateliers concernés</th>' +
+  '</tr></thead><tbody>';
+
+  items.forEach(function(item) {
+    var lieuxList = Object.keys(item.lieuxMax);
+    if (filterLieu) lieuxList = lieuxList.filter(function(l){ return l === filterLieu; });
+
+    lieuxList.forEach(function(lieu) {
+      var maxLieu = item.lieuxMax[lieu];
+      var ateliersThisLieu = item.demandes.filter(function(d){ return d.lieu === lieu; });
+      var isDeficit = (item.stock !== null && item.globalMaxInstant > item.stock);
+
+      var ateliersListStr = ateliersThisLieu.map(function(d) {
+        return '<strong>' + esc(d.jour) + ' ' + esc(d.horaire) + '</strong> : ' + esc(d.atelier) + ' (Qté: ' + d.qty + ')';
+      }).join('<br>');
+
+      html += '<tr>' +
+        '<td style="font-weight:700;color:var(--accent);">📍 ' + esc(lieu) + '</td>' +
+        '<td style="font-weight:700;">' + esc(item.value) + '<br><small style="font-family:monospace;color:var(--muted);font-weight:normal;">' + esc(item.id) + '</small></td>' +
+        '<td>' + badgeType(item.type) + '</td>' +
+        '<td><span class="badge badge-cat">' + esc(item.categorie) + '</span></td>' +
+        '<td class="num"><strong style="font-size:14px;color:var(--accent);">' + maxLieu + '</strong></td>' +
+        '<td class="num">' + (item.stock !== null ? item.stock : 'N/A') + '</td>' +
+        '<td class="num">' + (isDeficit ? '<span class="status-danger">⚠️ ' + item.globalMaxInstant + '</span>' : item.globalMaxInstant) + '</td>' +
+        '<td style="font-size:11px;line-height:1.4;">' + ateliersListStr + '</td>' +
+      '</tr>';
+    });
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// ── VUE 3 : ALERTES ET CONFLITS ──
+function renderConflits(items, container) {
+  var html = '<table><thead><tr>' +
+    '<th>Équipement en dépassement</th>' +
+    '<th>Fournisseur</th>' +
+    '<th class="num">Stock Global</th>' +
+    '<th class="num">Pic Simultané Demandé</th>' +
+    '<th class="num">Manquant (Déficit)</th>' +
+    '<th>Salles &amp; Ateliers en Conflit</th>' +
+  '</tr></thead><tbody>';
+
+  items.forEach(function(item) {
+    var deficit = item.globalMaxInstant - (item.stock || 0);
+    html += '<tr>' +
+      '<td style="font-weight:700;color:var(--danger);">' + esc(item.value) + '<br><small style="font-family:monospace;color:var(--muted);">' + esc(item.id) + '</small></td>' +
+      '<td>' + badgeType(item.type) + '</td>' +
+      '<td class="num" style="font-size:14px;"><strong>' + item.stock + '</strong></td>' +
+      '<td class="num" style="font-size:14px;color:var(--danger);"><strong>' + item.globalMaxInstant + '</strong></td>' +
+      '<td class="num"><span class="status-danger" style="font-size:13px;">-' + deficit + '</span></td>' +
+      '<td>' +
+        '<div style="font-size:11px;line-height:1.5;">' +
+          item.demandes.map(function(d){
+            return '• <strong>' + esc(d.jour) + ' ' + esc(d.horaire) + '</strong> [' + esc(d.lieu) + '] : ' + esc(d.atelier) + ' — <strong>' + d.qty + ' unités</strong>';
+          }).join('<br>') +
+        '</div>' +
+      '</td>' +
+    '</tr>';
+  });
+
+  html += '</tbody></table>';
+  container.innerHTML = html;
+}
+
+// ── LIGNE EXPAND DETAILS DEMANDES ──
+function renderDetailDemandesRow(item, colspan) {
+  var rows = item.demandes.map(function(d) {
+    return '<tr>' +
+      '<td><strong>' + esc(d.jour) + '</strong></td>' +
+      '<td>' + esc(d.horaire) + '</td>' +
+      '<td><span class="badge badge-x">📍 ' + esc(d.lieu) + '</span></td>' +
+      '<td style="font-weight:600;">' + esc(d.atelier) + '</td>' +
+      '<td>' + esc(d.facs || '—') + '</td>' +
+      '<td class="num" style="font-weight:700;color:var(--accent);">' + d.qty + '</td>' +
+    '</tr>';
+  }).join('');
+
+  return '<tr class="details-row"><td colspan="' + colspan + '">' +
+    '<div style="font-weight:700;margin-bottom:8px;font-size:12px;color:var(--text);">📋 Détail des ateliers utilisant "' + esc(item.value) + '" :</div>' +
+    '<table class="details-table">' +
+      '<thead><tr><th>Jour</th><th>Horaire</th><th>Lieu</th><th>Atelier</th><th>Animateurs</th><th class="num">Quantité demandée</th></tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+    '</table>' +
+  '</td></tr>';
+}
+
+function badgeType(t) {
+  if (t === 'Hameau') return '<span class="badge badge-h">Hameau</span>';
+  if (t === 'Tantramour') return '<span class="badge badge-t">Dreamteam</span>';
+  if (t === 'Animateur') return '<span class="badge badge-a">Animateur</span>';
+  return '<span class="badge badge-x">' + esc(t || 'Autre') + '</span>';
+}
+
+function sortIcon(col) {
+  if (SORT.col !== col) return '<span style="opacity:.3">⇅</span>';
+  return SORT.dir === 1 ? '▲' : '▼';
+}
+
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════════════════════════════════
+// EXPORT EXCEL
+// ══════════════════════════════════════════════════════════════════
+async function exportExcel() {
+  if (typeof ExcelJS === 'undefined') {
+    alert('Erreur: Bibliothèque ExcelJS non disponible.');
+    return;
+  }
+  var workbook = new ExcelJS.Workbook();
+  workbook.creator = 'Tantramour 2026';
+  workbook.created = new Date();
+
+  // Feuille 1 : Synthèse par Équipement & Salle
+  var sheet1 = workbook.addWorksheet('Synthèse Équipements');
+  sheet1.columns = [
+    { header: 'ID', key: 'id', width: 14 },
+    { header: 'Équipement', key: 'nom', width: 28 },
+    { header: 'Fournisseur', key: 'type', width: 14 },
+    { header: 'Catégorie', key: 'cat', width: 20 },
+    { header: 'Stock Global', key: 'stock', width: 12 },
+    { header: 'Pic Simultané', key: 'pic', width: 14 },
+    { header: 'Statut', key: 'statut', width: 16 },
+    { header: 'Détail Salles (Max demandés)', key: 'salles', width: 45 }
+  ];
+
+  Object.keys(window.EQ_DATA).forEach(function(k) {
+    var item = window.EQ_DATA[k];
+    var isDeficit = (item.stock !== null && item.globalMaxInstant > item.stock);
+    var statut = isDeficit ? 'DÉPASSEMENT (-' + (item.globalMaxInstant - item.stock) + ')' : (item.demandes.length > 0 ? 'OK' : 'Non utilisé');
+    var sallesStr = Object.keys(item.lieuxMax).map(function(l){ return l + ': ' + item.lieuxMax[l]; }).join(' | ');
+
+    sheet1.addRow({
+      id: item.id,
+      nom: item.value,
+      type: item.type,
+      cat: item.categorie,
+      stock: item.stock !== null ? item.stock : 'N/A',
+      pic: item.globalMaxInstant,
+      statut: statut,
+      salles: sallesStr
+    });
+  });
+
+  // Feuille 2 : Détail complet des besoins par Atelier
+  var sheet2 = workbook.addWorksheet('Détail par Atelier');
+  sheet2.columns = [
+    { header: 'Jour', key: 'jour', width: 10 },
+    { header: 'Horaire', key: 'horaire', width: 14 },
+    { header: 'Lieu / Salle', key: 'lieu', width: 18 },
+    { header: 'Atelier', key: 'atelier', width: 30 },
+    { header: 'Animateurs', key: 'facs', width: 24 },
+    { header: 'ID Équipement', key: 'id', width: 14 },
+    { header: 'Nom Équipement', key: 'nom', width: 28 },
+    { header: 'Quantité demandée', key: 'qty', width: 16 }
+  ];
+
+  Object.keys(window.EQ_DATA).forEach(function(k) {
+    var item = window.EQ_DATA[k];
+    item.demandes.forEach(function(d) {
+      sheet2.addRow({
+        jour: d.jour,
+        horaire: d.horaire,
+        lieu: d.lieu,
+        atelier: d.atelier,
+        facs: d.facs,
+        id: item.id,
+        nom: item.value,
+        qty: d.qty
+      });
+    });
+  });
+
+  var buf = await workbook.xlsx.writeBuffer();
+  var blob = new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Tantramour_2026_Stock_Equipements_Par_Lieu_' + new Date().toISOString().slice(0,10) + '.xlsx';
+  a.click();
+}
+window.exportExcel = exportExcel;
+</script>
+</body>
+</html>
