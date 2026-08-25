@@ -23,7 +23,7 @@ var LOGISTICS_HELPERS = {
     avant: "",
     pendant: "",
     apres: "",
-    updatedAt: "2026-08-25 21:42"
+    updatedAt: "2026-08-24 01:21"
   },
 
   "JOUR2_ALICE___OUVERTURE__1_3____MASS": {
