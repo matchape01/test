@@ -1,17 +1,20 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tantramour 2026 — Charge de travail</title>
+<title data-i18n-title="r6_subtitle">Tantramour 2026 — Charge de travail — Helpers, Angels &amp; Traducteurs</title>
 <style>
   :root {
     --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
     --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
-    --header-bg: #f0f4fb;
+    /* Ligne NOM (même palette que Mon Planning V2) */
+    --header-bg: #1e40af; --header-tx: #ffffff;
+    /* Ligne JOUR (même palette que Mon Planning V2) */
+    --day-bg: #374151; --day-tx: #f9fafb;
     --helper-bg: #e0f2fe; --helper-border: #7dd3fc; --helper-text: #0369a1;
-    --angel-bg:  #fce7f3; --angel-border:  #f9a8d4; --angel-text:  #9d174d;
-    --trad-bg:   #fefce8; --trad-border:   #fde047; --trad-text:   #854d0e;
+    --angel-bg:  #fee2e2; --angel-border:  #fca5a5; --angel-text:  #dc2626;
+    --trad-bg:   #f5f3ff; --trad-border:   #c4b5fd; --trad-text:   #7c3aed;
     --green: #166534; --green-bg: #dcfce7; --green-border: #86efac;
     --orange: #c2410c; --orange-bg: #fff7ed; --orange-border: #fdba74;
     --red: #dc2626; --red-bg: #fef2f2; --red-border: #fca5a5;
@@ -20,10 +23,13 @@
   .dark {
     --bg: #0d1117; --surface: #161b22; --border: #30363d;
     --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
-    --header-bg: #1c2333;
+    /* Ligne NOM mode nuit */
+    --header-bg: #1e3a8a; --header-tx: #bfdbfe;
+    /* Ligne JOUR mode nuit */
+    --day-bg: #1f2937; --day-tx: #d1d5db;
     --helper-bg: #0c2d48; --helper-border: #1e4a8a; --helper-text: #7dd3fc;
-    --angel-bg:  #3b1030; --angel-border:  #9d174d; --angel-text:  #f9a8d4;
-    --trad-bg:   #1c1500; --trad-border:   #854d0e; --trad-text:   #fde047;
+    --angel-bg:  #2d0000; --angel-border:  #991b1b; --angel-text:  #f87171;
+    --trad-bg:   #1e1b4b; --trad-border:   #5b21b6; --trad-text:   #a78bfa;
     --green-bg: #052e16; --green-border: #166534;
     --orange-bg: #1c1000; --orange-border: #92400e;
     --red-bg: #2d0a0a; --red-border: #991b1b;
@@ -63,11 +69,11 @@
   .person-card { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
   .person-header {
     display: flex; align-items: center; gap: 14px; padding: 14px 18px;
-    background: var(--surface); flex-wrap: wrap; cursor: pointer;
+    background: var(--header-bg); flex-wrap: wrap; cursor: pointer;
   }
-  .person-header:hover { background: var(--border); }
-  .person-rank { font-size: 18px; font-weight: 800; color: var(--muted); min-width: 28px; }
-  .person-name { font-size: 15px; font-weight: 700; flex: 1; }
+  .person-header:hover { filter: brightness(1.08); }
+  .person-rank { font-size: 18px; font-weight: 800; color: rgba(255,255,255,.5); min-width: 28px; }
+  .person-name { font-size: 15px; font-weight: 700; flex: 1; color: var(--header-tx); }
   .person-role-badge {
     font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 99px;
     border: 1px solid; white-space: nowrap;
@@ -79,24 +85,35 @@
 
   .person-stats { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; margin-left: auto; }
   .stat-block { text-align: center; }
-  .stat-num   { font-size: 20px; font-weight: 800; line-height: 1; }
-  .stat-lbl   { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; }
-  .stat-num.h { color: var(--helper-text); }
-  .stat-num.a { color: var(--angel-text); }
-  .stat-num.t { color: var(--trad-text); }
+  .stat-num   { font-size: 20px; font-weight: 800; line-height: 1; color: rgba(255,255,255,.9); }
+  .stat-lbl   { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: rgba(255,255,255,.6); font-weight: 600; }
+  .stat-num.h { color: rgba(255,255,255,.9); }
+  .stat-num.a { color: rgba(255,255,255,.9); }
+  .stat-num.t { color: rgba(255,255,255,.9); }
 
   /* Barre de charge */
-  .load-bar-wrap { height: 6px; background: var(--border); border-radius: 3px; margin-top: 6px; min-width: 80px; }
+  .load-bar-wrap { height: 6px; background: rgba(255,255,255,.25); border-radius: 3px; margin-top: 6px; min-width: 80px; }
   .load-bar { height: 6px; border-radius: 3px; transition: width .4s; }
   .load-bar.low    { background: #16a34a; }
   .load-bar.medium { background: #f59e0b; }
   .load-bar.high   { background: #dc2626; }
 
-  /* Détail ateliers (collapsible) */
+  /* Détail ateliers (collapsible 2 niveaux) */
   .person-detail { display: none; padding: 0 18px 16px; }
   .person-detail.open { display: block; }
-  .detail-day { margin-top: 12px; }
-  .detail-day-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); margin-bottom: 6px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+  .detail-day { margin-top: 10px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .detail-day-label {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px;
+    color: #93c5fd; padding: 8px 14px;
+    background: var(--day-bg); cursor: pointer; user-select: none;
+  }
+  .detail-day-label:hover { filter: brightness(1.1); }
+  .detail-day-label-text { flex: 1; color: var(--day-tx); }
+  .detail-day-chevron { font-size: 12px; transition: transform .2s; color: #9ca3af; }
+  .detail-day.open .detail-day-chevron { transform: rotate(180deg); }
+  .detail-day-body { display: none; padding: 8px 12px 10px; }
+  .detail-day.open .detail-day-body { display: block; }
   .detail-row { display: flex; gap: 10px; align-items: flex-start; padding: 5px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
   .detail-row:last-child { border-bottom: none; }
   .detail-heure { font-size: 11px; color: var(--muted); min-width: 110px; white-space: nowrap; }
@@ -105,6 +122,35 @@
   .detail-dur { font-size: 11px; font-weight: 700; color: var(--muted); white-space: nowrap; background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 1px 6px; }
   .detail-dedupe { font-size: 10px; color: var(--muted); font-style: italic; }
   .day-dur-badge { margin-left: 10px; font-size: 11px; font-weight: 700; background: var(--accent); color: #fff; border-radius: 99px; padding: 1px 9px; vertical-align: middle; letter-spacing: .2px; }
+  /* ── Blocs rôle (Angel / Helper / Traducteur) ── */
+  /* Angel */
+  .angel-shift-block { margin: 6px 0; border: 1px solid var(--angel-border); border-radius: 8px; overflow: hidden; }
+  .angel-shift-header { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: var(--angel-bg); cursor: pointer; user-select: none; }
+  .angel-shift-header:hover { filter: brightness(.96); }
+  .angel-shift-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .5px; color: var(--angel-text); flex: 1; }
+  .angel-shift-heure { font-size: 12px; color: var(--angel-text); font-variant-numeric: tabular-nums; font-weight: 600; }
+  .angel-shift-dur   { font-size: 11px; font-weight: 700; background: var(--angel-text); color: #fff; border-radius: 99px; padding: 1px 10px; white-space: nowrap; }
+  .angel-shift-chevron { font-size: 12px; color: var(--angel-text); margin-left: 4px; transition: transform .2s; }
+  .angel-shift-block.open .angel-shift-chevron { transform: rotate(180deg); }
+  .angel-shift-ateliers { display: none; background: var(--bg); border-top: 1px solid var(--angel-border); }
+  .angel-shift-block.open .angel-shift-ateliers { display: block; }
+  .angel-shift-atelier-row { display: flex; gap: 10px; align-items: flex-start; padding: 5px 10px 5px 28px; border-bottom: 1px solid var(--border); flex-wrap: wrap; position: relative; }
+  .angel-shift-atelier-row::before { content: '└'; position: absolute; left: 12px; top: 5px; color: var(--angel-border); font-size: 13px; }
+  .angel-shift-atelier-row:last-child { border-bottom: none; }
+  /* Helper */
+  .helper-row-block { margin: 6px 0; border: 1px solid var(--helper-border); border-radius: 8px; overflow: hidden; }
+  .helper-row-header { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: var(--helper-bg); }
+  .helper-row-label  { font-size: 12px; font-weight: 700; color: var(--helper-text); flex: 1; }
+  .helper-row-heure  { font-size: 12px; color: var(--helper-text); font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  .helper-row-dur    { font-size: 11px; font-weight: 700; background: var(--helper-text); color: #fff; border-radius: 99px; padding: 1px 10px; margin-left: auto; white-space: nowrap; }
+  /* Traducteur */
+  .trad-row-block  { margin: 6px 0; border: 1px solid var(--trad-border); border-radius: 8px; overflow: hidden; }
+  .trad-row-header { display: flex; align-items: center; gap: 10px; padding: 8px 14px; background: var(--trad-bg); }
+  .trad-row-label  { font-size: 12px; font-weight: 700; color: var(--trad-text); flex: 1; }
+  .trad-row-heure  { font-size: 12px; color: var(--trad-text); font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+  .trad-row-dur    { font-size: 11px; font-weight: 700; background: var(--trad-text); color: #fff; border-radius: 99px; padding: 1px 10px; margin-left: auto; white-space: nowrap; }
+  /* Vue combinée (multi-rôle) : badge rôle dans le header */
+  .role-row-badge { font-size: 10px; font-weight: 700; padding: 1px 8px; border-radius: 99px; border: 1px solid; white-space: nowrap; }
 
   /* ── SECTION HARMONISATION ── */
   .section-title { font-size: 16px; font-weight: 700; margin: 36px 0 16px; padding-bottom: 10px; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 8px; }
@@ -140,88 +186,107 @@
   .sum-pill .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; margin-top: 2px; }
 
   footer { margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+
+  /* ── SCOPE NOTICE ── */
+  .scope-notice { display: flex; align-items: flex-start; gap: 12px; background: #fffbeb; border: 1px solid #fcd34d; border-radius: 10px; padding: 14px 18px; margin-bottom: 24px; }
+  .dark .scope-notice { background: #1c1500; border-color: #92400e; }
+  .scope-notice-icon { font-size: 22px; flex-shrink: 0; line-height: 1.4; }
+  .scope-notice-body { flex: 1; }
+  .scope-notice-title { font-size: 14px; font-weight: 800; color: #92400e; margin-bottom: 3px; }
+  .dark .scope-notice-title { color: #fbbf24; }
+  .scope-notice-text { font-size: 13px; color: #78350f; line-height: 1.6; }
+  .dark .scope-notice-text { color: #d97706; }
 </style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
 </head>
+<!-- i18n -->
 <body>
 <div class="wrap">
 
   <header>
     <div class="logo">
       <h1>Tantramour 2026</h1>
-      <p>Charge de travail — Helpers, Angels &amp; Traducteurs</p>
-      <small>Workload Analysis Report</small>
+      <p data-i18n="r6_subtitle">Charge de travail — Helpers, Angels &amp; Traducteurs</p>
+      <small data-i18n="r6_subtitle_small">Workload Analysis Report</small>
     </div>
     <div class="header-actions">
-      <a class="btn-ghost" href="index.html">🏠 Home</a>
-      <button class="btn-ghost" onclick="hardReload()">🔄 Refresh</button>
-      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 Mode Nuit</button>
+      <a class="btn-ghost" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="btn-ghost" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <a class="btn-ghost" href="gestion_planning.html" data-i18n="nav_admin">⚙️ Admin</a>
+      <button class="btn-ghost" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit">Mode Nuit</span></button>
+      <button class="mode-btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
     </div>
   </header>
 
   <!-- FILTRES -->
   <div class="filters">
     <div class="filter-group">
-      <label>Jour</label>
+      <label data-i18n="col_jour">Jour</label>
       <select id="filterJour" onchange="render()">
-        <option value="">Tous les jours</option>
+        <option value="" data-i18n="filter_tous_jours">Tous les jours</option>
       </select>
+    </div>
+    <div class="filter-group">
+      <label data-i18n="r6_filter_nom">Nom</label>
+      <select id="filterPersonne" onchange="render()">
+        <option value="" data-i18n="filter_toutes_pers">Toutes les personnes</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- SCOPE NOTICE -->
+  <div class="scope-notice">
+    <div class="scope-notice-icon">ℹ️</div>
+    <div class="scope-notice-body">
+      <div class="scope-notice-title" data-i18n="r6_scope_notice_title">Ce rapport couvre uniquement les rôles Helpers, Angels et Traducteurs</div>
+      <div class="scope-notice-text" data-i18n="r6_scope_notice_text">Les Animateurs ne sont pas inclus dans cette analyse de charge de travail.</div>
     </div>
   </div>
 
   <!-- ONGLETS -->
   <div class="tabs">
-    <button class="tab"          id="tab-h"  onclick="setTab('h')">🤝 Helpers</button>
-    <button class="tab"          id="tab-a"  onclick="setTab('a')">👼 Angels</button>
-    <button class="tab"          id="tab-t"  onclick="setTab('t')">🌐 Traducteurs</button>
-    <button class="tab active-s" id="tab-s"  onclick="setTab('s')">📊 Vue combinée</button>
-    <button class="tab"          id="tab-eq" onclick="openHarmony()">⚖️ Harmonisation</button>
+    <button class="tab"          id="tab-h"  onclick="setTab('h')">🤝 <span data-i18n="r6_tab_helpers">Helpers</span></button>
+    <button class="tab"          id="tab-a"  onclick="setTab('a')">👼 <span data-i18n="r6_tab_angels">Angels</span></button>
+    <button class="tab"          id="tab-t"  onclick="setTab('t')">🌐 <span data-i18n="r6_tab_traducteurs">Traducteurs</span></button>
+    <button class="tab active-s" id="tab-s"  onclick="setTab('s')">📊 <span data-i18n="r6_tab_combined">Vue combinée</span></button>
+    <button class="tab"          id="tab-eq" onclick="setTab('eq')">⚖️ <span data-i18n="r6_tab_harmony">Harmonisation</span></button>
   </div>
 
   <!-- SUMMARY -->
   <div class="summary-bar" id="summaryBar"></div>
 
-  <!-- LISTE PERSONNES -->
+  <!-- LISTE PERSONNES / HARMONISATION -->
   <div class="person-grid" id="personGrid"></div>
-
-  <!-- HARMONISATION — grille cachée, alimentée pour openHarmony() -->
-  <div id="harmonyGrid" style="display:none"></div>
 
 </div>
 
-<footer><p>Made with IBM Bob</p></footer>
 
 <script src="ref_jours.js"></script>
 <script src="loader.js"></script>
 <script>
-loadData(['data.js'], function() {
+loadData(['ref_ressources.js', 'data.js'], function() {
 
 // ════════════════════════════════════════════════
 // CONFIGURATION
 // ════════════════════════════════════════════════
 // Types d'ateliers pris en compte (exclut repas, prep, réunions internes)
 const TYPES_ACTIFS = new Set([
-  'ATELIERS TANTRA (AM)', 'ATELIERS TANTRA (PM)',
-  'ATELIER ARTISTIQUE (AM)', 'ATELIER ARTISTIQUE (PM)',
+  'ATELIERS TANTRA (Matin)', 'ATELIERS TANTRA (Apres-Midi)',
+  'ATELIER ARTISTIQUE (Matin)', 'ATELIER ARTISTIQUE (Apres-Midi)',
   'MEDITATION / YOGA', 'RASSEMBLEMENT',
-  'CEREMONIE & CONCERT', "REUNION D'EQUIPE",
+  'CEREMONIE & CONCERT',
   'LOVE TEMPLE', 'SUPPORT EMOTIONNEL',
-  'POOL PARTY', 'PREPA & LOGITICS',
-  'TANTRA CAFÉ & CONFERENCE',
-  'TANTRA CAFE & CONFERENCE',       // variante sans accent
-  'TANTRA CAF\u00C9 & CONFERENCE',  // É en unicode
-  'TEST',                            // entrées de test visibles dans data.js
+  'DJ Set', 'POOL PARTY',
+  'TANTRA CAFE', 'CONFERENCE',
+  'PREPA & LOGISTICS',
+  'REUNION',                        // ateliers de type réunion (helpers, trads, angels)
+  'SHIFT ANGEL',                    // nécessaire pour grouper les ateliers par shift angel
 ]);
 
-// Fonction utilitaire : normalise un type avant comparaison
-// (gère les problèmes d'encodage UTF-8 de data.js)
 function typeActif(type) {
-  if (!type) return false;
-  if (TYPES_ACTIFS.has(type)) return true;
-  // Normalise les caractères mal encodés (â€" → —, Ã‰ → É, etc.)
-  const norm = type.replace(/Ã‰/g, 'É').replace(/Ã©/g, 'é')
-                   .replace(/â€œ/g, '"').replace(/â€/g, '"')
-                   .replace(/Ã /g, 'à').replace(/Ã¨/g, 'è');
-  return TYPES_ACTIFS.has(norm);
+  return type ? TYPES_ACTIFS.has(type) : false;
 }
 
 const JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
@@ -273,6 +338,15 @@ function buildStats(jourFilter) {
     (jourFilter === '' || e.jour === jourFilter)
   );
 
+  // Helpers exclus des moyennes (mais toujours affichés) :
+  // ceux qui ont aussi un rôle colibri, manager ou admin dans REF_RESSOURCES
+  const EXCLUDED_ROLES = new Set(['colibri', 'manager', 'admin']);
+  const HELPERS_EXCLUS = new Set(
+    (typeof REF_RESSOURCES !== 'undefined' ? REF_RESSOURCES : [])
+      .filter(r => r.roles.includes('helper') && r.roles.some(role => EXCLUDED_ROLES.has(role)))
+      .map(r => r.value)
+  );
+
   // Map nom → { assignments: [{atelier, jour, heure, type, role}], ... }
   const helpers = {};
   const angels  = {};
@@ -284,13 +358,26 @@ function buildStats(jourFilter) {
     map[nom].push(entry);
   }
 
+  // Helpers et traducteurs : filtrés par TYPES_ACTIFS (pas de repas, réunions, etc.)
   filtered.forEach(e => {
     const base = { atelier: e.atelier, jour: e.jour, heure: e.heure, type: e.type, date: e.date };
     addTo(helpers, e.helper1,    { ...base, role: 'Helper' });
     addTo(helpers, e.helper2,    { ...base, role: 'Helper' });
     addTo(helpers, e.helper3,    { ...base, role: 'Helper' });
-    addTo(angels,  e.angel,      { ...base, role: 'Angel'  });
+    addTo(helpers, e.helper4,    { ...base, role: 'Helper' });
     addTo(trads,   e.traduction, { ...base, role: 'Traducteur' });
+  });
+
+  // Angels : collectés depuis TOUTES les entrées du jour (sans filtre typeActif),
+  // sauf les types sans intérêt pour la charge de travail.
+  const ANGEL_TYPES_EXCLUS = new Set(['REPAS & PAUSE', 'PREPA & LOGISTICS', "REUNION D'EQUIPE"]);
+  const allForAngel = AGENDA.filter(e =>
+    (jourFilter === '' || e.jour === jourFilter) &&
+    !ANGEL_TYPES_EXCLUS.has(e.type)
+  );
+  allForAngel.forEach(e => {
+    const base = { atelier: e.atelier, jour: e.jour, heure: e.heure, type: e.type, date: e.date };
+    addTo(angels, e.angel, { ...base, role: 'Angel' });
   });
 
   // Pour les angels : fusion des intervalles qui se chevauchent (interval merging)
@@ -401,7 +488,7 @@ function buildStats(jourFilter) {
     nom, role: 'Traducteur', ...computeAngelStats(list)
   })).sort((a, b) => b.minutes - a.minutes || b.count - a.count);
 
-  return { helperStats, angelStats, tradStats };
+  return { helperStats, angelStats, tradStats, helpersExclus: HELPERS_EXCLUS };
 }
 
 // ════════════════════════════════════════════════
@@ -422,8 +509,14 @@ function loadBar(count, max) {
 
 function renderPersonCard(person, rank, max, roleOverride) {
   const role = roleOverride || person.role;
-  const badgeCls = role === 'Helper' ? 'badge-h' : role === 'Angel' ? 'badge-a' : role === 'Traducteur' ? 'badge-t' : 'badge-b';
-  const statCls  = role === 'Helper' ? 'h' : role === 'Traducteur' ? 't' : 'a';
+  // Rôles distincts pour l'en-tête (gère les multi-rôles "Helper + Angel + Traducteur")
+  const ROLE_BADGE_CLS = { 'Helper': 'badge-h', 'Angel': 'badge-a', 'Traducteur': 'badge-t' };
+  const roleList = role ? role.split(' + ').map(r => r.trim()) : [role];
+  const headerBadges = roleList.map(r =>
+    `<span class="person-role-badge ${ROLE_BADGE_CLS[r] || 'badge-b'}">${r}</span>`
+  ).join('');
+  const badgeCls = ROLE_BADGE_CLS[roleList[0]] || 'badge-b';
+  const statCls  = roleList[0] === 'Helper' ? 'h' : roleList[0] === 'Traducteur' ? 't' : 'a';
   const id = 'card-' + person.nom.replace(/\W/g, '_');
 
   // Grouper les ateliers par jour
@@ -432,6 +525,59 @@ function renderPersonCard(person, rank, max, roleOverride) {
     if (!byDay[a.jour]) byDay[a.jour] = [];
     byDay[a.jour].push(a);
   });
+
+  // Rendu d'un atelier sous forme de bloc coloré selon le rôle
+  function rowHtml(a) {
+    const dur = parseDuration(a.heure);
+    const fmtDur = dur && !a.isDupe ? fmtMin(dur) : null;
+    const dupeHtml = a.isDupe ? ` <span class="detail-dedupe">${I18n.t('r6_deduplique')}</span>` : '';
+
+    // Déterminer le rôle effectif de cette ligne (pour vue combinée, a.role peut varier)
+    const r = a.role || role;
+    const isHelper = r === 'Helper';
+    const isTrad   = r === 'Traducteur';
+    const isAngel  = r === 'Angel';
+
+    if (isHelper) {
+      return `<div class="helper-row-block">
+        <div class="helper-row-header">
+          <span class="role-row-badge badge-h" style="flex-shrink:0">Helper</span>
+          <span class="helper-row-label">${a.atelier}${dupeHtml}</span>
+          <span class="helper-row-heure">${a.heure || '—'}</span>
+          ${fmtDur ? `<span class="helper-row-dur">${fmtDur}</span>` : ''}
+        </div>
+      </div>`;
+    }
+    if (isTrad) {
+      return `<div class="trad-row-block">
+        <div class="trad-row-header">
+          <span class="role-row-badge badge-t" style="flex-shrink:0">Traducteur</span>
+          <span class="trad-row-label">${a.atelier}${dupeHtml}</span>
+          <span class="trad-row-heure">${a.heure || '—'}</span>
+          ${fmtDur ? `<span class="trad-row-dur">${fmtDur}</span>` : ''}
+        </div>
+      </div>`;
+    }
+    if (isAngel) {
+      return `<div class="angel-shift-block">
+        <div class="angel-shift-header">
+          <span class="role-row-badge badge-a" style="flex-shrink:0">Angel</span>
+          <span class="angel-shift-label">${a.atelier}${dupeHtml}</span>
+          <span class="angel-shift-heure">${a.heure || '—'}</span>
+          ${fmtDur ? `<span class="angel-shift-dur">${fmtDur}</span>` : ''}
+        </div>
+      </div>`;
+    }
+    // Fallback multi-rôle inconnu
+    return `<div class="helper-row-block">
+      <div class="helper-row-header">
+        <span class="role-row-badge ${badgeCls}" style="flex-shrink:0">${r}</span>
+        <span class="helper-row-label">${a.atelier}${dupeHtml}</span>
+        <span class="helper-row-heure">${a.heure || '—'}</span>
+        ${fmtDur ? `<span class="helper-row-dur">${fmtDur}</span>` : ''}
+      </div>
+    </div>`;
+  }
 
   const detailHtml = JOUR_ORDER
     .filter(j => byDay[j])
@@ -448,24 +594,148 @@ function renderPersonCard(person, rank, max, roleOverride) {
       });
       const dayMin = merged.reduce((s, iv) => s + (iv.e - iv.s), 0);
 
-      const rows = byDay[j].map(a => {
-        const dur = parseDuration(a.heure);
-        return `
-        <div class="detail-row">
-          <span class="detail-heure">${a.heure || '—'}</span>
-          <span class="detail-atelier">${a.atelier}</span>
-          ${dur && !a.isDupe ? `<span class="detail-dur">${fmtMin(dur)}</span>` : ''}
-          <span class="detail-role ${badgeCls}">${a.role}</span>
-          ${a.isDupe ? '<span class="detail-dedupe">⟳ dédupliqué</span>' : ''}
-        </div>`;
-      }).join('');
+      // Tri chronologique pour tout le jour
+      const sorted = byDay[j].slice().sort((a, b) => {
+        const sa = parseInterval(a.heure); const sb = parseInterval(b.heure);
+        return (sa ? sa.s : 9999) - (sb ? sb.s : 9999);
+      });
 
-      return `<div class="detail-day">
-        <div class="detail-day-label">
-          ${j} — ${byDay[j][0].date}
-          ${dayMin ? `<span class="day-dur-badge">${fmtMin(dayMin)} comptabilisé${role === 'Angel' ? ' (net)' : ''}</span>` : ''}
+      let bodyHtml;
+
+      // Le rendu shift s'active si la personne a des SHIFT ANGEL ce jour-là
+      // (fonctionne aussi en vue combinée où role peut être "Helper + Angel")
+      const hasShifts = sorted.some(a => a.type === 'SHIFT ANGEL');
+
+      if (hasShifts) {
+        // ── Rendu spécial Angels : ordre chronologique global ──
+        // Les shifts angel contiennent les ateliers couverts indentés juste dessous,
+        // les ateliers hors-shift sont intercalés à leur position chronologique naturelle.
+        const shifts   = sorted.filter(a => a.type === 'SHIFT ANGEL');
+        const ateliers = sorted.filter(a => a.type !== 'SHIFT ANGEL');
+
+        // Source étendue : tous les ateliers du jour depuis AGENDA (pas seulement ceux de cet angel)
+        const AGENDA_SHIFT_EXCLUS = new Set(['REPAS & PAUSE', 'PREPA & LOGISTICS', "REUNION D'EQUIPE", 'SHIFT ANGEL']);
+        const allDayEntries = AGENDA.filter(e =>
+          e.jour === j &&
+          !AGENDA_SHIFT_EXCLUS.has(e.type)
+        );
+
+        // Rendu d'une ligne atelier indentée sous un shift
+        function shiftRowHtml(a) {
+          const dur = parseDuration(a.heure);
+          const angelLabel = (a.angel && a.angel !== person.nom)
+            ? `<span style="font-size:10px;color:var(--muted);margin-left:4px;">(${I18n.t('r6_angel_label')} ${a.angel})</span>`
+            : '';
+          return `<div class="angel-shift-atelier-row">
+            <span class="detail-heure">${a.heure || '—'}</span>
+            <span class="detail-atelier">${a.atelier}${angelLabel}</span>
+            ${dur ? `<span class="detail-dur">${fmtMin(dur)}</span>` : ''}
+          </div>`;
+        }
+
+        // Construire un bloc HTML pour un shift angel et ses ateliers couverts
+        function shiftBlockHtml(sh) {
+          const shIv = parseInterval(sh.heure);
+          const inside = shIv
+            ? allDayEntries.filter(a => {
+                const aIv = parseInterval(a.heure);
+                return aIv && aIv.s >= shIv.s && aIv.s < shIv.e;
+              }).sort((a, b) => {
+                const aIv = parseInterval(a.heure);
+                const bIv = parseInterval(b.heure);
+                if (aIv && bIv && aIv.s !== bIv.s) return aIv.s - bIv.s;
+                return (a.atelier || '').localeCompare(b.atelier || '', 'fr', { sensitivity: 'base' });
+              })
+            : [];
+          const shDur = shIv ? fmtMin(shIv.e - shIv.s) : '';
+          const shiftId = 'sh-' + id + '-' + j.replace(/\W/g,'_') + '-' + (shIv ? shIv.s : Math.random().toString(36).slice(2));
+          const nbAteliers = inside.length;
+          return `<div class="angel-shift-block" id="${shiftId}">
+            <div class="angel-shift-header" onclick="toggleShift('${shiftId}')">
+              <span class="role-row-badge badge-a" style="flex-shrink:0">Angel</span>
+              <span class="angel-shift-label">${sh.atelier || I18n.t('r6_shift_angel')}</span>
+              <span class="angel-shift-heure">${sh.heure || '—'}</span>
+              ${shDur ? `<span class="angel-shift-dur">${shDur}</span>` : ''}
+              ${nbAteliers ? `<span class="angel-shift-dur" style="margin-left:2px">${nbAteliers} atelier${nbAteliers > 1 ? 's' : ''}</span>` : ''}
+              <span class="angel-shift-chevron">▾</span>
+            </div>
+            <div class="angel-shift-ateliers">
+              ${inside.length
+                ? inside.map(shiftRowHtml).join('')
+                : `<div style="padding:6px 14px;font-size:12px;color:var(--muted);font-style:italic">${I18n.t('r6_aucun_atelier_creneau')}</div>`}
+            </div>
+          </div>`;
+        }
+
+        // Déterminer si un atelier est couvert par un shift
+        function isCoveredByShift(a) {
+          const aIv = parseInterval(a.heure);
+          if (!aIv) return false;
+          return shifts.some(sh => {
+            const shIv = parseInterval(sh.heure);
+            return shIv && aIv.s >= shIv.s && aIv.s < shIv.e;
+          });
+        }
+
+        // Construire la séquence chronologique globale :
+        // - ateliers hors-shift : affichés à leur position naturelle (rowHtml)
+        // - shifts : affichés à leur position + ateliers couverts indentés juste dessous
+        const freeAteliers = ateliers.filter(a => !isCoveredByShift(a));
+
+        // Mélanger shifts + ateliers libres dans l'ordre chrono
+        const anchors = [...shifts, ...freeAteliers].sort((a, b) => {
+          const sa = parseInterval(a.heure); const sb = parseInterval(b.heure);
+          return (sa ? sa.s : 9999) - (sb ? sb.s : 9999);
+        });
+
+        bodyHtml = anchors.map(a =>
+          a.type === 'SHIFT ANGEL' ? shiftBlockHtml(a) : rowHtml(a)
+        ).join('');
+      } else {
+        // ── Rendu standard (Helpers / Traducteurs) ──
+        bodyHtml = sorted.map(rowHtml).join('');
+      }
+
+      const dayId = 'day-' + id + '-' + j.replace(/\W/g, '_');
+      // Rôles uniques du jour
+      const dayRoles = [...new Set(byDay[j].map(a => a.role).filter(Boolean))];
+      const ROLE_BADGE = { 'Helper': 'badge-h', 'Angel': 'badge-a', 'Traducteur': 'badge-t' };
+      const dayRoleBadges = dayRoles.map(r =>
+        `<span class="role-row-badge ${ROLE_BADGE[r] || 'badge-b'}">${r}</span>`
+      ).join('');
+      // Pour les Angels (et traducteurs) : compter les blocs temporels fusionnés du jour,
+      // pas le nombre brut d'assignments (un shift qui couvre plusieurs ateliers simultanés = 1 seul bloc)
+      const isAngelOrTrad = byDay[j].every(a => a.role === 'Angel' || a.role === 'Traducteur');
+      let nbJour;
+      if (isAngelOrTrad && merged.length > 0) {
+        nbJour = merged.length; // nombre de blocs temporels distincts après interval merging
+      } else {
+        nbJour = byDay[j].filter(a => {
+          // Pour les angels en vue combinée, exclure les ateliers couverts par un shift
+          if (a.role === 'Angel' || a.role === 'Traducteur') {
+            const aIv = parseInterval(a.heure);
+            if (!aIv) return true;
+            // Exclure si ce créneau est strictement contenu dans un plus long du même jour
+            return !byDay[j].some(other => {
+              if (other === a) return false;
+              const oIv = parseInterval(other.heure);
+              return oIv && oIv.s <= aIv.s && oIv.e >= aIv.e && (oIv.e - oIv.s) > (aIv.e - aIv.s);
+            });
+          }
+          return true;
+        }).length;
+      }
+      return `<div class="detail-day" id="${dayId}">
+        <div class="detail-day-label" onclick="toggleDay('${dayId}')">
+          <span class="detail-day-label-text">${j} — ${byDay[j][0].date}</span>
+          ${dayRoleBadges}
+          ${dayMin ? `<span class="day-dur-badge">${fmtMin(dayMin)} ${role === 'Angel' ? I18n.t('r6_comptabilise_net') : I18n.t('r6_comptabilise')}</span>` : ''}
+          <span class="angel-shift-dur" style="background:var(--muted)">${nbJour} ${nbJour > 1 ? I18n.t('r6_ateliers_pl') : I18n.t('r6_atelier')}</span>
+          <span class="detail-day-chevron">▾</span>
         </div>
-        ${rows}
+        <div class="detail-day-body">
+          ${bodyHtml}
+        </div>
       </div>`;
     }).join('');
 
@@ -474,19 +744,19 @@ function renderPersonCard(person, rank, max, roleOverride) {
       <div class="person-header" onclick="toggleDetail('${id}')">
         <div class="person-rank">#${rank}</div>
         <div class="person-name">${person.nom}</div>
-        <span class="person-role-badge ${badgeCls}">${role}</span>
+        ${headerBadges}
         <div class="person-stats">
           <div class="stat-block">
             <div class="stat-num ${statCls}">${person.count}</div>
-            <div class="stat-lbl">ateliers</div>
+            <div class="stat-lbl" data-i18n="r6_ateliers">ateliers</div>
             ${loadBar(person.count, max)}
           </div>
           <div class="stat-block">
             <div class="stat-num ${statCls}">${fmtMin(person.minutes)}</div>
-            <div class="stat-lbl">durée totale</div>
+            <div class="stat-lbl" data-i18n="r6_duree_totale">durée totale</div>
           </div>
         </div>
-        <span style="color:var(--muted);font-size:16px;margin-left:8px;">▾</span>
+        <span style="color:rgba(255,255,255,.6);font-size:16px;margin-left:8px;">▾</span>
       </div>
       <div class="person-detail" id="detail-${id}">
         ${detailHtml}
@@ -499,13 +769,19 @@ function toggleDetail(id) {
   if (d) d.classList.toggle('open');
 }
 
+function toggleDay(dayId) {
+  const el = document.getElementById(dayId);
+  if (el) el.classList.toggle('open');
+}
+
 // ════════════════════════════════════════════════
 // HARMONISATION
 // ════════════════════════════════════════════════
-function buildHarmony(helperStats, angelStats, tradStats) {
+function buildHarmony(helperStats, angelStats, tradStats, helpersExclus) {
   const cards = [];
+  const _helpersExclus = helpersExclus || new Set();
 
-  // Personnes exclues des suggestions de redistribution (facilitateurs, personnes non substituables)
+  // Personnes exclues des suggestions de redistribution (animateurs, personnes non substituables)
   const EXCLUDED_FROM_SUGGESTIONS = new Set([
     'Amana (William Duplain)',
     'Paul Raj Amar',
@@ -516,7 +792,8 @@ function buildHarmony(helperStats, angelStats, tradStats) {
   ]);
 
   // Helpers actifs (non exclus, ayant au moins une affectation)
-  const helperActifs = helperStats.filter(p => !EXCLUDED_FROM_SUGGESTIONS.has(p.nom) && p.minutes > 0);
+  // Exclut aussi les colibri/manager/admin (même règle que la summary bar)
+  const helperActifs = helperStats.filter(p => !EXCLUDED_FROM_SUGGESTIONS.has(p.nom) && !_helpersExclus.has(p.nom) && p.minutes > 0);
   const angelActifs  = angelStats.filter(p  => !EXCLUDED_FROM_SUGGESTIONS.has(p.nom) && p.minutes > 0);
   const tradActifs   = tradStats.filter(p   => !EXCLUDED_FROM_SUGGESTIONS.has(p.nom) && p.minutes > 0);
 
@@ -546,15 +823,15 @@ function buildHarmony(helperStats, angelStats, tradStats) {
   addGlobal(tradStats,    'Traducteur');
 
   const allGlobal = Object.values(globalLoad);
-  // Pour la moyenne, exclure les personnes non substituables (même liste que EXCLUDED_FROM_SUGGESTIONS)
-  const allGlobalForAvg = allGlobal.filter(p => !EXCLUDED_FROM_SUGGESTIONS.has(p.nom));
+  // Pour la moyenne, exclure les personnes non substituables ET les colibri/manager/admin
+  const allGlobalForAvg = allGlobal.filter(p => !EXCLUDED_FROM_SUGGESTIONS.has(p.nom) && !_helpersExclus.has(p.nom));
   const AVG_GLOBAL = allGlobalForAvg.reduce((s, p) => s + p.count, 0) / (allGlobalForAvg.length || 1);
   const AVG_GLOBAL_min = allGlobalForAvg.reduce((s, p) => s + p.minutes, 0) / (allGlobalForAvg.length || 1);
 
   function globalNote(nom) {
     const g = globalLoad[nom];
     if (!g || g.roles.length <= 1) return '';
-    return ` <em style="font-size:11px;color:var(--muted);">(charge globale : ${g.count} ateliers — ${g.roles.join(' + ')})</em>`;
+    return ` <em style="font-size:11px;color:var(--muted);">(${I18n.t('r6_charge_globale')} ${g.count} ${I18n.t('r6_ateliers')} — ${g.roles.join(' + ')})</em>`;
   }
 
   // ════════════════════════════════════════════════
@@ -592,8 +869,8 @@ function buildHarmony(helperStats, angelStats, tradStats) {
       return `
         <tr style="background:var(--surface)">
           <td colspan="5" style="font-size:12px;font-weight:700;padding:10px 8px 4px;color:${colorVar}">
-            ${label} &nbsp;·&nbsp; Moyenne : <strong>${fmtMin(Math.round(avg_min))}</strong>
-            &nbsp;<span style="font-size:11px;font-weight:400;color:var(--muted)">Fourchette cible : ${lo} – ${hi}</span>
+            ${label} &nbsp;·&nbsp; ${I18n.t('r6_h_moy')} <strong>${fmtMin(Math.round(avg_min))}</strong>
+            &nbsp;<span style="font-size:11px;font-weight:400;color:var(--muted)">${I18n.t('r6_h_fourchette')} ${lo} – ${hi}</span>
           </td>
         </tr>
         ${rows}`;
@@ -608,22 +885,19 @@ function buildHarmony(helperStats, angelStats, tradStats) {
         cat: 'global',
         cls: '',
         icon: '🎯',
-        title: 'Objectif d\'équilibre — Heures moyennes par catégorie',
+        title: I18n.t('r6_h_objectif_title'),
         body: `
-          <p style="font-size:13px;color:var(--muted);margin-bottom:12px">
-            Ce tableau montre, pour chaque personne, son total d'heures par rapport à la moyenne de sa catégorie.
-            L'objectif est que chacun se trouve dans la <strong>fourchette ±20%</strong> autour de la moyenne.
-          </p>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:12px">${I18n.t('r6_h_objectif_body')}</p>
           <table class="redist-table" style="margin-top:6px">
-            <thead><tr><th>Nom</th><th style="text-align:center">Heures</th><th style="text-align:center">% moy.</th><th>Écart</th><th>Charge</th></tr></thead>
+            <thead><tr><th>${I18n.t('r6_h_col_nom')}</th><th style="text-align:center">${I18n.t('r6_h_col_heures')}</th><th style="text-align:center">${I18n.t('r6_h_col_pctmoy')}</th><th>${I18n.t('r6_h_col_ecart')}</th><th>${I18n.t('r6_h_col_charge')}</th></tr></thead>
             <tbody>${hRows}${aRows}${tRows}</tbody>
           </table>
           <p style="margin-top:10px;font-size:11px;color:var(--muted);">
-            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc2626;margin-right:4px"></span>Surchargé (&gt;140%)&nbsp;&nbsp;
-            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f59e0b;margin-right:4px"></span>Au-dessus (&gt;115%)&nbsp;&nbsp;
-            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#16a34a;margin-right:4px"></span>Dans la cible (80–115%)&nbsp;&nbsp;
-            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#3b82f6;margin-right:4px"></span>Sous la moy. (&lt;75%)&nbsp;&nbsp;
-            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#9333ea;margin-right:4px"></span>Très peu chargé (&lt;50%)
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc2626;margin-right:4px"></span>${I18n.t('r6_h_legend_overload')}&nbsp;&nbsp;
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f59e0b;margin-right:4px"></span>${I18n.t('r6_h_legend_above')}&nbsp;&nbsp;
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#16a34a;margin-right:4px"></span>${I18n.t('r6_h_legend_target')}&nbsp;&nbsp;
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#3b82f6;margin-right:4px"></span>${I18n.t('r6_h_legend_below')}&nbsp;&nbsp;
+            <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#9333ea;margin-right:4px"></span>${I18n.t('r6_h_legend_light')}
           </p>`
       });
     }
@@ -670,9 +944,9 @@ function buildHarmony(helperStats, angelStats, tradStats) {
       const aP = angelStats.find(x => x.nom === g.nom);
       const tP = tradStats.find(x => x.nom === g.nom);
       const parts = [];
-      if (hP) parts.push(`${hP.count} atelier${hP.count > 1 ? 's' : ''} · ${fmtMin(hP.minutes)} helper`);
-      if (aP) parts.push(`${aP.count} bloc${aP.count > 1 ? 's' : ''} · ${fmtMin(aP.minutes)} angel`);
-      if (tP) parts.push(`${tP.count} atelier${tP.count > 1 ? 's' : ''} · ${fmtMin(tP.minutes)} trad.`);
+      if (hP) parts.push(`${hP.count} ${hP.count > 1 ? I18n.t('r6_ateliers_pl') : I18n.t('r6_atelier')} · ${fmtMin(hP.minutes)} ${I18n.t('r6_helper_label')}`);
+      if (aP) parts.push(`${aP.count} ${aP.count > 1 ? I18n.t('r6_blocs_uniques') : I18n.t('r6_net')} · ${fmtMin(aP.minutes)} ${I18n.t('r6_angel_role')}`);
+      if (tP) parts.push(`${tP.count} ${tP.count > 1 ? I18n.t('r6_ateliers_pl') : I18n.t('r6_atelier')} · ${fmtMin(tP.minutes)} ${I18n.t('r6_trad_label')}`);
       const detail = parts.length > 1
         ? `<br><span style="font-size:10px;color:var(--muted)">${parts.join(' + ')}</span>`
         : `<br><span style="font-size:10px;color:var(--muted)">${parts[0] || ''}</span>`;
@@ -689,29 +963,29 @@ function buildHarmony(helperStats, angelStats, tradStats) {
       </tr>`;
     }).join('');
 
-    cards.push({
+    cards.unshift({
       cat: 'global',
       cls: '',
       icon: '📊',
-      title: 'Classement global — Heures totales (Helper + Angel + Traducteur)',
+      title: I18n.t('r6_classement_title'),
       body: `
-        <div class="avg-bar">
-          <div class="avg-pill"><strong style="color:var(--helper-text)">${fmtMin(Math.round(AVG_H_min))}</strong>Moy. helpers</div>
-          <div class="avg-pill"><strong style="color:var(--angel-text)">${fmtMin(Math.round(AVG_A_min))}</strong>Moy. angels</div>
-          ${AVG_T_min > 0 ? `<div class="avg-pill"><strong style="color:var(--trad-text)">${fmtMin(Math.round(AVG_T_min))}</strong>Moy. traducteurs</div>` : ''}
-          <div class="avg-pill"><strong style="color:var(--accent)">${fmtMin(Math.round(AVG_GLOBAL_min))}</strong>Moy. globale</div>
-        </div>
-        <table class="redist-table" style="margin-top:10px">
-          <thead><tr><th>Nom</th><th>Rôles</th><th>Ateliers</th><th>Durée totale</th><th>Écart moy. globale</th><th>Charge</th></tr></thead>
-          <tbody>${rows}</tbody>
-        </table>
-        <p style="margin-top:10px;font-size:11px;color:var(--muted);">
-          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc2626;margin-right:4px"></span>Surchargé (&gt;140% moy.)&nbsp;&nbsp;
-          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f59e0b;margin-right:4px"></span>Au-dessus (&gt;115%)&nbsp;&nbsp;
-          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#16a34a;margin-right:4px"></span>Dans la cible&nbsp;&nbsp;
-          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#3b82f6;margin-right:4px"></span>Sous la moy. (&lt;75%)&nbsp;&nbsp;
-          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#9333ea;margin-right:4px"></span>Très peu chargé (&lt;50%)
-        </p>`
+      <div class="avg-bar">
+        <div class="avg-pill"><strong style="color:var(--helper-text)">${fmtMin(Math.round(AVG_H_min))}</strong>${I18n.t('r6_moy_helpers')}</div>
+        <div class="avg-pill"><strong style="color:var(--angel-text)">${fmtMin(Math.round(AVG_A_min))}</strong>${I18n.t('r6_moy_angels')}</div>
+        ${AVG_T_min > 0 ? `<div class="avg-pill"><strong style="color:var(--trad-text)">${fmtMin(Math.round(AVG_T_min))}</strong>${I18n.t('r6_moy_traducteurs')}</div>` : ''}
+        <div class="avg-pill"><strong style="color:var(--accent)">${fmtMin(Math.round(AVG_GLOBAL_min))}</strong>${I18n.t('r6_moy_globale')}</div>
+      </div>
+      <table class="redist-table" style="margin-top:10px">
+        <thead><tr><th>${I18n.t('r6_h_col_nom')}</th><th>${I18n.t('r6_col_roles')}</th><th>${I18n.t('r6_col_ateliers')}</th><th>${I18n.t('r6_col_duree')}</th><th>${I18n.t('r6_col_ecart_global')}</th><th>${I18n.t('r6_h_col_charge')}</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <p style="margin-top:10px;font-size:11px;color:var(--muted);">
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#dc2626;margin-right:4px"></span>${I18n.t('r6_h_legend_overload')}&nbsp;&nbsp;
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#f59e0b;margin-right:4px"></span>${I18n.t('r6_h_legend_above')}&nbsp;&nbsp;
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#16a34a;margin-right:4px"></span>${I18n.t('r6_h_legend_target')}&nbsp;&nbsp;
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#3b82f6;margin-right:4px"></span>${I18n.t('r6_h_legend_below')}&nbsp;&nbsp;
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#9333ea;margin-right:4px"></span>${I18n.t('r6_h_legend_light')}
+      </p>`
     });
   }
 
@@ -799,7 +1073,7 @@ function buildHarmony(helperStats, angelStats, tradStats) {
           const candHtml = [
             ...candUnder.map(c => {
               const gain = fmtMin(Math.round(AVG_H_min - c.minutes));
-              return `<span style="color:#16a34a;font-weight:600">${c.nom}</span> <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)} — sous la moy. de ${gain}</span>`;
+              return `<span style="color:#16a34a;font-weight:600">${c.nom}</span> <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)} — ${I18n.t('r6_sous_moy_de')} ${gain}</span>`;
             }),
             ...candOther.slice(0, 2).map(c => {
               return `${c.nom} <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)}</span>`;
@@ -810,8 +1084,8 @@ function buildHarmony(helperStats, angelStats, tradStats) {
             <td class="col-atelier">${atelier.jour}<br><span style="font-weight:400;color:var(--muted);font-size:11px">${atelier.heure}</span></td>
             <td style="font-weight:600">${atelier.atelier}</td>
             <td class="col-actuel">${overP.nom}<br>
-              <span style="font-size:10px;font-weight:400;color:var(--muted)">${fmtMin(overP.minutes)} total</span><br>
-              <span style="font-size:10px;color:#dc2626">+${ecartOver} vs moy.</span>
+              <span style="font-size:10px;font-weight:400;color:var(--muted)">${fmtMin(overP.minutes)} ${I18n.t('r6_total')}</span><br>
+              <span style="font-size:10px;color:#dc2626">+${ecartOver} ${I18n.t('r6_vs_moy')}</span>
             </td>
             <td>${candHtml}</td>
             <td class="col-heures">${fmtMin(dur)}</td>
@@ -824,15 +1098,13 @@ function buildHarmony(helperStats, angelStats, tradStats) {
           cat: 'h',
           cls: 'tag-suggest',
           icon: '🔄',
-          title: `Suggestions de redistribution — Helpers (moy. : ${fmtMin(Math.round(AVG_H_min))} · cible : ${fmtMin(Math.round(AVG_H_min * 0.8))}–${fmtMin(Math.round(AVG_H_min * 1.2))})`,
-          body: `<p>Les ateliers ci-dessous sont portés par des helpers au-dessus de 120% de la moyenne (<strong>${fmtMin(Math.round(AVG_H_min))}</strong>).
-                 Les remplaçants potentiels sont triés par ordre de charge croissante — les personnes en <span style="color:#16a34a;font-weight:600">vert</span> sont en dessous de la moyenne.
-                 <strong>Vérifier avant toute modification.</strong></p>
+          title: `${I18n.t('r6_redist_h_title')} (${I18n.t('r6_h_moy')} ${fmtMin(Math.round(AVG_H_min))} · ${I18n.t('r6_cible_label')} ${fmtMin(Math.round(AVG_H_min * 0.8))}–${fmtMin(Math.round(AVG_H_min * 1.2))})`,
+          body: `<p>${I18n.t('r6_redist_h_body')}</p>
                  <table class="redist-table" style="margin-top:10px">
-                   <thead><tr><th>Jour / Horaire</th><th>Atelier</th><th>Actuellement assigné</th><th>Remplaçants potentiels (du moins au plus chargé)</th><th>Durée</th></tr></thead>
+                   <thead><tr><th>${I18n.t('r6_col_jour_horaire')}</th><th>${I18n.t('col_atelier')}</th><th>${I18n.t('r6_col_actuel')}</th><th>${I18n.t('r6_col_remplacants')}</th><th>${I18n.t('r6_col_duree_short')}</th></tr></thead>
                    <tbody>${rows.join('')}</tbody>
                  </table>
-                 <p style="margin-top:10px;font-size:11px;color:var(--muted);">💡 Les remplaçants en vert sont sous la moyenne — les choisir en priorité pour maximiser l'équilibre. Vérifier le Rapport 4 pour confirmation.</p>`
+                 <p style="margin-top:10px;font-size:11px;color:var(--muted);">💡 ${I18n.t('r6_tip_redist_h')}</p>`
         });
       }
     }
@@ -923,7 +1195,7 @@ function buildHarmony(helperStats, angelStats, tradStats) {
             const candHtml = [
               ...candUnder.map(c => {
                 const gain = fmtMin(Math.round(AVG_A_min - c.minutes));
-                return `<span style="color:#16a34a;font-weight:600">${c.nom}</span> <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)} — sous la moy. de ${gain}</span>`;
+                return `<span style="color:#16a34a;font-weight:600">${c.nom}</span> <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)} — ${I18n.t('r6_sous_moy_de')} ${gain}</span>`;
               }),
               ...candOther.slice(0, 2).map(c => `${c.nom} <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)}</span>`)
             ].join('<br>');
@@ -932,8 +1204,8 @@ function buildHarmony(helperStats, angelStats, tradStats) {
               <td class="col-atelier">${jour}<br><span style="font-size:11px;color:var(--muted)">${a.heure}</span></td>
               <td>${ateliersCoverts.length ? ateliersCoverts.join('<br>') : a.atelier}</td>
               <td class="col-actuel">${overP.nom}<br>
-                <span style="font-size:10px;font-weight:400;color:var(--muted)">${fmtMin(overP.minutes)} total</span><br>
-                <span style="font-size:10px;color:#dc2626">+${ecartOver} vs moy.</span>
+                <span style="font-size:10px;font-weight:400;color:var(--muted)">${fmtMin(overP.minutes)} ${I18n.t('r6_total')}</span><br>
+                <span style="font-size:10px;color:#dc2626">+${ecartOver} ${I18n.t('r6_vs_moy')}</span>
               </td>
               <td>${candHtml}</td>
               <td class="col-heures">${fmtMin(dur)}</td>
@@ -947,14 +1219,13 @@ function buildHarmony(helperStats, angelStats, tradStats) {
           cat: 'a',
           cls: 'tag-suggest',
           icon: '🔄',
-          title: `Suggestions de redistribution — Angels (moy. : ${fmtMin(Math.round(AVG_A_min))} · cible : ${fmtMin(Math.round(AVG_A_min * 0.8))}–${fmtMin(Math.round(AVG_A_min * 1.2))})`,
-          body: `<p>Les blocs ci-dessous sont couverts par des angels au-dessus de 120% de la moyenne (<strong>${fmtMin(Math.round(AVG_A_min))}</strong>).
-                 Les remplaçants sont triés par charge croissante — les personnes en <span style="color:#16a34a;font-weight:600">vert</span> sont sous la moyenne.</p>
+          title: `${I18n.t('r6_redist_a_title')} (${I18n.t('r6_h_moy')} ${fmtMin(Math.round(AVG_A_min))} · ${I18n.t('r6_cible_label')} ${fmtMin(Math.round(AVG_A_min * 0.8))}–${fmtMin(Math.round(AVG_A_min * 1.2))})`,
+          body: `<p>${I18n.t('r6_redist_h_body')}</p>
                  <table class="redist-table" style="margin-top:10px">
-                   <thead><tr><th>Jour / Horaire</th><th>Ateliers couverts</th><th>Actuellement assigné</th><th>Remplaçants potentiels (du moins au plus chargé)</th><th>Durée</th></tr></thead>
+                   <thead><tr><th>${I18n.t('r6_col_jour_horaire')}</th><th>${I18n.t('col_atelier')}</th><th>${I18n.t('r6_col_actuel')}</th><th>${I18n.t('r6_col_remplacants')}</th><th>${I18n.t('r6_col_duree_short')}</th></tr></thead>
                    <tbody>${rows.join('')}</tbody>
                  </table>
-                 <p style="margin-top:10px;font-size:11px;color:var(--muted);">💡 Les angels disponibles peuvent couvrir simultanément plusieurs salles — vérifier leur capacité réelle avant réaffectation.</p>`
+                 <p style="margin-top:10px;font-size:11px;color:var(--muted);">💡 ${I18n.t('r6_tip_redist_a')}</p>`
         });
       }
     }
@@ -967,10 +1238,9 @@ function buildHarmony(helperStats, angelStats, tradStats) {
       cat: 'h',
       cls: 'tag-overload',
       icon: '🔴',
-      title: 'Helpers avec charge élevée (résumé)',
-      body: `<p>Les helpers suivants ont une durée totale significativement supérieure à la moyenne (${fmtMin(Math.round(AVG_H_min))}) :</p>
-             <ul>${overH.map(p => `<li><strong>${p.nom}</strong> — ${p.count} ateliers · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('')}</ul>
-             <p style="margin-top:8px;">💡 Voir le tableau de redistribution ci-dessus pour les suggestions détaillées.</p>`
+      title: I18n.t('r6_charge_elevee_h'),
+      body: `<p>${I18n.t('r6_charge_elevee_h_body')} (${fmtMin(Math.round(AVG_H_min))}) :</p>
+             <ul>${overH.map(p => `<li><strong>${p.nom}</strong> — ${p.count} ${I18n.t('r6_ateliers')} · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('')}</ul>`
     });
   }
 
@@ -985,15 +1255,15 @@ function buildHarmony(helperStats, angelStats, tradStats) {
     globalLoad[p.nom] && globalLoad[p.nom].minutes > AVG_GLOBAL_min * 1.3
   );
   if (lightH.length || lightHHidden.length) {
-    const listAvail = lightH.map(p => `<li><strong>${p.nom}</strong> — ${p.count} atelier${p.count > 1 ? 's' : ''} · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('');
-    const listBusy  = lightHHidden.map(p => `<li><strong>${p.nom}</strong> — charge helper légère (${fmtMin(p.minutes)}) mais charge globale : ${fmtMin(globalLoad[p.nom].minutes)} (${globalLoad[p.nom].roles.join(' + ')})</li>`).join('');
+    const listAvail = lightH.map(p => `<li><strong>${p.nom}</strong> — ${p.count} ${p.count > 1 ? I18n.t('r6_ateliers_pl') : I18n.t('r6_atelier')} · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('');
+    const listBusy  = lightHHidden.map(p => `<li><strong>${p.nom}</strong> — ${I18n.t('r6_dispo_h_busy').replace(':', '')} (${fmtMin(p.minutes)}) — ${I18n.t('r6_charge_globale')} ${fmtMin(globalLoad[p.nom].minutes)} (${globalLoad[p.nom].roles.join(' + ')})</li>`).join('');
     cards.push({
       cat: 'h',
       cls: 'tag-light',
       icon: '🟢',
-      title: 'Helpers avec disponibilité',
-      body: (lightH.length ? `<p>Ces helpers ont une durée totale inférieure à la moyenne et une charge globale raisonnable :</p><ul>${listAvail}</ul><p style="margin-top:8px;">💡 Ces personnes peuvent absorber des ateliers supplémentaires.</p>` : '')
-          + (lightHHidden.length ? `<p style="margin-top:10px;"><strong>⚠️ Durée légère en helper, mais déjà chargés sur d'autres rôles :</strong></p><ul>${listBusy}</ul><p style="margin-top:6px;color:var(--muted);font-size:12px;">À ne pas surcharger davantage.</p>` : '')
+      title: I18n.t('r6_dispo_h'),
+      body: (lightH.length ? `<p>${I18n.t('r6_dispo_h_body')}</p><ul>${listAvail}</ul><p style="margin-top:8px;">💡 ${I18n.t('r6_dispo_h_tip')}</p>` : '')
+          + (lightHHidden.length ? `<p style="margin-top:10px;"><strong>⚠️ ${I18n.t('r6_dispo_h_busy')}</strong></p><ul>${listBusy}</ul><p style="margin-top:6px;color:var(--muted);font-size:12px;">${I18n.t('r6_dispo_h_warn')}</p>` : '')
     });
   }
 
@@ -1004,10 +1274,9 @@ function buildHarmony(helperStats, angelStats, tradStats) {
       cat: 'a',
       cls: 'tag-overload',
       icon: '🔴',
-      title: 'Angels avec charge élevée (résumé)',
-      body: `<p>Les angels suivants couvrent une durée nette supérieure à la moyenne (${fmtMin(Math.round(AVG_A_min))}) :</p>
-             <ul>${overA.map(p => `<li><strong>${p.nom}</strong> — ${p.count} blocs uniques · ${fmtMin(p.minutes)} net${globalNote(p.nom)}</li>`).join('')}</ul>
-             <p style="margin-top:8px;">💡 Voir le tableau de redistribution angels ci-dessus.</p>`
+      title: I18n.t('r6_charge_elevee_a'),
+      body: `<p>${I18n.t('r6_charge_elevee_a_body')} (${fmtMin(Math.round(AVG_A_min))}) :</p>
+             <ul>${overA.map(p => `<li><strong>${p.nom}</strong> — ${p.count} ${I18n.t('r6_blocs_uniques')} · ${fmtMin(p.minutes)} ${I18n.t('r6_net')}${globalNote(p.nom)}</li>`).join('')}</ul>`
     });
   }
 
@@ -1022,9 +1291,9 @@ function buildHarmony(helperStats, angelStats, tradStats) {
       cat: 'a',
       cls: 'tag-light',
       icon: '🟢',
-      title: 'Angels avec disponibilité',
-      body: `<p>Ces angels ont une durée nette inférieure à la moyenne et une charge globale raisonnable :</p>
-             <ul>${lightA.map(p => `<li><strong>${p.nom}</strong> — ${p.count} blocs · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('')}</ul>`
+      title: I18n.t('r6_dispo_a'),
+      body: `<p>${I18n.t('r6_dispo_a_body')}</p>
+             <ul>${lightA.map(p => `<li><strong>${p.nom}</strong> — ${p.count} ${I18n.t('r6_blocs_uniques')} · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('')}</ul>`
     });
   }
 
@@ -1038,9 +1307,9 @@ function buildHarmony(helperStats, angelStats, tradStats) {
       cat: 'h',
       cls: 'tag-suggest',
       icon: '⚠️',
-      title: 'Déséquilibre global helpers (en heures)',
-      body: `<p>L'écart entre le helper le plus chargé (<strong>${topH?.nom}</strong> — ${fmtMin(topH?.minutes)}) et le moins chargé (<strong>${botH?.nom}</strong> — ${fmtMin(botH?.minutes)}) est de <strong>${fmtMin(maxHmin - minHmin)}</strong>.</p>
-             <p style="margin-top:8px;">💡 La cible idéale serait de ramener tous les helpers dans la fourchette ${fmtMin(Math.round(AVG_H_min * 0.8))} – ${fmtMin(Math.round(AVG_H_min * 1.2))}.</p>`
+      title: I18n.t('r6_desequilibre_h'),
+      body: `<p>${I18n.t('r6_ecart_label')} helper ${I18n.t('r6_plus_charge')} (<strong>${topH?.nom}</strong> — ${fmtMin(topH?.minutes)}) ${I18n.t('r6_est_de')} ${I18n.t('r6_moins_charge')} (<strong>${botH?.nom}</strong> — ${fmtMin(botH?.minutes)}) ${I18n.t('r6_est_de')} <strong>${fmtMin(maxHmin - minHmin)}</strong>.</p>
+             <p style="margin-top:8px;">💡 ${I18n.t('r6_cible_fourchette')} ${fmtMin(Math.round(AVG_H_min * 0.8))} – ${fmtMin(Math.round(AVG_H_min * 1.2))}.</p>`
     });
   }
 
@@ -1049,9 +1318,9 @@ function buildHarmony(helperStats, angelStats, tradStats) {
       cat: 'a',
       cls: 'tag-suggest',
       icon: '⚠️',
-      title: 'Déséquilibre global angels (en blocs)',
-      body: `<p>L'écart entre l'angel le plus chargé (<strong>${angelActifs[0]?.nom}</strong> — ${MAX_A} blocs) et le moins chargé (<strong>${angelActifs[angelActifs.length-1]?.nom}</strong> — ${MIN_A} blocs) est de <strong>${MAX_A - MIN_A} blocs</strong>.</p>
-             <p style="margin-top:8px;">💡 Cible recommandée : maximum ${Math.ceil(AVG_A * 1.3)} blocs uniques par angel.</p>`
+      title: I18n.t('r6_desequilibre_a'),
+      body: `<p>${I18n.t('r6_ecart_label')} angel ${I18n.t('r6_plus_charge')} (<strong>${angelActifs[0]?.nom}</strong> — ${MAX_A} ${I18n.t('r6_blocs_uniques')}) ${I18n.t('r6_est_de')} ${I18n.t('r6_moins_charge')} (<strong>${angelActifs[angelActifs.length-1]?.nom}</strong> — ${MIN_A} ${I18n.t('r6_blocs_uniques')}) ${I18n.t('r6_est_de')} <strong>${MAX_A - MIN_A}</strong>.</p>
+             <p style="margin-top:8px;">💡 ${I18n.t('r6_cible_max_angel')} ${Math.ceil(AVG_A * 1.3)} ${I18n.t('r6_blocs_par_angel')}</p>`
     });
   }
 
@@ -1062,10 +1331,9 @@ function buildHarmony(helperStats, angelStats, tradStats) {
       cat: 't',
       cls: 'tag-overload',
       icon: '🔴',
-      title: 'Traducteurs avec charge élevée',
-      body: `<p>Les traducteurs suivants ont une durée supérieure à la moyenne (${fmtMin(Math.round(AVG_T_min))}) :</p>
-             <ul>${overT.map(p => `<li><strong>${p.nom}</strong> — ${p.count} atelier${p.count > 1 ? 's' : ''} · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('')}</ul>
-             <p style="margin-top:8px;">💡 Vérifier si un autre traducteur peut prendre le relais sur certains créneaux.</p>`
+      title: I18n.t('r6_charge_elevee_t'),
+      body: `<p>${I18n.t('r6_charge_elevee_t_body')} (${fmtMin(Math.round(AVG_T_min))}) :</p>
+             <ul>${overT.map(p => `<li><strong>${p.nom}</strong> — ${p.count} ${p.count > 1 ? I18n.t('r6_ateliers_pl') : I18n.t('r6_atelier')} · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('')}</ul>`
     });
   }
 
@@ -1079,9 +1347,9 @@ function buildHarmony(helperStats, angelStats, tradStats) {
       cat: 't',
       cls: 'tag-light',
       icon: '🟢',
-      title: 'Traducteurs avec disponibilité',
-      body: `<p>Ces traducteurs ont une durée légère et une charge globale raisonnable :</p>
-             <ul>${lightT.map(p => `<li><strong>${p.nom}</strong> — ${p.count} atelier${p.count > 1 ? 's' : ''} · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('')}</ul>`
+      title: I18n.t('r6_dispo_t'),
+      body: `<p>${I18n.t('r6_dispo_t_body')}</p>
+             <ul>${lightT.map(p => `<li><strong>${p.nom}</strong> — ${p.count} ${p.count > 1 ? I18n.t('r6_ateliers_pl') : I18n.t('r6_atelier')} · ${fmtMin(p.minutes)}${globalNote(p.nom)}</li>`).join('')}</ul>`
     });
   }
 
@@ -1090,9 +1358,9 @@ function buildHarmony(helperStats, angelStats, tradStats) {
       cat: 't',
       cls: 'tag-suggest',
       icon: '⚠️',
-      title: 'Déséquilibre global traducteurs',
-      body: `<p>L'écart entre le traducteur le plus chargé (<strong>${tradActifs[0]?.nom}</strong> — ${MAX_T} ateliers) et le moins chargé (<strong>${tradActifs[tradActifs.length-1]?.nom}</strong> — ${MIN_T} ateliers) est de <strong>${MAX_T - MIN_T} ateliers</strong>.</p>
-             <p style="margin-top:8px;">💡 Cible : maximum ${Math.ceil(AVG_T * 1.3)} ateliers par traducteur.</p>`
+      title: I18n.t('r6_desequilibre_t'),
+      body: `<p>${I18n.t('r6_ecart_label')} ${I18n.t('r6_tab_traducteurs').toLowerCase()} ${I18n.t('r6_plus_charge')} (<strong>${tradActifs[0]?.nom}</strong> — ${MAX_T} ${I18n.t('r6_ateliers_pl')}) ${I18n.t('r6_est_de')} ${I18n.t('r6_moins_charge')} (<strong>${tradActifs[tradActifs.length-1]?.nom}</strong> — ${MIN_T} ${I18n.t('r6_ateliers_pl')}) ${I18n.t('r6_est_de')} <strong>${MAX_T - MIN_T} ${I18n.t('r6_ateliers_pl')}</strong>.</p>
+             <p style="margin-top:8px;">💡 ${I18n.t('r6_cible_max_trad')} ${Math.ceil(AVG_T * 1.3)} ${I18n.t('r6_ateliers_par_trad')}</p>`
     });
   }
 
@@ -1144,7 +1412,7 @@ function buildHarmony(helperStats, angelStats, tradStats) {
           const candHtml = [
             ...candUnder.map(c => {
               const gain = fmtMin(Math.round(AVG_T_min - c.minutes));
-              return `<span style="color:#16a34a;font-weight:600">${c.nom}</span> <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)} — sous la moy. de ${gain}</span>`;
+              return `<span style="color:#16a34a;font-weight:600">${c.nom}</span> <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)} — ${I18n.t('r6_sous_moy_de')} ${gain}</span>`;
             }),
             ...candOther.slice(0, 2).map(c => `${c.nom} <span style="font-size:10px;color:var(--muted)">${fmtMin(c.minutes)}</span>`)
           ].join('<br>');
@@ -1153,8 +1421,8 @@ function buildHarmony(helperStats, angelStats, tradStats) {
             <td class="col-atelier">${atelier.jour}<br><span style="font-weight:400;color:var(--muted);font-size:11px">${atelier.heure}</span></td>
             <td style="font-weight:600">${atelier.atelier}</td>
             <td class="col-actuel">${overP.nom}<br>
-              <span style="font-size:10px;font-weight:400;color:var(--muted)">${fmtMin(overP.minutes)} total</span><br>
-              <span style="font-size:10px;color:#dc2626">+${ecartOver} vs moy.</span>
+              <span style="font-size:10px;font-weight:400;color:var(--muted)">${fmtMin(overP.minutes)} ${I18n.t('r6_total')}</span><br>
+              <span style="font-size:10px;color:#dc2626">+${ecartOver} ${I18n.t('r6_vs_moy')}</span>
             </td>
             <td>${candHtml}</td>
             <td class="col-heures">${fmtMin(dur)}</td>
@@ -1167,14 +1435,13 @@ function buildHarmony(helperStats, angelStats, tradStats) {
           cat: 't',
           cls: 'tag-suggest',
           icon: '🔄',
-          title: `Suggestions de redistribution — Traducteurs (moy. : ${fmtMin(Math.round(AVG_T_min))} · cible : ${fmtMin(Math.round(AVG_T_min * 0.8))}–${fmtMin(Math.round(AVG_T_min * 1.2))})`,
-          body: `<p>Les ateliers ci-dessous sont pris en charge par des traducteurs au-dessus de 120% de la moyenne (<strong>${fmtMin(Math.round(AVG_T_min))}</strong>).
-                 Les remplaçants sont triés par charge croissante — les personnes en <span style="color:#16a34a;font-weight:600">vert</span> sont sous la moyenne.</p>
+          title: `${I18n.t('r6_redist_t_title')} (${I18n.t('r6_h_moy')} ${fmtMin(Math.round(AVG_T_min))} · ${I18n.t('r6_cible_label')} ${fmtMin(Math.round(AVG_T_min * 0.8))}–${fmtMin(Math.round(AVG_T_min * 1.2))})`,
+          body: `<p>${I18n.t('r6_redist_t_body')}</p>
                  <table class="redist-table" style="margin-top:10px">
-                   <thead><tr><th>Jour / Horaire</th><th>Atelier</th><th>Actuellement assigné</th><th>Remplaçants potentiels (du moins au plus chargé)</th><th>Durée</th></tr></thead>
+                   <thead><tr><th>${I18n.t('r6_col_jour_horaire')}</th><th>${I18n.t('col_atelier')}</th><th>${I18n.t('r6_col_actuel')}</th><th>${I18n.t('r6_col_remplacants')}</th><th>${I18n.t('r6_col_duree_short')}</th></tr></thead>
                    <tbody>${rows.join('')}</tbody>
                  </table>
-                 <p style="margin-top:10px;font-size:11px;color:var(--muted);">💡 Vérifier que le remplaçant maîtrise la langue de traduction requise avant toute réaffectation.</p>`
+                 <p style="margin-top:10px;font-size:11px;color:var(--muted);">💡 ${I18n.t('r6_tip_redist_t')}</p>`
         });
       }
     }
@@ -1188,10 +1455,10 @@ function buildHarmony(helperStats, angelStats, tradStats) {
       cat: 'global',
       cls: 'tag-overload',
       icon: '🔴',
-      title: 'Multi-rôles avec charge globale élevée',
-      body: `<p>Ces personnes cumulent plusieurs rôles et ont une durée totale très supérieure à la moyenne globale (${fmtMin(Math.round(AVG_GLOBAL_min))}) :</p>
-             <ul>${multiOverload.map(p => `<li><strong>${p.nom}</strong> — ${fmtMin(p.minutes)} au total (${p.roles.join(' + ')}) · ${p.count} ateliers</li>`).join('')}</ul>
-             <p style="margin-top:8px;">💡 Priorité absolue : ne pas leur assigner d'ateliers supplémentaires et envisager un allègement sur leur rôle secondaire.</p>`
+      title: I18n.t('r6_multi_overload'),
+      body: `<p>${I18n.t('r6_multi_overload_body')} (${fmtMin(Math.round(AVG_GLOBAL_min))}) :</p>
+             <ul>${multiOverload.map(p => `<li><strong>${p.nom}</strong> — ${fmtMin(p.minutes)} (${p.roles.join(' + ')}) · ${p.count} ${I18n.t('r6_ateliers')}</li>`).join('')}</ul>
+             <p style="margin-top:8px;">💡 ${I18n.t('r6_multi_tip')}</p>`
     });
   }
 
@@ -1200,13 +1467,13 @@ function buildHarmony(helperStats, angelStats, tradStats) {
     cat: 'global',
     cls: '',
     icon: '⚠️',
-    title: 'Important — Vérification des conflits',
-    body: `<p>Ces suggestions tiennent compte de la <strong>durée totale</strong> et de la <strong>charge globale</strong> de chaque personne. Avant toute modification :</p>
+    title: I18n.t('r6_verif_title'),
+    body: `<p>${I18n.t('r6_verif_body')}</p>
            <ul>
-             <li>Vérifier l'absence de conflit horaire via le <strong>Rapport 4 — Conflits de planning</strong></li>
-             <li>Confirmer la disponibilité de la personne pour le créneau concerné</li>
-             <li>Obtenir l'accord de l'intéressé(e)</li>
-             <li>Mettre à jour <code>data.js</code> via la page <strong>Admin</strong></li>
+             <li>${I18n.t('r6_verif_li1')}</li>
+             <li>${I18n.t('r6_verif_li2')}</li>
+             <li>${I18n.t('r6_verif_li3')}</li>
+             <li>${I18n.t('r6_verif_li4')}</li>
            </ul>`
   });
 
@@ -1217,47 +1484,59 @@ function buildHarmony(helperStats, angelStats, tradStats) {
 // RENDER PRINCIPAL
 // ════════════════════════════════════════════════
 function render() {
-  const jourFilter = document.getElementById('filterJour').value;
-  const { helperStats, angelStats, tradStats } = buildStats(jourFilter);
+  const jourFilter    = document.getElementById('filterJour').value;
+  const personFilter  = document.getElementById('filterPersonne').value;
+  const { helperStats, angelStats, tradStats, helpersExclus } = buildStats(jourFilter);
+
+  // Appliquer le filtre personne si actif
+  const filterList = list => personFilter ? list.filter(p => p.nom === personFilter) : list;
+  const hStats = filterList(helperStats);
+  const aStats = filterList(angelStats);
+  const tStats = filterList(tradStats);
 
   // Summary bar
-  const totalH = helperStats.reduce((s, p) => s + p.count, 0);
-  const totalA = angelStats.reduce((s, p) => s + p.count, 0);
-  const totalT = tradStats.reduce((s, p) => s + p.count, 0);
-  const avgH   = helperStats.length ? (totalH / helperStats.length).toFixed(1) : 0;
-  const avgA   = angelStats.length  ? (totalA / angelStats.length).toFixed(1)  : 0;
-  const avgT   = tradStats.length   ? (totalT / tradStats.length).toFixed(1)   : 0;
+  // Pour les moyennes helpers : exclure les colibri/manager/admin
+  const helpersPourMoy = helperStats.filter(p => !helpersExclus.has(p.nom));
+  const totalH    = helperStats.reduce((s, p) => s + p.count, 0);
+  const totalA    = angelStats.reduce((s, p) => s + p.count, 0);
+  const totalT    = tradStats.reduce((s, p) => s + p.count, 0);
+  const avgH      = helpersPourMoy.length ? (helpersPourMoy.reduce((s, p) => s + p.count, 0) / helpersPourMoy.length).toFixed(1) : 0;
+  const avgA      = angelStats.length  ? (totalA / angelStats.length).toFixed(1)  : 0;
+  const avgT      = tradStats.length   ? (totalT / tradStats.length).toFixed(1)   : 0;
+  const avgHmin   = helpersPourMoy.length ? Math.round(helpersPourMoy.reduce((s, p) => s + p.minutes, 0) / helpersPourMoy.length) : 0;
+  const avgAmin   = angelStats.length  ? Math.round(angelStats.reduce((s, p) => s + p.minutes, 0)  / angelStats.length)  : 0;
+  const avgTmin   = tradStats.length   ? Math.round(tradStats.reduce((s, p) => s + p.minutes, 0)   / tradStats.length)   : 0;
 
   document.getElementById('summaryBar').innerHTML = `
-    <div class="sum-pill"><div class="num" style="color:var(--helper-text)">${helperStats.length}</div><div class="lbl">Helpers actifs</div></div>
-    <div class="sum-pill"><div class="num" style="color:var(--helper-text)">${totalH}</div><div class="lbl">Missions helpers</div></div>
-    <div class="sum-pill"><div class="num" style="color:var(--helper-text)">${avgH}</div><div class="lbl">Moy. / helper</div></div>
-    <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${angelStats.length}</div><div class="lbl">Angels actifs</div></div>
-    <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${totalA}</div><div class="lbl">Missions angels</div></div>
-    <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${avgA}</div><div class="lbl">Moy. / angel</div></div>
-    <div class="sum-pill"><div class="num" style="color:var(--trad-text)">${tradStats.length}</div><div class="lbl">Traducteurs actifs</div></div>
-    <div class="sum-pill"><div class="num" style="color:var(--trad-text)">${totalT}</div><div class="lbl">Missions trad.</div></div>
-    <div class="sum-pill"><div class="num" style="color:var(--trad-text)">${avgT}</div><div class="lbl">Moy. / trad.</div></div>
-  `;
+    <div class="sum-pill"><div class="num" style="color:var(--helper-text)">${helperStats.length}</div><div class="lbl">${I18n.t('r6_helpers_actifs')}</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--helper-text)">${avgH}</div><div class="lbl">${I18n.t('r6_moy_ateliers_helper')}</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--helper-text)">${fmtMin(avgHmin)}</div><div class="lbl">${I18n.t('r6_moy_heures_helper')}</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${angelStats.length}</div><div class="lbl">${I18n.t('r6_angels_actifs')}</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${avgA}</div><div class="lbl">${I18n.t('r6_moy_ateliers_angel')}</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--angel-text)">${fmtMin(avgAmin)}</div><div class="lbl">${I18n.t('r6_moy_heures_angel')}</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--trad-text)">${tradStats.length}</div><div class="lbl">${I18n.t('r6_trads_actifs')}</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--trad-text)">${avgT}</div><div class="lbl">${I18n.t('r6_moy_ateliers_trad')}</div></div>
+    <div class="sum-pill"><div class="num" style="color:var(--trad-text)">${fmtMin(avgTmin)}</div><div class="lbl">${I18n.t('r6_moy_heures_trad')}</div></div>
+  ` + (helpersExclus.size > 0 ? `<p style="font-size:11px;color:var(--muted);margin-top:6px;">${I18n.t('r6_moy_exclu_note')} ${helpersPourMoy.length} ${I18n.t('r6_moy_exclu_hors')} ${[...helpersExclus].join(', ')})</p>` : '');
 
   // Person grid
   const grid = document.getElementById('personGrid');
 
   if (currentTab === 'h') {
-    const max = helperStats.length ? helperStats[0].minutes : 1;
-    grid.innerHTML = helperStats.length
-      ? helperStats.map((p, i) => renderPersonCard(p, i + 1, max, 'Helper')).join('')
-      : '<p style="color:var(--muted);padding:20px 0;">Aucun helper trouvé.</p>';
+    const max = hStats.length ? hStats[0].minutes : 1;
+    grid.innerHTML = hStats.length
+      ? hStats.map((p, i) => renderPersonCard(p, i + 1, max, 'Helper')).join('')
+      : `<p style="color:var(--muted);padding:20px 0;">${I18n.t('r6_no_helper')}</p>`;
   } else if (currentTab === 'a') {
-    const max = angelStats.length ? angelStats[0].minutes : 1;
-    grid.innerHTML = angelStats.length
-      ? angelStats.map((p, i) => renderPersonCard(p, i + 1, max, 'Angel')).join('')
-      : '<p style="color:var(--muted);padding:20px 0;">Aucun angel trouvé.</p>';
+    const max = aStats.length ? aStats[0].minutes : 1;
+    grid.innerHTML = aStats.length
+      ? aStats.map((p, i) => renderPersonCard(p, i + 1, max, 'Angel')).join('')
+      : `<p style="color:var(--muted);padding:20px 0;">${I18n.t('r6_no_angel')}</p>`;
   } else if (currentTab === 't') {
-    const max = tradStats.length ? tradStats[0].minutes : 1;
-    grid.innerHTML = tradStats.length
-      ? tradStats.map((p, i) => renderPersonCard(p, i + 1, max, 'Traducteur')).join('')
-      : '<p style="color:var(--muted);padding:20px 0;">Aucun traducteur trouvé.</p>';
+    const max = tStats.length ? tStats[0].minutes : 1;
+    grid.innerHTML = tStats.length
+      ? tStats.map((p, i) => renderPersonCard(p, i + 1, max, 'Traducteur')).join('')
+      : `<p style="color:var(--muted);padding:20px 0;">${I18n.t('r6_no_trad')}</p>`;
   } else {
     // Vue combinée — fusionne les rôles multiples par personne
     const allByNom = {};
@@ -1268,9 +1547,9 @@ function render() {
       allByNom[p.nom].minutes   += p.minutes;
       allByNom[p.nom].assignments = [...allByNom[p.nom].assignments, ...p.assignments];
     });
-    addToMap(helperStats, 'Helper');
-    addToMap(angelStats,  'Angel');
-    addToMap(tradStats,   'Traducteur');
+    addToMap(hStats, 'Helper');
+    addToMap(aStats, 'Angel');
+    addToMap(tStats, 'Traducteur');
     const finalList = Object.values(allByNom).map(p => ({
       ...p, role: p.roles.length > 1 ? p.roles.join(' + ') : p.roles[0]
     })).sort((a, b) => b.minutes - a.minutes || b.count - a.count);
@@ -1280,7 +1559,7 @@ function render() {
   }
 
   // Harmonisation — calculée et mise en cache pour openHarmony()
-  const harmonyCards = buildHarmony(helperStats, angelStats, tradStats);
+  const harmonyCards = buildHarmony(helperStats, angelStats, tradStats, helpersExclus);
   window._lastHarmonyCards = harmonyCards;
 }
 
@@ -1289,178 +1568,89 @@ function render() {
 // ════════════════════════════════════════════════
 function setTab(t) {
   currentTab = t;
-  document.getElementById('tab-h').className  = 'tab' + (t === 'h' ? ' active-h' : '');
-  document.getElementById('tab-a').className  = 'tab' + (t === 'a' ? ' active-a' : '');
-  document.getElementById('tab-t').className  = 'tab' + (t === 't' ? ' active-t' : '');
-  document.getElementById('tab-s').className  = 'tab' + (t === 's' ? ' active-s' : '');
-  render();
+  document.getElementById('tab-h').className  = 'tab' + (t === 'h'  ? ' active-h'  : '');
+  document.getElementById('tab-a').className  = 'tab' + (t === 'a'  ? ' active-a'  : '');
+  document.getElementById('tab-t').className  = 'tab' + (t === 't'  ? ' active-t'  : '');
+  document.getElementById('tab-s').className  = 'tab' + (t === 's'  ? ' active-s'  : '');
+  document.getElementById('tab-eq').className = 'tab' + (t === 'eq' ? ' active-eq' : '');
+  if (t === 'eq') {
+    renderHarmony('global');
+  } else {
+    render();
+  }
 }
 
 // ════════════════════════════════════════════════
-// OUVRIR L'HARMONISATION DANS UNE NOUVELLE FENÊTRE
+// HARMONISATION — affichée directement dans la page
 // Vue par défaut : global (classement + suggestions globales)
-// Boutons : 🤝 Helpers | 👼 Angels | 🌐 Traducteurs
+// Sous-navigation : 📊 Global | 🤝 Helpers | 👼 Angels | 🌐 Traducteurs
 // ════════════════════════════════════════════════
-function openHarmony() {
+
+function getHarmonyIntros() {
+  return {
+    global: I18n.t('r6_intro_global'),
+    h: I18n.t('r6_intro_h'),
+    a: I18n.t('r6_intro_a'),
+    t: I18n.t('r6_intro_t')
+  };
+}
+
+let harmonyView = 'global';
+
+function renderHarmony(view) {
+  harmonyView = view || 'global';
   const cards = window._lastHarmonyCards || [];
-  const isDark = document.body.classList.contains('dark');
 
-  // Sérialiser les cards en JSON pour les passer à la popup
-  const cardsJson = JSON.stringify(cards.map(c => ({
-    cat:   c.cat || 'global',
-    cls:   c.cls || '',
-    icon:  c.icon || '',
-    title: c.title || '',
-    body:  c.body || ''
-  })));
+  // Summary bar : sous-navigation des vues harmonisation
+  document.getElementById('summaryBar').innerHTML = `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;width:100%">
+      <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-right:4px">${I18n.t('r6_vue_label')}</span>
+      <button onclick="renderHarmony('global')" style="cursor:pointer;padding:6px 16px;border-radius:999px;border:2px solid ${harmonyView==='global'?'var(--accent)':'var(--border)'};background:${harmonyView==='global'?'#eff6ff':'var(--surface)'};font-size:13px;font-weight:600;font-family:inherit;color:${harmonyView==='global'?'var(--accent)':'var(--muted)'}">📊 ${I18n.t('r6_vue_global')}</button>
+      <button onclick="renderHarmony('h')"      style="cursor:pointer;padding:6px 16px;border-radius:999px;border:2px solid ${harmonyView==='h'?'var(--helper-text)':'var(--border)'};background:${harmonyView==='h'?'var(--helper-bg)':'var(--surface)'};font-size:13px;font-weight:600;font-family:inherit;color:${harmonyView==='h'?'var(--helper-text)':'var(--muted)'}">🤝 ${I18n.t('r6_tab_helpers')}</button>
+      <button onclick="renderHarmony('a')"      style="cursor:pointer;padding:6px 16px;border-radius:999px;border:2px solid ${harmonyView==='a'?'var(--angel-text)':'var(--border)'};background:${harmonyView==='a'?'var(--angel-bg)':'var(--surface)'};font-size:13px;font-weight:600;font-family:inherit;color:${harmonyView==='a'?'var(--angel-text)':'var(--muted)'}">👼 ${I18n.t('r6_tab_angels')}</button>
+      <button onclick="renderHarmony('t')"      style="cursor:pointer;padding:6px 16px;border-radius:999px;border:2px solid ${harmonyView==='t'?'var(--trad-text)':'var(--border)'};background:${harmonyView==='t'?'var(--trad-bg)':'var(--surface)'};font-size:13px;font-weight:600;font-family:inherit;color:${harmonyView==='t'?'var(--trad-text)':'var(--muted)'}">🌐 ${I18n.t('r6_tab_traducteurs')}</button>
+    </div>`;
 
-  const html = `<!DOCTYPE html>
-<html lang="fr">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tantramour 2026 — Harmonisation</title>
-<style>
-  :root{
-    --bg:#ffffff;--surface:#f7f8fa;--border:#e5e7eb;--text:#1f2328;--muted:#57606a;--accent:#3b82d4;
-    --red:#dc2626;--red-bg:#fef2f2;--red-border:#fca5a5;
-    --green:#166534;--green-bg:#dcfce7;--green-border:#86efac;
-    --orange:#c2410c;--orange-bg:#fff7ed;--orange-border:#fdba74;
-    --helper-bg:#e0f2fe;--helper-border:#7dd3fc;--helper-text:#0369a1;
-    --angel-bg:#fce7f3;--angel-border:#f9a8d4;--angel-text:#9d174d;
-    --trad-bg:#fefce8;--trad-border:#92400e;--trad-text:#854d0e;
-  }
-  .dark{
-    --bg:#0d1117;--surface:#161b22;--border:#30363d;--text:#e6edf3;--muted:#8b949e;--accent:#58a6ff;
-    --red-bg:#2d0a0a;--red-border:#991b1b;
-    --green-bg:#052e16;--green-border:#166534;
-    --orange-bg:#1c1000;--orange-border:#92400e;
-    --helper-bg:#0c2d48;--helper-border:#1e4a8a;--helper-text:#7dd3fc;
-    --angel-bg:#3b1030;--angel-border:#9d174d;--angel-text:#f9a8d4;
-    --trad-bg:#1c1500;--trad-border:#854d0e;--trad-text:#fde047;
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,"Segoe UI",system-ui,sans-serif;font-size:14px;line-height:1.6;background:var(--bg);color:var(--text);padding:28px 20px 60px}
-  .wrap{max-width:1020px;margin:0 auto}
-  header{margin-bottom:20px;padding-bottom:14px;border-bottom:2px solid var(--border)}
-  header h1{font-size:20px;font-weight:700}
-  header p{font-size:26px;font-weight:800;color:var(--accent);line-height:1.2;margin-top:2px}
-  header small{font-size:12px;color:var(--muted);display:block;margin-top:2px}
-
-  /* ── BARRE DE VUE ── */
-  .view-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
-  .view-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-right:4px}
-  .vbtn{cursor:pointer;padding:7px 18px;border-radius:999px;border:2px solid var(--border);background:var(--surface);font-size:13px;font-weight:600;font-family:inherit;color:var(--muted);transition:all .15s}
-  .vbtn:hover{border-color:var(--accent);color:var(--text)}
-  .vbtn.active-g{border-color:var(--accent);background:#eff6ff;color:var(--accent)}
-  .vbtn.active-h{border-color:var(--helper-text);background:var(--helper-bg);color:var(--helper-text)}
-  .vbtn.active-a{border-color:var(--angel-text);background:var(--angel-bg);color:var(--angel-text)}
-  .vbtn.active-t{border-color:var(--trad-text);background:var(--trad-bg);color:var(--trad-text)}
-
-  .intro{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.6;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 18px}
-  .harmony-grid{display:flex;flex-direction:column;gap:12px}
-  .harmony-card{border:1px solid var(--border);border-radius:8px;padding:14px 18px;background:var(--bg)}
-  .harmony-card-title{font-size:13px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-  .harmony-card p{font-size:13px;color:var(--muted);line-height:1.6}
-  .harmony-card ul{font-size:13px;color:var(--muted);padding-left:20px;line-height:1.8}
-  .tag-overload{background:var(--red-bg);border-color:var(--red-border)}
-  .tag-light   {background:var(--green-bg);border-color:var(--green-border)}
-  .tag-suggest {background:var(--orange-bg);border-color:var(--orange-border)}
-  .redist-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:10px}
-  .redist-table th{text-align:left;padding:6px 10px;background:var(--surface);border-bottom:2px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700}
-  .redist-table td{padding:7px 10px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text)}
-  .redist-table tr:last-child td{border-bottom:none}
-  .col-actuel{color:#dc2626;font-weight:600}
-  .col-rempl{color:#16a34a;font-weight:600}
-  .col-heures{white-space:nowrap}
-  .col-atelier{max-width:200px;font-weight:600}
-  .avg-bar{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 4px}
-  .avg-pill{border-radius:6px;padding:8px 14px;border:1px solid var(--border);background:var(--surface);font-size:12px}
-  .avg-pill strong{display:block;font-size:17px;font-weight:800}
-  .empty-view{text-align:center;padding:48px;color:var(--muted);font-style:italic;border:2px dashed var(--border);border-radius:10px}
-  footer{margin-top:48px;padding-top:14px;border-top:1px solid var(--border);text-align:center;font-size:12px;color:var(--muted)}
-</style>
-</head>
-<body${isDark ? ' class="dark"' : ''}>
-<div class="wrap">
-  <header>
-    <h1>Tantramour 2026</h1>
-    <p>⚖️ Propositions d'harmonisation</p>
-    <small>Workload Balancing Suggestions — généré le ${new Date().toLocaleDateString('fr-FR', {day:'2-digit',month:'long',year:'numeric'})}</small>
-  </header>
-
-  <!-- Barre de vue -->
-  <div class="view-bar">
-    <span class="view-label">Vue :</span>
-    <button class="vbtn active-g" id="vbtn-g" onclick="setView('global')">📊 Vue globale</button>
-    <button class="vbtn"          id="vbtn-h" onclick="setView('h')">🤝 Helpers</button>
-    <button class="vbtn"          id="vbtn-a" onclick="setView('a')">👼 Angels</button>
-    <button class="vbtn"          id="vbtn-t" onclick="setView('t')">🌐 Traducteurs</button>
-  </div>
-
-  <div class="intro" id="viewIntro"></div>
-  <div class="harmony-grid" id="harmonyGrid"></div>
-</div>
-<footer><p>Made with IBM Bob</p></footer>
-
-<script>
-var CARDS = ${cardsJson};
-var currentView = 'global';
-
-var INTROS = {
-  global: 'Vue globale — Classement de toutes les personnes par heures totales (Helper + Angel + Traducteur) et suggestions de redistribution multi-rôles. Les propositions sont générées automatiquement et doivent être vérifiées manuellement.',
-  h: 'Vue Helpers — Analyse de la charge des helpers, personnes surchargées, personnes disponibles et suggestions de transfert d\\'ateliers.',
-  a: 'Vue Angels — Analyse de la charge nette des angels (intervalles fusionnés), personnes surchargées et suggestions de redistribution.',
-  t: 'Vue Traducteurs — Analyse de la charge des traducteurs, déséquilibres et suggestions de transfert.'
-};
-
-var BTN_ACTIVE = { global:'active-g', h:'active-h', a:'active-a', t:'active-t' };
-
-function setView(v) {
-  currentView = v;
-  // Boutons
-  ['g','h','a','t'].forEach(function(k) {
-    var btn = document.getElementById('vbtn-' + k);
-    var vkey = k === 'g' ? 'global' : k;
-    btn.className = 'vbtn' + (vkey === v ? ' ' + BTN_ACTIVE[vkey] : '');
+  // Filtrer les cartes selon la vue
+  const visible = cards.filter(c => {
+    if (harmonyView === 'global') return c.cat === 'global';
+    return c.cat === harmonyView || c.cat === 'global';
   });
-  // Intro
-  document.getElementById('viewIntro').innerHTML = INTROS[v] || '';
-  // Cards
-  var grid = document.getElementById('harmonyGrid');
-  var visible = CARDS.filter(function(c) {
-    if (v === 'global') return c.cat === 'global';
-    return c.cat === v || c.cat === 'global';
-  });
+
+  const intro = getHarmonyIntros()[harmonyView] || '';
+
+  const grid = document.getElementById('personGrid');
   if (!visible.length) {
-    grid.innerHTML = "<div class='empty-view'>Aucune proposition pour cette vue.</div>";
+    grid.innerHTML = `
+      <div class="harmony-intro">${intro}</div>
+      <div style="text-align:center;padding:48px;color:var(--muted);font-style:italic;border:2px dashed var(--border);border-radius:10px;">
+        ${I18n.t('r6_no_proposal')}
+      </div>`;
     return;
   }
-  grid.innerHTML = visible.map(function(c) {
-    return "<div class='harmony-card " + c.cls + "'>" +
-      "<div class='harmony-card-title'>" + c.icon + " " + c.title + "</div>" +
-      c.body +
-    "</div>";
-  }).join('');
+
+  grid.innerHTML = `
+    <div class="harmony-intro">${intro}</div>
+    <div class="harmony-grid">
+      ${visible.map(c => `
+        <div class="harmony-card ${c.cls || ''}">
+          <div class="harmony-card-title">${c.icon || ''} ${c.title || ''}</div>
+          ${c.body || ''}
+        </div>`).join('')}
+    </div>`;
 }
 
-setView('global');
-<\\/script>
-</body>
-</html>`;
-
-  const win = window.open('', '_blank', 'width=1100,height=850,scrollbars=yes,resizable=yes');
-  if (win) {
-    win.document.open();
-    win.document.write(html);
-    win.document.close();
-  }
+function toggleShift(shiftId) {
+  const el = document.getElementById(shiftId);
+  if (el) el.classList.toggle('open');
 }
 
 // Exposer dans window les fonctions appelées depuis les onclick HTML
 window.setTab        = setTab;
-window.openHarmony   = openHarmony;
+window.renderHarmony = renderHarmony;
 window.toggleDetail  = toggleDetail;
+window.toggleDay     = toggleDay;
+window.toggleShift   = toggleShift;
 window.render        = render;
 window.hardReload    = hardReload;
 window.toggleMode    = toggleMode;
@@ -1469,13 +1659,31 @@ window.toggleMode    = toggleMode;
 // INIT FILTRES
 // ════════════════════════════════════════════════
 (function initFilters() {
-  const sel = document.getElementById('filterJour');
+  // Filtre Jour
+  const selJour = document.getElementById('filterJour');
   JOUR_ORDER.forEach(j => {
     if (AGENDA.some(e => e.jour === j)) {
       const o = document.createElement('option');
       o.value = j; o.textContent = j;
-      sel.appendChild(o);
+      selJour.appendChild(o);
     }
+  });
+
+  // Filtre Personne — toutes les personnes présentes dans AGENDA (helpers, angels, trads)
+  const selPersonne = document.getElementById('filterPersonne');
+  const nomsSet = new Set();
+  AGENDA.forEach(e => {
+    if (e.helper1) nomsSet.add(e.helper1);
+    if (e.helper2) nomsSet.add(e.helper2);
+    if (e.helper3) nomsSet.add(e.helper3);
+    if (e.helper4) nomsSet.add(e.helper4);
+    if (e.angel)   nomsSet.add(e.angel);
+    if (e.traduction) nomsSet.add(e.traduction);
+  });
+  [...nomsSet].sort((a, b) => a.localeCompare(b, 'fr', { sensitivity: 'base' })).forEach(nom => {
+    const o = document.createElement('option');
+    o.value = nom; o.textContent = nom;
+    selPersonne.appendChild(o);
   });
 })();
 
@@ -1493,7 +1701,9 @@ function hardReload() {
 
 function toggleMode() {
   const isDark = document.body.classList.toggle('dark');
-  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+  document.getElementById('modeBtn').innerHTML = isDark
+    ? `☀️ <span data-i18n="nav_mode_jour">${I18n.t('nav_mode_jour')}</span>`
+    : `🌙 <span data-i18n="nav_mode_nuit">${I18n.t('nav_mode_nuit')}</span>`;
 }
 
 // Auto-refresh si ouvert depuis Home (paramètre ?v= présent)
@@ -1508,3 +1718,6 @@ render();
 </script>
 </body>
 </html>
+
+
+
