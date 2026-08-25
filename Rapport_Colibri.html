@@ -1,0 +1,439 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Planning Colibri</title>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --header-bg:#f0f4fb; --row-alt:#f7f8fa;
+    --green:#16a34a; --green-bg:#dcfce7; --green-border:#86efac;
+    --red:#dc2626; --red-bg:#fee2e2; --red-border:#fca5a5;
+    --colibri:#db2777; --colibri-bg:#fce7f3; --colibri-border:#f9a8d4;
+    --badge-f-bg:#dcfce7; --badge-f-tx:#166534;
+    --badge-h-bg:#e0f2fe; --badge-h-tx:#0369a1;
+    --badge-t-bg:#f5f3ff; --badge-t-tx:#7c3aed;
+    --badge-a-bg:#fee2e2; --badge-a-tx:#dc2626;
+    --tag-bg:#eef2ff; --tag-text:#3b5bdb;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --header-bg:#1c2333; --row-alt:#161b22;
+    --green-bg:#052e16; --green-border:#166534;
+    --red-bg:#2d0a0a; --red-border:#991b1b;
+    --colibri:#f472b6; --colibri-bg:#500724; --colibri-border:#9d174d;
+    --badge-f-bg:#0a2e1a; --badge-f-tx:#4ade80;
+    --badge-h-bg:#0c2d48; --badge-h-tx:#58a6ff;
+    --badge-t-bg:#1e1b4b; --badge-t-tx:#a78bfa;
+    --badge-a-bg:#2d0000; --badge-a-tx:#f87171;
+    --tag-bg:#1c2a4a; --tag-text:#79a8ff;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
+  .wrap { max-width:1100px; margin:0 auto; padding:24px 20px 80px; }
+
+  /* ── HEADER ── */
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:20px; font-weight:700; }
+  .logo p  { font-size:26px; font-weight:800; color:var(--colibri); line-height:1.2; margin-top:2px; }
+  .logo small { font-size:12px; color:var(--muted); display:block; margin-top:2px; }
+  .header-actions { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .btn-ghost { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:6px 14px; font-size:13px; color:var(--text); font-family:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+  .btn-ghost:hover { background:var(--border); }
+
+  /* ── STATS ── */
+  .stats-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:22px; }
+  .stat-pill { flex:1; min-width:110px; border-radius:8px; padding:12px 14px; border:1px solid var(--border); background:var(--surface); text-align:center; }
+  .stat-pill .num { font-size:26px; font-weight:800; line-height:1; }
+  .stat-pill .lbl { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); font-weight:600; margin-top:3px; }
+  .stat-pill.colibri .num { color:var(--colibri); }
+  .stat-pill.colibri { border-color:var(--colibri-border); background:var(--colibri-bg); }
+  .stat-pill.info .num { color:var(--accent); }
+  .stat-pill.err .num { color:var(--red); }
+  .stat-pill.err { border-color:var(--red-border); background:var(--red-bg); }
+
+  /* ── FILTRES ── */
+  .filters { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; align-items:flex-end; }
+  .fg { display:flex; flex-direction:column; gap:4px; }
+  .fg label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); }
+  .fg select { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 10px; font-size:13px; color:var(--text); font-family:inherit; cursor:pointer; min-width:180px; }
+
+  /* ── SÉPARATEUR JOUR ── */
+  .day-sep { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); padding-bottom:8px; border-bottom:2px solid var(--border); margin:24px 0 14px; display:flex; align-items:center; gap:8px; }
+  .day-count { display:inline-flex; align-items:center; justify-content:center; min-width:20px; height:20px; background:var(--colibri); color:#fff; border-radius:99px; font-size:11px; font-weight:700; padding:0 6px; }
+
+  /* ── CARTE ATELIER ── */
+  .ws-card { border:1px solid var(--colibri-border); border-radius:10px; overflow:hidden; margin-bottom:12px; }
+  .ws-card.missing { border-color:var(--red-border); }
+  .ws-card.missing .ws-header { background:var(--red-bg); border-bottom-color:var(--red-border); }
+  .ws-card.missing .ws-day { color:var(--red); }
+  .alert-banner { display:flex; align-items:center; gap:8px; padding:7px 16px; background:var(--red-bg); border-bottom:1px solid var(--red-border); font-size:12px; font-weight:700; color:var(--red); }
+  .ws-header { display:flex; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 16px; background:var(--colibri-bg); border-bottom:1px solid var(--colibri-border); }
+  .ws-day   { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--colibri); min-width:52px; }
+  .ws-time  { font-size:12px; color:var(--muted); min-width:120px; font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .ws-title { font-size:14px; font-weight:800; flex:1; min-width:0; }
+  .ws-lieu  { font-size:11px; color:var(--muted); background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:1px 8px; white-space:nowrap; }
+  .ws-type  { font-size:10px; font-weight:700; padding:2px 8px; border-radius:4px; background:var(--tag-bg); color:var(--tag-text); white-space:nowrap; }
+  .ws-body  { padding:14px 16px; background:var(--bg); display:flex; flex-direction:column; gap:10px; }
+
+  /* ── LIGNES INFO ── */
+  .info-row { display:flex; align-items:flex-start; gap:10px; flex-wrap:wrap; }
+  .info-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); min-width:90px; padding-top:3px; flex-shrink:0; }
+  .pills-wrap { display:flex; flex-wrap:wrap; gap:5px; align-items:center; }
+
+  /* ── PILLS ── */
+  .pill { display:inline-flex; align-items:center; gap:4px; border-radius:99px; padding:2px 9px; font-size:12px; font-weight:600; white-space:nowrap; }
+  .pill-f { background:var(--badge-f-bg); color:var(--badge-f-tx); }
+  .pill-h { background:var(--badge-h-bg); color:var(--badge-h-tx); }
+  .pill-t { background:var(--badge-t-bg); color:var(--badge-t-tx); }
+  .pill-a { background:var(--badge-a-bg); color:var(--badge-a-tx); }
+  .pill-colibri { background:var(--colibri-bg); color:var(--colibri); border:1px solid var(--colibri-border); font-weight:800; }
+  .avail-note { font-size:11px; color:var(--muted); font-style:italic; }
+
+  /* ── BOUTON ÉDITER ── */
+  .btn-edit { cursor:pointer; background:var(--accent); color:#fff; border:none; border-radius:6px; padding:6px 14px; font-size:12px; font-weight:700; font-family:inherit; display:inline-flex; align-items:center; gap:5px; align-self:flex-start; margin-top:2px; }
+  .btn-edit:hover { filter:brightness(1.1); }
+
+  /* ── MODALE MOT DE PASSE ── */
+  .pw-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:9999; align-items:center; justify-content:center; }
+  .pw-overlay.open { display:flex; }
+  .pw-box { background:var(--bg); border-radius:12px; padding:32px 28px; max-width:320px; width:90%; box-shadow:0 8px 32px rgba(0,0,0,.2); display:flex; flex-direction:column; gap:10px; }
+  .pw-box h3 { font-size:16px; font-weight:700; }
+  .pw-box p  { font-size:12px; color:var(--muted); }
+  .pw-box input { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:8px; font-size:15px; background:var(--surface); color:var(--text); font-family:inherit; outline:none; }
+  .pw-box input:focus { border-color:var(--accent); }
+  .pw-error { font-size:12px; color:var(--red); min-height:16px; }
+  .pw-actions { display:flex; gap:8px; }
+  .pw-btn-ok     { flex:1; padding:10px; border:none; border-radius:8px; background:var(--accent); color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; }
+  .pw-btn-ok:hover { filter:brightness(1.1); }
+  .pw-btn-cancel { flex:1; padding:10px; border:1px solid var(--border); border-radius:8px; background:var(--surface); font-size:14px; cursor:pointer; font-family:inherit; color:var(--text); }
+  .pw-btn-cancel:hover { background:var(--border); }
+
+  /* ── VIDE ── */
+  .empty { text-align:center; padding:48px; color:var(--muted); border:2px dashed var(--border); border-radius:10px; }
+  .empty-ok { border-color:var(--green-border); background:var(--green-bg); color:var(--green); font-weight:700; font-size:15px; }
+
+  footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
+</style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+</head>
+<!-- i18n -->
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p data-i18n="r8_title">Planning Colibri 🐦</p>
+      <small>Ateliers avec un helper ou traducteur ayant le rôle Colibri</small>
+    </div>
+    <div class="header-actions">
+      <a class="btn-ghost" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="btn-ghost" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <button class="btn-ghost" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit">Mode Nuit</span></button>
+      <button class="mode-btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
+    </div>
+  </header>
+
+  <div class="stats-bar" id="statsBar"></div>
+
+  <div class="filters">
+    <div class="fg">
+      <label data-i18n="col_jour">Jour</label>
+      <select id="filterJour" onchange="render()">
+        <option value="" data-i18n="filter_tous_jours">Tous les jours</option>
+        <option value="Jour 1" data-i18n="jour1_label">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2" data-i18n="jour2_label">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3" data-i18n="jour3_label">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4" data-i18n="jour4_label">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5" data-i18n="jour5_label">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6" data-i18n="jour6_label">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7" data-i18n="jour7_label">Jour 7 — Ven. 4 sept.</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Colibri</label>
+      <select id="filterColibri" onchange="render()">
+        <option value="">Tous les Colibris</option>
+      </select>
+    </div>
+  </div>
+
+  <div id="results"></div>
+
+</div>
+
+<!-- ── MODALE MOT DE PASSE ── -->
+<div class="pw-overlay" id="pwOverlay">
+  <div class="pw-box">
+    <h3>🔒 Accès restreint</h3>
+    <p id="pwTarget" style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted)"></p>
+    <input id="pwInput" type="password" placeholder="Mot de passe" autocomplete="off"
+      onkeydown="if(event.key==='Enter') checkPw()">
+    <div class="pw-error" id="pwError"></div>
+    <div class="pw-actions">
+      <button class="pw-btn-cancel" onclick="closePw()">Annuler</button>
+      <button class="pw-btn-ok"     onclick="checkPw()">Ouvrir ✏️</button>
+    </div>
+  </div>
+</div>
+
+<script src="ref_resource_types.js"></script>
+<script src="ref_ressources.js"></script>
+<script src="loader.js"></script>
+<script>
+loadData(['data.js'], function() {
+
+var JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+// ── Index des ressources ───────────────────────────────────────────────────────
+var RES_MAP = {};
+(REF_RESSOURCES || []).forEach(function(r) { RES_MAP[r.value] = r; });
+
+function hasRole(nom, role) {
+  var r = RES_MAP[nom];
+  return !!(r && r.roles && r.roles.indexOf(role) !== -1);
+}
+function isColibri(nom)    { return hasRole(nom, 'colibri'); }
+function isTraducteur(nom) { return hasRole(nom, 'traducteur'); }
+
+
+// ── Construction de la liste des ateliers Colibri ─────────────────────────────
+// Inclut :
+//   • Les ateliers qui ont au moins un helper/traducteur avec le rôle "colibri" (ok)
+//   • Les ateliers dont le flag e.colibri===true mais sans aucune ressource colibri assignée (manquant)
+function buildList() {
+  var result = [];
+  AGENDA.forEach(function(e, idx) {
+    var slots = [
+      { nom: e.helper1,    role: 'helper' },
+      { nom: e.helper2,    role: 'helper' },
+      { nom: e.helper3,    role: 'helper' },
+      { nom: e.helper4,    role: 'helper' },
+      { nom: e.traduction, role: 'traducteur' },
+    ];
+    var colibrisPresents = slots.filter(function(s) {
+      return s.nom && isColibri(s.nom);
+    }).map(function(s) {
+      return { nom: s.nom, slot: s.role };
+    });
+
+    // Inclure uniquement les ateliers avec au moins un Colibri assigné
+    if (colibrisPresents.length === 0) return;
+
+    result.push({
+      idx:              idx,
+      entry:            e,
+      colibrisPresents: colibrisPresents,
+      manquant:         false,
+    });
+  });
+  return result;
+}
+
+var WORKSHOPS = buildList();
+
+// ── Peupler le filtre Colibri avec uniquement les Colibris qui ont des ateliers ─
+var colibrisActifs = {};
+WORKSHOPS.forEach(function(w) {
+  w.colibrisPresents.forEach(function(c) { colibrisActifs[c.nom] = true; });
+});
+var selColibri = document.getElementById('filterColibri');
+Object.keys(colibrisActifs).sort().forEach(function(nom) {
+  var o = document.createElement('option');
+  o.value = nom; o.text = nom;
+  selColibri.appendChild(o);
+});
+
+// ── Filtrage ──────────────────────────────────────────────────────────────────
+function getFiltered() {
+  var jour    = document.getElementById('filterJour').value;
+  var colibri = document.getElementById('filterColibri').value;
+  return WORKSHOPS.filter(function(w) {
+    if (jour    && w.entry.jour !== jour) return false;
+    if (colibri && !w.colibrisPresents.some(function(c) { return c.nom === colibri; })) return false;
+    return true;
+  });
+}
+
+// ── Rendu ─────────────────────────────────────────────────────────────────────
+function render() {
+  var filtered  = getFiltered();
+  var total     = WORKSHOPS.length;
+  var nManquant = WORKSHOPS.filter(function(w) { return w.manquant; }).length;
+  var nOk       = total - nManquant;
+
+  // Stats
+  var colibriCount = {};
+  WORKSHOPS.filter(function(w) { return !w.manquant; }).forEach(function(w) {
+    w.colibrisPresents.forEach(function(c) {
+      colibriCount[c.nom] = (colibriCount[c.nom] || 0) + 1;
+    });
+  });
+  var nbColibris = Object.keys(colibriCount).length;
+
+  document.getElementById('statsBar').innerHTML =
+    '<div class="stat-pill colibri"><div class="num">' + total + '</div><div class="lbl">Ateliers Colibri</div></div>' +
+    '<div class="stat-pill info"><div class="num">' + nOk + '</div><div class="lbl">✅ Colibri assigné</div></div>' +
+    '<div class="stat-pill info"><div class="num">' + nbColibris + '</div><div class="lbl">Colibris actifs</div></div>';
+
+  if (!filtered.length) {
+    document.getElementById('results').innerHTML =
+      '<div class="empty empty-ok">✅ Aucun atelier Colibri dans cette sélection.</div>';
+    return;
+  }
+
+  // Grouper par jour
+  var html = '';
+  var byDay = {};
+  filtered.forEach(function(w) {
+    var j = w.entry.jour;
+    if (!byDay[j]) byDay[j] = [];
+    byDay[j].push(w);
+  });
+  JOUR_ORDER.forEach(function(jour) {
+    if (!byDay[jour]) return;
+    var items = byDay[jour];
+    html += '<div class="day-sep">' + esc(jour) + ' — ' + esc(items[0].entry.date) +
+      ' <span class="day-count">' + items.length + '</span></div>';
+    items.forEach(function(w) { html += renderCard(w); });
+  });
+
+  document.getElementById('results').innerHTML = html;
+}
+
+function renderCard(w) {
+  var e = w.entry;
+
+  // Animateurs
+  var facsHtml = [e.fac1, e.fac2].filter(Boolean)
+    .map(function(nom) { return '<span class="pill pill-f">' + esc(nom) + '</span>'; })
+    .join('') || '<span class="avail-note">—</span>';
+
+  // Helpers — marquer les Colibris
+  var helpers = [e.helper1, e.helper2, e.helper3, e.helper4].filter(Boolean);
+  var helpersHtml = helpers.length
+    ? helpers.map(function(nom) {
+        var col  = isColibri(nom);
+        var trad = isTraducteur(nom);
+        var cls  = col ? 'pill-colibri' : (trad ? 'pill-t' : 'pill-h');
+        var icon = col ? '🐦 ' : (trad ? '🌐 ' : '');
+        return '<span class="pill ' + cls + '">' + icon + esc(nom) + '</span>';
+      }).join('')
+    : '<span class="avail-note">Aucun helper</span>';
+
+  // Traducteur — marquer si Colibri
+  var tradHtml = '';
+  if (e.traduction) {
+    var col  = isColibri(e.traduction);
+    var cls  = col ? 'pill-colibri' : 'pill-t';
+    var icon = col ? '🐦 ' : '🌐 ';
+    tradHtml = '<span class="pill ' + cls + '">' + icon + esc(e.traduction) + '</span>';
+  } else {
+    tradHtml = '<span class="avail-note">—</span>';
+  }
+
+  // Ligne Colibri(s) : alerte si manquant, pills si assigné
+  var colibriRowHtml;
+  if (w.manquant) {
+    colibriRowHtml =
+      '<span style="font-size:12px;font-weight:700;color:var(--red)">⚠️ Aucun colibri assigné — à pourvoir</span>';
+  } else {
+    colibriRowHtml = w.colibrisPresents.map(function(c) {
+      return '<span class="pill pill-colibri">🐦 ' + esc(c.nom) + '</span>';
+    }).join('');
+  }
+
+  var cardCls = w.manquant ? 'ws-card missing' : 'ws-card';
+
+  return '<div class="' + cardCls + '">' +
+    (w.manquant ? '<div class="alert-banner">⚠️ Shift Colibri requis — aucun colibri assigné en helper ou traducteur</div>' : '') +
+    '<div class="ws-header">' +
+      '<div class="ws-day">'   + esc(e.jour)    + '</div>' +
+      '<div class="ws-time">'  + esc(e.heure)   + '</div>' +
+      '<div class="ws-title">' + esc(e.atelier) + '</div>' +
+      (e.lieu ? '<div class="ws-lieu">' + esc(e.lieu) + '</div>' : '') +
+      '<div class="ws-type">'  + esc(e.type)    + '</div>' +
+    '</div>' +
+    '<div class="ws-body">' +
+      '<div class="info-row"><span class="info-label">🐦 Colibri(s)</span><div class="pills-wrap">' + colibriRowHtml + '</div></div>' +
+      '<div class="info-row"><span class="info-label">🎓 Animateurs</span><div class="pills-wrap">' + facsHtml       + '</div></div>' +
+      '<div class="info-row"><span class="info-label">🤝 Helpers</span><div class="pills-wrap">'    + helpersHtml    + '</div></div>' +
+      '<div class="info-row"><span class="info-label">🌐 Traducteur</span><div class="pills-wrap">' + tradHtml       + '</div></div>' +
+      '<button class="btn-edit" onclick="openPw(' + w.idx + ')">✏️ Éditer cet atelier</button>' +
+    '</div>' +
+  '</div>';
+}
+
+// ── Utilitaires ───────────────────────────────────────────────────────────────
+window.render = render;
+
+function esc(v) {
+  return String(v || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function toggleMode() {
+  var dark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = dark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+function hardReload() { location.reload(true); }
+window.toggleMode = toggleMode;
+window.hardReload = hardReload;
+
+// ── Modale mot de passe → Éditer Atelier ──────────────────────────────────────
+var PW = '007';
+var _pendingIdx = null;
+
+function openPw(idx) {
+  _pendingIdx = idx;
+  var e = AGENDA[idx];
+  document.getElementById('pwTarget').textContent = e ? e.atelier : '';
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').textContent = '';
+  document.getElementById('pwOverlay').classList.add('open');
+  setTimeout(function() { document.getElementById('pwInput').focus(); }, 50);
+}
+window.openPw = openPw;
+
+function closePw() {
+  document.getElementById('pwOverlay').classList.remove('open');
+  _pendingIdx = null;
+}
+window.closePw = closePw;
+
+function checkPw() {
+  if (document.getElementById('pwInput').value === PW) {
+    closePw();
+    // Ouvrir Rapport_Editer_Atelier.html avec ?idx= uniquement — pas de v= pour ne pas déclencher hardReload
+    var url = 'Rapport_Editer_Atelier.html?idx=' + _pendingIdx;
+    window.open(url, '_blank', 'noopener');
+  } else {
+    document.getElementById('pwError').textContent = '❌ Mot de passe incorrect';
+    document.getElementById('pwInput').select();
+  }
+}
+window.checkPw = checkPw;
+
+document.getElementById('pwOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closePw();
+});
+
+// Auto-refresh si ouvert depuis Home
+if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
+  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
+  hardReload();
+}
+
+render();
+
+}); // end loadData
+</script>
+</body>
+</html>
+
+
+
