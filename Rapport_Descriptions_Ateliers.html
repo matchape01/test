@@ -1,0 +1,823 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Descriptions / Workshop Descriptions</title>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --header-bg:#f0f4fb; --row-alt:#f7f8fa;
+    --tag-bg:#eef2ff; --tag-text:#3b5bdb;
+    --green:#16a34a; --green-bg:#dcfce7; --green-border:#86efac;
+    --orange:#c2410c; --orange-bg:#fff7ed; --orange-border:#fed7aa;
+    --fr-bg:#eff6ff; --fr-border:#bfdbfe;
+    --en-bg:#f0fdf4; --en-border:#86efac;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --header-bg:#1c2333; --row-alt:#161b22;
+    --tag-bg:#1c2a4a; --tag-text:#79a8ff;
+    --green-bg:#052e16; --green-border:#166534;
+    --orange-bg:#1c0a00; --orange-border:#7c2d12;
+    --fr-bg:#0c2d48; --fr-border:#1e4e7a;
+    --en-bg:#052e16; --en-border:#166534;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
+  .wrap { max-width:900px; margin:0 auto; padding:24px 20px 80px; }
+
+  /* ── HEADER ── */
+  header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
+  .logo h1 { font-size:19px; font-weight:700; }
+  .logo p  { font-size:22px; font-weight:800; color:var(--accent); line-height:1.2; margin-top:2px; }
+  .header-actions { display:flex; gap:8px; align-items:center; }
+  .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 14px; font-size:13px; color:var(--text); font-family:inherit; display:inline-flex; align-items:center; gap:6px; text-decoration:none; transition:background .15s; }
+  .btn:hover { background:var(--border); }
+  .btn-primary { background:var(--accent); color:#fff; border-color:var(--accent); font-weight:600; }
+  .btn-primary:hover { background:#2563eb; border-color:#2563eb; }
+  .btn-sm { padding:5px 10px; font-size:12px; }
+
+  /* ── INDICATEURS GLOBAUX ── */
+  .summary { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:24px; }
+  .sum-card { flex:1; min-width:100px; border-radius:10px; padding:12px 16px; border:1px solid var(--border); background:var(--surface); }
+  .sum-num  { font-size:26px; font-weight:800; line-height:1; margin-bottom:3px; color:var(--accent); }
+  .sum-lbl  { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); }
+
+  /* ── PANNEAU FILTRES ── */
+  .filters-panel {
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:18px 20px; margin-bottom:20px;
+  }
+  .filters-title { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); margin-bottom:14px; }
+  .filters-row { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
+  .filter-group { flex:1; min-width:150px; }
+  .filter-label { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; }
+  .filter-select {
+    width:100%; padding:7px 10px; border:1px solid var(--border); border-radius:8px;
+    background:var(--bg); color:var(--text); font-size:13px; font-family:inherit;
+    outline:none; cursor:pointer; appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2357606a' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat; background-position:right 10px center;
+    padding-right:28px;
+  }
+  .filter-select:focus { border-color:var(--accent); }
+  .filter-reset { white-space:nowrap; }
+
+  /* ── RÉSULTAT COMPTEUR ── */
+  .results-bar {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:14px; flex-wrap:wrap; gap:8px;
+  }
+  .results-count { font-size:13px; color:var(--muted); }
+  .results-count strong { color:var(--text); }
+
+  /* ── LISTE ATELIERS ── */
+  .ws-list { display:flex; flex-direction:column; gap:8px; }
+  .ws-card {
+    border:1px solid var(--border); border-radius:10px; padding:13px 16px;
+    cursor:pointer; transition:border-color .15s, background .15s;
+    display:flex; align-items:center; gap:14px;
+  }
+  .ws-card:hover { border-color:var(--accent); background:var(--fr-bg); }
+  .dark .ws-card:hover { background:#0c2d48; }
+  .ws-card-left { flex:1; min-width:0; }
+  .ws-card-jour { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:2px; }
+  .ws-card-name { font-size:14px; font-weight:700; margin-bottom:4px; }
+  .ws-card-meta { font-size:12px; color:var(--muted); display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .ws-card-right { flex-shrink:0; display:flex; align-items:center; gap:8px; }
+  .ws-pill { font-size:11px; font-weight:700; padding:3px 10px; border-radius:99px; white-space:nowrap; }
+  .ws-pill.filled  { background:var(--green-bg);  color:var(--green);  border:1px solid var(--green-border); }
+  .ws-pill.partial { background:var(--orange-bg); color:var(--orange); border:1px solid var(--orange-border); }
+  .ws-pill.empty   { background:var(--surface);   color:var(--muted);  border:1px solid var(--border); }
+  .tag { display:inline-block; border-radius:4px; padding:2px 7px; font-size:11px; font-weight:600; white-space:nowrap; }
+  .tag-type { background:var(--tag-bg); color:var(--tag-text); }
+
+  /* ── ÉCRAN D'ÉDITION ── */
+  #screenEdit { display:none; }
+  .back-bar { display:flex; align-items:center; gap:10px; margin-bottom:22px; flex-wrap:wrap; }
+  .breadcrumb { font-size:13px; color:var(--muted); flex:1; }
+  .bc-link { color:var(--accent); cursor:pointer; }
+  .bc-link:hover { text-decoration:underline; }
+
+  .ws-header-box { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:18px 22px; margin-bottom:24px; }
+  .ws-header-jour  { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); margin-bottom:4px; }
+  .ws-header-title { font-size:20px; font-weight:800; margin-bottom:6px; }
+  .ws-header-meta  { font-size:13px; color:var(--muted); display:flex; gap:14px; flex-wrap:wrap; }
+
+  .section-label { font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--muted); font-weight:700; margin-bottom:12px; }
+  .piment-btns { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:24px; }
+  .piment-btn  { cursor:pointer; padding:7px 16px; border-radius:8px; border:2px solid var(--border); background:var(--bg); font-size:14px; font-family:inherit; color:var(--text); transition:all .15s; }
+  .piment-btn.active { border-color:var(--accent); background:#eff6ff; font-weight:700; }
+  .dark .piment-btn.active { background:#0c2d48; }
+
+  .desc-block { margin-bottom:22px; }
+  .desc-label {
+    display:flex; align-items:center; gap:8px;
+    font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.6px;
+    color:var(--muted); margin-bottom:7px;
+  }
+  .lang-badge { font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px; }
+  .lang-fr { background:var(--fr-bg); color:#1d4ed8; border:1px solid var(--fr-border); }
+  .lang-en { background:var(--en-bg); color:#166534; border:1px solid var(--en-border); }
+  .desc-area {
+    width:100%; min-height:150px; resize:vertical;
+    border:1px solid var(--border); border-radius:8px;
+    padding:12px 14px; font-size:14px; line-height:1.7;
+    font-family:inherit; color:var(--text); background:var(--bg);
+    outline:none; transition:border-color .15s, background .15s;
+  }
+  .desc-area.fr:focus      { border-color:#3b82f6; box-shadow:0 0 0 3px rgba(59,130,246,.1); background:var(--fr-bg); }
+  .desc-area.en:focus      { border-color:#16a34a; box-shadow:0 0 0 3px rgba(22,163,74,.1);  background:var(--en-bg); }
+  .desc-area.consigne      { min-height:80px; border-color:#f59e0b; }
+  .desc-area.consigne:focus{ border-color:#d97706; box-shadow:0 0 0 3px rgba(245,158,11,.15); background:#fffbeb; }
+  .dark .desc-area.consigne:focus { background:#1c1400; }
+  .consigne-badge { font-size:10px; font-weight:800; padding:2px 7px; border-radius:4px; background:#fef3c7; color:#92400e; border:1px solid #fcd34d; }
+  /* badge alerte dans la liste des ateliers */
+  .ws-card-alert { font-size:15px; flex-shrink:0; }
+  /* badge alerte dans la carte programme (liste) */
+  .badge-alert { display:inline-flex; align-items:center; font-size:13px; }
+  .validee-row { display:flex; align-items:center; gap:10px; margin-bottom:24px; padding:12px 16px; border-radius:8px; border:1px solid var(--border); background:var(--surface); }
+  .validee-row input[type=checkbox] { width:18px; height:18px; cursor:pointer; accent-color:var(--green,#16a34a); flex-shrink:0; }
+  .validee-label { font-size:13px; font-weight:600; cursor:pointer; user-select:none; }
+  .validee-row.checked { border-color:var(--green-border,#86efac); background:var(--green-bg,#dcfce7); }
+  .dark .validee-row.checked { background:#052e16; border-color:#166534; }
+  .ws-pill.validated { background:#dcfce7; color:#166534; border:1px solid #86efac; }
+
+  .editor-actions { display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-top:24px; }
+  .save-stamp { font-size:12px; color:var(--muted); margin-left:8px; }
+
+  /* ── VIDE ── */
+  .empty { text-align:center; padding:40px; color:var(--muted); font-style:italic; border:2px dashed var(--border); border-radius:10px; }
+
+  /* ── TOAST ── */
+  #toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(80px); background:#1f2328; color:#fff; border-radius:8px; padding:12px 22px; font-size:13px; font-weight:600; z-index:10000; transition:transform .3s,opacity .3s; opacity:0; white-space:nowrap; }
+  #toast.show { transform:translateX(-50%) translateY(0); opacity:1; }
+  #toast.ok  { background:#166534; }
+  #toast.err { background:#dc2626; }
+
+  footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>📝 <span data-i18n="r_desc_title">Descriptions des Ateliers</span></p>
+    </div>
+    <div class="header-actions">
+      <a class="btn" href="index_bis.html">🏠 <span data-i18n="nav_home">Home</span></a>
+      <button class="btn" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="btn" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit">Mode Nuit</span></button>
+      <button class="btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
+    </div>
+  </header>
+
+  <!-- ══ ÉCRAN LISTE (filtres + ateliers) ══ -->
+  <div id="screenList">
+
+    <!-- Indicateurs globaux -->
+    <div class="summary">
+      <div class="sum-card"><div class="sum-num" id="sumTotal">—</div><div class="sum-lbl" data-i18n="r_desc_sum_ateliers">Ateliers</div></div>
+      <div class="sum-card" style="border-color:var(--green-border)"><div class="sum-num" style="color:var(--green)" id="sumBoth">—</div><div class="sum-lbl" data-i18n="r_desc_sum_both">FR + EN ✓</div></div>
+      <div class="sum-card" style="border-color:var(--orange-border)"><div class="sum-num" style="color:var(--orange)" id="sumPartial">—</div><div class="sum-lbl" data-i18n="r_desc_sum_partial">Partiel</div></div>
+      <div class="sum-card"><div class="sum-num" style="color:var(--muted)" id="sumNone">—</div><div class="sum-lbl" data-i18n="r_desc_sum_vide">Vide</div></div>
+    </div>
+
+    <!-- Filtres -->
+    <div class="filters-panel">
+      <div class="filters-title" data-i18n="r_desc_filters_title">🔍 Filtres</div>
+      <div class="filters-row">
+        <div class="filter-group">
+          <div class="filter-label" data-i18n="r_desc_filter_jour">📅 Jour</div>
+          <select class="filter-select" id="filterJour" onchange="applyFilters()">
+            <option value="" data-i18n="r_desc_all_days">Tous les jours</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label" data-i18n="r_desc_filter_fac">🎓 Animateur</div>
+          <select class="filter-select" id="filterFac" onchange="applyFilters()">
+            <option value="" data-i18n="r_desc_all_fac">Tous les animateurs</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <div class="filter-label" data-i18n="r_desc_filter_type">🏷 Type d'atelier</div>
+          <select class="filter-select" id="filterType" onchange="applyFilters()">
+            <option value="" data-i18n="r_desc_all_types">Tous les types</option>
+          </select>
+        </div>
+        <div class="filter-group" style="flex:0">
+          <div class="filter-label">&nbsp;</div>
+          <button class="btn filter-reset" onclick="resetFilters()" data-i18n="r_desc_filter_reset">✕ Réinitialiser</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barre résultats -->
+    <div class="results-bar">
+      <div class="results-count" id="resultsCount"></div>
+    </div>
+
+    <!-- Liste ateliers -->
+    <div class="ws-list" id="wsList"></div>
+
+  </div><!-- /screenList -->
+
+  <!-- ══ ÉCRAN ÉDITION ══ -->
+  <div id="screenEdit">
+
+    <div class="back-bar">
+      <button class="btn btn-sm" onclick="goList()" data-i18n="r_desc_back">← Retour à la liste</button>
+      <div class="breadcrumb">
+        <span class="bc-link" onclick="goList()" data-i18n="r_desc_breadcrumb">Ateliers</span>
+        &nbsp;›&nbsp;
+        <span id="bcAtelier">—</span>
+      </div>
+    </div>
+
+    <!-- En-tête lecture seule -->
+    <div class="ws-header-box">
+      <div class="ws-header-jour" id="s4Jour"></div>
+      <div class="ws-header-title" id="s4Title"></div>
+      <div class="ws-header-meta" id="s4Meta"></div>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--border);margin:0 0 24px">
+
+    <!-- Piment -->
+    <p class="section-label" data-i18n="r_desc_piment_label">Niveau Piment</p>
+    <div class="piment-btns" id="s4PimentBtns"></div>
+
+    <!-- Description FR -->
+    <div class="desc-block">
+      <div class="desc-label">
+        <span data-i18n="r_desc_label_fr">Description</span> <span class="lang-badge lang-fr">🇫🇷 Français</span>
+      </div>
+      <textarea class="desc-area fr" id="s4DescFr"
+        data-i18n-placeholder="r_desc_ph_fr"
+        placeholder="Saisissez ou collez la description en français…"></textarea>
+    </div>
+
+    <!-- Description EN -->
+    <div class="desc-block">
+      <div class="desc-label">
+        <span data-i18n="r_desc_label_en">Description</span> <span class="lang-badge lang-en">🇬🇧 English</span>
+      </div>
+      <textarea class="desc-area en" id="s4DescEn"
+        data-i18n-placeholder="r_desc_ph_en"
+        placeholder="Enter or paste the English description…"></textarea>
+    </div>
+
+    <div class="desc-block">
+      <div class="desc-label">
+        <span>Consigne pour festivalier</span>
+        <span class="consigne-badge">⚠️ Alerte</span>
+      </div>
+      <textarea class="desc-area consigne" id="s4Consigne"
+        placeholder="Consignes particulières affichées aux festivaliers (ex : venir avec un partenaire, tenue spécifique, etc.)…"></textarea>
+    </div>
+
+    <div class="validee-row" id="valideeRow">
+      <input type="checkbox" id="s4ValidatedByFac" onchange="toggleValideeStyle()">
+      <label class="validee-label" for="s4ValidatedByFac" id="valideeLabel" data-i18n="r_desc_validee_fac">Validée par Animateur</label>
+    </div>
+
+    <div class="editor-actions">
+      <button class="btn btn-primary" onclick="doSave()" data-i18n="r_desc_save">💾 Enregistrer</button>
+      <button class="btn" onclick="goList()" data-i18n="r_desc_back">← Retour à la liste</button>
+      <span class="save-stamp" id="s4Stamp"></span>
+    </div>
+
+  </div><!-- /screenEdit -->
+
+  <footer data-i18n="r_desc_footer">Tantramour 2026 — Gestion des descriptions FR/EN</footer>
+</div><!-- /wrap -->
+
+<div id="toast"></div>
+
+<script src="github-api.js"></script>
+<script src="loader.js"></script>
+<script src="ref_piment.js"></script>
+<script>
+loadData(['data.js', 'ref_descriptions.js'], function() {
+
+// ════════════════════════════════════════════
+// CONSTANTES
+// ════════════════════════════════════════════
+var JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+var JOUR_META  = {
+  'Jour 1': { date:'Samedi 29 août',    emoji:'🌅' },
+  'Jour 2': { date:'Dimanche 30 août',  emoji:'☀️' },
+  'Jour 3': { date:'Lundi 31 août',     emoji:'🌿' },
+  'Jour 4': { date:'Mardi 1 sept.',     emoji:'🔥' },
+  'Jour 5': { date:'Mercredi 2 sept.',  emoji:'💧' },
+  'Jour 6': { date:'Jeudi 3 sept.',     emoji:'🌙' },
+  'Jour 7': { date:'Vendredi 4 sept.',  emoji:'✨' },
+};
+
+// ════════════════════════════════════════════
+// ÉTAT
+// ════════════════════════════════════════════
+var currentKey    = '';
+var currentPiment = 0;
+
+// Copie de travail indexée par clé
+var DESCS = {};
+REF_DESCRIPTIONS.forEach(function(d) { DESCS[d.key] = Object.assign({}, d); });
+
+// Ateliers dédupliqués depuis AGENDA (1 entrée par nom d'atelier unique)
+// On garde toutes les occurrences pour les jours multiples
+var AGENDA_ATELIERS = AGENDA.filter(function(e) {
+  return (e.fac1 || e.fac2);
+});
+
+// ════════════════════════════════════════════
+// INDICATEURS GLOBAUX
+// ════════════════════════════════════════════
+function updateStats() {
+  var total = 0, both = 0, partial = 0, none = 0;
+  // Compter sur les ateliers uniques (par nom)
+  var seen = new Set();
+  AGENDA_ATELIERS.forEach(function(e) {
+    var nom = (e.atelier||'').trim();
+    if (seen.has(nom)) return;
+    seen.add(nom);
+    total++;
+    var d = findDescByName(nom);
+    var hasFr = d && d.descFr && d.descFr.trim();
+    var hasEn = d && d.descEn && d.descEn.trim();
+    if (hasFr && hasEn) both++;
+    else if (hasFr || hasEn) partial++;
+    else none++;
+  });
+  document.getElementById('sumTotal').textContent   = total;
+  document.getElementById('sumBoth').textContent    = both;
+  document.getElementById('sumPartial').textContent = partial;
+  document.getElementById('sumNone').textContent    = none;
+}
+
+// ════════════════════════════════════════════
+// PEUPLEMENT DES FILTRES
+// ════════════════════════════════════════════
+function buildFilterOptions() {
+  // Jours
+  var joursPresents = new Set();
+  AGENDA_ATELIERS.forEach(function(e) { if (e.jour) joursPresents.add(e.jour); });
+  var selJour = document.getElementById('filterJour');
+  JOUR_ORDER.filter(function(j){ return joursPresents.has(j); }).forEach(function(j) {
+    var meta = JOUR_META[j] || {};
+    var opt = document.createElement('option');
+    opt.value = j;
+    opt.textContent = j + (meta.date ? ' — ' + meta.date : '');
+    selJour.appendChild(opt);
+  });
+
+  // Animateurs (triés alphabétiquement)
+  var facsSet = new Set();
+  AGENDA_ATELIERS.forEach(function(e) {
+    if (e.fac1) facsSet.add(e.fac1);
+    if (e.fac2) facsSet.add(e.fac2);
+  });
+  var facsSorted = Array.from(facsSet).sort(function(a,b){ return a.localeCompare(b,'fr'); });
+  var selFac = document.getElementById('filterFac');
+  facsSorted.forEach(function(f) {
+    var opt = document.createElement('option');
+    opt.value = f; opt.textContent = f;
+    selFac.appendChild(opt);
+  });
+
+  // Types (triés alphabétiquement)
+  var typesSet = new Set();
+  AGENDA_ATELIERS.forEach(function(e) { if (e.type) typesSet.add(e.type); });
+  var typesSorted = Array.from(typesSet).sort(function(a,b){ return a.localeCompare(b,'fr'); });
+  var selType = document.getElementById('filterType');
+  typesSorted.forEach(function(t) {
+    var opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    selType.appendChild(opt);
+  });
+}
+
+// ════════════════════════════════════════════
+// FILTRAGE
+// ════════════════════════════════════════════
+function getFilteredAteliers() {
+  var fJour = document.getElementById('filterJour').value;
+  var fFac  = document.getElementById('filterFac').value;
+  var fType = document.getElementById('filterType').value;
+
+  // Filtrer les entrées AGENDA
+  var filtered = AGENDA_ATELIERS.filter(function(e) {
+    if (fJour && e.jour !== fJour) return false;
+    if (fFac  && e.fac1 !== fFac && e.fac2 !== fFac) return false;
+    if (fType && e.type !== fType) return false;
+    return true;
+  });
+
+  // Dédupliquer par nom d'atelier (garder la première occurrence)
+  // SAUF si un filtre jour est actif : dans ce cas on peut avoir le même atelier sur 2 jours
+  var seen = new Set();
+  var deduped = [];
+  filtered.forEach(function(e) {
+    var nom = (e.atelier||'').trim();
+    // Clé de dédup = nom + jour si filtre jour actif, sinon juste nom
+    var key = fJour ? nom + '|' + e.jour : nom;
+    if (!seen.has(key)) {
+      seen.add(key);
+      deduped.push(e);
+    }
+  });
+
+  // Tri : jour → heure → nom
+  deduped.sort(function(a, b) {
+    var ji = JOUR_ORDER.indexOf(a.jour) - JOUR_ORDER.indexOf(b.jour);
+    if (ji !== 0) return ji;
+    var hi = heureMin(a.heure) - heureMin(b.heure);
+    if (hi !== 0) return hi;
+    return (a.atelier||'').localeCompare(b.atelier||'', 'fr');
+  });
+
+  return deduped;
+}
+
+function applyFilters() {
+  var ateliers = getFilteredAteliers();
+  renderList(ateliers);
+}
+window.applyFilters = applyFilters;
+
+function resetFilters() {
+  document.getElementById('filterJour').value = '';
+  document.getElementById('filterFac').value  = '';
+  document.getElementById('filterType').value = '';
+  applyFilters();
+}
+window.resetFilters = resetFilters;
+
+// ════════════════════════════════════════════
+// RENDU DE LA LISTE
+// ════════════════════════════════════════════
+function renderList(ateliers) {
+  var list = document.getElementById('wsList');
+  var count = document.getElementById('resultsCount');
+
+  var wLabel = ateliers.length > 1 ? I18n.t('r_desc_workshops') : I18n.t('r_desc_workshop');
+  count.innerHTML = I18n.t('r_desc_showing') + ' <strong>' + ateliers.length + '</strong> ' + wLabel;
+
+  if (!ateliers.length) {
+    list.innerHTML = '<div class="empty">' + I18n.t('r_desc_no_result') + '</div>';
+    return;
+  }
+
+  list.innerHTML = ateliers.map(function(e, idx) {
+    var d   = findDescByName((e.atelier||'').trim());
+    var facs = [e.fac1, e.fac2].filter(Boolean).join(' & ');
+    var meta = JOUR_META[e.jour] || {};
+    var pimentStr = e.piment > 0
+      ? '<span style="letter-spacing:-1px">' + '🌶️'.repeat(e.piment) + '</span>' : '';
+    return '<div class="ws-card" onclick="selectAtelier(' + idx + ')">' +
+      '<div class="ws-card-left">' +
+        '<div class="ws-card-jour">' +
+          esc(e.jour) + (meta.date ? ' — ' + meta.date : '') +
+          (e.heure ? ' · ' + esc(e.heure) : '') +
+          (e.lieu  ? ' · 📍 ' + esc(e.lieu) : '') +
+        '</div>' +
+        '<div class="ws-card-name">' + esc(e.atelier||'—') + (pimentStr ? ' ' + pimentStr : '') + '</div>' +
+        '<div class="ws-card-meta">' +
+          '<span class="tag tag-type">' + esc(e.type||'') + '</span>' +
+          (facs ? '<span>🎓 ' + esc(facs) + '</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="ws-card-right">' +
+        (d && d.consigne && d.consigne.trim() ? '<span class="ws-card-alert" title="Consigne pour festivalier">⚠️</span>' : '') +
+        validatedPill(d) + descPill(d) +
+        '<span style="font-size:18px;color:var(--muted);margin-left:4px">›</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+
+  // Stocker pour selectAtelier
+  window._currentList = ateliers;
+}
+
+// ════════════════════════════════════════════
+// UTILITAIRES DESCRIPTIONS
+// ════════════════════════════════════════════
+function findDescByName(nom) {
+  return Object.values(DESCS).find(function(d) {
+    return (d.atelier||'').trim() === nom;
+  }) || null;
+}
+
+function validatedPill(d) {
+  if (d && d.validatedByFac) return '<span class="ws-pill validated">' + I18n.t('r_desc_pill_validee') + '</span>';
+  return '';
+}
+
+function descPill(d) {
+  if (!d) return '<span class="ws-pill empty">' + I18n.t('r_desc_pill_empty') + '</span>';
+  var hasFr = d.descFr && d.descFr.trim();
+  var hasEn = d.descEn && d.descEn.trim();
+  if (hasFr && hasEn) return '<span class="ws-pill filled">' + I18n.t('r_desc_pill_filled') + '</span>';
+  if (hasFr) return '<span class="ws-pill partial">' + I18n.t('r_desc_pill_partial_fr') + '</span>';
+  if (hasEn) return '<span class="ws-pill partial">' + I18n.t('r_desc_pill_partial_en') + '</span>';
+  return '<span class="ws-pill empty">' + I18n.t('r_desc_pill_empty') + '</span>';
+}
+
+// ════════════════════════════════════════════
+// SÉLECTION D'UN ATELIER → ÉDITION
+// ════════════════════════════════════════════
+function selectAtelier(idx) {
+  var e = (window._currentList || [])[idx];
+  if (!e) return;
+
+  // Chercher ou créer une entrée de description
+  var d = findDescByName((e.atelier||'').trim());
+  if (!d) {
+    var newKey = (e.atelier||'').replace(/[^a-zA-Z0-9]/g,'_').toLowerCase().slice(0,40)
+                  .replace(/_+/g,'_').replace(/^_|_$/g,'');
+    var base = newKey, n = 2;
+    while (DESCS[newKey]) { newKey = base + '_' + n; n++; }
+    d = { key:newKey, atelier:e.atelier, type:e.type, piment:e.piment||0, fac1:e.fac1||'', fac2:e.fac2||'', descFr:'', descEn:'', consigne:'', validatedByFac:false, updatedAt:'' };
+    DESCS[newKey] = d;
+  }
+
+  currentKey    = d.key;
+  currentPiment = d.piment !== undefined ? d.piment : (e.piment||0);
+
+  // Remplir l'écran d'édition
+  var meta = JOUR_META[e.jour] || {};
+  document.getElementById('s4Jour').textContent  = e.jour + (meta.date ? ' — ' + meta.date : '');
+  document.getElementById('s4Title').textContent = e.atelier || '—';
+  document.getElementById('s4Meta').innerHTML = [
+    e.heure && '🕐 ' + e.heure,
+    e.lieu  && '📍 ' + e.lieu,
+    e.type  && '🏷 ' + e.type,
+    [e.fac1,e.fac2].filter(Boolean).length && '🎓 ' + [e.fac1,e.fac2].filter(Boolean).join(' & '),
+  ].filter(Boolean).join('&nbsp;&nbsp;&nbsp;');
+
+  document.getElementById('bcAtelier').textContent = e.atelier || '—';
+
+  buildPimentBtns(currentPiment);
+  document.getElementById('s4DescFr').value     = d.descFr   || '';
+  document.getElementById('s4DescEn').value     = d.descEn   || '';
+  document.getElementById('s4Consigne').value   = d.consigne || '';
+  document.getElementById('s4Stamp').textContent = d.updatedAt ? I18n.t('r_desc_last_modif') + ' ' + d.updatedAt : '';
+  var cbx = document.getElementById('s4ValidatedByFac');
+  cbx.checked = !!d.validatedByFac;
+  document.getElementById('valideeRow').classList.toggle('checked', !!d.validatedByFac);
+
+  showScreen('edit');
+}
+window.selectAtelier = selectAtelier;
+
+// ════════════════════════════════════════════
+// NAVIGATION ENTRE ÉCRANS
+// ════════════════════════════════════════════
+function showScreen(name) {
+  document.getElementById('screenList').style.display = (name === 'list') ? 'block' : 'none';
+  document.getElementById('screenEdit').style.display = (name === 'edit') ? 'block' : 'none';
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+function goList() {
+  showScreen('list');
+  updateStats();
+  applyFilters(); // Rafraîchir les pills après sauvegarde
+}
+window.goList = goList;
+
+// ════════════════════════════════════════════
+// PIMENT
+// ════════════════════════════════════════════
+function buildPimentBtns(selected) {
+  document.getElementById('s4PimentBtns').innerHTML = REF_PIMENT.map(function(p) {
+    return '<button class="piment-btn' + (p.value === selected ? ' active' : '') + '" ' +
+      'onclick="setPiment(' + p.value + ')">' + p.label + '</button>';
+  }).join('');
+}
+function setPiment(val) {
+  currentPiment = val;
+  buildPimentBtns(val);
+}
+window.setPiment = setPiment;
+
+function toggleValideeStyle() {
+  var checked = document.getElementById('s4ValidatedByFac').checked;
+  document.getElementById('valideeRow').classList.toggle('checked', checked);
+}
+window.toggleValideeStyle = toggleValideeStyle;
+
+// ════════════════════════════════════════════
+// SAUVEGARDE
+// ════════════════════════════════════════════
+async function doSave() {
+  var d = DESCS[currentKey];
+  if (!d) return;
+
+  var prevPiment    = d.piment !== undefined ? d.piment : 0;
+  d.piment          = currentPiment;
+  d.descFr          = document.getElementById('s4DescFr').value;
+  d.descEn          = document.getElementById('s4DescEn').value;
+  d.consigne        = document.getElementById('s4Consigne').value;
+  d.validatedByFac  = document.getElementById('s4ValidatedByFac').checked;
+  d.updatedAt       = new Date().toISOString().slice(0,10);
+
+  var orig = REF_DESCRIPTIONS.find(function(x) { return x.key === d.key; });
+  if (orig) {
+    orig.piment = d.piment; orig.descFr = d.descFr; orig.descEn = d.descEn;
+    orig.consigne = d.consigne;
+    orig.validatedByFac = d.validatedByFac; orig.updatedAt = d.updatedAt;
+  } else {
+    REF_DESCRIPTIONS.push(Object.assign({}, d));
+  }
+
+  // Mettre à jour piment dans AGENDA (data.js) pour toutes les entrées de cet atelier
+  var atelierName = (d.atelier || '').trim();
+  AGENDA.forEach(function(e) {
+    if ((e.atelier || '').trim() === atelierName) {
+      e.piment = d.piment;
+    }
+  });
+
+  try {
+    var saves = [saveFile('ref_descriptions.js', buildRefDescJs())];
+    if (d.piment !== prevPiment) {
+      saves.push(saveFile('data.js', buildDataJs()));
+    }
+    await Promise.all(saves);
+    document.getElementById('s4Stamp').textContent = I18n.t('r_desc_last_modif') + ' ' + d.updatedAt;
+    showToast(I18n.t('r_desc_saved_ok'), 'ok');
+  } catch(err) {
+    showToast('❌ ' + err.message, 'err');
+  }
+}
+window.doSave = doSave;
+
+// ════════════════════════════════════════════
+// SÉRIALISATION data.js
+// ════════════════════════════════════════════
+function buildDataJs() {
+  var lines = AGENDA.map(function(e) {
+    return '  {jour:"'       + escJs(e.jour||'') +
+      '",date:"'             + escJs(e.date||'') +
+      '",heure:"'            + escJs(e.heure||'') +
+      '",type:"'             + escJs(e.type||'') +
+      '",atelier:"'          + escJs(e.atelier||'') +
+      '",lieu:"'             + escJs(e.lieu||'') +
+      '",fac1:"'             + escJs(e.fac1||'') +
+      '",fac2:"'             + escJs(e.fac2||'') +
+      '",traduction:"'       + escJs(e.traduction||'') +
+      '",helper1:"'          + escJs(e.helper1||'') +
+      '",helper2:"'          + escJs(e.helper2||'') +
+      '",helper3:"'          + escJs(e.helper3||'') +
+      '",helper4:"'          + escJs(e.helper4||'') +
+      '",angel:"'            + escJs(e.angel||'') +
+      '",note:"'             + escJs(e.note||'') +
+      '",piment:'            + (e.piment||0) +
+      ',logisticId:"'        + escJs(e.logisticId||'') + '"}';
+  }).join(',\n');
+
+  return '/**\n' +
+    ' * TANTRAMOUR 2026 \u2014 R\u00e9f\u00e9rentiel de donn\u00e9es commun\n' +
+    ' * ================================================\n' +
+    ' * Source unique pour les 3 rapports HTML.\n' +
+    ' * Pour mettre \u00e0 jour : modifier uniquement ce fichier.\n' +
+    ' *\n' +
+    ' * Structure de chaque entr\u00e9e :\n' +
+    ' *   jour       {string}  "Jour 1" \u2026 "Jour 7"\n' +
+    ' *   date       {string}  "Samedi 29 aout" \u2026\n' +
+    ' *   heure      {string}  "9:45 - 11:00" | "Matin" | "APRES MIDI"\n' +
+    ' *   type       {string}  cat\u00e9gorie (ex: "ATELIERS TANTRA (AM)")\n' +
+    ' *   atelier    {string}  nom de l\'atelier / activit\u00e9\n' +
+    ' *   lieu       {string}  salle / espace (ex: "SHIVA", "CHENREZIG" \u2026)\n' +
+    ' *   fac1       {string}  Animateur principal\n' +
+    ' *   fac2       {string}  Animateur secondaire\n' +
+    ' *   traduction {string}  Langue / traducteur\n' +
+    ' *   helper1    {string}  Helper 1\n' +
+    ' *   helper2    {string}  Helper 2\n' +
+    ' *   helper3    {string}  Helper 3\n' +
+    ' *   helper4    {string}  Helper 4\n' +
+    ' *   angel      {string}  Angel\n' +
+    ' *   note       {string}  Note logistique (ex: "Shift Colibri", "Atelier + long")\n' +
+    ' */\n\n' +
+    'var AGENDA = [\n\n' + lines + '\n];\n';
+}
+
+// ════════════════════════════════════════════
+// SÉRIALISATION ref_descriptions.js
+// ════════════════════════════════════════════
+function escJs(s) {
+  return (s||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"').replace(/\r?\n/g,'\\n').replace(/\t/g,'\\t');
+}
+
+function buildRefDescJs() {
+  var allKeys = new Set(REF_DESCRIPTIONS.map(function(d) { return d.key; }));
+  Object.keys(DESCS).forEach(function(k) { allKeys.add(k); });
+
+  var merged = Array.from(allKeys).map(function(k) {
+    return DESCS[k] || REF_DESCRIPTIONS.find(function(d) { return d.key === k; });
+  }).filter(Boolean);
+
+  var lines = merged.map(function(d) {
+    return '  { key:"' + escJs(d.key||'') +
+      '", atelier:"'        + escJs(d.atelier||'') +
+      '", nomEn:"'          + escJs(d.nomEn||'') +
+      '", type:"'           + escJs(d.type||'') +
+      '", piment:'          + (d.piment||0) +
+      ', fac1:"'            + escJs(d.fac1||'') +
+      '", fac2:"'           + escJs(d.fac2||'') +
+      '", descFr:"'         + escJs(d.descFr||'') +
+      '", descEn:"'         + escJs(d.descEn||'') +
+      '", consigne:"'       + escJs(d.consigne||'') +
+      '", consigneEn:"'     + escJs(d.consigneEn||'') +
+      '", validatedByFac:'  + (d.validatedByFac ? 'true' : 'false') +
+      ', updatedAt:"'       + escJs(d.updatedAt||'') + '" }';
+  }).join(',\n');
+
+  return '/**\n * TANTRAMOUR 2026 — Descriptions des Ateliers (FR / EN)\n' +
+    ' * Géré automatiquement par Rapport_Descriptions_Ateliers.html\n */\n\n' +
+    'var REF_DESCRIPTIONS = [\n\n' + lines + '\n\n];\n';
+}
+
+// ════════════════════════════════════════════
+// API SAVE
+// ════════════════════════════════════════════
+async function saveFile(filename, content) {
+  if (location.protocol === 'file:') {
+    throw new Error(I18n.t('r_desc_open_via_server'));
+  }
+  var isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  if (isLocal) {
+    var res = await fetch('http://localhost:3000/save', {
+      method:'POST', headers:{ 'Content-Type':'application/json' },
+      body:JSON.stringify({ filename:filename, content:content })
+    });
+    if (!res.ok) {
+      var err = await res.json().catch(function(){return{};});
+      throw new Error(err.error || 'Erreur serveur ' + res.status);
+    }
+    return;
+  }
+  await githubSaveFile(filename, content);
+}
+
+// ════════════════════════════════════════════
+// UTILITAIRES
+// ════════════════════════════════════════════
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function heureMin(h) {
+  if (!h) return 9999;
+  var m = String(h).replace(/\./g,':').match(/(\d{1,2}):(\d{2})/);
+  return m ? parseInt(m[1])*60+parseInt(m[2]) : 9999;
+}
+
+var toastTimer;
+function showToast(msg, type) {
+  var el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { el.className = ''; }, 3000);
+}
+
+function hardReload() {
+  if ('caches' in window) {
+    caches.keys().then(function(keys) {
+      return Promise.all(keys.map(function(k){ return caches.delete(k); }));
+    }).finally(function() { location.reload(true); });
+  } else { location.reload(true); }
+}
+window.hardReload = hardReload;
+
+function toggleMode() {
+  var isDark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = isDark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+window.toggleMode = toggleMode;
+
+if (location.search.includes('v=') && !sessionStorage.getItem('_refreshed_' + location.pathname)) {
+  sessionStorage.setItem('_refreshed_' + location.pathname, '1');
+  hardReload();
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+buildFilterOptions();
+updateStats();
+applyFilters();
+showScreen('list');
+
+}); // fin loadData
+</script>
+</body>
+</html>
