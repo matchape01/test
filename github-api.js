@@ -66,6 +66,9 @@ function _ensureConfigBanner() {
 
 /**
  * Sauvegarde un fichier dans le repo GitHub.
+ * Stratégie robuste anti-409 :
+ *   - GET frais (If-None-Match vide + cache-buster) juste avant chaque PUT
+ *   - Jusqu'à MAX_RETRIES tentatives GET→PUT en cas de conflit de SHA
  * @param {string} filename  — nom du fichier (ex: 'data.js')
  * @param {string} content   — contenu texte complet du fichier
  * @returns {Promise<boolean>} — true si succès, false sinon
@@ -79,7 +82,7 @@ async function githubSaveFile(filename, content) {
   }
 
   const apiBase = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${filename}`;
-  const headers = {
+  const authHeaders = {
     'Authorization': `token ${token}`,
     'Accept':        'application/vnd.github+json',
     'Content-Type':  'application/json'
@@ -88,9 +91,29 @@ async function githubSaveFile(filename, content) {
   // Encoder le contenu en Base64
   const encoded = btoa(unescape(encodeURIComponent(content)));
 
-  // Stratégie : on essaie d'abord sans SHA (création).
-  // Si GitHub répond 409 (conflit), il nous donne le vrai SHA actuel dans le message
-  // → on réessaie immédiatement avec ce SHA. Aucun GET préalable nécessaire.
+  // Récupère le SHA actuel — garanti frais grâce à If-None-Match + cache-buster.
+  // Retourne null si le fichier n'existe pas encore (404).
+  async function getFreshSha() {
+    const r = await fetch(
+      `${apiBase}?ref=${GITHUB_BRANCH}&_t=${Date.now()}`,
+      {
+        method: 'GET',
+        headers: { ...authHeaders, 'If-None-Match': '' },
+        cache: 'no-store'
+      }
+    );
+    if (r.status === 401) {
+      localStorage.removeItem('tm_gh_token');
+      _ensureConfigBanner();
+      throw new Error('Token invalide ou expiré — saisis-en un nouveau.');
+    }
+    if (r.status === 404) return null;
+    if (!r.ok) throw new Error(`GitHub GET ${r.status}`);
+    const d = await r.json();
+    return d.sha || null;
+  }
+
+  // PUT avec le SHA fourni (ou sans SHA si fichier nouveau).
   async function doPut(sha) {
     const body = {
       message: `[Tantramour 2026] Mise à jour ${filename}`,
@@ -100,89 +123,59 @@ async function githubSaveFile(filename, content) {
     };
     return fetch(apiBase, {
       method: 'PUT',
-      headers,
+      headers: authHeaders,
       body:   JSON.stringify(body)
     });
   }
 
-  // Stratégie en 3 passes :
-  // 1. GET /contents pour avoir le SHA frais
-  // 2. PUT avec ce SHA
-  // 3. Si 409/422 avec SHA dans le message → on réessaie avec le bon SHA
+  // Boucle GET → PUT avec jusqu'à MAX_RETRIES tentatives.
+  // Chaque tentative récupère le SHA au dernier moment juste avant le PUT,
+  // ce qui élimine la fenêtre de désynchronisation entre les appels successifs.
+  const MAX_RETRIES = 4;
+  let lastErr = null;
 
-  // Passe 1 — récupérer le SHA actuel via GET simple
-  let sha = null;
-  try {
-    const getRes = await fetch(apiBase + '?ref=' + GITHUB_BRANCH, {
-      method: 'GET',
-      headers
-    });
-    if (getRes.status === 401) {
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    // GET frais juste avant le PUT — jamais de SHA mis en cache entre tentatives
+    let sha = null;
+    try {
+      sha = await getFreshSha();
+      console.log(`[github-api] Tentative ${attempt}/${MAX_RETRIES} — SHA pour ${filename}: ${sha}`);
+    } catch (err) {
+      // Erreur d'auth → on remonte immédiatement, pas la peine de réessayer
+      throw err;
+    }
+
+    const res = await doPut(sha);
+
+    // Succès
+    if (res.ok) {
+      console.log(`[github-api] ✅ ${filename} sauvegardé (tentative ${attempt})`);
+      return true;
+    }
+
+    // Erreur d'authentification → on remonte immédiatement
+    if (res.status === 401) {
       localStorage.removeItem('tm_gh_token');
       _ensureConfigBanner();
       throw new Error('Token invalide ou expiré — saisis-en un nouveau.');
     }
-    if (getRes.ok) {
-      const data = await getRes.json();
-      sha = data.sha || null;
-      console.log(`[github-api] SHA GET pour ${filename}: ${sha}`);
-    }
-    // 404 = fichier nouveau → sha reste null
-  } catch(err) {
-    if (err.message.includes('Token')) throw err;
-    // Erreur réseau sur le GET → on tente quand même le PUT sans SHA
-    console.warn(`[github-api] GET échoué pour ${filename}: ${err.message}`);
-  }
 
-  // Passe 2 — PUT avec le SHA récupéré (ou null si nouveau fichier)
-  let res = await doPut(sha);
-
-  // Passe 3 — Si conflit de SHA (409/422), refaire un GET frais pour obtenir
-  // le vrai SHA actuel, puis réessayer le PUT avec ce SHA garanti frais.
-  if (res.status === 409 || res.status === 422) {
-    const errData = await res.json().catch(() => ({}));
-    const msg = errData.message || '';
-    console.log(`[github-api] Conflit ${res.status} pour ${filename}: ${msg}`);
-
-    // GET frais sans aucun cache possible
-    let freshSha = null;
-    try {
-      const retryGet = await fetch(
-        `${apiBase}?ref=${GITHUB_BRANCH}&_nocache=${Date.now()}`,
-        { method: 'GET', headers, cache: 'no-store' }
-      );
-      if (retryGet.ok) {
-        const retryData = await retryGet.json();
-        freshSha = retryData.sha || null;
-        console.log(`[github-api] SHA frais après conflit: ${freshSha}`);
-      }
-    } catch(e) {
-      console.warn(`[github-api] GET de récupération échoué: ${e.message}`);
+    // Conflit de SHA (409/422) → on récupère le message et on réessaie
+    if (res.status === 409 || res.status === 422) {
+      const errData = await res.json().catch(() => ({}));
+      const msg = errData.message || '';
+      console.warn(`[github-api] Conflit ${res.status} tentative ${attempt}/${MAX_RETRIES} pour ${filename}: ${msg}`);
+      lastErr = new Error(`GitHub ${res.status} : ${msg}`);
+      // Petite pause croissante avant de réessayer (100ms, 200ms, 400ms…)
+      await new Promise(r => setTimeout(r, 100 * attempt));
+      continue;
     }
 
-    // Fallback : extraire le SHA depuis le message d'erreur si GET échoue
-    if (!freshSha) {
-      const match = msg.match(/([0-9a-f]{40})/);
-      if (match) freshSha = match[1];
-    }
-
-    if (freshSha) {
-      res = await doPut(freshSha);
-    } else {
-      throw new Error(`GitHub ${res.status} : ${msg || 'Conflit de version'}`);
-    }
-  }
-
-  if (res.status === 401) {
-    localStorage.removeItem('tm_gh_token');
-    _ensureConfigBanner();
-    throw new Error('Token invalide ou expiré — saisis-en un nouveau.');
-  }
-
-  if (!res.ok) {
+    // Autre erreur → on remonte
     const errData = await res.json().catch(() => ({}));
     throw new Error(`GitHub ${res.status} : ${errData.message || 'Erreur inconnue'}`);
   }
 
-  return true;
+  // Toutes les tentatives ont échoué
+  throw lastErr || new Error(`GitHub : échec après ${MAX_RETRIES} tentatives pour ${filename}`);
 }
