@@ -3,278 +3,453 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tantramour 2026 — Rapports</title>
+<title>Tantramour 2026</title>
 <style>
   :root {
-    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
-    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: -apple-system, "Segoe UI", system-ui, sans-serif;
-    font-size: 15px; line-height: 1.6;
-    background: var(--bg); color: var(--text);
-    min-height: 100vh;
-  }
-  .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 60px; }
-
-  /* ── EN-TÊTE ── */
-  .logo { margin-bottom: 40px; }
-  .logo h1 { font-size: 26px; font-weight: 700; letter-spacing: .2px; }
-  .logo p  { font-size: 13px; color: var(--muted); margin-top: 4px; }
-
-  /* ── GROUPE ── */
-  .group { margin-bottom: 32px; }
-  .group-label {
-    font-size: 15px; font-weight: 700;
-    color: var(--text);
-    padding-bottom: 10px; margin-bottom: 2px;
-    border-bottom: 2px solid var(--border);
-  }
-  .group-label span {
-    display: inline-block; margin-right: 8px; font-size: 17px; vertical-align: middle;
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
   }
 
-  /* ── GRILLE 2 colonnes ── */
-  .grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-top: 10px;
-  }
-  @media (max-width: 540px) { .grid { grid-template-columns: 1fr; } }
-
-  /* ── CARTE ── */
-  .card {
-    display: flex; align-items: center; gap: 14px;
+  /* ── WIDGET MESSAGE IMPORTANT ── */
+  .msg-important {
+    background: #fffbeb;
+    border: 2px solid #fcd34d;
+    border-radius: 14px;
     padding: 14px 16px;
-    border: 1px solid var(--border); border-radius: 10px;
-    background: var(--surface);
-    text-decoration: none; color: inherit;
-    transition: border-color .15s, background .15s;
-    cursor: pointer;
+    margin-bottom: 16px;
+    width: 100%; max-width: 400px;
   }
-  .card:hover { border-color: var(--accent); background: #fff; }
-  .card-icon {
-    font-size: 22px; flex-shrink: 0;
-    width: 42px; height: 42px;
-    display: flex; align-items: center; justify-content: center;
-    background: #fff; border: 1px solid var(--border); border-radius: 8px;
-  }
-  .card-body { flex: 1; min-width: 0; }
-  .card-title { font-size: 14px; font-weight: 700; margin-bottom: 1px; }
-  .card-desc  { font-size: 12px; color: var(--muted); line-height: 1.4; }
-  .card-arrow { font-size: 16px; color: var(--muted); flex-shrink: 0; }
-
-  /* ── FOOTER ── */
-  footer {
-    margin-top: 48px; padding-top: 16px;
-    border-top: 1px solid var(--border);
+  .msg-important-header {
     display: flex; align-items: center; justify-content: space-between;
-    flex-wrap: wrap; gap: 10px;
-    font-size: 12px; color: var(--muted);
+    margin-bottom: 10px;
   }
-  .footer-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    padding: 6px 12px;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
-    font-size: 12px; font-weight: 600; color: var(--text);
-    text-decoration: none; cursor: pointer; font-family: inherit;
+  .msg-important-header-left { display: flex; align-items: center; gap: 7px; }
+  .msg-important-title {
+    font-size: 12px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: .7px;
+    color: #b45309;
   }
-  .footer-btn:hover { background: var(--border); }
+  .msg-counter {
+    font-size: 11px; color: #92400e; font-weight: 600;
+    background: #fde68a; border-radius: 10px; padding: 1px 7px;
+  }
+  .msg-nav-btn {
+    cursor: pointer; background: none; border: 1.5px solid #fcd34d;
+    border-radius: 50%; width: 26px; height: 26px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; color: #b45309; flex-shrink: 0;
+    transition: background .15s, border-color .15s;
+    padding: 0;
+  }
+  .msg-nav-btn:hover { background: #fde68a; border-color: #f59e0b; }
+  .msg-date { font-size: 11px; color: #92400e; margin-bottom: 4px; }
+  .msg-text { font-size: 14px; color: #1f2328; line-height: 1.6; }
+
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif;
+    font-size:15px; line-height:1.6;
+    background:var(--bg); color:var(--text);
+    min-height:100vh;
+    display:flex; flex-direction:column;
+  }
+
+  /* ── LANGUE ── */
+  .lang-bar {
+    margin-top:12px;
+  }
+  .lang-bar button {
+    cursor:pointer; background:var(--bg); border:1px solid var(--border);
+    border-radius:20px; padding:5px 14px; font-size:12px; font-weight:700;
+    color:var(--text); font-family:inherit; box-shadow:0 1px 4px rgba(0,0,0,.08);
+    transition:background .15s, border-color .15s;
+  }
+  .lang-bar button:hover { background:var(--surface); border-color:var(--accent); color:var(--accent); }
+
+  /* ── CONTENU CENTRAL ── */
+  .main {
+    flex:1; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:40px 24px 20px;
+  }
+
+  /* ── LOGO ── */
+  .logo { text-align:center; margin-bottom:48px; }
+  .logo-sub { font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:var(--muted); margin-bottom:10px; }
+  .logo h1  { font-size:38px; font-weight:800; letter-spacing:-.5px; color:var(--text); line-height:1.1; }
+  .logo h2  { font-size:15px; font-weight:400; color:var(--muted); margin-top:8px; }
+  .logo-link { display:inline-block; margin-top:8px; font-size:13px; color:var(--accent); text-decoration:none; }
+  .logo-link:hover { text-decoration:underline; }
+
+  /* ── BOUTON PRINCIPAL ── */
+  .main-btn {
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    width:100%; max-width:400px;
+    background:var(--accent); color:#fff;
+    border:none; border-radius:14px; padding:20px 24px;
+    font-size:17px; font-weight:700; font-family:inherit;
+    cursor:pointer; text-decoration:none;
+    transition:filter .15s, transform .1s;
+    box-shadow:0 4px 20px rgba(59,130,212,.3);
+    margin-bottom:16px;
+  }
+  .main-btn:hover { filter:brightness(1.08); transform:translateY(-2px); }
+  .main-btn:active { transform:translateY(0); }
+  .main-btn-left { display:flex; align-items:center; gap:14px; }
+  .main-btn-icon { font-size:28px; flex-shrink:0; }
+  .main-btn-text { text-align:left; }
+  .main-btn-title { font-size:17px; font-weight:700; line-height:1.2; }
+  .main-btn-desc  { font-size:12px; font-weight:400; opacity:.85; margin-top:2px; }
+  .main-btn-arrow { font-size:22px; opacity:.7; flex-shrink:0; }
+
+  /* ── PLAN HAMEAU ── */
+  .plan-section {
+    margin-top:28px; text-align:center;
+  }
+  .dreamteam-inline {
+    margin-top:14px;
+    text-align:center;
+  }
+  .plan-label {
+    font-size:11px; font-weight:700; text-transform:uppercase;
+    letter-spacing:1.5px; color:var(--muted); margin-bottom:10px;
+  }
+  .plan-thumb {
+    max-width:400px; width:100%; border-radius:10px;
+    border:1px solid var(--border); cursor:pointer;
+    transition:transform .15s, box-shadow .15s;
+    display:inline-flex; align-items:center; justify-content:center;
+    margin:0 auto; padding:14px 18px;
+    background:var(--surface); color:var(--text);
+    font-family:inherit; font-size:14px; font-weight:700;
+  }
+  .plan-thumb:hover { transform:scale(1.01); box-shadow:0 4px 20px rgba(0,0,0,.12); }
+
+  /* ── LIGHTBOX PLAN ── */
+  .lightbox {
+    display:none; position:fixed; inset:0; z-index:9990;
+    background:rgba(0,0,0,.88);
+    align-items:center; justify-content:center;
+    padding:20px;
+  }
+  .lightbox.open { display:flex; }
+  .lightbox-img {
+    max-width:100%; max-height:100%;
+    border-radius:8px; object-fit:contain;
+    cursor:default;
+  }
+  .lightbox-close {
+    position:fixed; top:16px; right:20px;
+    background:#fff; color:#1f2328;
+    border:none; border-radius:8px;
+    padding:8px 18px; font-size:14px; font-weight:700;
+    cursor:pointer; font-family:inherit;
+    box-shadow:0 2px 8px rgba(0,0,0,.25);
+    transition:background .15s;
+    z-index:9991;
+  }
+  .lightbox-close:hover { background:#f0f4ff; }
+
+  /* ── BOUTON DREAMTEAM ── */
+  .dreamteam-btn {
+    cursor:pointer; background:transparent; border:1px solid var(--border);
+    border-radius:20px; padding:8px 20px; font-size:12px; font-weight:700;
+    color:var(--muted); font-family:inherit; letter-spacing:.5px;
+    transition:border-color .15s, color .15s, background .15s;
+    display:inline-flex; align-items:center; gap:7px;
+  }
+  .dreamteam-btn:hover { border-color:var(--text); color:var(--text); background:var(--surface); }
+
+  /* ── MODALE MOT DE PASSE ── */
+  .pw-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.5); z-index:9999;
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .pw-overlay.open { display:flex; }
+  .pw-box {
+    background:#fff; border-radius:14px; padding:36px 32px;
+    max-width:340px; width:100%;
+    box-shadow:0 12px 40px rgba(0,0,0,.2);
+    font-family:-apple-system,"Segoe UI",system-ui,sans-serif;
+  }
+  .pw-icon { font-size:32px; margin-bottom:10px; }
+  .pw-title { font-size:18px; font-weight:800; color:#1f2328; margin-bottom:6px; }
+  .pw-sub   { font-size:13px; color:#57606a; margin-bottom:22px; }
+  .pw-input {
+    width:100%; padding:11px 14px; border:1px solid #e5e7eb;
+    border-radius:8px; font-size:16px; outline:none; margin-bottom:10px;
+    transition:border-color .15s;
+    font-family:inherit; letter-spacing:4px; text-align:center;
+  }
+  .pw-input:focus { border-color:#3b82d4; box-shadow:0 0 0 3px rgba(59,130,212,.12); }
+  .pw-error { font-size:12px; color:#dc2626; min-height:18px; margin-bottom:12px; text-align:center; }
+  .pw-actions { display:flex; gap:10px; }
+  .pw-cancel {
+    flex:1; padding:10px; border:1px solid #e5e7eb; border-radius:8px;
+    background:#f7f8fa; font-size:14px; cursor:pointer; font-family:inherit;
+  }
+  .pw-cancel:hover { background:#e5e7eb; }
+  .pw-confirm {
+    flex:1; padding:10px; border:none; border-radius:8px;
+    background:#3b82d4; color:#fff; font-size:14px; font-weight:700;
+    cursor:pointer; font-family:inherit;
+  }
+  .pw-confirm:hover { background:#2563eb; }
 </style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
 </head>
 <body>
 
-<!-- ── MODALE MOT DE PASSE ── -->
-<div id="pwOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;align-items:center;justify-content:center;">
-  <div style="background:#fff;border-radius:12px;padding:36px 32px;max-width:340px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);font-family:-apple-system,'Segoe UI',system-ui,sans-serif;">
-    <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#57606a;margin-bottom:6px;" id="pwTarget"></p>
-    <p style="font-size:17px;font-weight:700;color:#1f2328;margin-bottom:20px;">🔒 Accès restreint</p>
-    <input id="pwInput" type="password" placeholder="Mot de passe" autocomplete="off"
-      style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;font-size:15px;outline:none;margin-bottom:8px;"
-      onkeydown="if(event.key==='Enter')checkPw()" />
-    <p id="pwError" style="font-size:12px;color:#dc2626;min-height:18px;margin-bottom:12px;"></p>
-    <div style="display:flex;gap:10px;">
-      <button onclick="closePw()" style="flex:1;padding:10px;border:1px solid #e5e7eb;border-radius:8px;background:#f7f8fa;font-size:14px;cursor:pointer;">Annuler</button>
-      <button onclick="checkPw()" style="flex:1;padding:10px;border:none;border-radius:8px;background:#3b82d4;color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Ouvrir</button>
-    </div>
-  </div>
-</div>
-
-<div class="wrap">
+<!-- ── CONTENU PRINCIPAL ── -->
+<main class="main">
 
   <div class="logo">
-    <h1>Tantramour 2026</h1>
-    <p>Portail des rapports — 29 août › 4 septembre 2026</p>
-  </div>
-
-  <!-- ══════════════════════════════════
-       GROUPE 1 — GÉNÉRAL
-  ══════════════════════════════════ -->
-  <div class="group">
-    <div class="group-label"><span>📆</span>Général</div>
-    <div class="grid">
-
-      <a class="card" href="Rapport_Agenda_par_Jour.html" target="_blank" rel="noopener">
-        <div class="card-icon">📅</div>
-        <div class="card-body">
-          <div class="card-title">Agenda par Jour (Per day)</div>
-          <div class="card-desc">Tous les ateliers — filtres jour, lieu, rôle</div>
-        </div>
-        <div class="card-arrow">›</div>
-      </a>
-
-      <a class="card" href="Rapport_Agenda_par_Personne.html" target="_blank" rel="noopener">
-        <div class="card-icon">👤</div>
-        <div class="card-body">
-          <div class="card-title">Agenda par Personne (Per Person)</div>
-          <div class="card-desc">Planning individuel par facilitateur, helper ou angel</div>
-        </div>
-        <div class="card-arrow">›</div>
-      </a>
-
-      <a class="card" href="Rapport_Mon_Planning.html" target="_blank" rel="noopener">
-        <div class="card-icon">🗓️</div>
-        <div class="card-body">
-          <div class="card-title">Mon Planning (My Planning)</div>
-          <div class="card-desc">Vue combinée ou par rôle — Facilitateurs, Helpers, Traducteurs, Angels</div>
-        </div>
-        <div class="card-arrow">›</div>
-      </a>
-
-      <a class="card" href="Rapport_Logistique_par_Atelier.html" target="_blank" rel="noopener">
-        <div class="card-icon">📋</div>
-        <div class="card-body">
-          <div class="card-title">Logistique par Atelier</div>
-          <div class="card-desc">Vue détaillée atelier — lieux, équipes &amp; notes</div>
-        </div>
-        <div class="card-arrow">›</div>
-      </a>
-
-      <a class="card" href="Rapport_Logistique_Helpers.html" target="_blank" rel="noopener">
-        <div class="card-icon">🤝</div>
-        <div class="card-body">
-          <div class="card-title">Logistique Helpers</div>
-          <div class="card-desc">Vue logistique par helper — ateliers assignés et besoins</div>
-        </div>
-        <div class="card-arrow">›</div>
-      </a>
-
-      <a class="card" href="Rapport_Logistics_Input.html" target="_blank" rel="noopener" style="border-color:#86efac;">
-        <div class="card-icon">✏️</div>
-        <div class="card-body">
-          <div class="card-title">Saisie des besoins logistiques (Logistic needs)</div>
-          <div class="card-desc">Facilitateurs : saisissez vos besoins atelier par atelier</div>
-        </div>
-        <div class="card-arrow">›</div>
-      </a>
-
+    <div class="logo-sub" data-i18n="home_festival_dates">Festival · 29 août – 4 septembre 2026</div>
+    <h1>Tantramour</h1>
+    <h1>2026</h1>
+    <a class="logo-link" href="https://tantramourfestival.com" target="_blank" rel="noopener">tantramourfestival.com</a>
+    <h2>Bienvenue · Welcome</h2>
+    <div class="lang-bar">
+      <button id="langBtn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════
-       GROUPE 4 — GESTION PLANNING
-  ══════════════════════════════════ -->
-  <div class="group">
-    <div class="group-label"><span>📊</span>Gestion planning</div>
-    <div class="grid">
+  <a class="main-btn" href="Rapport_Programme.html">
+    <div class="main-btn-left">
+      <div class="main-btn-icon">🎪</div>
+      <div class="main-btn-text">
+        <div class="main-btn-title" data-i18n="prog_btn_title">Programme Festival</div>
+        <div class="main-btn-desc"  data-i18n="prog_btn_desc">Découvrez les ateliers jour par jour</div>
+      </div>
+    </div>
+    <div class="main-btn-arrow">›</div>
+  </a>
 
-      <a class="card" href="Rapport_Conflits.html" target="_blank" rel="noopener">
-        <div class="card-icon">⚠️</div>
-        <div class="card-body">
-          <div class="card-title">Conflits de planning</div>
-          <div class="card-desc">Personnes assignées à plusieurs rôles simultanément</div>
+  <!-- ── WIDGET MESSAGE IMPORTANT (Festivaliers) ── -->
+  <div id="msgFvWidget" style="display:none;">
+    <div class="msg-important">
+      <div class="msg-important-header">
+        <div class="msg-important-header-left">
+          <span style="font-size:18px;">⚠️</span>
+          <span class="msg-important-title" id="msgFvTitle">Message Important</span>
+          <span class="msg-counter" id="msgFvCounter" style="display:none;"></span>
         </div>
-        <div class="card-arrow">›</div>
-      </a>
-
-      <a class="card" href="Rapport_Charge_Travail.html" target="_blank" rel="noopener">
-        <div class="card-icon">⚖️</div>
-        <div class="card-body">
-          <div class="card-title">Charge de travail (Workload)</div>
-          <div class="card-desc">Helpers &amp; Angels — nombre d'ateliers, durée, harmonisation</div>
-        </div>
-        <div class="card-arrow">›</div>
-      </a>
-
-      <a class="card" href="Rapport_Editer_Atelier.html" target="_blank" rel="noopener" style="border-color:#86efac;">
-        <div class="card-icon">✏️</div>
-        <div class="card-body">
-          <div class="card-title">Éditer un atelier</div>
-          <div class="card-desc">Sélectionnez un atelier et modifiez ses champs — génère le code à copier dans data.js</div>
-        </div>
-        <div class="card-arrow">›</div>
-      </a>
-
-      <a class="card" href="Rapport_Gerer_Ressources.html" target="_blank" rel="noopener" style="border-color:#86efac;">
-        <div class="card-icon">👥</div>
-        <div class="card-body">
-          <div class="card-title">Gérer les Ressources</div>
-          <div class="card-desc">Facilitateurs, Helpers, Traducteurs, Angels — référentiel unifié éditable</div>
-        </div>
-        <div class="card-arrow">›</div>
-      </a>
-
+        <button class="msg-nav-btn" id="msgFvNavBtn" onclick="msgFvNext()" style="display:none;" title="Message suivant">›</button>
+      </div>
+      <div id="msgFvBody"></div>
     </div>
   </div>
 
-  <footer>
-    <span>Made with IBM Bob</span>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;">
-      <a href="user-manual.html" target="_blank" rel="noopener" class="footer-btn">📖 Manuel</a>
-      <button onclick="openPw('Admin.html','⚙️ Admin')" class="footer-btn">⚙️ Admin</button>
-      <button onclick="openPw('MasterData.html','🗂 Master Data')" class="footer-btn">🗂 Master Data</button>
-    </div>
-  </footer>
+  <!-- ── PLAN HAMEAU ── -->
+  <div class="plan-section">
+    <div class="plan-label" data-i18n="home_hameau_map">🗺 Plan du Hameau</div>
+    <button
+      class="plan-thumb"
+      type="button"
+      onclick="openLightbox()"
+    >
+      <span data-i18n="home_hameau_open">Ouvrir le plan du Hameau</span>
+    </button>
+  </div>
 
+  <div class="dreamteam-inline">
+    <button class="dreamteam-btn" onclick="openPw()">
+      🌀 <span data-i18n="dreamteam_btn">DREAM TEAM</span>
+    </button>
+  </div>
+
+</main>
+
+<!-- ── LIGHTBOX PLAN ── -->
+<div class="lightbox" id="planLightbox" onclick="closeLightboxOnOverlay(event)">
+  <button class="lightbox-close" onclick="closeLightbox()">✕ Fermer</button>
+  <img
+    class="lightbox-img"
+    src="Hameau%20de%20l%27etoile_FESTI%20PLAN%20V2.jpeg"
+    alt="Plan du Hameau Tantramour 2026 — plein écran"
+  />
 </div>
 
+
+<!-- ── MODALE MOT DE PASSE ── -->
+<div class="pw-overlay" id="pwOverlay" onclick="overlayClick(event)">
+  <div class="pw-box" id="pwBox">
+    <div class="pw-icon">🔒</div>
+    <div class="pw-title" data-i18n="pw_acces_restreint">Accès restreint</div>
+    <div class="pw-sub"   data-i18n="dreamteam_pw_sub">Espace réservé à l'équipe Tantramour.</div>
+    <input id="pwInput" class="pw-input" type="password"
+      placeholder="••••••"
+      autocomplete="off"
+      onkeydown="if(event.key==='Enter')checkPw()"
+    />
+    <div class="pw-error" id="pwError"></div>
+    <div class="pw-actions">
+      <button class="pw-cancel"  onclick="closePw()"  data-i18n="pw_annuler">Annuler</button>
+      <button class="pw-confirm" onclick="checkPw()"  data-i18n="pw_ouvrir">Ouvrir</button>
+    </div>
+  </div>
+</div>
+
+<script src="loader.js"></script>
 <script>
-const PW = '007';
-let _dest = '';
+// ── MESSAGE IMPORTANT (Festivaliers) ─────────────────────────────────────────
+var _fvNews   = [];   // liste filtrée (festivalier), ordre chronologique
+var _fvIndex  = 0;   // index du message affiché (0 = plus ancien, length-1 = plus récent)
 
-// Ajoute un timestamp à l'URL pour forcer un rechargement sans cache
-function withTs(url) {
-  return url + '?v=' + Date.now();
+function formatMsgFvDate(str) {
+  if (!str) return '';
+  var parts = str.split(' ');
+  if (parts.length < 2) return str;
+  var d = parts[0].split('-');
+  if (d.length < 3) return str;
+  return d[2] + '/' + d[1] + '/' + d[0] + ' ' + parts[1];
 }
 
-// Remplace tous les liens de rapports par des versions avec timestamp
-document.querySelectorAll('a.card[href]').forEach(a => {
-  const base = a.getAttribute('href');
-  a.addEventListener('click', function(e) {
-    e.preventDefault();
-    window.open(withTs(base), '_blank', 'noopener');
-  });
-});
+function renderMsgFvWidget() {
+  if (typeof REF_NEWS === 'undefined' || !Array.isArray(REF_NEWS)) return;
+  var all = REF_NEWS.filter(function(n) { return n.type === 'festivalier' && !n.hidden; });
+  if (all.length === 0) return;
 
-function openPw(url, label) {
-  _dest = url;
-  document.getElementById('pwTarget').textContent = label;
-  document.getElementById('pwInput').value = '';
-  document.getElementById('pwError').textContent = '';
-  const ov = document.getElementById('pwOverlay');
-  ov.style.display = 'flex';
-  setTimeout(() => document.getElementById('pwInput').focus(), 50);
+  // News prioritaire en tête si elle existe, puis les autres du plus récent au plus ancien
+  var prio  = all.filter(function(n) { return n.priority === true; });
+  var rest  = all.filter(function(n) { return !n.priority; });
+  _fvNews = prio.concat(rest);
+
+  // Afficher la prioritaire (index 0) ou la plus récente si pas de prioritaire
+  _fvIndex = 0;
+
+  var titleEl  = document.getElementById('msgFvTitle');
+  var navBtn   = document.getElementById('msgFvNavBtn');
+  var counter  = document.getElementById('msgFvCounter');
+  var lang     = (typeof I18n !== 'undefined') ? I18n.getLang() : 'fr';
+
+  if (titleEl) titleEl.textContent = lang === 'en' ? 'Important Info' : 'Message Important';
+
+  // Flèche et compteur visibles seulement si plusieurs messages
+  if (_fvNews.length > 1) {
+    navBtn.style.display  = '';
+    counter.style.display = '';
+  }
+
+  document.getElementById('msgFvWidget').style.display = 'block';
+  _renderFvMsg();
 }
 
-function closePw() {
-  document.getElementById('pwOverlay').style.display = 'none';
-}
+function _renderFvMsg() {
+  var lang    = (typeof I18n !== 'undefined') ? I18n.getLang() : 'fr';
+  var n       = _fvNews[_fvIndex];
+  var text    = lang === 'en' ? (n.en || n.fr || '') : (n.fr || n.en || '');
+  var body    = document.getElementById('msgFvBody');
+  var counter = document.getElementById('msgFvCounter');
 
-function checkPw() {
-  if (document.getElementById('pwInput').value === PW) {
-    closePw();
-    window.open(withTs(_dest), '_blank', 'noopener');
-  } else {
-    document.getElementById('pwError').textContent = 'Mot de passe incorrect.';
-    document.getElementById('pwInput').select();
+  body.innerHTML =
+    '<div class="msg-date">' + formatMsgFvDate(n.publishedAt) + '</div>' +
+    '<div class="msg-text">' + text + '</div>';
+
+  // Compteur : "2 / 3"
+  if (_fvNews.length > 1) {
+    counter.textContent = (_fvIndex + 1) + ' / ' + _fvNews.length;
   }
 }
 
-document.getElementById('pwOverlay').addEventListener('click', function(e) {
-  if (e.target === this) closePw();
+// Avance au message suivant (ou revient au premier si on est au dernier)
+function msgFvNext() {
+  if (_fvNews.length < 2) return;
+  _fvIndex = (_fvIndex + 1) % _fvNews.length;
+  _renderFvMsg();
+}
+
+loadData(['ref_news.js'], function() {
+  renderMsgFvWidget();
+  document.addEventListener('tm_lang_changed', renderMsgFvWidget);
 });
+// ── FIN MESSAGE IMPORTANT ─────────────────────────────────────────────────────
+
+// ── Bouton FR/EN ─────────────────────────────────────────────────────────────
+function updateLangBtn() {
+  var btn = document.getElementById('langBtn');
+  if (!btn) return;
+  var lang = (typeof I18n !== 'undefined') ? I18n.getLang() : 'fr';
+  btn.textContent = lang === 'fr' ? '🌐 EN' : '🌐 FR';
+  btn.title = lang === 'fr' ? 'Switch to English' : 'Passer en Français';
+}
+updateLangBtn();
+document.addEventListener('tm_lang_changed', updateLangBtn);
+
+// ── Mot de passe ────────────────────────────────────────────────────────────
+var PW = 'ohm';
+
+function openPw() {
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').textContent = '';
+  document.getElementById('pwOverlay').classList.add('open');
+  setTimeout(function() { document.getElementById('pwInput').focus(); }, 80);
+}
+
+function closePw() {
+  document.getElementById('pwOverlay').classList.remove('open');
+}
+
+function overlayClick(e) {
+  if (e.target === document.getElementById('pwOverlay')) closePw();
+}
+
+var _pwLocked = false;
+function checkPw() {
+  if (_pwLocked) return;
+  var val = document.getElementById('pwInput').value;
+  if (val === PW) {
+    closePw();
+    window.location.href = 'index_bis.html';
+  } else {
+    var inp = document.getElementById('pwInput');
+    var err = document.getElementById('pwError');
+    var btn = document.querySelector('.pw-confirm');
+    inp.value = '';
+    inp.style.borderColor = '#dc2626';
+    _pwLocked = true;
+    inp.disabled = true;
+    if (btn) btn.disabled = true;
+    var remaining = 3;
+    err.textContent = '❌ Incorrect — réessayez dans ' + remaining + 's';
+    var countdown = setInterval(function() {
+      remaining--;
+      if (remaining > 0) {
+        err.textContent = '❌ Incorrect — réessayez dans ' + remaining + 's';
+      } else {
+        clearInterval(countdown);
+        _pwLocked = false;
+        inp.disabled = false;
+        if (btn) btn.disabled = false;
+        inp.style.borderColor = '';
+        err.textContent = '';
+        inp.focus();
+      }
+    }, 1000);
+  }
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closePw();
+    closeLightbox();
+  }
+});
+
+// ── Lightbox Plan Hameau ─────────────────────────────────────────────────────
+function openLightbox() {
+  document.getElementById('planLightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('planLightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeLightboxOnOverlay(e) {
+  if (e.target === document.getElementById('planLightbox')) closeLightbox();
+}
 </script>
 </body>
 </html>
