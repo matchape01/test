@@ -1,0 +1,442 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Traducteur Affectation</title>
+<style>
+  :root {
+    --bg: #ffffff; --surface: #f7f8fa; --border: #e5e7eb;
+    --text: #1f2328; --muted: #57606a; --accent: #3b82d4;
+    --header-bg: #f0f4fb;
+    --green: #166534; --green-bg: #dcfce7; --green-border: #86efac;
+    --orange: #c2410c; --orange-bg: #fff7ed; --orange-border: #fdba74;
+    --red: #dc2626; --red-bg: #fef2f2; --red-border: #fca5a5;
+    --purple: #7c3aed; --purple-bg: #ede9fe; --purple-border: #c4b5fd;
+    --badge-f-bg: #dcfce7; --badge-f-tx: #166534;
+    --badge-h-bg: #e0f2fe; --badge-h-tx: #0369a1;
+    --badge-t-bg: #f5f3ff; --badge-t-tx: #7c3aed;
+    --badge-a-bg: #fee2e2; --badge-a-tx: #dc2626;
+    --badge-en-bg: #eff6ff; --badge-en-tx: #1e40af;
+    --row-alt: #f7f8fa;
+  }
+  .dark {
+    --bg: #0d1117; --surface: #161b22; --border: #30363d;
+    --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    --header-bg: #1c2333;
+    --green-bg: #052e16; --green-border: #166534;
+    --orange-bg: #1c1000; --orange-border: #92400e;
+    --red-bg: #2d0a0a; --red-border: #991b1b;
+    --purple-bg: #1e1b4b; --purple-border: #5b21b6;
+    --badge-f-bg: #0a2e1a; --badge-f-tx: #4ade80;
+    --badge-h-bg: #0c2d48; --badge-h-tx: #58a6ff;
+    --badge-t-bg: #1e1b4b; --badge-t-tx: #a78bfa;
+    --badge-a-bg: #2d0000; --badge-a-tx: #f87171;
+    --badge-en-bg: #0c1a3a; --badge-en-tx: #93c5fd;
+    --row-alt: #161b22;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system,"Segoe UI",system-ui,sans-serif; font-size: 14px; line-height: 1.6; background: var(--bg); color: var(--text); transition: background .2s, color .2s; }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 24px 20px 80px; }
+
+  /* ── HEADER ── */
+  header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; flex-wrap: wrap; gap: 12px; }
+  .logo h1 { font-size: 20px; font-weight: 700; }
+  .logo p  { font-size: 26px; font-weight: 800; color: var(--accent); line-height: 1.2; margin-top: 2px; }
+  .logo small { font-size: 12px; color: var(--muted); display: block; margin-top: 2px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .btn-ghost { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 6px 14px; font-size: 13px; color: var(--text); font-family: inherit; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-ghost:hover { background: var(--border); }
+
+  /* ── STATS ── */
+  .stats-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+  .stat-pill { flex: 1; min-width: 110px; border-radius: 8px; padding: 12px 14px; border: 1px solid var(--border); background: var(--surface); text-align: center; }
+  .stat-pill .num { font-size: 26px; font-weight: 800; line-height: 1; }
+  .stat-pill .lbl { font-size: 10px; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); font-weight: 600; margin-top: 3px; }
+  .stat-pill.ok   { border-color: var(--green-border); background: var(--green-bg); }
+  .stat-pill.ok   .num { color: var(--green); }
+  .stat-pill.warn { border-color: var(--orange-border); background: var(--orange-bg); }
+  .stat-pill.warn .num { color: var(--orange); }
+  .stat-pill.err  { border-color: var(--red-border); background: var(--red-bg); }
+  .stat-pill.err  .num { color: var(--red); }
+  .stat-pill.info .num { color: var(--accent); }
+
+  /* ── FILTRES ── */
+  .filters { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; align-items: flex-end; }
+  .fg { display: flex; flex-direction: column; gap: 4px; }
+  .fg label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); }
+  .fg select { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 10px; font-size: 13px; color: var(--text); font-family: inherit; cursor: pointer; min-width: 170px; }
+
+  /* ── CARTE ATELIER ── */
+  .ws-card {
+    border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; margin-bottom: 12px;
+    transition: border-color .15s;
+  }
+  .ws-card.status-ok     { border-color: var(--green-border); }
+  .ws-card.status-tbc    { border-color: var(--orange-border); }
+  .ws-card.status-missing { border-color: var(--red-border); }
+  .ws-card.status-validated { border-color: var(--green-border); background: var(--green-bg); }
+
+  /* ── EN-TÊTE CARTE ── */
+  .ws-header {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 12px 16px; background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .ws-card.status-ok       .ws-header { background: var(--green-bg); }
+  .ws-card.status-tbc      .ws-header { background: var(--orange-bg); }
+  .ws-card.status-missing  .ws-header { background: var(--red-bg); }
+  .ws-card.status-validated .ws-header { background: var(--green-bg); }
+
+  .ws-day   { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--accent); min-width: 52px; }
+  .ws-time  { font-size: 12px; color: var(--muted); min-width: 120px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .ws-title { font-size: 14px; font-weight: 800; flex: 1; min-width: 0; }
+  .ws-lieu  { font-size: 11px; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 4px; padding: 1px 8px; white-space: nowrap; }
+
+  /* status badge en-tête */
+  .status-badge { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 99px; white-space: nowrap; }
+  .sb-ok        { background: var(--green-bg);   color: var(--green);   border: 1px solid var(--green-border); }
+  .sb-tbc       { background: var(--orange-bg);  color: var(--orange);  border: 1px solid var(--orange-border); }
+  .sb-missing   { background: var(--red-bg);     color: var(--red);     border: 1px solid var(--red-border); }
+  .sb-validated { background: var(--green-bg);   color: var(--green);   border: 1px solid var(--green-border); }
+
+  /* ── CORPS CARTE ── */
+  .ws-body { padding: 14px 16px; background: var(--bg); display: flex; flex-direction: column; gap: 12px; }
+
+  /* Ligne info */
+  .info-row { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
+  .info-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); min-width: 90px; padding-top: 3px; flex-shrink: 0; }
+  .pills-wrap { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+
+  /* Pills */
+  .pill { display: inline-flex; align-items: center; gap: 4px; border-radius: 99px; padding: 2px 9px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .pill-f { background: var(--badge-f-bg); color: var(--badge-f-tx); }
+  .pill-h { background: var(--badge-h-bg); color: var(--badge-h-tx); }
+  .pill-t { background: var(--badge-t-bg); color: var(--badge-t-tx); }
+  .pill-a { background: var(--badge-a-bg); color: var(--badge-a-tx); }
+  .pill-en { background: var(--badge-en-bg); color: var(--badge-en-tx); border: 1px solid #bfdbfe; }
+  .pill-tbc { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); font-weight: 800; font-size: 12px; }
+
+  /* Zone traducteur : actuel + proposition */
+  .trad-zone { display: flex; flex-direction: column; gap: 8px; }
+  .trad-current { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 13px; }
+  .trad-current .label-sm { font-size: 11px; color: var(--muted); font-weight: 600; }
+
+  /* Sélecteur proposition */
+  .proposal-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .proposal-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--muted); min-width: 90px; flex-shrink: 0; }
+  .proposal-select {
+    flex: 1; min-width: 200px;
+    background: var(--bg); border: 2px solid var(--border); border-radius: 6px;
+    padding: 7px 10px; font-size: 13px; color: var(--text); font-family: inherit; cursor: pointer;
+  }
+  .proposal-select:focus { outline: none; border-color: var(--accent); }
+  .proposal-select.chosen { border-color: var(--green-border); }
+
+  /* Helpers traducteurs disponibles */
+  .helpers-trad { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+  .helper-trad-pill {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--badge-t-bg); color: var(--badge-t-tx);
+    border: 1px solid #fde68a; border-radius: 99px;
+    padding: 2px 9px; font-size: 12px; font-weight: 600; white-space: nowrap;
+    cursor: pointer; transition: filter .1s;
+  }
+  .helper-trad-pill:hover { filter: brightness(.95); }
+  .helper-trad-pill.selected { background: var(--badge-t-tx); color: #fff; }
+
+  /* Actions */
+  .card-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; align-items: center; }
+  .btn-validate { cursor: pointer; background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); border-radius: 6px; padding: 7px 16px; font-size: 13px; font-weight: 700; font-family: inherit; }
+  .btn-validate:hover { filter: brightness(.95); }
+  .btn-validate:disabled { opacity: .4; cursor: not-allowed; filter: none; }
+  .btn-save-all { cursor: pointer; background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 10px 24px; font-size: 14px; font-weight: 700; font-family: inherit; display: inline-flex; align-items: center; gap: 7px; }
+  .btn-save-all:hover { filter: brightness(1.08); }
+  .btn-save-all:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+  .btn-sec { cursor: pointer; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 7px 16px; font-size: 13px; color: var(--text); font-family: inherit; }
+  .btn-sec:hover { background: var(--border); }
+  .validated-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 700; color: var(--green); padding: 6px 12px; background: var(--green-bg); border: 1px solid var(--green-border); border-radius: 6px; }
+
+  /* Note conflit */
+  .conflict-note { font-size: 11px; color: var(--red); background: var(--red-bg); border: 1px solid var(--red-border); border-radius: 4px; padding: 2px 8px; display: inline-flex; align-items: center; gap: 4px; }
+  .avail-note    { font-size: 11px; color: var(--muted); font-style: italic; }
+
+  /* ── BARRE STICKY ── */
+  .save-bar {
+    position: sticky; bottom: 0;
+    background: var(--bg); border-top: 2px solid var(--green-border);
+    padding: 12px 20px; display: flex; align-items: center;
+    justify-content: space-between; gap: 12px; flex-wrap: wrap; z-index: 100;
+    box-shadow: 0 -4px 16px rgba(0,0,0,.08);
+  }
+  .save-bar-info { font-size: 13px; color: var(--muted); }
+  .save-bar-info strong { color: var(--text); }
+
+  /* ── RÉCAP FINAL ── */
+  .recap-box { border: 2px solid var(--green-border); background: var(--green-bg); border-radius: 12px; padding: 20px 24px; margin-bottom: 24px; }
+  .recap-box h2 { font-size: 17px; font-weight: 800; color: var(--green); margin-bottom: 12px; }
+  .recap-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--green-border); font-size: 13px; flex-wrap: wrap; }
+  .recap-row:last-child { border-bottom: none; }
+  .recap-old { text-decoration: line-through; color: var(--muted); }
+  .recap-arrow { color: var(--green); font-weight: 800; }
+  .recap-new { font-weight: 800; color: var(--green); }
+
+  /* ── SÉPARATEUR JOUR ── */
+  .day-sep { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--muted); padding-bottom: 8px; border-bottom: 2px solid var(--border); margin: 24px 0 14px; display: flex; align-items: center; gap: 8px; }
+  .day-count { display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; background: var(--accent); color: #fff; border-radius: 99px; font-size: 11px; font-weight: 700; padding: 0 6px; }
+
+  /* ── CALLOUT ── */
+  .callout { border-radius: 8px; padding: 12px 16px; font-size: 13px; display: flex; gap: 10px; margin-bottom: 20px; }
+  .callout-icon { flex-shrink: 0; font-size: 16px; }
+  .callout.info  { background: var(--badge-en-bg); border: 1px solid #bfdbfe; color: #1e40af; }
+  .callout.warn  { background: var(--orange-bg);  border: 1px solid var(--orange-border); color: #92400e; }
+
+  .empty { text-align: center; padding: 48px; color: var(--muted); border: 2px dashed var(--border); border-radius: 10px; }
+  .empty-ok { border-color: var(--green-border); background: var(--green-bg); color: var(--green); }
+
+  /* ── TOAST ── */
+  #toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(60px); background: #1f2328; color: #fff; border-radius: 8px; padding: 12px 22px; font-size: 13px; font-weight: 700; z-index: 10000; opacity: 0; transition: transform .3s, opacity .3s; white-space: nowrap; }
+  #toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  #toast.ok  { background: #166534; }
+  #toast.err { background: #dc2626; }
+
+  footer { margin-top: 48px; padding-top: 14px; border-top: 1px solid var(--border); text-align: center; font-size: 12px; color: var(--muted); }
+</style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+</head>
+<!-- i18n -->
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo">
+      <h1>Tantramour 2026</h1>
+      <p>Traducteur — Affectation</p>
+      <small>Ateliers animés par un intervenant anglophone</small>
+    </div>
+    <div class="header-actions">
+      <a class="btn-ghost" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="btn-ghost" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <button class="btn-ghost" onclick="hardReload()">🔄 <span data-i18n="nav_refresh">Refresh</span></button>
+      <button class="btn-ghost" id="modeBtn" onclick="toggleMode()">🌙 <span data-i18n="nav_mode_nuit">Mode Nuit</span></button>
+      <button class="mode-btn tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
+    </div>
+  </header>
+
+  <!-- CALLOUT règle -->
+  <div class="callout info">
+    <div class="callout-icon">📐</div>
+    <div>
+      <strong>Règle appliquée</strong> — Tout atelier dont au moins un animateur (Fac1 ou Fac2) est identifié comme
+      <strong>Anglophone</strong> doit avoir un traducteur identifié dans le champ <strong>Traduction</strong>.
+      Si ce champ est vide, l'atelier affiche <strong style="color:var(--red)">TBC</strong> en rouge.
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar" id="statsBar"></div>
+
+  <!-- FILTRES -->
+  <div class="filters">
+    <div class="fg">
+      <label data-i18n="col_jour">Jour</label>
+      <select id="filterJour" onchange="render()">
+        <option value="" data-i18n="filter_tous_jours">Tous les jours</option>
+        <option value="Jour 1" data-i18n="jour1_label">Jour 1 — Sam. 29 août</option>
+        <option value="Jour 2" data-i18n="jour2_label">Jour 2 — Dim. 30 août</option>
+        <option value="Jour 3" data-i18n="jour3_label">Jour 3 — Lun. 31 août</option>
+        <option value="Jour 4" data-i18n="jour4_label">Jour 4 — Mar. 1 sept.</option>
+        <option value="Jour 5" data-i18n="jour5_label">Jour 5 — Mer. 2 sept.</option>
+        <option value="Jour 6" data-i18n="jour6_label">Jour 6 — Jeu. 3 sept.</option>
+        <option value="Jour 7" data-i18n="jour7_label">Jour 7 — Ven. 4 sept.</option>
+      </select>
+    </div>
+    <div class="fg">
+      <label>Statut</label>
+      <select id="filterStatus" onchange="render()">
+        <option value="">Tous les statuts</option>
+        <option value="ok">✅ Traducteur assigné</option>
+        <option value="tbc">⏳ TBC — Traducteur manquant</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- LISTE -->
+  <div id="workshopList"></div>
+
+</div>
+
+<div id="toast"></div>
+
+<!-- ── SCRIPTS ── -->
+<script src="github-api.js"></script>
+<script src="loader.js"></script>
+<script>
+loadData(['ref_resource_types.js', 'ref_ressources.js', 'data.js'], function() {
+
+// ════════════════════════════════════════════════════════════════
+// CONSTANTES & UTILITAIRES
+// ════════════════════════════════════════════════════════════════
+var JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+
+var RES_BY_NAME = {};
+REF_RESSOURCES.forEach(function(r) { RES_BY_NAME[r.value] = r; });
+
+function isAnglophone(nom) {
+  var r = RES_BY_NAME[nom];
+  return r && r.roles.indexOf('anglophone') !== -1;
+}
+
+// ════════════════════════════════════════════════════════════════
+// CONSTRUCTION DE LA LISTE DES ATELIERS CONCERNÉS
+// ════════════════════════════════════════════════════════════════
+function buildWorkshops() {
+  var result = [];
+  AGENDA.forEach(function(e, idx) {
+    // L'atelier est concerné si fac1 ou fac2 est anglophone
+    var angloFacs = [e.fac1, e.fac2].filter(isAnglophone);
+    if (!angloFacs.length) return;
+
+    var tradField = (e.traduction || '').trim();
+    // ✅ OK si le champ traduction est rempli — ⏳ TBC sinon
+    var status = tradField ? 'ok' : 'tbc';
+
+    result.push({
+      idx:        idx,
+      entry:      e,
+      angloFacs:  angloFacs,
+      helpers:    [e.helper1, e.helper2, e.helper3, e.helper4].filter(Boolean),
+      tradField:  tradField,
+      status:     status,
+    });
+  });
+  return result;
+}
+
+// ════════════════════════════════════════════════════════════════
+// ÉTAT
+// ════════════════════════════════════════════════════════════════
+var workshops = buildWorkshops();
+
+function getFiltered() {
+  var jour   = document.getElementById('filterJour').value;
+  var status = document.getElementById('filterStatus').value;
+  return workshops.filter(function(w) {
+    if (jour   && w.entry.jour !== jour) return false;
+    if (status && w.status !== status)   return false;
+    return true;
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+// RENDU
+// ════════════════════════════════════════════════════════════════
+function render() {
+  var filtered = getFiltered();
+  var total = workshops.length;
+  var nOk   = workshops.filter(function(w) { return w.status === 'ok';  }).length;
+  var nTbc  = workshops.filter(function(w) { return w.status === 'tbc'; }).length;
+
+  document.getElementById('statsBar').innerHTML =
+    '<div class="stat-pill info"><div class="num">' + total + '</div><div class="lbl">Ateliers concernés</div></div>' +
+    '<div class="stat-pill ok"><div class="num">'   + nOk   + '</div><div class="lbl">✅ Traducteur assigné</div></div>' +
+    '<div class="stat-pill warn"><div class="num">' + nTbc  + '</div><div class="lbl">⏳ TBC — à affecter</div></div>';
+
+  if (!filtered.length) {
+    document.getElementById('workshopList').innerHTML =
+      '<div class="empty empty-ok">✅ Aucun atelier correspondant à ce filtre.</div>';
+    return;
+  }
+
+  // Grouper par jour
+  var byDay = {};
+  filtered.forEach(function(w) {
+    if (!byDay[w.entry.jour]) byDay[w.entry.jour] = [];
+    byDay[w.entry.jour].push(w);
+  });
+
+  var html = '';
+  JOUR_ORDER.forEach(function(jour) {
+    if (!byDay[jour]) return;
+    var items = byDay[jour];
+    html += '<div class="day-sep">' + jour + ' — ' + items[0].entry.date +
+      ' <span class="day-count">' + items.length + '</span></div>';
+    items.forEach(function(w) { html += renderCard(w); });
+  });
+  document.getElementById('workshopList').innerHTML = html;
+}
+
+function renderCard(w) {
+  var e = w.entry;
+
+  // Animateurs avec badge anglophone
+  var facsHtml = [e.fac1, e.fac2].filter(Boolean).map(function(nom) {
+    var en = isAnglophone(nom);
+    return '<span class="pill ' + (en ? 'pill-en' : 'pill-f') + '">' + (en ? '🇬🇧 ' : '') + esc(nom) + '</span>';
+  }).join('');
+
+  // Helpers
+  var helpersHtml = w.helpers.length
+    ? w.helpers.map(function(nom) {
+        return '<span class="pill pill-h">' + esc(nom) + '</span>';
+      }).join('')
+    : '<span class="avail-note">Aucun helper assigné</span>';
+
+  // Zone traducteur
+  var tradHtml = w.tradField
+    ? '<span class="pill pill-t">🌐 ' + esc(w.tradField) + '</span>'
+    : '<span class="pill pill-tbc">⏳ TBC — traducteur non assigné</span>';
+
+  // Action : bouton éditer si TBC
+  var actionHtml = w.status === 'ok'
+    ? '<span class="validated-badge">✅ Traducteur assigné</span>'
+    : '<a class="btn-ghost" href="Rapport_Editer_Atelier.html?idx=' + w.idx + '" target="_blank">✏️ Assigner un traducteur</a>';
+
+  // Badge statut
+  var statusBadge = w.status === 'ok'
+    ? '<span class="status-badge sb-ok">✅ OK</span>'
+    : '<span class="status-badge sb-tbc">⏳ TBC</span>';
+
+  return '<div class="ws-card status-' + w.status + '" id="wscard_' + w.idx + '">' +
+    '<div class="ws-header">' +
+      '<div class="ws-day">'  + esc(e.jour)    + '</div>' +
+      '<div class="ws-time">' + esc(e.heure)   + '</div>' +
+      '<div class="ws-title">' + esc(e.atelier) + '</div>' +
+      (e.lieu ? '<div class="ws-lieu">' + esc(e.lieu) + '</div>' : '') +
+      statusBadge +
+    '</div>' +
+    '<div class="ws-body">' +
+      '<div class="info-row"><span class="info-label">🎓 Animateurs</span><div class="pills-wrap">' + facsHtml    + '</div></div>' +
+      '<div class="info-row"><span class="info-label">🤝 Helpers</span><div class="pills-wrap">'    + helpersHtml + '</div></div>' +
+      '<div class="info-row"><span class="info-label">🌐 Traducteur</span><div class="pills-wrap">' + tradHtml    + '</div></div>' +
+      '<div class="card-actions">' + actionHtml + '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+// ════════════════════════════════════════════════════════════════
+// UTILITAIRES
+// ════════════════════════════════════════════════════════════════
+function esc(v) {
+  return String(v || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function toggleMode() {
+  var dark = document.body.classList.toggle('dark');
+  document.getElementById('modeBtn').textContent = dark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+}
+function hardReload() { location.reload(true); }
+window.toggleMode = toggleMode;
+window.hardReload = hardReload;
+
+// ── Démarrage ──
+render();
+
+}); // end loadData
+</script>
+</body>
+</html>
+
+
+
