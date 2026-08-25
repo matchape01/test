@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tantramour 2026 — Mon Agenda Simplifié / My Simplified Schedule</title>
+<style>
+  :root {
+    --bg:#ffffff; --surface:#f7f8fa; --border:#e5e7eb;
+    --text:#1f2328; --muted:#57606a; --accent:#3b82d4;
+    --hour-col:56px;
+    /* Couleurs PAR RÔLE (priorité sur le type d'atelier) */
+    --c-animateur:#166534;   --c-animateur-bg:#dcfce7;   --c-animateur-bd:#86efac;
+    --c-helper:#0369a1;      --c-helper-bg:#e0f2fe;      --c-helper-bd:#7dd3fc;
+    --c-traducteur:#7c3aed;  --c-traducteur-bg:#f5f3ff;  --c-traducteur-bd:#c4b5fd;
+    --c-angel:#dc2626;       --c-angel-bg:#fee2e2;        --c-angel-bd:#fca5a5;
+    --c-reunion:#92400e;     --c-reunion-bg:#fffbeb;      --c-reunion-bd:#fcd34d;
+    --c-multi:#1e40af;       --c-multi-bg:#eff6ff;        --c-multi-bd:#93c5fd;
+  }
+  .dark {
+    --bg:#0d1117; --surface:#161b22; --border:#30363d;
+    --text:#e6edf3; --muted:#8b949e; --accent:#58a6ff;
+    --c-animateur:#4ade80;    --c-animateur-bg:#0a2e1a;   --c-animateur-bd:#166534;
+    --c-helper:#58a6ff;       --c-helper-bg:#0c2d48;      --c-helper-bd:#1d4ed8;
+    --c-traducteur:#a78bfa;   --c-traducteur-bg:#1e1b4b;  --c-traducteur-bd:#7c3aed;
+    --c-angel:#f87171;        --c-angel-bg:#2d0000;       --c-angel-bd:#991b1b;
+    --c-reunion:#fcd34d;      --c-reunion-bg:#2a1500;     --c-reunion-bd:#92400e;
+    --c-multi:#93c5fd;        --c-multi-bg:#0c1a40;       --c-multi-bd:#1e40af;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  html, body { height:100%; overflow:hidden; }
+  body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:12px; line-height:1.4; background:var(--bg); color:var(--text); display:flex; flex-direction:column; }
+
+  /* ── HEADER ── */
+  .topbar { display:flex; align-items:center; justify-content:space-between; padding:10px 16px; border-bottom:1px solid var(--border); background:var(--bg); position:sticky; top:0; z-index:100; flex-wrap:wrap; gap:8px; }
+  .topbar-left { display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; }
+  .topbar-left h1 { font-size:15px; font-weight:700; }
+  .topbar-left p  { font-size:13px; font-weight:800; color:var(--accent); }
+  .topbar-right { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .btn { cursor:pointer; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:4px 10px; font-size:11px; color:var(--text); font-family:inherit; text-decoration:none; display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
+  .btn:hover { background:var(--border); }
+  .chip { cursor:pointer; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600; border:1px solid var(--border); background:var(--surface); color:var(--muted); white-space:nowrap; }
+  .chip:hover { border-color:var(--accent); color:var(--accent); }
+  .chip.on { background:var(--accent); border-color:var(--accent); color:#fff; }
+
+  /* ── FILTRE NOM ── */
+  .filter-bar { display:flex; align-items:center; gap:10px; padding:8px 16px; border-bottom:1px solid var(--border); background:var(--surface); flex-wrap:wrap; }
+  .filter-bar label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); white-space:nowrap; }
+  .filter-bar select { background:var(--bg); border:1px solid var(--border); border-radius:6px; padding:5px 10px; font-size:12px; color:var(--text); font-family:inherit; cursor:pointer; min-width:220px; }
+  .filter-bar .hint { font-size:11px; color:var(--muted); font-style:italic; }
+
+  /* ── LÉGENDE PAR RÔLE ── */
+  .legend { display:flex; flex-wrap:wrap; gap:8px; padding:8px 16px; border-bottom:1px solid var(--border); background:var(--bg); }
+  .leg { display:flex; align-items:center; gap:4px; font-size:10px; color:var(--muted); white-space:nowrap; }
+  .leg-dot { width:10px; height:10px; border-radius:3px; flex-shrink:0; }
+
+  /* ── ÉCRAN VIDE ── */
+  .empty-state { display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:260px; gap:12px; color:var(--muted); }
+  .empty-state .icon { font-size:48px; }
+  .empty-state p { font-size:14px; }
+
+  /* ── SCROLL WRAPPER ── */
+  .cal-scroll { overflow-x:auto; overflow-y:auto; width:100%; }
+  #mainContent { flex:1; min-height:0; display:flex; flex-direction:column; }
+  #mainContent .cal-scroll { flex:1; min-height:0; }
+
+  /* ── GRILLE CALENDRIER ── */
+  .cal-wrap { display:flex; flex-direction:column; width:100%; }
+
+  /* En-tête */
+  .cal-head { display:flex; width:100%; position:sticky; top:0; z-index:50; background:var(--bg); border-bottom:2px solid var(--border); }
+  .head-hour { width:var(--hour-col); flex-shrink:0; border-right:1px solid var(--border); }
+  .head-day-group { display:flex; flex-direction:column; border-right:2px solid var(--border); min-width:0; overflow:hidden; }
+  .hd-jour { background:var(--text); color:#fff; padding:8px 6px; text-align:center; display:flex; align-items:baseline; justify-content:center; gap:8px; white-space:nowrap; overflow:hidden; }
+  .hd-name { font-size:14px; font-weight:700; }
+  .hd-date { font-size:12px; opacity:.8; }
+
+  /* Corps calendrier */
+  .cal-body { display:flex; width:100%; position:relative; }
+  .col-hours { width:var(--hour-col); flex-shrink:0; border-right:1px solid var(--border); position:relative; }
+  .hour-label { position:absolute; right:4px; font-size:11px; font-weight:600; color:var(--muted); line-height:1; transform:translateY(-50%); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .col-day { flex:1; min-width:120px; position:relative; border-right:2px solid var(--border); overflow:visible; }
+  .col-day:last-child { border-right:none; }
+
+  /* Lignes horaires (fond) */
+  .hour-line { position:absolute; left:0; right:0; border-top:1px solid var(--border); }
+  .hour-line.full { border-top-color:var(--border); }
+  .hour-line.half { border-top:1px dashed var(--border); opacity:.5; }
+
+  /* ── BLOC ATELIER ── */
+  .evt {
+    position:absolute; left:1px; right:1px;
+    border-radius:3px; border-left:3px solid #9ca3af;
+    background:var(--surface); border-top:1px solid var(--border); border-right:1px solid var(--border); border-bottom:1px solid var(--border);
+    padding:2px 3px; overflow:hidden; cursor:default;
+    transition:box-shadow .1s;
+  }
+  .evt:hover { box-shadow:0 2px 8px rgba(0,0,0,.15); z-index:20; }
+  .evt-name { font-size:11px; font-weight:600; line-height:1.2; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; }
+  .evt-name-anim { font-weight:400; font-size:10px; opacity:.85; }
+  .evt-meta-row { display:flex; align-items:baseline; gap:6px; margin-top:1px; flex-wrap:wrap; min-width:0; }
+  .evt-role { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.3px; flex-shrink:0; }
+  .evt-lieu { font-size:10px; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; flex-shrink:1; min-width:0; }
+  .evt-time-row { display:flex; align-items:baseline; gap:6px; margin-top:1px; flex-wrap:wrap; min-width:0; }
+  .evt-time { font-size:10px; color:var(--muted); font-variant-numeric:tabular-nums; flex-shrink:0; }
+  .evt-arrivee { font-size:10px; font-weight:700; color:#dc2626; font-variant-numeric:tabular-nums; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:inline-flex; align-items:baseline; gap:3px; }
+  .dark .evt-arrivee { color:#f87171; }
+  .evt-arrivee-warn { font-size:10px; font-weight:700; color:#b45309; }
+  .dark .evt-arrivee-warn { color:#fbbf24; }
+  .evt-arrivee-badge { display:inline-block; background:#fef3c7; color:#b45309; font-size:8px; font-weight:700; padding:1px 4px; border-radius:3px; vertical-align:middle; text-transform:uppercase; letter-spacing:.3px; }
+  .dark .evt-arrivee-badge { background:#2a1500; color:#fbbf24; }
+  .evt-arrivee-prep { font-size:9px; font-weight:400; color:var(--muted); }
+  .evt-facs { font-size:10px; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+  /* ── BLOC RANGEMENT (hachures grises après l'atelier) ── */
+  .evt-range {
+    position:absolute; z-index:1; pointer-events:none;
+    background: repeating-linear-gradient(
+      -45deg, transparent, transparent 3px,
+      rgba(100,116,139,.18) 3px, rgba(100,116,139,.18) 6px
+    );
+    border: 1px dashed rgba(100,116,139,.4);
+    border-radius: 4px;
+    box-sizing: border-box;
+    display:flex; align-items:flex-start; justify-content:center; padding-top:2px;
+  }
+  .dark .evt-range {
+    background: repeating-linear-gradient(
+      -45deg, transparent, transparent 3px,
+      rgba(148,163,184,.15) 3px, rgba(148,163,184,.15) 6px
+    );
+    border-color: rgba(148,163,184,.35);
+  }
+  .evt-range-label {
+    font-size:9px; font-weight:600; color:var(--muted);
+    background:rgba(255,255,255,.8); border-radius:3px; padding:0 3px; white-space:nowrap;
+  }
+  .dark .evt-range-label { background:rgba(22,27,34,.75); color:#8b949e; }
+
+  /* ── BLOC PRÉPARATION (hachures grises avant l'atelier) ── */
+  .evt-prep {
+    position:absolute; left:1px; right:1px;
+    border-radius:3px 3px 0 0;
+    border:1px dashed #9ca3af;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 4px,
+      rgba(156,163,175,.18) 4px,
+      rgba(156,163,175,.18) 8px
+    );
+    pointer-events:none; overflow:hidden; z-index:1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .dark .evt-prep {
+    border-color:#4b5563;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 4px,
+      rgba(75,85,99,.3) 4px,
+      rgba(75,85,99,.3) 8px
+    );
+  }
+  .evt-prep-label {
+    font-size:9px; font-weight:600; color:#6b7280;
+    background:rgba(255,255,255,.75); padding:1px 5px; border-radius:3px;
+    white-space:nowrap; pointer-events:none;
+  }
+  .dark .evt-prep-label { background:rgba(22,27,34,.75); color:#8b949e; }
+
+  /* Couleurs PAR RÔLE */
+  .r-animateur { border-left-color:var(--c-animateur); background:var(--c-animateur-bg); border-color:var(--c-animateur-bd); }
+  .r-animateur .evt-name { color:var(--c-animateur); }
+  .r-animateur .evt-role { color:var(--c-animateur); }
+
+  .r-helper { border-left-color:var(--c-helper); background:var(--c-helper-bg); border-color:var(--c-helper-bd); }
+  .r-helper .evt-name { color:var(--c-helper); }
+  .r-helper .evt-role { color:var(--c-helper); }
+
+  .r-traducteur { border-left-color:var(--c-traducteur); background:var(--c-traducteur-bg); border-color:var(--c-traducteur-bd); }
+  .r-traducteur .evt-name { color:var(--c-traducteur); }
+  .r-traducteur .evt-role { color:var(--c-traducteur); }
+
+  .r-angel { border-left-color:var(--c-angel); background:var(--c-angel-bg); border-color:var(--c-angel-bd); }
+  .r-angel .evt-name { color:var(--c-angel); }
+  .r-angel .evt-role { color:var(--c-angel); }
+
+  .r-reunion { border-left-color:var(--c-reunion); background:var(--c-reunion-bg); border-color:var(--c-reunion-bd); }
+  .r-reunion .evt-name { color:var(--c-reunion); }
+  .r-reunion .evt-role { color:var(--c-reunion); }
+
+  .r-multi { border-left-color:var(--c-multi); background:var(--c-multi-bg); border-color:var(--c-multi-bd); }
+  .r-multi .evt-name { color:var(--c-multi); }
+  .r-multi .evt-role { color:var(--c-multi); }
+
+  /* ── TOOLTIP CUSTOM ── */
+  #evtTooltip {
+    display:none; position:fixed; z-index:9999; pointer-events:none;
+    background:var(--bg); border:1px solid var(--border);
+    border-radius:8px; padding:10px 14px;
+    box-shadow:0 4px 18px rgba(0,0,0,.18);
+    max-width:300px; min-width:160px;
+  }
+  #evtTooltip .tt-name { font-size:14px; font-weight:700; color:var(--text); margin-bottom:6px; line-height:1.3; }
+  #evtTooltip .tt-row  { font-size:12px; color:var(--muted); display:flex; gap:6px; align-items:flex-start; margin-top:3px; line-height:1.4; }
+  #evtTooltip .tt-row b { color:var(--text); font-weight:600; flex-shrink:0; min-width:80px; }
+  #evtTooltip .tt-role-pill { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-weight:700; padding:2px 8px; border-radius:20px; margin-bottom:6px; }
+  #evtTooltip .tt-sep { border:none; border-top:1px solid var(--border); margin:6px 0; }
+  #evtTooltip .tt-arrivee { font-size:12px; font-weight:700; color:#dc2626; margin-top:1px; }
+  .dark #evtTooltip .tt-arrivee { color:#f87171; }
+
+  @media print {
+    .topbar, .filter-bar, .legend { position:static; }
+    .cal-scroll { overflow:visible; }
+    .evt { break-inside:avoid; }
+    #evtTooltip { display:none !important; }
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>Tantramour 2026</h1>
+    <p data-i18n="mas_title">Mon Agenda Simplifié</p>
+  </div>
+  <div class="topbar-right" id="jourChips"></div>
+  <div class="topbar-right">
+    <a class="btn" href="index.html">🏠 Accueil</a>
+    <a class="btn" href="index_bis.html">🌀 DreamTeam</a>
+    <button class="btn" onclick="doRefresh()" data-i18n="mas_refresh">🔄 Refresh</button>
+    <button class="btn" id="btnExport" onclick="exportJpeg()" style="display:none;" data-i18n="mas_export_jpeg">📷 Export JPEG</button>
+    <button class="btn" id="btnIcal" onclick="exportIcal()" style="display:none;">📅 Export iCal</button>
+    <div id="langToggleContainer"></div>
+    <button class="btn" onclick="document.body.classList.toggle('dark')">🌙</button>
+  </div>
+</div>
+
+<!-- Filtre NOM -->
+<div class="filter-bar">
+  <label for="fNom" data-i18n="mas_filter_nom_lbl">👤 Nom :</label>
+  <select id="fNom" onchange="onNomChange()">
+    <option value="" data-i18n="mas_filter_nom_opt">— Choisissez votre nom —</option>
+  </select>
+  <span class="hint" id="filterHint"></span>
+</div>
+
+<!-- Légende par rôle -->
+<div class="legend">
+  <strong style="font-size:10px;color:var(--text);margin-right:4px;" data-i18n="mas_legend_title">Légende :</strong>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-animateur);"></div><span data-i18n="mas_leg_animateur">Animateur</span></div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-helper);"></div><span data-i18n="mas_leg_helper">Helper</span></div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-traducteur);"></div><span data-i18n="mas_leg_traducteur">Traducteur</span></div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-angel);"></div><span data-i18n="mas_leg_angel">Angel</span></div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-reunion);"></div><span data-i18n="mas_leg_reunion">Réunion</span></div>
+  <div class="leg"><div class="leg-dot" style="background:var(--c-multi);"></div><span data-i18n="mas_leg_multi">Multi-rôles</span></div>
+</div>
+
+<div id="evtTooltip"></div>
+
+<div id="mainContent">
+  <!-- L'état vide ou le calendrier sont rendus ici -->
+  <div class="empty-state">
+    <div class="icon">📅</div>
+    <p>Choisissez votre nom pour afficher votre agenda.</p>
+  </div>
+</div>
+
+<script src="loader.js"></script>
+<script src="ref_translations.js"></script>
+<script src="ref_descriptions.js"></script>
+<script src="ref_ressources.js"></script>
+<script src="i18n.js"></script>
+<script>
+loadData(['data.js','logistics.js'], function() {
+
+// ── Config ────────────────────────────────────────────────────────────────────
+var H_START = 7;
+var H_END   = 25;
+var PX_PER_MIN = 1.6; // recalculé dynamiquement par computePxPerMin()
+
+var LIEUX_ORDER = ['SHIVA','CHENREZIG','SHAKTI','TARA','GANESH','HANUMAN','PISCINE','BUDDHA','EXTERIEUR','TEST',''];
+
+var JOUR_ORDER = ['Jour 1','Jour 2','Jour 3','Jour 4','Jour 5','Jour 6','Jour 7'];
+var JOUR_DATES = {
+  fr: { 'Jour 1':'Sam. 29/08','Jour 2':'Dim. 30/08','Jour 3':'Lun. 31/08',
+        'Jour 4':'Mar. 01/09','Jour 5':'Mer. 02/09','Jour 6':'Jeu. 03/09','Jour 7':'Ven. 04/09' },
+  en: { 'Jour 1':'Sat. Aug 29','Jour 2':'Sun. Aug 30','Jour 3':'Mon. Aug 31',
+        'Jour 4':'Tue. Sep 01','Jour 5':'Wed. Sep 02','Jour 6':'Thu. Sep 03','Jour 7':'Fri. Sep 04' },
+};
+function jourDate(j) {
+  var lang = (typeof I18n !== 'undefined') ? I18n.getLang() : 'fr';
+  return (JOUR_DATES[lang] || JOUR_DATES.fr)[j] || '';
+}
+
+// Ordre de priorité pour l'affichage couleur quand plusieurs rôles
+var ROLE_PRIORITY = ['animateur','traducteur','helper','angel','reunion'];
+
+// Libellé lisible par rôle — dynamique selon langue
+function getRoleLabel() {
+  var t = (typeof I18n !== 'undefined') ? function(k){ return I18n.t(k); } : function(k){ return k; };
+  return {
+    animateur: '🎙 ' + t('mas_role_animateur'),
+    helper:    '🤝 ' + t('mas_role_helper'),
+    traducteur:'🌐 ' + t('mas_role_traducteur'),
+    angel:     '👼 ' + t('mas_role_angel'),
+    reunion:   '📋 ' + t('mas_role_reunion'),
+  };
+}
+function getRoleLabelShort() {
+  var t = (typeof I18n !== 'undefined') ? function(k){ return I18n.t(k); } : function(k){ return k; };
+  return {
+    animateur: t('mas_role_animateur'),
+    helper:    t('mas_role_helper'),
+    traducteur:t('mas_role_traducteur'),
+    angel:     t('mas_role_angel'),
+    reunion:   t('mas_role_reunion'),
+  };
+}
+// Alias statiques conservés pour compatibilité (recalculés à chaque render via fonctions)
+var ROLE_LABEL       = getRoleLabel();
+var ROLE_LABEL_SHORT = getRoleLabelShort();
+
+// CSS class selon rôle dominant
+var ROLE_CSS = {
+  animateur:'r-animateur',
+  helper:'r-helper',
+  traducteur:'r-traducteur',
+  angel:'r-angel',
+  reunion:'r-reunion',
+};
+
+// Couleurs tooltip pill
+var ROLE_PILL_STYLE = {
+  animateur:'background:#dcfce7;color:#166534;',
+  helper:'background:#e0f2fe;color:#0369a1;',
+  traducteur:'background:#f5f3ff;color:#7c3aed;',
+  angel:'background:#fee2e2;color:#dc2626;',
+  reunion:'background:#fffbeb;color:#92400e;',
+};
+
+var activeJour = '';
+var activeNom  = '';
+
+// ── Parsing heure ─────────────────────────────────────────────────────────────
+function parseHM(s) {
+  if (!s) return null;
+  var m = String(s).replace(/\./g,':').trim().match(/^(\d{1,2}):(\d{2})$/);
+  if (!m) return null;
+  return parseInt(m[1])*60 + parseInt(m[2]);
+}
+function parseInterval(h) {
+  if (!h) return null;
+  var norm = String(h).replace(/\./g,':').replace(/[–—]/g,'-').trim();
+  var parts = norm.split(/\s*-+\s*/);
+  if (parts.length < 2) return null;
+  var s = parseHM(parts[0]), e = parseHM(parts[1]);
+  if (s == null || e == null) return null;
+  if (e < s) e += 24*60;
+  return { s:s, e:e };
+}
+
+// ── Conversion minutes → pixels (dynamique selon hauteur fenêtre) ─────────────
+var OFFSET_MIN = H_START * 60;
+
+function computePxPerMin() {
+  // Hauteur totale de la fenêtre moins les barres fixes (topbar + filter-bar + légende)
+  var usedH = 0;
+  ['topbar','filter-bar','legend'].forEach(function(cls) {
+    var el = document.querySelector('.' + cls);
+    if (el) usedH += el.offsetHeight;
+  });
+  var available = window.innerHeight - usedH - 2; // 2px de marge
+  var totalMin  = (H_END - H_START) * 60;
+  // Minimum 0.7 px/min pour rester lisible, maximum 1.8 px/min pour ne pas être trop espacé
+  return Math.min(1.8, Math.max(0.7, available / totalMin));
+}
+
+function minToPx(min) { return (min - OFFSET_MIN) * PX_PER_MIN; }
+function durationPx(dur) { return Math.max(dur * PX_PER_MIN, 18); }
+var TOTAL_PX = (H_END - H_START) * 60 * PX_PER_MIN;
+
+// ── Escape HTML ───────────────────────────────────────────────────────────────
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ── Index : indexer toutes les personnes ──────────────────────────────────────
+function buildIndex() {
+  var idx = {};
+
+  function add(nom, entry, role) {
+    if (!nom || !nom.trim()) return;
+    var key = nom.trim();
+    if (!idx[key]) idx[key] = [];
+    var arr = idx[key];
+    var found = arr.find(function(x){
+      return x.entry === entry || (x.entry.atelier===entry.atelier && x.entry.jour===entry.jour && x.entry.heure===entry.heure);
+    });
+    if (found) { if (found.roles.indexOf(role)===-1) found.roles.push(role); }
+    else arr.push({ entry: entry, roles: [role] });
+  }
+
+  AGENDA.forEach(function(e) {
+    if (e.fac1)       add(e.fac1, e, 'animateur');
+    if (e.fac2)       add(e.fac2, e, 'animateur');
+    if (e.fac3)       add(e.fac3, e, 'animateur');
+    if (e.fac4)       add(e.fac4, e, 'animateur');
+    if (e.traduction) add(e.traduction, e, 'traducteur');
+    if (e.helper1)    add(e.helper1, e, 'helper');
+    if (e.helper2)    add(e.helper2, e, 'helper');
+    if (e.helper3)    add(e.helper3, e, 'helper');
+    if (e.helper4)    add(e.helper4, e, 'helper');
+    if (e.angel)      add(e.angel, e, 'angel');
+    // REUNION : diffuser selon meetingRoles
+    if (e.type === 'REUNION' && e.meetingRoles) {
+      var meetRoles = e.meetingRoles.split(',').map(function(r){ return r.trim(); }).filter(Boolean);
+      if (meetRoles.length && typeof REF_RESSOURCES !== 'undefined') {
+        REF_RESSOURCES.forEach(function(res) {
+          if (!res.value) return;
+          var hasRole = meetRoles.some(function(r){ return res.roles && res.roles.indexOf(r) !== -1; });
+          if (!hasRole) return;
+          var alreadyIn = [e.fac1,e.fac2,e.fac3,e.fac4,e.traduction,e.helper1,e.helper2,e.helper3,e.helper4,e.angel].indexOf(res.value) !== -1;
+          if (!alreadyIn) add(res.value, e, 'reunion');
+        });
+      }
+    }
+  });
+  return idx;
+}
+
+var FULL_INDEX = buildIndex();
+
+// ── Vérifier si une personne est Colibri ou Mi-Colibri ───────────────────────
+function hasRole(nom, role) {
+  if (!nom || typeof REF_RESSOURCES === 'undefined') return false;
+  var res = REF_RESSOURCES.find(function(r) { return r.value === nom; });
+  return !!(res && res.roles && res.roles.indexOf(role) !== -1);
+}
+function isColibri(nom)   { return hasRole(nom, 'colibri'); }
+function isMiColibri(nom) { return hasRole(nom, 'Mi-Colibri'); }
+
+// ── Vérifier si une réunion est "Animateur seul" ou contient "helper" ─────────
+function isReunionAnimateur(entry) {
+  if (entry.type !== 'REUNION') return false;
+  var roles = (entry.meetingRoles || '').split(',').map(function(r){ return r.trim(); });
+  return roles.indexOf('animateur') !== -1;
+}
+function isReunionHelper(entry) {
+  if (entry.type !== 'REUNION') return false;
+  var roles = (entry.meetingRoles || '').split(',').map(function(r){ return r.trim(); });
+  return roles.indexOf('helper') !== -1;
+}
+
+// ── Peupler le select NOM ─────────────────────────────────────────────────────
+var allNoms = Object.keys(FULL_INDEX).sort(function(a,b){ return a.localeCompare(b,'fr'); });
+var selNom = document.getElementById('fNom');
+allNoms.forEach(function(n) {
+  var o = document.createElement('option');
+  o.value = n; o.text = n;
+  selNom.appendChild(o);
+});
+
+// ── Rôle dominant d'un item ───────────────────────────────────────────────────
+function dominantRole(roles) {
+  for (var i=0; i<ROLE_PRIORITY.length; i++) {
+    if (roles.indexOf(ROLE_PRIORITY[i]) !== -1) return ROLE_PRIORITY[i];
+  }
+  return roles[0] || 'helper';
+}
+
+// ── Libellé des rôles pour tooltip ───────────────────────────────────────────
+function rolesStr(roles) {
+  return roles.map(function(r){ return ROLE_LABEL_SHORT[r] || r; }).join(' + ');
+}
+
+// ── Libellé court (badge sur le bloc) ────────────────────────────────────────
+function roleBadgeShort(roles) {
+  if (roles.length > 1) return roles.map(function(r){ return ROLE_LABEL_SHORT[r]||r; }).join(' + ');
+  return ROLE_LABEL[roles[0]] || roles[0];
+}
+
+// ── Entrées de la personne filtrées par jour actif ────────────────────────────
+function getPersonEntries(nom, jour) {
+  var all = FULL_INDEX[nom] || [];
+  if (jour) return all.filter(function(x){ return x.entry.jour === jour; });
+  return all;
+}
+
+// ── Jours qui ont des entrées pour cette personne (pour les chips) ────────────
+function getJoursWithEntries(nom) {
+  var entries = FULL_INDEX[nom] || [];
+  var s = new Set(entries.map(function(x){ return x.entry.jour; }));
+  return JOUR_ORDER.filter(function(j){ return s.has(j); });
+}
+
+// ── Rendu chips jours ─────────────────────────────────────────────────────────
+function renderChips() {
+  if (!activeNom) {
+    document.getElementById('jourChips').innerHTML = '';
+    return;
+  }
+  var jours = getJoursWithEntries(activeNom);
+  var _t = (typeof I18n !== 'undefined') ? function(k){ return I18n.t(k); } : function(k){ return k; };
+  var html = '<span class="chip'+(activeJour===''?' on':'')+'" onclick="setJour(\'\')">'+_t('mas_tous')+'</span>';
+  jours.forEach(function(j) {
+    html += '<span class="chip'+(activeJour===j?' on':'')+'" onclick="setJour(\''+j+'\')">'+j+'</span>';
+  });
+  document.getElementById('jourChips').innerHTML = html;
+}
+
+// ── Rendu principal ───────────────────────────────────────────────────────────
+function render() {
+  // Recalculer les libellés de rôles dans la langue courante
+  ROLE_LABEL       = getRoleLabel();
+  ROLE_LABEL_SHORT = getRoleLabelShort();
+
+  renderChips();
+
+  var t = (typeof I18n !== 'undefined') ? function(k){ return I18n.t(k); } : function(k){ return k; };
+  var mainContent = document.getElementById('mainContent');
+
+  if (!activeNom) {
+    mainContent.innerHTML = '<div class="empty-state"><div class="icon">📅</div><p>'+t('mas_empty_choose')+'</p></div>';
+    document.getElementById('filterHint').textContent = '';
+    return;
+  }
+
+  var jours = activeJour ? [activeJour] : JOUR_ORDER;
+
+  // ── Réduire la plage horaire aux créneaux réels de la personne (+ marge 30 min) ──
+  var entries = FULL_INDEX[activeNom] || [];
+  var minH = 25, maxH = 7;
+  entries.forEach(function(ev) {
+    var iv = parseInterval(ev.heure);
+    if (!iv) return;
+    var startH = Math.floor(iv.s / 60);
+    var endH   = Math.ceil(iv.e / 60);
+    if (startH < minH) minH = startH;
+    if (endH   > maxH) maxH = endH;
+  });
+  // Marge d'1h avant/après, bornée sur 7h–25h
+  H_START = Math.max(7,  minH - 1);
+  H_END   = Math.min(25, maxH + 1);
+  // Fallback si aucune entrée
+  if (minH > maxH) { H_START = 7; H_END = 25; }
+  OFFSET_MIN = H_START * 60;
+
+  // Recalculer px/min selon la hauteur de fenêtre disponible et la plage réduite
+  PX_PER_MIN = computePxPerMin();
+  TOTAL_PX   = (H_END - H_START) * 60 * PX_PER_MIN;
+
+  // Total ateliers
+  var total = (FULL_INDEX[activeNom] || []).length;
+  var joursAvecEntrees = getJoursWithEntries(activeNom);
+  var txt = activeJour
+    ? 'Affichage pour ' + activeJour
+    : joursAvecEntrees.length + ' ' + t('mas_hint_jours') + ' avec ateliers';
+  document.getElementById('filterHint').textContent = total + ' ' + t('mas_hint_total') + ' · ' + txt;
+
+  // ── En-tête (1 colonne par jour) ─────────────────────────────────────────────
+  var joursAvecEntreesSet = new Set(joursAvecEntrees);
+  var headHtml = '<div class="cal-head">';
+  headHtml += '<div class="head-hour"></div>';
+  jours.forEach(function(j) {
+    var isEmpty = !joursAvecEntreesSet.has(j);
+    var emptyStyle = isEmpty ? 'opacity:.45;' : '';
+    headHtml += '<div class="head-day-group" style="flex:1 1 0;min-width:120px;'+emptyStyle+'">';
+    headHtml += '<div class="hd-jour"><span class="hd-name">'+esc(j)+'</span><span class="hd-date">'+esc(jourDate(j))+'</span>'+(isEmpty?'<span style="display:block;font-size:8px;opacity:.7;margin-top:1px;">—</span>':'')+'</div>';
+    headHtml += '</div>';
+  });
+  headHtml += '</div>';
+
+  // ── Corps ────────────────────────────────────────────────────────────────────
+  var bodyHtml = '<div class="cal-body">';
+
+  // Colonne heures
+  bodyHtml += '<div class="col-hours" style="height:'+TOTAL_PX+'px;">';
+  for (var h=H_START; h<=H_END; h++) {
+    var yFull = minToPx(h*60);
+    var label = h < 24 ? (h < 10 ? '0'+h : h)+':00' : '0'+(h-24)+':00';
+    bodyHtml += '<div class="hour-line full" style="top:'+yFull+'px;"></div>';
+    bodyHtml += '<div class="hour-label" style="top:'+yFull+'px;">'+label+'</div>';
+    if (h < H_END) {
+      var yHalf = minToPx(h*60+30);
+      bodyHtml += '<div class="hour-line half" style="top:'+yHalf+'px;"></div>';
+    }
+  }
+  bodyHtml += '</div>';
+
+  // 1 colonne par jour — tous les ateliers du jour dans cette colonne
+  jours.forEach(function(jour) {
+    var allEntries = getPersonEntries(activeNom, jour);
+
+    // Collecter tous les événements valides du jour
+    var events = [];
+    allEntries.forEach(function(x) {
+      var iv = parseInterval(x.entry.heure);
+      if (!iv) return;
+      events.push({ item:x, iv:iv });
+    });
+
+    // Si la personne est ANGEL sur une période, masquer les autres ateliers
+    // qui chevauchent entièrement cette période Angel
+    // Identifier les vrais SHIFTS ANGEL (type "SHIFT ANGEL") uniquement
+    var angelIntervals = events
+      .filter(function(ev) {
+        return ev.item.entry.type === 'SHIFT ANGEL';
+      })
+      .map(function(ev) { return ev.iv; });
+
+    // Ne masquer les ateliers couverts par un SHIFT ANGEL que si la personne
+    // a le rôle "angel" dans REF_RESSOURCES (pas pour les animateurs/helpers
+    // qui seraient simplement listés dans un shift angel)
+    if (angelIntervals.length && hasRole(activeNom, 'angel')) {
+      events = events.filter(function(ev) {
+        // Toujours garder les shifts Angel
+        if (ev.item.entry.type === 'SHIFT ANGEL') return true;
+        // Masquer tout autre atelier dont l'intervalle est entièrement
+        // couvert par au moins un shift Angel
+        return !angelIntervals.some(function(ai) {
+          return ev.iv.s >= ai.s && ev.iv.e <= ai.e;
+        });
+      });
+    }
+
+    // Si la personne a "PREPARATION Rassemblement" et une REUNION au même créneau,
+    // masquer la REUNION — la PREPA prime toujours
+    var prepRassIds = events
+      .filter(function(ev) {
+        return ev.item.entry.atelier === 'PREPARATION Rassemblement';
+      })
+      .map(function(ev) { return ev.iv; });
+
+    if (prepRassIds.length) {
+      events = events.filter(function(ev) {
+        if (ev.item.entry.type !== 'REUNION') return true;
+        // Masquer toute REUNION qui chevauche une PREPARATION Rassemblement
+        return !prepRassIds.some(function(pi) {
+          return ev.iv.s < pi.e && ev.iv.e > pi.s;
+        });
+      });
+    }
+
+    // Gestion des conflits de réunions
+    // Capturer TOUTES les réunions de la personne (quel que soit son rôle dans la réunion)
+    var reunionEvts = events.filter(function(ev) {
+      return ev.item.entry.type === 'REUNION';
+    });
+
+    if (reunionEvts.length >= 2) {
+      var personIsColibri   = isColibri(activeNom);
+      var personIsMiColibri = isMiColibri(activeNom);
+      var toRemove = []; // stocke les références d'objets entry (pas .id qui n'existe pas)
+
+      for (var i = 0; i < reunionEvts.length; i++) {
+        for (var j = i + 1; j < reunionEvts.length; j++) {
+          var a = reunionEvts[i], b = reunionEvts[j];
+          var overlap = a.iv.s < b.iv.e && a.iv.e > b.iv.s;
+          if (!overlap) continue;
+
+          // Est-ce que la personne est fac direct (animateur) dans chaque réunion ?
+          var aIsFac = a.item.roles.indexOf('animateur') !== -1;
+          var bIsFac = b.item.roles.indexOf('animateur') !== -1;
+
+          // Priorité 1 — la personne est fac direct d'une réunion et pas de l'autre
+          // → garder celle où elle est fac, quelle que soit la règle Colibri/Mi-Colibri
+          if (aIsFac && !bIsFac) { toRemove.push(b.item.entry); continue; }
+          if (bIsFac && !aIsFac) { toRemove.push(a.item.entry); continue; }
+
+          // Priorité 2 — Colibri → garder la réunion Animateur
+          if (personIsColibri) {
+            var aIsAnim = isReunionAnimateur(a.item.entry);
+            var bIsAnim = isReunionAnimateur(b.item.entry);
+            if (aIsAnim && !bIsAnim) toRemove.push(b.item.entry);
+            else if (bIsAnim && !aIsAnim) toRemove.push(a.item.entry);
+          }
+          // Priorité 2 — Mi-Colibri → garder la réunion Helpers
+          else if (personIsMiColibri) {
+            var aIsHelper = isReunionHelper(a.item.entry);
+            var bIsHelper = isReunionHelper(b.item.entry);
+            if (aIsHelper && !bIsHelper) toRemove.push(b.item.entry);
+            else if (bIsHelper && !aIsHelper) toRemove.push(a.item.entry);
+          }
+        }
+      }
+
+      if (toRemove.length) {
+        events = events.filter(function(ev) {
+          return toRemove.indexOf(ev.item.entry) === -1;
+        });
+      }
+    }
+
+    var isDayEmpty = !joursAvecEntreesSet.has(jour);
+    bodyHtml += '<div class="col-day" style="height:'+TOTAL_PX+'px;'+(isDayEmpty?'background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(0,0,0,.03) 8px,rgba(0,0,0,.03) 9px);opacity:.5;':'')+'">';
+
+    // Lignes horaires de fond
+    for (var h=H_START; h<=H_END; h++) {
+      bodyHtml += '<div class="hour-line full" style="top:'+minToPx(h*60)+'px;"></div>';
+      if (h < H_END) bodyHtml += '<div class="hour-line half" style="top:'+minToPx(h*60+30)+'px;"></div>';
+    }
+
+    // Algorithme chevauchement (sur tous les ateliers du jour)
+    var evts = events.slice().sort(function(a,b){ return a.iv.s - b.iv.s; });
+    var colEnds = [];
+    evts.forEach(function(ev) {
+      var placed = false;
+      for (var c=0; c<colEnds.length; c++) {
+        if (ev.iv.s >= colEnds[c]) { ev._col=c; colEnds[c]=ev.iv.e; placed=true; break; }
+      }
+      if (!placed) { ev._col=colEnds.length; colEnds.push(ev.iv.e); }
+      ev._ncols = 1;
+    });
+    evts.forEach(function(ev) {
+      var maxCol = ev._col;
+      evts.forEach(function(other) {
+        if (other.iv.s < ev.iv.e && other.iv.e > ev.iv.s) {
+          if (other._col > maxCol) maxCol = other._col;
+        }
+      });
+      ev._ncols = maxCol + 1;
+    });
+
+    evts.forEach(function(ev) {
+      var entry  = ev.item.entry;
+      var roles  = ev.item.roles;
+      var iv     = ev.iv;
+
+      var dom    = dominantRole(roles);
+      var css    = roles.length > 1 ? 'r-multi' : (ROLE_CSS[dom] || '');
+      var roleLabel = roleBadgeShort(roles);
+      var top    = minToPx(iv.s);
+      var height = durationPx(iv.e - iv.s);
+      var pct    = 100 / ev._ncols;
+      var left   = 'calc('+(ev._col * pct).toFixed(1)+'% + 2px)';
+      var width  = 'calc('+pct.toFixed(1)+'% - 4px)';
+      var fmtH   = entry.heure ? entry.heure.replace(/\s+/g,' ').trim() : '';
+      var lieu   = entry.lieu || '';
+      var pillStyle = roles.length > 1 ? 'background:#eff6ff;color:#1e40af;' : (ROLE_PILL_STYLE[dom] || '');
+
+      // Calcul heure d'arrivée depuis logistics
+      var logEntry  = (entry.logisticId && typeof LOGISTICS !== 'undefined') ? LOGISTICS[entry.logisticId] : null;
+      var prepMin   = (entry.type === 'REUNION' || entry.type === 'PREPA & LOGISTICS' || entry.type === 'SHIFT ANGEL') ? 0 : (logEntry && logEntry.prepDuration != null) ? logEntry.prepDuration : 15;
+      var debutMin  = parseHM(fmtH.split('-')[0].trim());
+      var arriveeStr = '';
+      if (debutMin !== null) {
+        var arrMin = debutMin - prepMin;
+        if (arrMin < 0) arrMin += 24 * 60;
+        arriveeStr = (arrMin < 600 ? '0' : '') + Math.floor(arrMin/60) + ':' + (arrMin%60 < 10 ? '0' : '') + (arrMin%60);
+      }
+
+      // Nom de l'atelier : EN si disponible et langue=EN
+      var lang = (typeof I18n !== 'undefined') ? I18n.getLang() : 'fr';
+      var atelierName = entry.atelier || '';
+      if (lang === 'en' && typeof REF_DESCRIPTIONS !== 'undefined') {
+        var descEntry = REF_DESCRIPTIONS.find(function(d){ return d.atelier && d.atelier.trim() === atelierName.trim(); });
+        if (descEntry && descEntry.nomEn && descEntry.nomEn.trim()) atelierName = descEntry.nomEn.trim();
+      }
+
+      // ── Résolution des animateurs et angel (avec héritage pour Prépa & Logistique / Extra Staff) ──
+      var facsList = [entry.fac1,entry.fac2,entry.fac3,entry.fac4].filter(Boolean);
+      var angelVal = entry.angel || '';
+
+      // Si atelier PREPA & LOGISTICS (ou atelier sans animateur/angel), chercher l'atelier principal associé
+      if (typeof AGENDA !== 'undefined' && (!facsList.length || !angelVal)) {
+        var cleanName = (entry.atelier || '')
+          .replace(/^(?:EXTRA\s+(?:STAFF|SUPPORT)\s*(?:\(\d+\))?\s*[-–:]*|PREPA\s+(?:TEMPLE\s*\([^)]+\)|CONCERT\s*\([^)]+\)|CONCERT|CEREMONIE\s+CACAO\s*\([^)]+\)|CEREMONIE\s+CACAO|CEREMONIE\s+DE\s+CLOTURE|OPENING\s+CEREMONY|Rassemblement)?\s*[-–:]*)/i, '')
+          .replace(/@.*$/, '')
+          .trim().toLowerCase();
+
+        if (cleanName.length >= 4) {
+          var parentMatch = AGENDA.find(function(a) {
+            if (a === entry || a.type === 'PREPA & LOGISTICS' || a.type === 'REPAS & PAUSE') return false;
+            if (a.jour !== entry.jour) return false;
+            var aName = (a.atelier || '').replace(/@.*$/, '').trim().toLowerCase();
+            return (aName.indexOf(cleanName) !== -1 || cleanName.indexOf(aName) !== -1);
+          });
+          if (parentMatch) {
+            if (!facsList.length) {
+              facsList = [parentMatch.fac1, parentMatch.fac2, parentMatch.fac3, parentMatch.fac4].filter(Boolean);
+            }
+            if (!angelVal && parentMatch.angel) {
+              angelVal = parentMatch.angel;
+            }
+          }
+        }
+      }
+
+      // Noms des participants pour le tooltip
+      var ttFacs    = facsList.join(', ');
+      var ttHelpers = [entry.helper1,entry.helper2,entry.helper3,entry.helper4].filter(Boolean).join(', ');
+      var ttTrad    = entry.traduction || '';
+      var ttAngel   = angelVal;
+
+      // ── Bloc rangement ────────────────────────────────────────────────────
+      var rangeMin = (entry.type === 'REUNION' || entry.type === 'PREPA & LOGISTICS' || entry.type === 'SHIFT ANGEL') ? 0 : (logEntry && logEntry.rangeDuration != null) ? logEntry.rangeDuration : 0;
+      var finMin   = iv.e;
+      if (rangeMin > 0 && finMin !== null) {
+        var rangeTop    = minToPx(finMin);
+        var rangeHeight = durationPx(rangeMin);
+        bodyHtml += '<div class="evt-range"'
+          +' style="top:'+rangeTop.toFixed(1)+'px;height:'+rangeHeight.toFixed(1)+'px;left:'+left+';width:'+width+';">';
+        if (rangeHeight > 16) {
+          var rangeLabel = rangeMin >= 60
+            ? (rangeMin/60 % 1 === 0 ? rangeMin/60+'h' : (Math.floor(rangeMin/60)+'h'+rangeMin%60)) + ' rangement'
+            : rangeMin + 'min rangement';
+          bodyHtml += '<div class="evt-range-label">'+rangeLabel+'</div>';
+        }
+        bodyHtml += '</div>';
+      }
+
+      // ── Bloc préparation ──────────────────────────────────────────────────
+      if (prepMin > 0 && debutMin !== null) {
+        var prepStartMin = iv.s - prepMin;
+        // Ne pas afficher si ça démarre avant la grille
+        if (prepStartMin >= OFFSET_MIN) {
+          var prepTop    = minToPx(prepStartMin);
+          var prepHeight = durationPx(prepMin);
+          var prepLabel  = prepMin >= 60
+            ? (prepMin/60 % 1 === 0 ? prepMin/60+'h' : (Math.floor(prepMin/60)+'h'+prepMin%60)) + ' de prépa'
+            : prepMin + 'min de prépa';
+          bodyHtml += '<div class="evt-prep"'
+            +' style="top:'+prepTop.toFixed(1)+'px;height:'+prepHeight.toFixed(1)+'px;left:'+left+';width:'+width+';">';
+          if (prepHeight > 16) {
+            bodyHtml += '<div class="evt-prep-label">'+prepLabel+'</div>';
+          }
+          bodyHtml += '</div>';
+        }
+      }
+
+      bodyHtml += '<div class="evt '+css+'"'
+        +' style="top:'+top.toFixed(1)+'px;height:'+height.toFixed(1)+'px;left:'+left+';width:'+width+';"'
+        +' data-tt-name="'+esc(entry.atelier)+'"'
+        +' data-tt-heure="'+esc(fmtH)+'"'
+        +' data-tt-lieu="'+esc(lieu)+'"'
+        +' data-tt-roles="'+esc(rolesStr(roles))+'"'
+        +' data-tt-pill="'+esc(pillStyle)+'"'
+        +' data-tt-arrivee="'+esc(arriveeStr)+'"'
+        +' data-tt-prep="'+prepMin+'"'
+        +' data-tt-range="'+rangeMin+'"'
+        +' data-tt-facs="'+esc(ttFacs)+'"'
+        +' data-tt-helpers="'+esc(ttHelpers)+'"'
+        +' data-tt-trad="'+esc(ttTrad)+'"'
+        +' data-tt-angel="'+esc(ttAngel)+'"'
+        +'>';
+      var animSuffix = ttFacs ? ' <span class="evt-name-anim">(' + esc(ttFacs) + ')</span>' : '';
+      bodyHtml += '<div class="evt-name">' + esc(atelierName) + animSuffix + '</div>';
+
+      // Rôle et Lieu côte à côte
+      var hasRole = (height > 20 && roleLabel);
+      var hasLieu = (height > 20 && lieu);
+      if (hasRole || hasLieu) {
+        bodyHtml += '<div class="evt-meta-row">';
+        if (hasRole) {
+          bodyHtml += '<span class="evt-role">' + esc(roleLabel) + '</span>';
+        }
+        if (hasLieu) {
+          var tLieu = (typeof I18n !== 'undefined') ? I18n.t('mas_tt_lieu') : '📍 Lieu';
+          bodyHtml += '<span class="evt-lieu">' + tLieu.split(' ')[0] + ' ' + esc(lieu) + '</span>';
+        }
+        bodyHtml += '</div>';
+      }
+
+      // Horaire, Arrivée et durée de préparation côte à côte
+      if (height > 34) {
+        bodyHtml += '<div class="evt-time-row">';
+        if (fmtH) {
+          bodyHtml += '<span class="evt-time">' + esc(fmtH) + '</span>';
+        }
+        if (arriveeStr) {
+          var isOneHourBefore = (prepMin >= 60);
+          var tRender = (typeof I18n !== 'undefined') ? function(k){ return I18n.t(k); } : function(k){ return k; };
+          var prepLabel = prepMin >= 60
+            ? '(' + tRender('mas_prep_label') + ' ' + (prepMin % 60 === 0 ? prepMin/60+'h' : Math.floor(prepMin/60)+'h'+prepMin%60) + ')'
+            : '(' + tRender('mas_prep_label') + ' ' + prepMin + 'min)';
+          bodyHtml += '<span class="evt-arrivee' + (isOneHourBefore ? ' evt-arrivee-warn' : '') + '">'
+            + '⏰ ' + esc(arriveeStr)
+            + ' <span class="evt-arrivee-prep">' + prepLabel + '</span>'
+            + (isOneHourBefore ? ' <span class="evt-arrivee-badge">' + tRender('mas_1h_avant') + '</span>' : '')
+            + '</span>';
+        }
+        bodyHtml += '</div>';
+      }
+      bodyHtml += '</div>';
+    });
+
+    bodyHtml += '</div>'; // col-day
+  });
+
+  bodyHtml += '</div>'; // cal-body
+
+  mainContent.innerHTML = '<div class="cal-scroll" id="calScroll"><div class="cal-wrap">'+headHtml+bodyHtml+'</div></div>';
+
+  // Scroll vers le début de la plage (H_START = déjà en haut de la grille, donc scrollTop = 0)
+  var cs = document.getElementById('calScroll');
+  if (cs) cs.scrollTop = 0;
+}
+
+// Redimensionnement fenêtre → recalcul de la grille
+(function() {
+  var resizeTimer;
+  window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function() {
+      if (activeNom) render();
+    }, 120);
+  });
+})();
+
+// ── Afficher/cacher le bouton Export selon si un nom est sélectionné ──────────
+function updateExportBtn() {
+  var show = activeNom ? 'inline-flex' : 'none';
+  var b1 = document.getElementById('btnExport');
+  var b2 = document.getElementById('btnIcal');
+  if (b1) b1.style.display = show;
+  if (b2) b2.style.display = show;
+}
+
+// ── Événements ───────────────────────────────────────────────────────────────
+window.onNomChange = function() {
+  activeNom  = document.getElementById('fNom').value;
+  activeJour = '';
+  render();
+  updateExportBtn();
+};
+
+window.setJour = function(j) {
+  activeJour = j;
+  render();
+};
+
+// ── Export JPEG ───────────────────────────────────────────────────────────────
+window.exportJpeg = function() {
+  if (!activeNom) return;
+  if (typeof html2canvas === 'undefined') {
+    alert('La librairie html2canvas n\'est pas disponible. Vérifiez votre connexion internet.');
+    return;
+  }
+
+  // 1. Forcer l'affichage de tous les jours (pas de filtre jour actif)
+  var savedJour = activeJour;
+  activeJour = '';
+  render();
+
+  var calScroll = document.getElementById('calScroll');
+  if (!calScroll) { activeJour = savedJour; render(); return; }
+
+  // 2. Créer le bandeau titre
+  var banner = document.createElement('div');
+  banner.id = '__export_banner__';
+  banner.style.cssText = [
+    'background:#1f2328', 'color:#fff', 'padding:14px 20px',
+    'font-family:-apple-system,"Segoe UI",system-ui,sans-serif',
+    'display:flex', 'align-items:center', 'gap:16px',
+    'border-bottom:3px solid #3b82d4'
+  ].join(';');
+  var tBanner = (typeof I18n !== 'undefined') ? I18n.t('mas_export_banner') : 'Tantramour 2026 — Mon Agenda Simplifié';
+  banner.innerHTML = '<div style="font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:1px;">'+esc(tBanner)+'</div>'
+    + '<div style="font-size:22px;font-weight:800;letter-spacing:.3px;">' + esc(activeNom) + '</div>';
+
+  // 3. Créer le conteneur de capture (hors écran)
+  var container = document.createElement('div');
+  container.style.cssText = 'position:fixed;left:-9999px;top:0;background:#fff;';
+
+  var calClone = calScroll.cloneNode(true);
+  // Retirer les overflow pour que html2canvas capture tout
+  calClone.style.cssText = 'overflow:visible;width:'+calScroll.scrollWidth+'px;';
+  var inner = calClone.querySelector('.cal-wrap');
+  if (inner) inner.style.width = calScroll.scrollWidth + 'px';
+
+  container.appendChild(banner);
+  container.appendChild(calClone);
+  document.body.appendChild(container);
+
+  // 4. Capture
+  var btn = document.getElementById('btnExport');
+  btn.disabled = true;
+  btn.textContent = (typeof I18n !== 'undefined') ? I18n.t('mas_export_exporting') : '⏳ Export…';
+  html2canvas(container, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#ffffff',
+    width: calScroll.scrollWidth,
+    windowWidth: calScroll.scrollWidth
+  }).then(function(canvas) {
+    // 5. Télécharger en JPEG
+    var link = document.createElement('a');
+    var safeName = activeNom.replace(/[^a-zA-Z0-9\u00C0-\u024F _-]/g, '').trim().replace(/\s+/g, '_');
+    link.download = 'Planning_' + safeName + '.jpg';
+    link.href = canvas.toDataURL('image/jpeg', 0.92);
+    link.click();
+  }).catch(function(err) {
+    console.error('Export JPEG échoué :', err);
+    alert('Export échoué : ' + err.message);
+  }).finally(function() {
+    document.body.removeChild(container);
+    btn.disabled = false;
+    btn.innerHTML = '📷 Export JPEG';
+    // Restaurer le filtre jour
+    activeJour = savedJour;
+    if (savedJour) render();
+  });
+};
+
+window.doRefresh = function() {
+  // Recharger la page en conservant le nom sélectionné via le hash URL
+  var nom = document.getElementById('fNom').value;
+  if (nom) {
+    location.href = location.pathname + '#nom=' + encodeURIComponent(nom);
+  } else {
+    location.reload();
+  }
+};
+
+// ── Restauration du nom depuis le hash URL après reload ───────────────────────
+(function() {
+  var hash = location.hash;
+  if (!hash) return;
+  var m = hash.match(/[#&]nom=([^&]*)/);
+  if (!m) return;
+  var nom = decodeURIComponent(m[1]);
+  // Attendre que le select soit peuplé (déjà fait au-dessus)
+  var sel = document.getElementById('fNom');
+  if (!sel) return;
+  // Chercher l'option correspondante
+  for (var i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === nom) {
+      sel.value = nom;
+      activeNom = nom;
+      activeJour = '';
+      // Nettoyer le hash sans recharger
+      history.replaceState(null, '', location.pathname);
+      updateExportBtn();
+      break;
+    }
+  }
+})();
+
+// ── Tooltip custom ────────────────────────────────────────────────────────────
+(function() {
+  var tip = document.getElementById('evtTooltip');
+  var MARGIN = 14;
+
+  document.addEventListener('mouseover', function(ev) {
+    var el = ev.target.closest('.evt');
+    if (!el) return;
+    var name    = el.dataset.ttName    || '';
+    var heure   = el.dataset.ttHeure   || '';
+    var lieu    = el.dataset.ttLieu    || '';
+    var roles   = el.dataset.ttRoles   || '';
+    var pill    = el.dataset.ttPill    || '';
+    var arrivee = el.dataset.ttArrivee || '';
+    var prep    = el.dataset.ttPrep    || '';
+    var range   = el.dataset.ttRange   || '';
+    var facs    = el.dataset.ttFacs    || '';
+    var helpers = el.dataset.ttHelpers || '';
+    var trad    = el.dataset.ttTrad    || '';
+    var angel   = el.dataset.ttAngel   || '';
+    var html = '';
+    var tt = (typeof I18n !== 'undefined') ? function(k){ return I18n.t(k); } : function(k){ return k; };
+    if (roles) html += '<div class="tt-role-pill" style="'+esc(pill)+'">'+esc(roles)+'</div>';
+    html += '<div class="tt-name">'+esc(name)+'</div>';
+    if (heure) {
+      html += '<div class="tt-row"><b>'+tt('mas_tt_horaire')+'</b><span>'+esc(heure)+'</span></div>';
+      if (arrivee) {
+        var prepTxt = prep && prep !== '0' ? ' <span style="color:var(--muted);font-weight:400;">('+tt('mas_prep_prefix')+' ' + esc(prep) + 'min)</span>' : '';
+        html += '<div class="tt-row"><b>'+tt('mas_tt_arrivee')+'</b><span class="tt-arrivee">'+esc(arrivee)+prepTxt+'</span></div>';
+      }
+      if (range && range !== '0') {
+        html += '<div class="tt-row"><b>🧹 Rangement</b><span style="color:var(--muted)">'+esc(range)+' min</span></div>';
+      }
+    }
+    if (lieu) html += '<div class="tt-row"><b>'+tt('mas_tt_lieu')+'</b><span>'+esc(lieu)+'</span></div>';
+    if (facs || helpers || trad || angel) {
+      html += '<hr class="tt-sep">';
+      if (facs)    html += '<div class="tt-row"><b>'+tt('mas_tt_animateurs')+'</b><span>'+esc(facs)+'</span></div>';
+      if (helpers) html += '<div class="tt-row"><b>'+tt('mas_tt_helpers')+'</b><span>'+esc(helpers)+'</span></div>';
+      if (trad)    html += '<div class="tt-row"><b>'+tt('mas_tt_traducteur')+'</b><span>'+esc(trad)+'</span></div>';
+      if (angel)   html += '<div class="tt-row"><b>'+tt('mas_tt_angel')+'</b><span>'+esc(angel)+'</span></div>';
+    }
+    tip.innerHTML = html;
+    tip.style.display = 'block';
+  });
+
+  document.addEventListener('mousemove', function(ev) {
+    if (tip.style.display === 'none') return;
+    var x = ev.clientX + MARGIN;
+    var y = ev.clientY + MARGIN;
+    if (x + tip.offsetWidth + 4 > window.innerWidth)  x = ev.clientX - tip.offsetWidth - MARGIN;
+    if (y + tip.offsetHeight + 4 > window.innerHeight) y = ev.clientY - tip.offsetHeight - MARGIN;
+    tip.style.left = x + 'px';
+    tip.style.top  = y + 'px';
+  });
+
+  document.addEventListener('mouseout', function(ev) {
+    if (!ev.target.closest('.evt')) return;
+    var to = ev.relatedTarget;
+    if (to && to.closest('.evt') === ev.target.closest('.evt')) return;
+    tip.style.display = 'none';
+  });
+})();
+
+// ── Export iCal ───────────────────────────────────────────────────────────────
+window.exportIcal = function() {
+  if (!activeNom) return;
+
+  // Correspondance Jour → date réelle 2026
+  var JOUR_TO_DATE = {
+    'Jour 1': { y:2026, m:8,  d:29 },
+    'Jour 2': { y:2026, m:8,  d:30 },
+    'Jour 3': { y:2026, m:8,  d:31 },
+    'Jour 4': { y:2026, m:9,  d:1  },
+    'Jour 5': { y:2026, m:9,  d:2  },
+    'Jour 6': { y:2026, m:9,  d:3  },
+    'Jour 7': { y:2026, m:9,  d:4  },
+  };
+
+  // Formate une date+heure en UTC iCal : YYYYMMDDTHHMMSSZ
+  // Les horaires sont en heure locale France (UTC+2 en août/sept)
+  function toIcalDT(jourKey, totalMin) {
+    var base = JOUR_TO_DATE[jourKey];
+    if (!base) return null;
+    // Si l'heure dépasse minuit (ex: 01:00 = 25*60), passer au lendemain
+    var extraDays = Math.floor(totalMin / (24*60));
+    var minOfDay  = totalMin % (24*60);
+    var hh = Math.floor(minOfDay / 60);
+    var mm = minOfDay % 60;
+    // Construire une Date UTC en soustrayant le décalage France (UTC+2)
+    var utcMs = Date.UTC(base.y, base.m - 1, base.d + extraDays, hh - 2, mm, 0);
+    var dt = new Date(utcMs);
+    function pad(n){ return n < 10 ? '0'+n : ''+n; }
+    return ''
+      + dt.getUTCFullYear()
+      + pad(dt.getUTCMonth()+1)
+      + pad(dt.getUTCDate())
+      + 'T'
+      + pad(dt.getUTCHours())
+      + pad(dt.getUTCMinutes())
+      + '00Z';
+  }
+
+  // Échappe les caractères spéciaux iCal
+  function icalEsc(s) {
+    return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\n/g,'\\n');
+  }
+
+  // Découpe une ligne iCal à 75 octets max (RFC 5545)
+  function foldLine(line) {
+    var out = '';
+    while (line.length > 75) {
+      out += line.slice(0, 75) + '\r\n ';
+      line  = line.slice(75);
+    }
+    return out + line;
+  }
+
+  // Construire les événements depuis FULL_INDEX (tous les jours, tous les filtres appliqués)
+  var allEntries = FULL_INDEX[activeNom] || [];
+  var lines = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Tantramour 2026//Mon Agenda//FR',
+    'CALSCALE:GREGORIAN',
+    'METHOD:PUBLISH',
+    'X-WR-CALNAME:' + icalEsc('Tantramour 2026 — ' + activeNom),
+    'X-WR-TIMEZONE:Europe/Paris',
+  ];
+
+  var now = new Date();
+  function pad(n){ return n < 10 ? '0'+n : ''+n; }
+  var dtStamp = now.getUTCFullYear()
+    + pad(now.getUTCMonth()+1) + pad(now.getUTCDate())
+    + 'T' + pad(now.getUTCHours()) + pad(now.getUTCMinutes()) + pad(now.getUTCSeconds()) + 'Z';
+
+  allEntries.forEach(function(x) {
+    var entry = x.entry;
+    var roles = x.roles;
+    var iv    = parseInterval(entry.heure);
+    if (!iv) return;
+
+    var dtStart = toIcalDT(entry.jour, iv.s);
+    var dtEnd   = toIcalDT(entry.jour, iv.e);
+    if (!dtStart || !dtEnd) return;
+
+    // Rôle(s) de la personne
+    var roleShort = roles.map(function(r){ return ROLE_LABEL_SHORT[r] || r; }).join(' + ');
+
+    // Titre : [RÔLE] Nom de l'atelier
+    var summary = '[' + roleShort.toUpperCase() + '] ' + (entry.atelier || '');
+
+    // Lieu
+    var location = entry.lieu || 'Hameau de l\'Etoile';
+
+    // Heure d'arrivée
+    var logEntry = (entry.logisticId && typeof LOGISTICS !== 'undefined') ? LOGISTICS[entry.logisticId] : null;
+    var prepMin  = (entry.type === 'REUNION' || entry.type === 'PREPA & LOGISTICS' || entry.type === 'SHIFT ANGEL')
+      ? 0 : (logEntry && logEntry.prepDuration != null) ? logEntry.prepDuration : 15;
+    var arrivalLine = '';
+    if (prepMin > 0) {
+      var arrMin = iv.s - prepMin;
+      if (arrMin < 0) arrMin += 24*60;
+      var arrH = Math.floor(arrMin/60), arrM = arrMin%60;
+      arrivalLine = '⏰ Arrivée : ' + (arrH < 10 ? '0'+arrH : arrH) + ':' + (arrM < 10 ? '0'+arrM : arrM)
+        + ' (' + (prepMin >= 60
+          ? 'préparation ' + (prepMin%60===0 ? prepMin/60+'h' : Math.floor(prepMin/60)+'h'+prepMin%60)
+          : 'préparation ' + prepMin + 'min') + ')\n';
+    }
+
+    // Participants
+    var facs    = [entry.fac1,entry.fac2,entry.fac3,entry.fac4].filter(Boolean);
+    var helpers = [entry.helper1,entry.helper2,entry.helper3,entry.helper4].filter(Boolean);
+    var descParts = [];
+    descParts.push('🏷 Type : ' + (entry.type || ''));
+    descParts.push('🎭 Rôle : ' + roleShort);
+    if (arrivalLine) descParts.push(arrivalLine.trim());
+    if (facs.length)    descParts.push('🎙 Animateur(s) : ' + facs.join(', '));
+    if (helpers.length) descParts.push('🤝 Helper(s) : '    + helpers.join(', '));
+    if (entry.traduction) descParts.push('🌐 Traducteur : ' + entry.traduction);
+    if (entry.angel)      descParts.push('👼 Angel : '      + entry.angel);
+    if (entry.note)       descParts.push('📝 Note : '       + entry.note);
+    var description = descParts.join('\n');
+
+    // UID unique et stable
+    var uid = 'tantramour-2026-' + (entry.id || '') + '-' + activeNom.replace(/\s+/g,'-') + '@tantramour.fr';
+
+    lines.push('BEGIN:VEVENT');
+    lines.push(foldLine('UID:'          + icalEsc(uid)));
+    lines.push(foldLine('DTSTAMP:'      + dtStamp));
+    lines.push(foldLine('DTSTART:'      + dtStart));
+    lines.push(foldLine('DTEND:'        + dtEnd));
+    lines.push(foldLine('SUMMARY:'      + icalEsc(summary)));
+    lines.push(foldLine('LOCATION:'     + icalEsc(location)));
+    lines.push(foldLine('DESCRIPTION:'  + icalEsc(description)));
+    lines.push('END:VEVENT');
+  });
+
+  lines.push('END:VCALENDAR');
+
+  // Télécharger le fichier .ics
+  var content = lines.join('\r\n') + '\r\n';
+  var blob = new Blob([content], { type: 'text/calendar;charset=utf-8' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  var safeName = activeNom.replace(/[^a-zA-Z0-9\u00C0-\u024F _-]/g,'').trim().replace(/\s+/g,'_');
+  a.download = 'Tantramour2026_' + safeName + '.ics';
+  a.href = url;
+  a.click();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+};
+
+// ── Bouton langue ─────────────────────────────────────────────────────────────
+if (typeof I18n !== 'undefined') {
+  I18n.renderToggleBtn('langToggleContainer', 'btn');
+  document.addEventListener('tm_lang_changed', function() { render(); });
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+render();
+
+}); // fin loadData
+</script>
+</body>
+</html>
