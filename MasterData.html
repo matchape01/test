@@ -22,7 +22,7 @@
   }
   * { box-sizing:border-box; margin:0; padding:0; }
   body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; font-size:14px; line-height:1.6; background:var(--bg); color:var(--text); transition:background .2s,color .2s; }
-  .wrap { max-width:900px; margin:0 auto; padding:24px 20px 60px; }
+  .wrap { max-width:1200px; margin:0 auto; padding:24px 20px 60px; }
 
   /* HEADER */
   header { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; flex-wrap:wrap; gap:12px; }
@@ -53,18 +53,77 @@
   .sec-meta  { font-size:11px; color:var(--muted); font-family:monospace; margin-bottom:16px; }
 
   /* TABLE */
-  .tbl-wrap { border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:16px; }
+  .tbl-wrap { border:1px solid var(--border); border-radius:8px; overflow:hidden; overflow-x:auto; margin-bottom:16px; }
+  .th-sort { cursor:pointer; user-select:none; white-space:nowrap; }
+  .th-sort:hover { color:var(--accent); }
+  .sort-icon { display:inline-block; margin-left:4px; font-size:10px; opacity:.45; }
+  .th-sort.asc  .sort-icon { opacity:1; color:var(--accent); }
+  .th-sort.desc .sort-icon { opacity:1; color:var(--accent); }
+  .th-content { display:inline-flex; align-items:center; gap:4px; width:100%; justify-content:space-between; }
+  .th-label { display:inline-flex; align-items:center; gap:4px; }
+  .th-filter-btn { cursor:pointer; background:transparent; border:none; padding:2px 4px; border-radius:4px; font-size:11px; opacity:.45; color:var(--text); transition:all .15s; line-height:1; }
+  .th-filter-btn:hover { opacity:1; background:var(--border); }
+  .th-filter-btn.active { opacity:1; color:#fff; background:var(--accent); }
+
+  /* POPOVER FILTRE MULTI-VALEURS */
+  .eq-filter-popover { position:fixed; z-index:500; background:var(--bg); border:1px solid var(--border); border-radius:8px; box-shadow:0 8px 24px rgba(0,0,0,.2); width:260px; max-width:90vw; display:flex; flex-direction:column; padding:10px; font-size:12px; }
+  .eq-fp-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-weight:700; font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); }
+  .eq-fp-search { width:100%; padding:5px 8px; border:1px solid var(--border); border-radius:5px; font-size:12px; background:var(--surface); color:var(--text); font-family:inherit; margin-bottom:8px; outline:none; }
+  .eq-fp-search:focus { border-color:var(--accent); }
+  .eq-fp-actions { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:11px; }
+  .eq-fp-link { color:var(--accent); cursor:pointer; background:none; border:none; padding:0; font-family:inherit; font-size:11px; }
+  .eq-fp-link:hover { text-decoration:underline; }
+  .eq-fp-list { max-height:180px; overflow-y:auto; display:flex; flex-direction:column; gap:2px; border:1px solid var(--border); border-radius:5px; padding:4px; background:var(--surface); margin-bottom:8px; }
+  .eq-fp-item { display:flex; align-items:center; gap:6px; padding:3px 4px; border-radius:4px; cursor:pointer; user-select:none; }
+  .eq-fp-item:hover { background:var(--border); }
+  .eq-fp-item input[type="checkbox"] { cursor:pointer; }
+  .eq-fp-item-text { flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .eq-fp-item-count { font-size:10px; color:var(--muted); margin-left:auto; }
+  .eq-fp-footer { display:flex; justify-content:flex-end; gap:6px; }
+
+  /* BARRE ACTIVE DES FILTRES */
+  .eq-active-filters-bar { display:none; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:12px; padding:8px 12px; background:var(--surface); border:1px solid var(--border); border-radius:8px; font-size:12px; }
+  .eq-active-filters-bar.on { display:flex; }
+  .eq-af-badge { display:inline-flex; align-items:center; gap:4px; background:var(--bg); border:1px solid var(--accent); color:var(--accent); padding:2px 8px; border-radius:12px; font-size:11px; font-weight:600; }
+  .eq-af-remove { cursor:pointer; font-weight:bold; margin-left:2px; border:none; background:transparent; color:inherit; font-size:12px; line-height:1; }
+  .eq-af-reset { cursor:pointer; background:transparent; border:1px solid var(--border); border-radius:6px; padding:3px 8px; font-size:11px; font-weight:600; color:var(--err); margin-left:auto; }
+  .eq-af-reset:hover { background:var(--err-bg); border-color:var(--err-border); }
   table { width:100%; border-collapse:collapse; }
-  thead th { background:var(--th-bg); padding:9px 14px; text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); border-bottom:1px solid var(--border); }
+  thead th { background:var(--th-bg); padding:9px 10px; text-align:left; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--muted); border-bottom:1px solid var(--border); white-space:nowrap; }
   tbody tr { border-bottom:1px solid var(--border); }
   tbody tr:last-child { border-bottom:none; }
   tbody tr:hover { background:var(--surface); }
-  td { padding:8px 14px; font-size:13px; vertical-align:middle; }
-  .td-id { font-family:monospace; font-size:11px; color:var(--muted); width:150px; white-space:nowrap; }
+  td { padding:7px 10px; font-size:12px; vertical-align:middle; }
+  .td-id { font-family:monospace; font-size:11px; color:var(--muted); }
   .td-val { }
   .td-lbl { font-size:12px; color:var(--muted); font-style:italic; }
-  .td-act { width:90px; text-align:right; white-space:nowrap; }
+  .td-act { text-align:right; white-space:nowrap; }
   .empty { padding:28px; text-align:center; color:var(--muted); font-style:italic; }
+
+  /* ── COLONNES ÉQUIPEMENTS — responsive sans table-layout:fixed ── */
+  /* Ordi ≥1024px */
+  #sec-equipements .tbl-wrap { overflow-x:auto; }
+  #sec-equipements th:nth-child(1) { width:9%;  min-width:80px; }   /* Fournisseur */
+  #sec-equipements th:nth-child(2) { width:15%; min-width:120px; }  /* Catégorie */
+  #sec-equipements th:nth-child(3) { width:11%; min-width:90px; }   /* ID */
+  #sec-equipements th:nth-child(4) { width:16%; min-width:110px; }  /* Équipement */
+  #sec-equipements th:nth-child(5) { width:6%;  min-width:50px; }   /* Stock */
+  #sec-equipements th:nth-child(6) { width:18%; min-width:110px; }  /* Description */
+  #sec-equipements th:nth-child(7) { width:9%;  min-width:70px; }   /* Remarque */
+  #sec-equipements th:nth-child(8) { width:6%;  min-width:90px; }   /* Actions */
+
+  /* Tablette ≤1023px : masquer Description + Remarque */
+  @media(max-width:1023px) {
+    #sec-equipements th.col-hide-tab,
+    #sec-equipements td.col-hide-tab { display:none; }
+  }
+
+  /* Mobile ≤640px : masquer aussi ID, Stock, Catégorie */
+  @media(max-width:640px) {
+    #sec-equipements th.col-hide-mob,
+    #sec-equipements td.col-hide-mob { display:none; }
+    .wrap { padding:12px 10px 60px; }
+  }
 
   /* BOUTONS */
   .btn { cursor:pointer; border-radius:6px; padding:6px 12px; font-size:12px; font-weight:600; font-family:inherit; border:1px solid var(--border); background:var(--surface); color:var(--text); transition:filter .15s; }
@@ -86,6 +145,11 @@
   .save-bar.on { display:flex; }
   .save-bar-msg { font-size:13px; font-weight:600; color:var(--warn); }
 
+  /* BARRE DE SAUVEGARDE FIXE (sticky) — apparaît en bas de l'écran */
+  .save-bar-sticky { position:fixed; bottom:0; left:0; right:0; z-index:90; border-radius:0; border-left:none; border-right:none; border-bottom:none; margin-top:0; box-shadow:0 -4px 16px rgba(0,0,0,.12); padding:12px 32px; display:none; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; background:var(--warn-bg); border-top:2px solid var(--warn-border); }
+  .save-bar-sticky.on { display:flex; }
+  .save-bar-sticky .save-bar-msg { font-size:13px; font-weight:600; color:var(--warn); }
+
   /* CONFIRM */
   .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:100; align-items:center; justify-content:center; }
   .overlay.open { display:flex; }
@@ -100,7 +164,50 @@
   @keyframes slideIn { from{transform:translateY(10px);opacity:0} to{transform:translateY(0);opacity:1} }
 
   footer { margin-top:48px; padding-top:14px; border-top:1px solid var(--border); text-align:center; font-size:12px; color:var(--muted); }
+  /* ── TRANSLATIONS EDITOR ── */
+  .trans-search { width:100%; padding:8px 12px; border:1px solid var(--border); border-radius:6px; font-size:13px; background:var(--bg); color:var(--text); font-family:inherit; outline:none; margin-bottom:14px; }
+  .trans-search:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(59,130,212,.1); }
+  .trans-count { font-size:11px; color:var(--muted); margin-bottom:8px; }
+  .trans-desc { font-size:12px; color:var(--muted); background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:10px 14px; margin-bottom:16px; line-height:1.6; }
+  .td-fr { color:var(--muted); font-style:italic; }
+  .td-en-inp { background:var(--bg); border:1px solid var(--border); border-radius:4px; padding:4px 8px; font-size:12px; color:var(--text); font-family:inherit; width:100%; outline:none; }
+  .td-en-inp:focus { border-color:var(--accent); box-shadow:0 0 0 2px rgba(59,130,212,.08); }
+  .td-key { font-family:monospace; font-size:10px; color:var(--muted); }
+
+  /* ── IMPORT / EXPORT EXCEL — ÉQUIPEMENTS ── */
+  .btn-sm { padding:5px 10px; font-size:12px; }
+  .hidden-file-input { display:none; }
+  .import-panel { display:none; margin:0 0 16px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px 18px; }
+  .import-panel.open { display:block; }
+  .import-title { font-size:12px; font-weight:700; margin-bottom:6px; }
+  .import-help { font-size:12px; color:var(--muted); margin-bottom:12px; }
+  .import-actions { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .import-summary { margin-top:14px; display:flex; flex-direction:column; gap:10px; }
+  .import-summary-box { background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:12px; }
+  .import-summary-title { font-size:12px; font-weight:700; margin-bottom:8px; }
+  .import-summary-list { display:flex; flex-direction:column; gap:8px; }
+  .import-item { border:1px solid var(--border); border-radius:8px; padding:10px; background:var(--bg); }
+  .import-item-head { display:flex; justify-content:space-between; gap:8px; align-items:flex-start; margin-bottom:8px; }
+  .import-item-title { font-size:13px; font-weight:700; }
+  .import-item-meta { font-size:11px; color:var(--muted); }
+  .import-fields-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:8px; }
+  .import-field { border:1px solid var(--border); border-radius:8px; padding:8px; background:var(--surface); }
+  .import-field-name { font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase; }
+  .import-field-values { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:start; margin-top:4px; }
+  .import-field-value { font-size:12px; white-space:pre-wrap; word-break:break-word; }
+  .import-field-arrow { color:var(--muted); font-size:12px; padding-top:2px; }
+  .import-choice { display:flex; gap:12px; margin-top:6px; font-size:12px; }
+  .import-choice label { display:flex; align-items:center; gap:5px; cursor:pointer; }
+  .import-empty { font-size:12px; color:var(--muted); font-style:italic; }
+  .status-ok { color:#166534; }
+  .status-warn { color:#92400e; }
+  @media(max-width:900px) {
+    .import-fields-grid { grid-template-columns:1fr; }
+  }
 </style>
+<script src="ref_translations.js"></script>
+<script src="i18n.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
 </head>
 <body>
 <script>
@@ -109,7 +216,7 @@
   if (pw !== '007') {
     var entered = prompt('🔒 Accès restreint — Mot de passe :');
     if (entered !== '007') {
-      document.write('<div style="font-family:system-ui;padding:60px;text-align:center"><h2>Accès refusé</h2><p style="margin-top:12px;color:#57606a">Mot de passe incorrect.</p><br><a href="index.html">← Retour</a></div>');
+      document.write('<div style="font-family:system-ui;padding:60px;text-align:center"><h2>Accès refusé</h2><p style="margin-top:12px;color:#57606a">Mot de passe incorrect.</p><br><a href="index_bis.html">← Retour</a></div>');
       document.close(); throw 'access denied';
     }
     sessionStorage.setItem('tm_admin_auth', '007');
@@ -122,50 +229,58 @@
   <header>
     <div class="logo">
       <h1>Tantramour 2026</h1>
-      <p>Master Data</p>
+      <p data-i18n="md_title">Master Data</p>
     </div>
     <div class="hdr-btns">
-      <a class="btn-ghost" href="index.html">🏠 Home</a>
-      <button class="btn-ghost" onclick="toggleMode()" id="modeBtn">🌙 Mode Nuit</button>
+      <a class="btn-ghost" href="index.html" data-i18n="nav_accueil">🏠 Accueil</a>
+      <a class="btn-ghost" href="index_bis.html" data-i18n="nav_dreamteam">🌀 DreamTeam</a>
+      <a class="btn-ghost" href="gestion_planning.html" data-i18n="nav_admin">⚙️ Admin</a>
+      <button class="btn-ghost" onclick="toggleMode()" id="modeBtn">🌙 <span data-i18n="nav_mode_nuit" id="modeBtnText">Mode Nuit</span></button>
+      <button class="btn-ghost tm-lang-btn" onclick="I18n.setLang(I18n.getLang()==='fr'?'en':'fr')">🌐 EN</button>
     </div>
   </header>
 
   <!-- BANNIÈRE RESSOURCES -->
   <div class="res-banner">
     <div>
-      <strong>👥 Facilitateurs · Helpers · Traducteurs · Angels</strong>
-      <span>Gérées dans le référentiel unifié — Rapport 12</span>
+      <strong>👥 <span data-i18n="md_banner_title">Animateurs · Helpers · Traducteurs · Angels</span></strong>
+      <span data-i18n="md_banner_sub">Gérées dans le référentiel unifié — Rapport 12</span>
     </div>
-    <a href="Rapport_Gerer_Ressources.html" target="_blank">Gérer les Ressources →</a>
+    <a href="Rapport_Gerer_Ressources.html" target="_blank" data-i18n="md_banner_btn">Gérer les Ressources →</a>
   </div>
 
   <!-- ONGLETS -->
   <div class="tabs">
-    <button class="tab active" onclick="showTab('lieux')">📍 Lieux</button>
-    <button class="tab"        onclick="showTab('types')">🏷️ Types</button>
-    <button class="tab"        onclick="showTab('notes')">📝 Notes</button>
-    <button class="tab"        onclick="showTab('jours')">📆 Jours</button>
-    <button class="tab"        onclick="showTab('piment')">🌶️ Piment</button>
-    <button class="tab"        onclick="showTab('resource_types')">🎭 Types de ressource</button>
-    <button class="tab"        onclick="showTab('heures')">🕐 Heures</button>
+    <button class="tab active" onclick="showTab('lieux',this)">📍 <span data-i18n="md_tab_lieux">Lieux</span></button>
+    <button class="tab"        onclick="showTab('types',this)">🏷️ <span data-i18n="md_tab_types">Types</span></button>
+    <button class="tab"        onclick="showTab('notes',this)">📝 <span data-i18n="md_tab_notes">Notes</span></button>
+    <button class="tab"        onclick="showTab('jours',this)">📆 <span data-i18n="md_tab_jours">Jours</span></button>
+    <button class="tab"        onclick="showTab('piment',this)">🌶️ <span data-i18n="md_tab_piment">Piment</span></button>
+    <button class="tab"        onclick="showTab('resource_types',this)">🎭 <span data-i18n="md_tab_res_types">Types de ressource</span></button>
+    <button class="tab"        onclick="showTab('heures',this)">🕐 <span data-i18n="md_tab_heures">Heures</span></button>
+    <button class="tab"        onclick="showTab('equipements',this)">🔧 Équipements</button>
+    <button class="tab"        onclick="showTab('equip_cat',this)">📂 Catégories équip.</button>
+    <button class="tab"        onclick="showTab('consignes_type',this)">📋 Consignes génériques</button>
+    <button class="tab"        onclick="showTab('consignes_recurrentes',this)">🔁 Consignes spécifiques</button>
+    <button class="tab"        onclick="showTab('translations',this)">🌐 <span data-i18n="md_tab_translations">Traductions</span></button>
   </div>
 
   <!-- ════════════════════════════════════════════════
        SECTION : LIEUX
-       Fichier : ref_lieux.js  |  { id, value, label }
+       Fichier : ref_lieux.js  |  { id, value, label, nomOfficiel, description }
   ════════════════════════════════════════════════ -->
   <div class="section visible" id="sec-lieux">
-    <div class="sec-title">📍 Lieux / Salles</div>
-    <div class="sec-meta">ref_lieux.js — REF_LIEUX — colonnes : id, value, label</div>
+    <div class="sec-title">📍 <span data-i18n="md_sec_lieux">Lieux / Salles</span></div>
+    <div class="sec-meta">ref_lieux.js — REF_LIEUX — colonnes : id, value, label, nomOfficiel, description, capacite</div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>ID</th><th>Value</th><th>Label affiché</th><th></th></tr></thead>
+        <thead><tr><th data-i18n="md_col_id">ID</th><th data-i18n="md_col_value">Value</th><th data-i18n="md_col_label">Label affiché</th><th>Nom officiel</th><th>Description</th><th>Capacité</th><th></th></tr></thead>
         <tbody id="tbody-lieux"></tbody>
       </table>
     </div>
-    <button class="btn-add" onclick="addRow('lieux')">+ Ajouter un lieu</button>
+    <button class="btn-add" onclick="addRow('lieux')" data-i18n="md_add_lieu">+ Ajouter un lieu</button>
     <div class="save-bar" id="bar-lieux">
-      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <span class="save-bar-msg" data-i18n="md_unsaved">⚠️ Modifications non sauvegardées</span>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-save"  onclick="save('lieux')">💾 Sauvegarder ref_lieux.js</button>
         <button class="btn-save2" onclick="save('lieux', true)">💾 + data.js mis à jour</button>
@@ -178,17 +293,17 @@
        Fichier : ref_types.js  |  { id, value, label }
   ════════════════════════════════════════════════ -->
   <div class="section" id="sec-types">
-    <div class="sec-title">🏷️ Types d'ateliers</div>
-    <div class="sec-meta">ref_types.js — REF_TYPES — colonnes : id, value, label</div>
+    <div class="sec-title">🏷️ <span data-i18n="md_sec_types">Types d'ateliers</span></div>
+    <div class="sec-meta">ref_types.js — REF_TYPES — colonnes : id, value, label, minRes, minHelpers, minTrad, tradCounts</div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>ID</th><th>Value</th><th>Label affiché</th><th></th></tr></thead>
+        <thead><tr><th data-i18n="md_col_id">ID</th><th data-i18n="md_col_value">Value</th><th data-i18n="md_col_label">Label affiché</th><th title="Nb total minimum de ressources">Min total</th><th title="Nb minimum de helpers">Min helpers</th><th title="Traducteur requis si anglophone">Trad requis</th><th title="Traducteur compte dans le total">Trad compte</th><th></th></tr></thead>
         <tbody id="tbody-types"></tbody>
       </table>
     </div>
-    <button class="btn-add" onclick="addRow('types')">+ Ajouter un type</button>
+    <button class="btn-add" onclick="addRow('types')" data-i18n="md_add_type">+ Ajouter un type</button>
     <div class="save-bar" id="bar-types">
-      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <span class="save-bar-msg" data-i18n="md_unsaved">⚠️ Modifications non sauvegardées</span>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-save"  onclick="save('types')">💾 Sauvegarder ref_types.js</button>
         <button class="btn-save2" onclick="save('types', true)">💾 + data.js mis à jour</button>
@@ -201,17 +316,17 @@
        Fichier : ref_notes.js  |  { id, value }
   ════════════════════════════════════════════════ -->
   <div class="section" id="sec-notes">
-    <div class="sec-title">📝 Notes</div>
-    <div class="sec-meta">ref_notes.js — REF_NOTES — colonnes : id, value</div>
+    <div class="sec-title">📝 <span data-i18n="md_sec_notes">Notes</span></div>
+    <div class="sec-meta">ref_notes.js — REF_NOTES — colonnes : id, value, valueEn</div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>ID</th><th>Value</th><th></th></tr></thead>
+        <thead><tr><th data-i18n="md_col_id">ID</th><th data-i18n="md_col_value">Value (FR)</th><th data-i18n="md_col_en">Value (EN)</th><th></th></tr></thead>
         <tbody id="tbody-notes"></tbody>
       </table>
     </div>
-    <button class="btn-add" onclick="addRow('notes')">+ Ajouter une note</button>
+    <button class="btn-add" onclick="addRow('notes')" data-i18n="md_add_note">+ Ajouter une note</button>
     <div class="save-bar" id="bar-notes">
-      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <span class="save-bar-msg" data-i18n="md_unsaved">⚠️ Modifications non sauvegardées</span>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-save"  onclick="save('notes')">💾 Sauvegarder ref_notes.js</button>
         <button class="btn-save2" onclick="save('notes', true)">💾 + data.js mis à jour</button>
@@ -224,17 +339,17 @@
        Fichier : ref_jours.js  |  { id, value, label, date }
   ════════════════════════════════════════════════ -->
   <div class="section" id="sec-jours">
-    <div class="sec-title">📆 Jours</div>
+    <div class="sec-title">📆 <span data-i18n="md_sec_jours">Jours</span></div>
     <div class="sec-meta">ref_jours.js — REF_JOURS — colonnes : id, value, label, date</div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>ID</th><th>Value</th><th>Label affiché</th><th>Date (agenda)</th><th></th></tr></thead>
+        <thead><tr><th data-i18n="md_col_id">ID</th><th data-i18n="md_col_value">Value</th><th data-i18n="md_col_label">Label affiché</th><th data-i18n="md_col_date">Date (agenda)</th><th></th></tr></thead>
         <tbody id="tbody-jours"></tbody>
       </table>
     </div>
-    <button class="btn-add" onclick="addRow('jours')">+ Ajouter un jour</button>
+    <button class="btn-add" onclick="addRow('jours')" data-i18n="md_add_jour">+ Ajouter un jour</button>
     <div class="save-bar" id="bar-jours">
-      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <span class="save-bar-msg" data-i18n="md_unsaved">⚠️ Modifications non sauvegardées</span>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-save"  onclick="save('jours')">💾 Sauvegarder ref_jours.js</button>
         <button class="btn-save2" onclick="save('jours', true)">💾 + data.js mis à jour</button>
@@ -247,17 +362,17 @@
        Fichier : ref_piment.js  |  { id, value (number), label }
   ════════════════════════════════════════════════ -->
   <div class="section" id="sec-piment">
-    <div class="sec-title">🌶️ Niveaux Piment</div>
+    <div class="sec-title">🌶️ <span data-i18n="md_sec_piment">Niveaux Piment</span></div>
     <div class="sec-meta">ref_piment.js — REF_PIMENT — colonnes : id, value (numérique), label</div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>ID</th><th>Value (0–9)</th><th>Label affiché</th><th></th></tr></thead>
+        <thead><tr><th data-i18n="md_col_id">ID</th><th>Value (0–9)</th><th data-i18n="md_col_label">Label affiché</th><th></th></tr></thead>
         <tbody id="tbody-piment"></tbody>
       </table>
     </div>
-    <button class="btn-add" onclick="addRow('piment')">+ Ajouter un niveau</button>
+    <button class="btn-add" onclick="addRow('piment')" data-i18n="md_add_niveau">+ Ajouter un niveau</button>
     <div class="save-bar" id="bar-piment">
-      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <span class="save-bar-msg" data-i18n="md_unsaved">⚠️ Modifications non sauvegardées</span>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-save" onclick="save('piment')">💾 Sauvegarder ref_piment.js</button>
       </div>
@@ -269,17 +384,17 @@
        Fichier : ref_resource_types.js  |  { id, value, label, icon }
   ════════════════════════════════════════════════ -->
   <div class="section" id="sec-resource_types">
-    <div class="sec-title">🎭 Types de ressource</div>
+    <div class="sec-title">🎭 <span data-i18n="md_sec_res_types">Types de ressource</span></div>
     <div class="sec-meta">ref_resource_types.js — REF_RESOURCE_TYPES — colonnes : id, value, label, icon</div>
     <div class="tbl-wrap">
       <table>
-        <thead><tr><th>ID</th><th>Value</th><th>Label</th><th>Icon</th><th></th></tr></thead>
+        <thead><tr><th data-i18n="md_col_id">ID</th><th data-i18n="md_col_value">Value</th><th data-i18n="md_col_label">Label</th><th data-i18n="md_col_icon">Icon</th><th></th></tr></thead>
         <tbody id="tbody-resource_types"></tbody>
       </table>
     </div>
-    <button class="btn-add" onclick="addRow('resource_types')">+ Ajouter un type de ressource</button>
+    <button class="btn-add" onclick="addRow('resource_types')" data-i18n="md_add_res_type">+ Ajouter un type de ressource</button>
     <div class="save-bar" id="bar-resource_types">
-      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <span class="save-bar-msg" data-i18n="md_unsaved">⚠️ Modifications non sauvegardées</span>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-save" onclick="save('resource_types')">💾 Sauvegarder ref_resource_types.js</button>
       </div>
@@ -292,20 +407,257 @@
        Note : liste de créneaux — ajout/suppression rarement nécessaire
   ════════════════════════════════════════════════ -->
   <div class="section" id="sec-heures">
-    <div class="sec-title">🕐 Heures</div>
+    <div class="sec-title">🕐 <span data-i18n="md_sec_heures">Heures</span></div>
     <div class="sec-meta">ref_heures.js — REF_HEURES — colonnes : id, value (HH:MM)</div>
     <div class="tbl-wrap" style="max-height:420px;overflow-y:auto">
       <table>
-        <thead><tr><th>ID</th><th>Value (HH:MM)</th><th></th></tr></thead>
+        <thead><tr><th data-i18n="md_col_id">ID</th><th>Value (HH:MM)</th><th></th></tr></thead>
         <tbody id="tbody-heures"></tbody>
       </table>
     </div>
-    <button class="btn-add" onclick="addRow('heures')">+ Ajouter un créneau</button>
+    <button class="btn-add" onclick="addRow('heures')" data-i18n="md_add_creneau">+ Ajouter un créneau</button>
     <div class="save-bar" id="bar-heures">
-      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <span class="save-bar-msg" data-i18n="md_unsaved">⚠️ Modifications non sauvegardées</span>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn-save" onclick="save('heures')">💾 Sauvegarder ref_heures.js</button>
       </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       SECTION : ÉQUIPEMENTS
+       Fichier : ref_equipements.js  |  { id, value, type, categorie, stock, description, remarque }
+  ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-equipements">
+    <div class="sec-title">🔧 Équipements</div>
+    <div class="sec-meta">ref_equipements.js — REF_EQUIPEMENTS — colonnes : type, categorie, id, value, stock, description, remarque</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="btn" onclick="exportEquipementsExcel()">📥 Export Excel</button>
+      <button class="btn" onclick="toggleEqImportPanel()">📤 Import Excel</button>
+      <input class="hidden-file-input" id="eqImportInput" type="file" accept=".xlsx" onchange="handleEqImportFile(event)">
+    </div>
+    <div class="import-panel" id="eqImportPanel">
+      <div class="import-title">Import des équipements</div>
+      <div class="import-help">Importe un fichier Excel exporté depuis cet onglet (feuille « Equipement »). Les lignes avec un ID existant proposent une confirmation avant modification ; les lignes sans ID correspondant créent un nouvel équipement (ID temporaire EQ_NEWxxx attribué automatiquement). Aucune suppression n'est effectuée.</div>
+      <div class="import-actions">
+        <button class="btn" onclick="triggerEqImportFile()">Choisir un fichier .xlsx</button>
+        <button class="btn btn-sm" onclick="closeEqImportPanel()">Fermer</button>
+      </div>
+      <div class="import-summary" id="eqImportSummary"></div>
+    </div>
+    <div class="eq-active-filters-bar" id="eqActiveFiltersBar"></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr id="thead-equipements-row">
+          <th class="th-sort" onclick="eqThClick(event, 'type')"><div class="th-content"><span class="th-label">Fournisseur <span class="sort-icon">⇅</span></span><button class="th-filter-btn" id="eq-fbtn-type" onclick="openEqFilter(event, 'type')" title="Filtrer par Fournisseur">🔍</button></div></th>
+          <th class="th-sort" onclick="eqThClick(event, 'categorie')"><div class="th-content"><span class="th-label">Catégorie <span class="sort-icon">⇅</span></span><button class="th-filter-btn" id="eq-fbtn-categorie" onclick="openEqFilter(event, 'categorie')" title="Filtrer par Catégorie">🔍</button></div></th>
+          <th class="th-sort col-hide-mob" onclick="eqThClick(event, 'id')"><div class="th-content"><span class="th-label">ID <span class="sort-icon">⇅</span></span><button class="th-filter-btn" id="eq-fbtn-id" onclick="openEqFilter(event, 'id')" title="Filtrer par ID">🔍</button></div></th>
+          <th class="th-sort" onclick="eqThClick(event, 'value')"><div class="th-content"><span class="th-label">Équipement <span class="sort-icon">⇅</span></span><button class="th-filter-btn" id="eq-fbtn-value" onclick="openEqFilter(event, 'value')" title="Filtrer par Équipement">🔍</button></div></th>
+          <th class="th-sort col-hide-mob" onclick="eqThClick(event, 'stock')"><div class="th-content"><span class="th-label">Stock <span class="sort-icon">⇅</span></span><button class="th-filter-btn" id="eq-fbtn-stock" onclick="openEqFilter(event, 'stock')" title="Filtrer par Stock">🔍</button></div></th>
+          <th class="th-sort col-hide-tab col-hide-mob" onclick="eqThClick(event, 'description')"><div class="th-content"><span class="th-label">Description <span class="sort-icon">⇅</span></span><button class="th-filter-btn" id="eq-fbtn-description" onclick="openEqFilter(event, 'description')" title="Filtrer par Description">🔍</button></div></th>
+          <th class="th-sort col-hide-tab col-hide-mob" onclick="eqThClick(event, 'remarque')"><div class="th-content"><span class="th-label">Remarque <span class="sort-icon">⇅</span></span><button class="th-filter-btn" id="eq-fbtn-remarque" onclick="openEqFilter(event, 'remarque')" title="Filtrer par Remarque">🔍</button></div></th>
+          <th></th>
+        </tr></thead>
+        <tbody id="tbody-equipements"></tbody>
+      </table>
+    </div>
+    <button class="btn-add" onclick="addRow('equipements')">+ Ajouter un équipement</button>
+    <div class="save-bar" id="bar-equipements">
+      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-save" onclick="save('equipements')">💾 Sauvegarder ref_equipements.js</button>
+      </div>
+    </div>
+    <!-- Barre sticky dupliquée pour accès rapide depuis n'importe où dans la section -->
+    <div class="save-bar-sticky" id="bar-equipements-sticky">
+      <span class="save-bar-msg">⚠️ Modifications non sauvegardées — Équipements</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-save" onclick="save('equipements')">💾 Sauvegarder ref_equipements.js</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       SECTION : CATÉGORIES D'ÉQUIPEMENTS
+       Fichier : ref_equip_cat.js  |  { id, value, ordre }
+  ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-equip_cat">
+    <div class="sec-title">📂 Catégories d'équipements</div>
+    <div class="sec-meta">ref_equip_cat.js — REF_EQUIP_CAT — colonnes : id, value, ordre</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr id="thead-equip_cat-row">
+          <th class="th-sort" onclick="equipCatSort('id')"><span data-i18n="md_col_id">ID</span> <span class="sort-icon">⇅</span></th>
+          <th class="th-sort" onclick="equipCatSort('value')"><span data-i18n="md_col_value">Value</span> <span class="sort-icon">⇅</span></th>
+          <th class="th-sort" onclick="equipCatSort('ordre')">Ordre affichage <span class="sort-icon">⇅</span></th>
+          <th></th>
+        </tr></thead>
+        <tbody id="tbody-equip_cat"></tbody>
+      </table>
+    </div>
+    <button class="btn-add" onclick="addRow('equip_cat')">+ Ajouter une catégorie</button>
+    <div class="save-bar" id="bar-equip_cat">
+      <span class="save-bar-msg" data-i18n="md_unsaved">⚠️ Modifications non sauvegardées</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-save" onclick="save('equip_cat')">💾 Sauvegarder ref_equip_cat.js</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       SECTION : CONSIGNES TYPE
+       Fichier : ref_consignes_type.js  |  { id, valueFr, valueEn, descriptif, placements[], actif, types[] }
+  ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-consignes_type">
+    <div class="sec-title">📋 Consignes génériques</div>
+    <div class="sec-meta">ref_consignes_type.js — REF_CONSIGNES_TYPE — colonnes : id, valueFr, valueEn, descriptif, placements, actif, types</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="btn" onclick="exportConsignesTypeExcel()">📥 Export Excel</button>
+      <button class="btn" onclick="toggleConsImportPanel()">📤 Import Excel</button>
+      <input class="hidden-file-input" id="consImportInput" type="file" accept=".xlsx" onchange="handleConsImportFile(event)">
+    </div>
+    <div class="import-panel" id="consImportPanel">
+      <div class="import-title">Import des consignes génériques</div>
+      <div class="import-help">Importe un fichier Excel exporté depuis cet onglet (feuille « Consignes »). Les lignes avec un ID existant permettent de modifier le texte, les placements, les types — mais jamais l'ID ni le statut Actif. Les lignes sans ID existant créent une nouvelle consigne (Actif = NON par défaut). Aucune suppression n'est effectuée.</div>
+      <div class="import-actions">
+        <button class="btn" onclick="triggerConsImportFile()">Choisir un fichier .xlsx</button>
+        <button class="btn btn-sm" onclick="closeConsImportPanel()">Fermer</button>
+      </div>
+      <div class="import-summary" id="consImportSummary"></div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;line-height:1.6;">
+      Les <strong>placements</strong> déterminent dans quelle section chaque consigne apparaîtra automatiquement :<br>
+      <strong>Avant / Pendant / Après</strong> → Consignes helpers &nbsp;|&nbsp;
+      <strong>Logistique</strong> → Informations logistiques &nbsp;|&nbsp;
+      <strong>Spécifique</strong> → Besoins logistiques spécifiques &nbsp;|&nbsp;
+      <strong>Participant</strong> → Instructions participants<br>
+      <strong>Types</strong> : restreint la consigne à certains types d'ateliers (vide = tous les types).<br>
+      <strong>Actif</strong> : décoché = consigne désactivée globalement pour tous les ateliers.
+    </p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:7%;min-width:60px">Actif</th>
+          <th style="width:10%;min-width:90px">ID</th>
+          <th style="min-width:130px">Texte FR</th>
+          <th style="min-width:130px">Texte EN</th>
+          <th style="min-width:100px">Descriptif</th>
+          <th style="min-width:140px">Placements</th>
+          <th style="min-width:140px">Types d'ateliers</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="tbody-consignes_type"></tbody>
+      </table>
+    </div>
+    <button class="btn-add" onclick="addConsigneType()">+ Ajouter une consigne générique</button>
+    <div class="save-bar" id="bar-consignes_type">
+      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-save" onclick="saveConsignesType()">💾 Sauvegarder ref_consignes_type.js</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       SECTION : CONSIGNES RÉCURRENTES
+       Fichier : ref_consignes_recurrentes.js  |  { id, valueFr, valueEn, descriptif, placements[], actif }
+  ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-consignes_recurrentes">
+    <div class="sec-title">🔁 Consignes spécifiques</div>
+    <div class="sec-meta">ref_consignes_recurrentes.js — REF_CONSIGNES_RECURRENTES — colonnes : id, valueFr, valueEn, descriptif, placements, actif, types</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="btn" onclick="exportConsignesRecurrentesExcel()">📥 Export Excel</button>
+      <button class="btn" onclick="toggleCorecImportPanel()">📤 Import Excel</button>
+      <input class="hidden-file-input" id="corecImportInput" type="file" accept=".xlsx" onchange="handleCorecImportFile(event)">
+    </div>
+    <div class="import-panel" id="corecImportPanel">
+      <div class="import-title">Import des consignes spécifiques</div>
+      <div class="import-help">Importe un fichier Excel exporté depuis cet onglet (feuille « Consignes »). Les lignes avec un ID existant permettent de modifier le texte, les placements, les types — mais jamais l'ID ni le statut Actif. Les lignes sans ID existant créent une nouvelle consigne (Actif = NON par défaut). Aucune suppression n'est effectuée.</div>
+      <div class="import-actions">
+        <button class="btn" onclick="triggerCorecImportFile()">Choisir un fichier .xlsx</button>
+        <button class="btn btn-sm" onclick="closeCorecImportPanel()">Fermer</button>
+      </div>
+      <div class="import-summary" id="corecImportSummary"></div>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;line-height:1.6;">
+      Les <strong>consignes spécifiques</strong> s'affichent automatiquement dans chaque atelier, dans le bloc « Consignes pour Helpers ».<br>
+      <strong>Avant / Pendant / Après</strong> → Consignes helpers &nbsp;|&nbsp;
+      <strong>Logistique</strong> → Informations logistiques &nbsp;|&nbsp;
+      <strong>Spécifique</strong> → Besoins logistiques spécifiques &nbsp;|&nbsp;
+      <strong>Participant</strong> → Instructions participants<br>
+      <strong>Types</strong> : restreint la consigne à certains types d'ateliers (vide = tous les types).<br>
+      <strong>Actif</strong> : décoché = consigne désactivée globalement pour tous les ateliers.
+    </p>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr>
+          <th style="width:7%;min-width:60px">Actif</th>
+          <th style="width:11%;min-width:90px">ID</th>
+          <th style="min-width:140px">Texte FR</th>
+          <th style="min-width:140px">Texte EN</th>
+          <th style="min-width:110px">Descriptif</th>
+          <th style="min-width:160px">Placements</th>
+          <th style="min-width:140px">Types d'ateliers</th>
+          <th></th>
+        </tr></thead>
+        <tbody id="tbody-consignes_recurrentes"></tbody>
+      </table>
+    </div>
+    <button class="btn-add" onclick="addConsigneRecurrente()">+ Ajouter une consigne spécifique</button>
+    <div class="save-bar" id="bar-consignes_recurrentes">
+      <span class="save-bar-msg">⚠️ Modifications non sauvegardées</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-save" onclick="saveConsignesRecurrentes()">💾 Sauvegarder ref_consignes_recurrentes.js</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       SECTION : TRADUCTIONS
+       Fichier : ref_translations.js  |  { key, fr, en }
+       Édition de la colonne "en" uniquement
+  ════════════════════════════════════════════════ -->
+  <div class="section" id="sec-translations">
+    <div class="sec-title">🌐 <span data-i18n="md_sec_translations">Traductions FR → EN</span></div>
+    <div class="sec-meta">ref_translations.js — REF_TRANSLATIONS — colonnes : key, fr, en</div>
+    <div class="trans-desc" data-i18n="md_trans_desc">Traduisez ici les libellés d'interface. Les données (noms, horaires, lieux) restent inchangées.</div>
+    <input type="text" class="trans-search" id="transSearch" data-i18n-placeholder="md_trans_search" placeholder="Rechercher un terme…" oninput="filterTrans()">
+    <div class="trans-count" id="transCount"></div>
+    <div class="tbl-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:140px" data-i18n="md_col_id">Key</th>
+            <th data-i18n="md_col_fr">Français (référence)</th>
+            <th data-i18n="md_col_en">English</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-translations"></tbody>
+      </table>
+    </div>
+    <div class="save-bar" id="bar-translations">
+      <span class="save-bar-msg" data-i18n="md_unsaved">⚠️ Modifications non sauvegardées</span>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn-save" onclick="saveTrans()">💾 Sauvegarder ref_translations.js</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── DATA UPDATE ── -->
+  <div style="margin-top:40px;padding:20px 22px;border:1px solid var(--border);border-radius:10px;background:var(--surface);display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+    <div style="flex:1;min-width:180px;">
+      <div style="font-size:14px;font-weight:700;margin-bottom:2px;">🗓 Data update</div>
+      <div style="font-size:12px;color:var(--muted);">Date de dernière mise à jour des données — affichée en bas à droite de chaque rapport.</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+      <input type="text" id="dataUpdateInput" placeholder="JJ/MM/AAAA"
+        style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:14px;color:var(--text);font-family:inherit;width:140px;outline:none;"
+        onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+      <button onclick="saveDataUpdate()"
+        style="cursor:pointer;background:var(--accent);color:#fff;border:none;border-radius:6px;padding:9px 18px;font-size:13px;font-weight:700;font-family:inherit;">
+        💾 Enregistrer
+      </button>
+      <span id="dataUpdateStatus" style="font-size:12px;color:var(--muted);"></span>
     </div>
   </div>
 
@@ -314,17 +666,16 @@
 <!-- CONFIRM -->
 <div class="overlay" id="overlay">
   <div class="dlg">
-    <h3>Confirmer la suppression</h3>
+    <h3 data-i18n="md_confirm_del">Confirmer la suppression</h3>
     <p id="dlg-msg"></p>
     <div class="dlg-btns">
-      <button class="btn" onclick="closeConfirm()">Annuler</button>
-      <button class="btn btn-del" id="dlg-ok">Supprimer</button>
+      <button class="btn" onclick="closeConfirm()" data-i18n="md_cancel">Annuler</button>
+      <button class="btn btn-del" id="dlg-ok" data-i18n="md_delete">Supprimer</button>
     </div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
-<footer><p>Made with IBM Bob</p></footer>
 
 <!-- ── RÉFÉRENTIELS ── -->
 <script src="ref_jours.js"></script>
@@ -335,6 +686,10 @@
 <script src="ref_notes.js"></script>
 <script src="ref_resource_types.js"></script>
 <script src="ref_ressources.js"></script>
+<script src="ref_equipements.js"></script>
+<script src="ref_equip_cat.js"></script>
+<script src="ref_consignes_type.js"></script>
+<script src="ref_consignes_recurrentes.js"></script>
 <script src="github-api.js"></script>
 <script src="loader.js"></script>
 <script>
@@ -346,24 +701,27 @@ loadData(['data.js'], function() {
 // ════════════════════════════════════════════════════════════
 var CFG = {
   lieux: {
-    varName:  'REF_LIEUX',
-    fileName: 'ref_lieux.js',
-    prefix:   'L_',
-    cols:     ['id','value','label'],
+    varName:   'REF_LIEUX',
+    fileName:  'ref_lieux.js',
+    prefix:    'L_',
+    cols:      ['id','value','label','nomOfficiel','description','capacite'],
+    textareaCols: ['description'],
+    numericCols: ['capacite'],
     dataField: ['lieu'],
   },
   types: {
     varName:  'REF_TYPES',
     fileName: 'ref_types.js',
     prefix:   'T_',
-    cols:     ['id','value','label'],
+    cols:     ['id','value','label','minRes','minHelpers','minTrad','tradCounts'],
+    numericCols: ['minRes','minHelpers','minTrad','tradCounts'],
     dataField: ['type'],
   },
   notes: {
     varName:  'REF_NOTES',
     fileName: 'ref_notes.js',
     prefix:   'N_',
-    cols:     ['id','value'],
+    cols:     ['id','value','valueEn'],
     dataField: ['note'],
   },
   jours: {
@@ -395,12 +753,35 @@ var CFG = {
     cols:     ['id','value'],
     dataField: [],
   },
+  equipements: {
+    varName:      'REF_EQUIPEMENTS',
+    fileName:     'ref_equipements.js',
+    prefix:       'EQ_',
+    cols:         ['type','categorie','id','value','stock','description','remarque'],
+    textareaCols: ['description','remarque'],
+    selectCols:   {
+      type:      ['Hameau','Tantramour','Animateur','Autre'],
+      categorie: [], // valeurs dynamiques — voir eqCategorieOptions() (basées sur REF_EQUIP_CAT)
+    },
+    stockCol:     'stock',
+    dataField:    [],
+  },
+  equip_cat: {
+    varName:     'REF_EQUIP_CAT',
+    fileName:    'ref_equip_cat.js',
+    prefix:      'CAT_',
+    cols:        ['id','value','ordre'],
+    numericCols: ['ordre'],
+    dataField:   [],
+  },
 };
 
 // ── Copies de travail
 var STORE = {};
 Object.keys(CFG).forEach(function(k) {
-  STORE[k] = window[CFG[k].varName].map(function(x) { return Object.assign({}, x); });
+  var src = window[CFG[k].varName];
+  if (!src) { console.error('[MasterData] Variable manquante :', CFG[k].varName, '— vérifiez que', CFG[k].fileName, 'est chargé.'); src = []; }
+  STORE[k] = src.map(function(x) { return Object.assign({}, x); });
 });
 
 // ── Renommages (pour propagation dans data.js)
@@ -414,14 +795,21 @@ Object.keys(CFG).forEach(function(k) { DIRTY[k] = false; });
 // ── Agenda de travail
 var SESSION_AGENDA = AGENDA.map(function(e) { return Object.assign({}, e); });
 
+// ── État édition inline (déclaré tôt car référencé par renderTable/eqSort)
+var editKey = null, editIdx = null;
+
 // ════════════════════════════════════════════════════════════
 // ONGLETS
 // ════════════════════════════════════════════════════════════
-function showTab(key) {
+function showTab(key, btn) {
   document.querySelectorAll('.tab').forEach(function(t) { t.classList.remove('active'); });
   document.querySelectorAll('.section').forEach(function(s) { s.classList.remove('visible'); });
-  event.currentTarget.classList.add('active');
+  if (btn) btn.classList.add('active');
   document.getElementById('sec-' + key).classList.add('visible');
+  // Rendu spécifique à l'onglet
+  if (key === 'consignes_type' && typeof renderConsignesType === 'function') renderConsignesType();
+  if (key === 'consignes_recurrentes' && typeof renderConsignesRecurrentes === 'function') renderConsignesRecurrentes();
+  if (key === 'translations' && typeof window.initTranslations === 'function') setTimeout(window.initTranslations, 0);
 }
 window.showTab = showTab;
 
@@ -430,7 +818,46 @@ window.showTab = showTab;
 // ════════════════════════════════════════════════════════════
 function esc(v) { return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
+// Classes responsive par colonne équipements
+var EQ_COL_CLASS = {
+  id:          'td-id col-hide-mob',
+  stock:       'td-val col-hide-mob',
+  description: 'td-val col-hide-tab col-hide-mob',
+  remarque:    'td-val col-hide-tab col-hide-mob',
+};
+
+// Options de la colonne "categorie" des équipements — dynamiques, basées sur REF_EQUIP_CAT (triées par ordre)
+function eqCategorieOptions() {
+  return STORE['equip_cat'].slice()
+    .sort(function(a, b) { return (parseInt(a.ordre) || 0) - (parseInt(b.ordre) || 0); })
+    .map(function(c) { return c.value; });
+}
+
 function renderTable(key) {
+  // Pour les équipements, toujours passer par eqSort (tri par défaut ou actif)
+  // SAUF si une édition est en cours sur cette table (ne pas écraser les inputs)
+  if (key === 'equipements') {
+    if (editKey === 'equipements' && editIdx !== null) {
+      // Édition en cours : ne rien faire — ne pas écraser la ligne d'inputs
+      return;
+    }
+    _renderTableInner(key);
+    eqSort(EQ_SORT && EQ_SORT.col ? EQ_SORT.col : null, true);
+    return;
+  }
+  // Pour equip_cat, passer par equipCatSort
+  if (key === 'equip_cat') {
+    if (editKey === 'equip_cat' && editIdx !== null) {
+      return;
+    }
+    _renderTableInner(key);
+    equipCatSort(EQUIP_CAT_SORT && EQUIP_CAT_SORT.col ? EQUIP_CAT_SORT.col : null, true);
+    return;
+  }
+  _renderTableInner(key);
+}
+
+function _renderTableInner(key) {
   var cfg   = CFG[key];
   var items = STORE[key];
   var tbody = document.getElementById('tbody-' + key);
@@ -442,58 +869,610 @@ function renderTable(key) {
   }
 
   tbody.innerHTML = items.map(function(item, i) {
-    // Cellules de données (toutes les colonnes sauf 'id' qui est en première)
     var cells = cfg.cols.map(function(col) {
-      if (col === 'id') return '<td class="td-id">' + esc(item.id) + '</td>';
-      return '<td class="td-val">' + esc(item[col] !== undefined ? item[col] : '') + '</td>';
+      var cls = (key === 'equipements' && EQ_COL_CLASS[col]) ? EQ_COL_CLASS[col] : (col === 'id' ? 'td-id' : 'td-val');
+      var v = item[col] !== undefined ? item[col] : '';
+      // Colonnes textarea : tronquer l'affichage en lecture
+      if (cfg.textareaCols && cfg.textareaCols.indexOf(col) !== -1) {
+        var short = String(v).length > 60 ? String(v).slice(0, 60) + '…' : v;
+        return '<td class="' + cls + '" title="' + esc(v) + '">' + esc(short) + '</td>';
+      }
+      return '<td class="' + cls + '">' + esc(v) + '</td>';
     }).join('');
 
+    // Bouton dupliquer uniquement si le CFG le prévoit (présence de selectCols)
+    var dupBtn = cfg.selectCols
+      ? '<button class="btn" onclick="duplicateRow(\'' + key + '\',' + i + ')" title="Dupliquer">⧉</button> '
+      : '';
+
+    var actStyle = dupBtn ? ' style="width:130px"' : '';
     return '<tr id="row-' + key + '-' + i + '">' +
       cells +
-      '<td class="td-act">' +
+      '<td class="td-act"' + actStyle + '>' +
         '<button class="btn" onclick="editRow(\'' + key + '\',' + i + ')">✏️</button> ' +
+        dupBtn +
         '<button class="btn btn-del" onclick="askDelete(\'' + key + '\',' + i + ')">🗑</button>' +
       '</td>' +
     '</tr>';
   }).join('');
 }
 
+// ════════════════════════════════════════════════════════════
+// TRI & FILTRES COLONNES — section Équipements uniquement
+// ════════════════════════════════════════════════════════════
+var EQ_SORT       = { col: null, dir: 0 }; // dir : 0=défaut 1=asc -1=desc
+var EQ_FILTERS    = {}; // { colName: Set of selected values }
+var activeFilterPopover = null;
+var EQUIP_CAT_SORT = { col: null, dir: 0 }; // déclaré ici pour être disponible avant renderTable()
+
+var EQ_COL_NAMES = {
+  type: 'Fournisseur',
+  categorie: 'Catégorie',
+  id: 'ID',
+  value: 'Équipement',
+  stock: 'Stock',
+  description: 'Description',
+  remarque: 'Remarque'
+};
+
+function eqThClick(e, col) {
+  // Si le clic provient du bouton filtre, ne pas déclencher le tri
+  if (e.target.closest('.th-filter-btn')) return;
+  eqSort(col, false);
+}
+window.eqThClick = eqThClick;
+
 // Rendu initial de tous les tableaux
 Object.keys(CFG).forEach(function(k) { renderTable(k); });
+// Appliquer le tri et filtres par défaut sur les équipements dès le chargement
+eqSort(null, true);
+
+// ── Validation ID en temps réel ──────────────────────────────────────────────
+function eqValidateId(el, i) {
+  var val = el.value.trim();
+  var isDupe = val && STORE['equipements'].some(function(it, idx) {
+    return idx !== i && it.id === val.toUpperCase().replace(/\s+/g, '_');
+  });
+  var isEmpty = !val;
+  var btnOk = document.getElementById('btn-ok-equipements-' + i);
+  if (isEmpty || isDupe) {
+    el.style.borderColor = '#dc2626';
+    el.style.boxShadow   = '0 0 0 3px rgba(220,38,38,.15)';
+    el.title = isEmpty ? 'L\'ID ne peut pas être vide.' : 'Cet ID existe déjà.';
+    if (btnOk) btnOk.disabled = true;
+  } else {
+    el.style.borderColor = '';
+    el.style.boxShadow   = '';
+    el.title = '';
+    if (btnOk) btnOk.disabled = false;
+  }
+}
+window.eqValidateId = eqValidateId;
+
+function eqMarkIdError(el, msg) {
+  el.style.borderColor = '#dc2626';
+  el.style.boxShadow   = '0 0 0 3px rgba(220,38,38,.15)';
+  el.title = msg;
+  el.focus();
+  el.select();
+}
+
+// Comparaison d'une colonne (retourne -1/0/1)
+function _eqCmp(a, b, c, d) {
+  var va = String(a[c] !== undefined ? a[c] : '').toLowerCase();
+  var vb = String(b[c] !== undefined ? b[c] : '').toLowerCase();
+  if (c === 'stock') {
+    var na = parseFloat(va), nb = parseFloat(vb);
+    if (!isNaN(na) && !isNaN(nb)) return d * (na - nb);
+  }
+  if (va < vb) return -d;
+  if (va > vb) return  d;
+  return 0;
+}
+
+// Tri par défaut : Type → Catégorie → Équipement (A→Z)
+function _eqDefaultSort(a, b) {
+  return _eqCmp(a, b, 'type', 1) || _eqCmp(a, b, 'categorie', 1) || _eqCmp(a, b, 'value', 1);
+}
+
+function eqSort(col, reapply) {
+  // Si une édition est en cours sur les équipements, ne pas trier (ne pas écraser les inputs)
+  if (editKey === 'equipements' && editIdx !== null) return;
+  // Annuler une édition en cours sur une autre table (clic utilisateur seulement)
+  if (!reapply && editKey !== null) cancelEdit(editKey, editIdx);
+
+  if (!reapply && col) {
+    // Bascule : aucun/défaut → asc (A→Z) → desc (Z→A) → défaut
+    if (EQ_SORT.col === col) {
+      EQ_SORT.dir = EQ_SORT.dir === 1 ? -1 : EQ_SORT.dir === -1 ? 0 : 1;
+    } else {
+      EQ_SORT.col = col;
+      EQ_SORT.dir = 1;
+    }
+    if (EQ_SORT.dir === 0) EQ_SORT.col = null;
+  }
+
+  // Filtrer les éléments selon EQ_FILTERS
+  var filtered = STORE['equipements'].filter(function(item) {
+    var cols = Object.keys(EQ_FILTERS);
+    for (var k = 0; k < cols.length; k++) {
+      var c = cols[k];
+      var selectedSet = EQ_FILTERS[c];
+      if (selectedSet && selectedSet.size > 0) {
+        var rawVal = item[c] !== undefined && item[c] !== null ? String(item[c]).trim() : '';
+        if (!selectedSet.has(rawVal)) return false;
+      }
+    }
+    return true;
+  });
+
+  // Trier les éléments filtrés
+  if (EQ_SORT.col && EQ_SORT.dir !== 0) {
+    var c = EQ_SORT.col, d = EQ_SORT.dir;
+    filtered.sort(function(a, b) {
+      return _eqCmp(a, b, c, d)
+          || _eqCmp(a, b, 'type', 1)
+          || _eqCmp(a, b, 'categorie', 1)
+          || _eqCmp(a, b, 'value', 1);
+    });
+  } else {
+    // Tri par défaut
+    filtered.sort(_eqDefaultSort);
+  }
+
+  // Mettre à jour l'affichage du tbody avec les index STORE réels (pour edit/delete)
+  var cfg   = CFG['equipements'];
+  var tbody = document.getElementById('tbody-equipements');
+  if (filtered.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty">Aucun équipement ne correspond aux filtres sélectionnés.</td></tr>';
+  } else {
+    tbody.innerHTML = filtered.map(function(item) {
+      // Retrouver l'index réel dans STORE pour les boutons edit/delete
+      var i = STORE['equipements'].indexOf(item);
+      var cells = cfg.cols.map(function(col) {
+        var cls = EQ_COL_CLASS[col] || 'td-val';
+        var v = item[col] !== undefined ? item[col] : '';
+        if (cfg.textareaCols && cfg.textareaCols.indexOf(col) !== -1) {
+          var short = String(v).length > 60 ? String(v).slice(0, 60) + '…' : v;
+          return '<td class="' + cls + '" title="' + esc(v) + '">' + esc(short) + '</td>';
+        }
+        return '<td class="' + cls + '">' + esc(v) + '</td>';
+      }).join('');
+      var dupBtn = '<button class="btn" onclick="duplicateRow(\'equipements\',' + i + ')" title="Dupliquer">⧉</button> ';
+      return '<tr id="row-equipements-' + i + '">' +
+        cells +
+        '<td class="td-act" style="width:130px">' +
+          '<button class="btn" onclick="editRow(\'equipements\',' + i + ')">✏️</button> ' +
+          dupBtn +
+          '<button class="btn btn-del" onclick="askDelete(\'equipements\',' + i + ')">🗑</button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  // Mettre à jour les indicateurs visuels de tri dans les en-têtes
+  var cols = ['type','categorie','id','value','stock','description','remarque'];
+  var thRow = document.getElementById('thead-equipements-row');
+  if (thRow) {
+    var ths = thRow.querySelectorAll('.th-sort');
+    ths.forEach(function(th, idx) {
+      th.classList.remove('asc', 'desc');
+      var icon = th.querySelector('.sort-icon');
+      if (cols[idx] === EQ_SORT.col) {
+        if (EQ_SORT.dir === 1)  { th.classList.add('asc');  if (icon) icon.textContent = '↑'; }
+        if (EQ_SORT.dir === -1) { th.classList.add('desc'); if (icon) icon.textContent = '↓'; }
+      } else {
+        if (icon) icon.textContent = '⇅';
+      }
+    });
+  }
+
+  // Mettre à jour l'état des boutons filtres
+  cols.forEach(function(c) {
+    var btn = document.getElementById('eq-fbtn-' + c);
+    if (btn) {
+      var isFilterActive = EQ_FILTERS[c] && EQ_FILTERS[c].size > 0;
+      btn.classList.toggle('active', isFilterActive);
+    }
+  });
+
+  // Mettre à jour la barre de filtres actifs
+  updateEqActiveFiltersBar();
+}
+window.eqSort = eqSort;
+
+// ── Gestion de la barre des filtres actifs ────────────────────────────────────
+function updateEqActiveFiltersBar() {
+  var bar = document.getElementById('eqActiveFiltersBar');
+  if (!bar) return;
+  var filterCols = Object.keys(EQ_FILTERS).filter(function(c) {
+    return EQ_FILTERS[c] && EQ_FILTERS[c].size > 0;
+  });
+
+  if (filterCols.length === 0) {
+    bar.classList.remove('on');
+    bar.innerHTML = '';
+    return;
+  }
+
+  bar.classList.add('on');
+  var html = '<span style="font-weight:700;color:var(--muted);font-size:11px;text-transform:uppercase;">Filtres actifs :</span>';
+  filterCols.forEach(function(c) {
+    var count = EQ_FILTERS[c].size;
+    var colName = EQ_COL_NAMES[c] || c;
+    var preview = Array.from(EQ_FILTERS[c]).slice(0, 2).map(function(v){ return v === '' ? '(vide)' : v; }).join(', ');
+    if (count > 2) preview += ' +' + (count - 2);
+    html += '<span class="eq-af-badge">'
+      + esc(colName) + ': <strong>' + esc(preview) + '</strong>'
+      + '<button class="eq-af-remove" onclick="removeEqFilterCol(\'' + c + '\')" title="Supprimer ce filtre">×</button>'
+      + '</span>';
+  });
+
+  html += '<button class="eq-af-reset" onclick="resetAllEqFilters()">✕ Réinitialiser tous les filtres</button>';
+  bar.innerHTML = html;
+}
+window.updateEqActiveFiltersBar = updateEqActiveFiltersBar;
+
+function removeEqFilterCol(col) {
+  delete EQ_FILTERS[col];
+  eqSort(null, true);
+}
+window.removeEqFilterCol = removeEqFilterCol;
+
+function resetAllEqFilters() {
+  EQ_FILTERS = {};
+  eqSort(null, true);
+}
+window.resetAllEqFilters = resetAllEqFilters;
+
+// ── Popover de filtre multi-valeurs ──────────────────────────────────────────
+function openEqFilter(e, col) {
+  if (e) {
+    e.stopPropagation();
+    e.preventDefault();
+  }
+  closeEqFilterPopover();
+
+  var btn = document.getElementById('eq-fbtn-' + col);
+  if (!btn) return;
+  var rect = btn.getBoundingClientRect();
+
+  // Calculer toutes les valeurs distinctes possibles pour cette colonne dans STORE['equipements']
+  var counts = {};
+  STORE['equipements'].forEach(function(item) {
+    var v = item[col] !== undefined && item[col] !== null ? String(item[col]).trim() : '';
+    counts[v] = (counts[v] || 0) + 1;
+  });
+
+  var distinctVals = Object.keys(counts).sort(function(a, b) {
+    if (col === 'stock') {
+      var na = parseFloat(a), nb = parseFloat(b);
+      if (!isNaN(na) && !isNaN(nb)) return na - nb;
+    }
+    return a.localeCompare(b, 'fr', { sensitivity: 'base' });
+  });
+
+  var selectedSet = new Set(EQ_FILTERS[col] ? Array.from(EQ_FILTERS[col]) : []);
+
+  var popover = document.createElement('div');
+  popover.className = 'eq-filter-popover';
+  popover.id = 'eqFilterPopover';
+
+  // Positionnement dynamique
+  var popLeft = rect.left;
+  if (popLeft + 270 > window.innerWidth) {
+    popLeft = window.innerWidth - 280;
+  }
+  if (popLeft < 10) popLeft = 10;
+  popover.style.left = popLeft + 'px';
+  popover.style.top = (rect.bottom + 6) + 'px';
+
+  var colTitle = EQ_COL_NAMES[col] || col;
+
+  popover.innerHTML =
+    '<div class="eq-fp-head">' +
+      '<span>Filtrer : ' + esc(colTitle) + '</span>' +
+      '<button class="eq-af-remove" style="cursor:pointer;font-size:14px;" onclick="closeEqFilterPopover()">×</button>' +
+    '</div>' +
+    '<input type="text" class="eq-fp-search" id="eqFpSearch" placeholder="Rechercher une valeur..." oninput="filterEqFpItems()">' +
+    '<div class="eq-fp-actions">' +
+      '<button class="eq-fp-link" type="button" onclick="eqFpSelectAll(true)">Tout cocher</button>' +
+      '<button class="eq-fp-link" type="button" onclick="eqFpSelectAll(false)">Tout décocher</button>' +
+    '</div>' +
+    '<div class="eq-fp-list" id="eqFpList"></div>' +
+    '<div class="eq-fp-footer">' +
+      '<button class="btn btn-sm" type="button" onclick="closeEqFilterPopover()">Annuler</button>' +
+      '<button class="btn btn-sm btn-ok" type="button" onclick="applyEqFilter(\'' + col + '\')">Appliquer</button>' +
+    '</div>';
+
+  document.body.appendChild(popover);
+  activeFilterPopover = { popover: popover, col: col, distinctVals: distinctVals, counts: counts };
+
+  renderEqFpList('', selectedSet);
+
+  setTimeout(function() {
+    var searchInp = document.getElementById('eqFpSearch');
+    if (searchInp) searchInp.focus();
+  }, 50);
+
+  // Fermeture si clic à l'extérieur
+  function onDocClick(ev) {
+    if (!popover.contains(ev.target) && ev.target !== btn && !btn.contains(ev.target)) {
+      closeEqFilterPopover();
+    }
+  }
+  popover._onDocClick = onDocClick;
+  setTimeout(function() {
+    document.addEventListener('click', onDocClick);
+  }, 10);
+}
+window.openEqFilter = openEqFilter;
+
+function closeEqFilterPopover() {
+  if (activeFilterPopover && activeFilterPopover.popover) {
+    if (activeFilterPopover.popover._onDocClick) {
+      document.removeEventListener('click', activeFilterPopover.popover._onDocClick);
+    }
+    if (activeFilterPopover.popover.parentNode) {
+      activeFilterPopover.popover.parentNode.removeChild(activeFilterPopover.popover);
+    }
+    activeFilterPopover = null;
+  }
+}
+window.closeEqFilterPopover = closeEqFilterPopover;
+
+function renderEqFpList(query, selectedSet) {
+  if (!activeFilterPopover) return;
+  var list = document.getElementById('eqFpList');
+  if (!list) return;
+
+  var q = (query || '').toLowerCase().trim();
+  var vals = activeFilterPopover.distinctVals.filter(function(v) {
+    if (!q) return true;
+    var display = v === '' ? '(vide)' : v;
+    return display.toLowerCase().indexOf(q) !== -1;
+  });
+
+  if (vals.length === 0) {
+    list.innerHTML = '<div style="font-size:11px;color:var(--muted);padding:6px;text-align:center;">Aucune valeur trouvée</div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  vals.forEach(function(v, idx) {
+    var isChecked = selectedSet ? selectedSet.has(v) : false;
+    var label = document.createElement('label');
+    label.className = 'eq-fp-item';
+
+    var chk = document.createElement('input');
+    chk.type = 'checkbox';
+    chk.className = 'eq-fp-chk';
+    chk.value = v;
+    chk.checked = isChecked;
+
+    var spanText = document.createElement('span');
+    spanText.className = 'eq-fp-item-text';
+    if (v === '') {
+      spanText.innerHTML = '<em>(Vide)</em>';
+    } else {
+      spanText.textContent = v;
+    }
+
+    var spanCount = document.createElement('span');
+    spanCount.className = 'eq-fp-item-count';
+    spanCount.textContent = '(' + (activeFilterPopover.counts[v] || 0) + ')';
+
+    label.appendChild(chk);
+    label.appendChild(spanText);
+    label.appendChild(spanCount);
+    list.appendChild(label);
+  });
+}
+
+function filterEqFpItems() {
+  var searchInp = document.getElementById('eqFpSearch');
+  var query = searchInp ? searchInp.value : '';
+  // Récupérer les cases actuellement cochées
+  var currentChecked = new Set();
+  var chks = document.querySelectorAll('.eq-fp-chk');
+  chks.forEach(function(chk) {
+    if (chk.checked) currentChecked.add(chk.value);
+  });
+  renderEqFpList(query, currentChecked);
+}
+window.filterEqFpItems = filterEqFpItems;
+
+function eqFpSelectAll(check) {
+  var chks = document.querySelectorAll('.eq-fp-chk');
+  chks.forEach(function(chk) { chk.checked = check; });
+}
+window.eqFpSelectAll = eqFpSelectAll;
+
+function applyEqFilter(col) {
+  if (!activeFilterPopover) return;
+  var chks = document.querySelectorAll('.eq-fp-chk');
+  var selected = new Set();
+  chks.forEach(function(chk) {
+    if (chk.checked) selected.add(chk.value);
+  });
+
+  // Si rien n'est coché, ou si toutes les valeurs existantes sont cochées (pas de filtrage)
+  if (selected.size === 0 || selected.size === activeFilterPopover.distinctVals.length) {
+    delete EQ_FILTERS[col];
+  } else {
+    EQ_FILTERS[col] = selected;
+  }
+
+  closeEqFilterPopover();
+  eqSort(null, true);
+}
+window.applyEqFilter = applyEqFilter;
+
+// ════════════════════════════════════════════════════════════
+// TRI COLONNES — section Catégories d'équipements (equip_cat)
+// ════════════════════════════════════════════════════════════
+function _equipCatCmp(a, b, c, d) {
+  var va = a[c] !== undefined && a[c] !== null ? a[c] : '';
+  var vb = b[c] !== undefined && b[c] !== null ? b[c] : '';
+  if (c === 'ordre') {
+    var na = parseInt(va, 10), nb = parseInt(vb, 10);
+    if (isNaN(na)) na = 999999;
+    if (isNaN(nb)) nb = 999999;
+    if (na !== nb) return d * (na - nb);
+    return 0;
+  }
+  return d * String(va).localeCompare(String(vb), 'fr', { numeric: true, sensitivity: 'base' });
+}
+
+function _equipCatDefaultSort(a, b) {
+  return _equipCatCmp(a, b, 'ordre', 1) || _equipCatCmp(a, b, 'value', 1);
+}
+
+function equipCatSort(col, reapply) {
+  if (editKey === 'equip_cat' && editIdx !== null) return;
+  if (!reapply && editKey !== null) cancelEdit(editKey, editIdx);
+
+  if (!reapply && col) {
+    if (EQUIP_CAT_SORT.col === col) {
+      EQUIP_CAT_SORT.dir = EQUIP_CAT_SORT.dir === 1 ? -1 : EQUIP_CAT_SORT.dir === -1 ? 0 : 1;
+    } else {
+      EQUIP_CAT_SORT.col = col;
+      EQUIP_CAT_SORT.dir = 1;
+    }
+    if (EQUIP_CAT_SORT.dir === 0) EQUIP_CAT_SORT.col = null;
+  }
+
+  var sorted = STORE['equip_cat'].slice();
+  if (EQUIP_CAT_SORT.col && EQUIP_CAT_SORT.dir !== 0) {
+    var c = EQUIP_CAT_SORT.col, d = EQUIP_CAT_SORT.dir;
+    sorted.sort(function(a, b) {
+      return _equipCatCmp(a, b, c, d) || _equipCatCmp(a, b, 'ordre', 1) || _equipCatCmp(a, b, 'value', 1);
+    });
+  } else {
+    sorted.sort(_equipCatDefaultSort);
+  }
+
+  var cfg = CFG['equip_cat'];
+  var tbody = document.getElementById('tbody-equip_cat');
+  if (!tbody) return;
+
+  if (sorted.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" class="empty">Aucune catégorie.</td></tr>';
+  } else {
+    tbody.innerHTML = sorted.map(function(item) {
+      var i = STORE['equip_cat'].indexOf(item);
+      var cells = cfg.cols.map(function(c) {
+        var cls = (c === 'id') ? 'td-id' : 'td-val';
+        var v = item[c] !== undefined ? item[c] : '';
+        return '<td class="' + cls + '">' + esc(v) + '</td>';
+      }).join('');
+      return '<tr id="row-equip_cat-' + i + '">' +
+        cells +
+        '<td class="td-act">' +
+          '<button class="btn" onclick="editRow(\'equip_cat\',' + i + ')">✏️</button> ' +
+          '<button class="btn btn-del" onclick="askDelete(\'equip_cat\',' + i + ')">🗑</button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  // Mettre à jour les indicateurs visuels dans les en-têtes
+  var cols = ['id', 'value', 'ordre'];
+  var thRow = document.getElementById('thead-equip_cat-row');
+  if (thRow) {
+    var ths = thRow.querySelectorAll('.th-sort');
+    ths.forEach(function(th, idx) {
+      th.classList.remove('asc', 'desc');
+      var icon = th.querySelector('.sort-icon');
+      if (cols[idx] === EQUIP_CAT_SORT.col) {
+        if (EQUIP_CAT_SORT.dir === 1)  { th.classList.add('asc');  if (icon) icon.textContent = '↑'; }
+        if (EQUIP_CAT_SORT.dir === -1) { th.classList.add('desc'); if (icon) icon.textContent = '↓'; }
+      } else {
+        if (icon) icon.textContent = '⇅';
+      }
+    });
+  }
+}
+window.equipCatSort = equipCatSort;
 
 // ════════════════════════════════════════════════════════════
 // ÉDITION INLINE
 // ════════════════════════════════════════════════════════════
-var editKey = null, editIdx = null;
 
 function editRow(key, i) {
-  // Annule édition précédente si besoin
-  if (editKey !== null) cancelEdit(editKey, editIdx);
+  // Annule édition précédente si besoin sur une autre ligne/clé
+  if (editKey !== null && (editKey !== key || editIdx !== i)) {
+    editKey = null; editIdx = null;
+    renderTable(key);
+  }
 
   editKey = key; editIdx = i;
   var cfg  = CFG[key];
   var item = STORE[key][i];
   var row  = document.getElementById('row-' + key + '-' + i);
+  if (!row) {
+    // Si la ligne n'est pas dans le DOM (ex : filtrée), on réaffiche la table pour la faire apparaître
+    renderTable(key);
+    row = document.getElementById('row-' + key + '-' + i);
+    if (!row) return;
+  }
 
-  // Remplace chaque cellule par un input (sauf id)
+  // Remplace chaque cellule par un input, select ou textarea (id éditable avec validation unicité)
   var cells = cfg.cols.map(function(col) {
-    if (col === 'id') return '<td class="td-id">' + esc(item.id) + '</td>';
+    if (col === 'id') {
+      var idOninput = key === 'equipements'
+        ? 'oninput="eqValidateId(this,' + i + ')"'
+        : 'onkeydown="keyEdit(event,\'' + key + '\',' + i + ')"';
+      return '<td style="min-width:100px"><input class="inp" id="inp-' + key + '-' + i + '-id" value="' + esc(item.id) + '" ' +
+        idOninput + ' style="font-family:monospace;font-size:12px;" placeholder="ID unique…"></td>';
+    }
     var v = item[col] !== undefined ? item[col] : '';
+    // Colonne avec liste déroulante (selectCols)
+    if (cfg.selectCols && cfg.selectCols[col]) {
+      var opts = (key === 'equipements' && col === 'categorie') ? eqCategorieOptions() : cfg.selectCols[col];
+      var selectOpts = opts.map(function(opt) {
+        return '<option value="' + esc(opt) + '"' + (String(v) === opt ? ' selected' : '') + '>' + esc(opt) + '</option>';
+      }).join('');
+      return '<td style="min-width:110px"><select class="inp" id="inp-' + key + '-' + i + '-' + col + '">' + selectOpts + '</select></td>';
+    }
+    // Colonne ordre : select dynamique 1…N+1 selon le type courant de l'item
+    if (cfg.ordreCol && cfg.ordreCol === col) {
+      var currentType = item.type || '';
+      var maxOrdre = STORE[key].reduce(function(m, it) {
+        return it.type === currentType ? Math.max(m, parseInt(it.ordre) || 0) : m;
+      }, 0);
+      var ordreOpts = '';
+      for (var o = 1; o <= maxOrdre + 1; o++) {
+        ordreOpts += '<option value="' + o + '"' + (parseInt(v) === o ? ' selected' : '') + '>' + o + '</option>';
+      }
+      return '<td style="width:60px"><select class="inp" id="inp-' + key + '-' + i + '-' + col + '" style="width:56px">' + ordreOpts + '</select></td>';
+    }
+    // Colonne stock : input texte (nombre 0-1000 ou "N/A")
+    if (cfg.stockCol && cfg.stockCol === col) {
+      return '<td style="width:70px"><input class="inp" id="inp-' + key + '-' + i + '-' + col + '" value="' + esc(v) + '" ' +
+        'placeholder="0 ou N/A" style="width:60px" ' +
+        'onkeydown="keyEdit(event,\'' + key + '\',' + i + ')"></td>';
+    }
+    // Colonne textarea → input simple en édition inline pour ne pas élargir la ligne
+    if (cfg.textareaCols && cfg.textareaCols.indexOf(col) !== -1) {
+      return '<td style="min-width:100px"><input class="inp" id="inp-' + key + '-' + i + '-' + col + '" value="' + esc(v) + '" ' +
+        'onkeydown="keyEdit(event,\'' + key + '\',' + i + ')"></td>';
+    }
     return '<td><input class="inp" id="inp-' + key + '-' + i + '-' + col + '" value="' + esc(v) + '" ' +
       'onkeydown="keyEdit(event,\'' + key + '\',' + i + ')"></td>';
   }).join('');
 
   row.innerHTML = cells +
     '<td class="td-act">' +
-      '<button class="btn btn-ok"  onclick="saveEdit(\'' + key + '\',' + i + ')">✔</button> ' +
-      '<button class="btn"         onclick="cancelEdit(\'' + key + '\',' + i + ')">✖</button>' +
+      '<button class="btn btn-ok" id="btn-ok-' + key + '-' + i + '" onclick="saveEdit(\'' + key + '\',' + i + ')">✔</button> ' +
+      '<button class="btn"        onclick="cancelEdit(\'' + key + '\',' + i + ')">✖</button>' +
     '</td>';
 
-  // Focus sur le premier input éditable
-  var firstCol = cfg.cols.find(function(c) { return c !== 'id'; });
-  if (firstCol) {
-    var el = document.getElementById('inp-' + key + '-' + i + '-' + firstCol);
-    if (el) el.focus();
+  // Focus sur l'ID en premier pour les équipements, sinon premier champ éditable
+  var focusCol = (key === 'equipements') ? 'id' : cfg.cols.find(function(c) { return c !== 'id'; });
+  if (focusCol) {
+    var el = document.getElementById('inp-' + key + '-' + i + '-' + focusCol);
+    if (el) { el.focus(); el.select(); }
   }
 }
 window.editRow = editRow;
@@ -508,19 +1487,40 @@ function saveEdit(key, i) {
   var cfg  = CFG[key];
   var item = STORE[key][i];
 
+  // Vérifier l'ID si éditable
+  var idEl = document.getElementById('inp-' + key + '-' + i + '-id');
+  if (idEl) {
+    var newId = idEl.value.trim().toUpperCase().replace(/\s+/g, '_');
+    if (!newId) {
+      eqMarkIdError(idEl, 'L\'ID ne peut pas être vide.');
+      return;
+    }
+    var duplicate = STORE[key].some(function(it, idx) { return idx !== i && it.id === newId; });
+    if (duplicate) {
+      eqMarkIdError(idEl, 'Cet ID existe déjà — choisissez un autre.');
+      return;
+    }
+    item.id = newId;
+  }
+
   cfg.cols.forEach(function(col) {
     if (col === 'id') return;
     var el = document.getElementById('inp-' + key + '-' + i + '-' + col);
     if (!el) return;
-    var newVal = el.value.trim();
+    // textarea : ne pas trim les retours à la ligne
+    var isTA = cfg.textareaCols && cfg.textareaCols.indexOf(col) !== -1;
+    var newVal = isTA ? el.value : el.value.trim();
 
     // Pour la colonne value, enregistre le renommage
     if (col === 'value' && newVal !== String(item.value)) {
       if (!RENAMES[key][i]) RENAMES[key][i] = item.value;
     }
 
-    // Conversion numérique si nécessaire
-    item[col] = (col === 'value' && cfg.numericValue) ? Number(newVal) : newVal;
+    // Conversion numérique si nécessaire (inclut la colonne ordre)
+    var isNum = (col === 'value' && cfg.numericValue)
+             || (cfg.numericCols && cfg.numericCols.indexOf(col) !== -1)
+             || (cfg.ordreCol && cfg.ordreCol === col);
+    item[col] = isNum ? Number(newVal) : newVal;
   });
 
   markDirty(key);
@@ -541,21 +1541,66 @@ window.cancelEdit = cancelEdit;
 function addRow(key) {
   var cfg = CFG[key];
   var ids = STORE[key].map(function(x) { return x.id; });
-  var n = 1, newId;
-  do { newId = cfg.prefix + 'NEW' + n; n++; } while (ids.indexOf(newId) !== -1);
+  var n, newId;
+  if (key === 'equipements') {
+    // Format EQ_NEW01, EQ_NEW02, …
+    n = 1;
+    do { newId = 'EQ_NEW' + (n < 10 ? '0' : '') + n; n++; } while (ids.indexOf(newId) !== -1);
+  } else {
+    n = 1;
+    do { newId = cfg.prefix + 'NEW' + n; n++; } while (ids.indexOf(newId) !== -1);
+  }
 
   var newItem = { id: newId };
   cfg.cols.forEach(function(col) {
     if (col === 'id') return;
-    newItem[col] = (col === 'value' && cfg.numericValue) ? 0 : '';
+    if (cfg.selectCols && cfg.selectCols[col]) {
+      var defOpts = (key === 'equipements' && col === 'categorie') ? eqCategorieOptions() : cfg.selectCols[col];
+      newItem[col] = defOpts[0]; // première valeur par défaut
+    } else if (cfg.stockCol && cfg.stockCol === col) {
+      newItem[col] = 'N/A';
+    } else if (key === 'equip_cat' && col === 'ordre') {
+      // Prochain ordre disponible (max + 1)
+      var maxOrdreCat = STORE[key].reduce(function(m, it) { return Math.max(m, parseInt(it.ordre) || 0); }, 0);
+      newItem[col] = maxOrdreCat + 1;
+    } else {
+      newItem[col] = (col === 'value' && cfg.numericValue) ? 0 : '';
+    }
   });
 
   STORE[key].push(newItem);
-  renderTable(key);
+  if (key === 'equipements') {
+    // Réinitialiser les filtres pour que le nouvel élément soit visible et éditable
+    EQ_FILTERS = {};
+  }
+  // Forcer l'édition sans que renderTable ne l'annule
+  editKey = key;
+  editIdx = STORE[key].length - 1;
+  _renderTableInner(key);
   editRow(key, STORE[key].length - 1);
   markDirty(key);
 }
 window.addRow = addRow;
+
+function duplicateRow(key, i) {
+  var cfg = CFG[key];
+  var src = STORE[key][i];
+  var ids = STORE[key].map(function(x) { return x.id; });
+  var n = 1, newId;
+  do { newId = cfg.prefix + 'COPY' + n; n++; } while (ids.indexOf(newId) !== -1);
+
+  var copy = Object.assign({}, src, { id: newId });
+  STORE[key].splice(i + 1, 0, copy);
+  if (key === 'equipements') {
+    EQ_FILTERS = {};
+  }
+  editKey = key;
+  editIdx = i + 1;
+  _renderTableInner(key);
+  editRow(key, i + 1);
+  markDirty(key);
+}
+window.duplicateRow = duplicateRow;
 
 // ════════════════════════════════════════════════════════════
 // SUPPRESSION
@@ -572,11 +1617,11 @@ function askDelete(key, i) {
 window.askDelete = askDelete;
 
 function doDelete() {
-  closeConfirm();
   if (!pendingDel) return;
   var key = pendingDel.key, i = pendingDel.i;
   STORE[key].splice(i, 1);
   pendingDel = null;
+  closeConfirm();
   markDirty(key);
   renderTable(key);
   showToast('🗑 Entrée supprimée.');
@@ -599,6 +1644,8 @@ function markDirty(key) {
   DIRTY[key] = true;
   var bar = document.getElementById('bar-' + key);
   if (bar) bar.classList.add('on');
+  var sticky = document.getElementById('bar-' + key + '-sticky');
+  if (sticky) sticky.classList.add('on');
 }
 
 // ════════════════════════════════════════════════════════════
@@ -607,13 +1654,15 @@ function markDirty(key) {
 function escJs(v) { return String(v||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"'); }
 
 var FILE_COMMENTS = {
-  lieux:          'Référentiel : Lieux / Salles\n * Chaque entrée : { id, value, label }',
-  types:          'Référentiel : Types d\'ateliers\n * Chaque entrée : { id, value, label }',
-  notes:          'Référentiel : Notes\n * Chaque entrée : { id, value }',
+  lieux:          'Référentiel : Lieux / Salles\n * Chaque entrée : { id, value, label, nomOfficiel, description, capacite }\n *   value       : identifiant technique utilisé dans data.js\n *   label       : libellé court affiché dans les rapports\n *   nomOfficiel : nom complet / officiel du lieu\n *   description : description du lieu (équipements, usage...)\n *   capacite    : capacité d\'accueil (nombre de personnes)',
+  types:          'Référentiel : Types d\'ateliers\n * Chaque entrée : { id, value, label, minRes, minHelpers, minTrad, tradCounts }\n *   minRes     : nb total minimum de ressources\n *   minHelpers : nb minimum de helpers\n *   minTrad    : 1 = traducteur requis si anglophone\n *   tradCounts : 1 = le traducteur compte dans minRes',
+  notes:          'Référentiel : Notes\n * Chaque entrée : { id, value, valueEn }\n *   value   : libellé français (référence)\n *   valueEn : traduction anglaise',
   jours:          'Référentiel : Jours\n * Chaque entrée : { id, value, label, date }',
   piment:         'Référentiel : Piment\n * Chaque entrée : { id, value (number), label }',
   resource_types: 'Référentiel : Types de ressource\n * Chaque entrée : { id, value, label, icon }',
   heures:         'Référentiel : Heures\n * Chaque entrée : { id, value } — format HH:MM',
+  equipements:    'Référentiel : Équipements\n * Chaque entrée : { id, value, type, categorie, stock, description, remarque }\n *   value       : nom de l\'équipement\n *   type        : "Hameau" | "Tantramour" | "Animateur" | "Autre" (fournisseur)\n *   categorie   : nom de la catégorie — géré via ref_equip_cat.js (REF_EQUIP_CAT)\n *   stock       : nombre (0-1000) ou "N/A"\n *   description : texte libre\n *   remarque    : texte libre',
+  equip_cat:      'Référentiel : Catégories d\'équipements\n * Chaque entrée : { id, value, ordre }\n *   value : nom de la catégorie (affiché dans Master Data et les rapports)\n *   ordre : ordre d\'affichage des catégories (1, 2, 3…)',
 };
 
 function genRefFile(key) {
@@ -622,7 +1671,18 @@ function genRefFile(key) {
   var lines = items.map(function(item) {
     var parts = cfg.cols.map(function(col) {
       var v = item[col] !== undefined ? item[col] : '';
-      if (col === 'value' && cfg.numericValue) return 'value: ' + Number(v);
+      var isNum = (col === 'value' && cfg.numericValue)
+               || (cfg.numericCols && cfg.numericCols.indexOf(col) !== -1)
+               || (cfg.ordreCol && cfg.ordreCol === col);
+      if (isNum) return col + ': ' + Number(v);
+      // stock : peut être un nombre ou la chaîne "N/A"
+      if (cfg.stockCol && cfg.stockCol === col) {
+        var sv = String(v).trim();
+        if (sv === 'N/A' || sv === '' ) return col + ': "N/A"';
+        var sn = Number(sv);
+        return col + ': ' + (isNaN(sn) ? '"N/A"' : sn);
+      }
+      // texte multiligne : les \n sont stockés comme \n dans le JS
       return col + ': "' + escJs(v) + '"';
     });
     return '  { ' + parts.join(', ') + ' },';
@@ -665,10 +1725,11 @@ function genDataJs() {
       section = '\n  // ─── ' + e.jour + ' — ' + dl + ' ' + '─'.repeat(Math.max(0, 56 - e.jour.length - dl.length)) + '\n';
     }
     var v = escJs;
-    return section + '  {jour:"' + v(e.jour) + '",date:"' + v(e.date) + '",heure:"' + v(e.heure) + '",type:"' + v(e.type) + '",atelier:"' + v(e.atelier) + '",lieu:"' + v(e.lieu) + '",fac1:"' + v(e.fac1) + '",fac2:"' + v(e.fac2) + '",traduction:"' + v(e.traduction) + '",helper1:"' + v(e.helper1) + '",helper2:"' + v(e.helper2) + '",helper3:"' + v(e.helper3) + '",angel:"' + v(e.angel) + '",note:"' + v(e.note) + '",piment:' + (e.piment||0) + ',logisticId:"' + v(e.logisticId||'') + '"},';
+    var idPart = e.id ? 'id:"' + v(e.id) + '",' : '';
+    return section + '  {' + idPart + 'jour:"' + v(e.jour) + '",date:"' + v(e.date) + '",heure:"' + v(e.heure) + '",type:"' + v(e.type) + '",atelier:"' + v(e.atelier) + '",lieu:"' + v(e.lieu) + '",fac1:"' + v(e.fac1) + '",fac2:"' + v(e.fac2) + '",fac3:"' + v(e.fac3||'') + '",fac4:"' + v(e.fac4||'') + '",traduction:"' + v(e.traduction) + '",helper1:"' + v(e.helper1) + '",helper2:"' + v(e.helper2) + '",helper3:"' + v(e.helper3) + '",helper4:"' + v(e.helper4||'') + '",angel:"' + v(e.angel) + '",note:"' + v(e.note) + '",piment:' + (e.piment||0) + ',colibri:' + (e.colibri?true:false) + ',logisticId:"' + v(e.logisticId||'') + '",meetingRoles:"' + v(e.meetingRoles||'') + '"},';
   }).join('\n');
 
-  return '/**\n * TANTRAMOUR 2026 — Données AGENDA\n */\nvar AGENDA = [\n' + lines + '\n];\n\nfunction agendaToRaw(entries) {\n  return entries.map(function(e) { return [e.jour,e.date,e.heure,e.type,e.atelier,e.lieu,e.fac1,e.fac2,e.traduction,e.helper1,e.helper2,e.helper3,e.angel,e.note,e.logisticId||"",e.piment||0]; });\n}';
+  return '/**\n * TANTRAMOUR 2026 — Données AGENDA\n */\nvar AGENDA = [\n' + lines + '\n];\n\nfunction agendaToRaw(entries) {\n  return entries.map(function(e) { return [e.jour,e.date,e.heure,e.type,e.atelier,e.lieu,e.fac1,e.fac2,e.traduction,e.helper1,e.helper2,e.helper3,e.helper4||"",e.angel,e.note,e.logisticId||"",e.piment||0]; });\n}';
 }
 
 // ════════════════════════════════════════════════════════════
@@ -690,6 +1751,10 @@ async function saveToServer(filename, content) {
 
 async function save(key, withData) {
   var cfg = CFG[key];
+  // Si une ligne est encore en mode édition pour ce référentiel, la valider avant de sauvegarder
+  if (editKey === key && editIdx !== null) {
+    saveEdit(editKey, editIdx);
+  }
   try {
     if (withData) applyRenames(key);
     await saveToServer(cfg.fileName, genRefFile(key));
@@ -698,12 +1763,383 @@ async function save(key, withData) {
     RENAMES[key] = {};
     var bar = document.getElementById('bar-' + key);
     if (bar) bar.classList.remove('on');
+    var sticky = document.getElementById('bar-' + key + '-sticky');
+    if (sticky) sticky.classList.remove('on');
     showToast('✅ ' + cfg.fileName + ' sauvegardé' + (withData ? ' + data.js' : '') + '.', false);
   } catch(err) {
     showToast('❌ ' + err.message, true);
   }
 }
 window.save = save;
+
+// ════════════════════════════════════════════════════════════
+// EXPORT EXCEL — ÉQUIPEMENTS
+// ════════════════════════════════════════════════════════════
+function exportEquipementsExcel() {
+  if (typeof ExcelJS === 'undefined') {
+    showToast('❌ Bibliothèque Excel indisponible', true);
+    return;
+  }
+  var workbook = new ExcelJS.Workbook();
+
+  // ── Onglet Fournisseur ──
+  var shipSheet = workbook.addWorksheet('Fournisseur');
+  shipSheet.addRow(['Fournisseur']);
+  CFG.equipements.selectCols.type.forEach(function(v) { shipSheet.addRow([v]); });
+  shipSheet.getColumn(1).width = 22;
+  shipSheet.getRow(1).font = { bold: true };
+  shipSheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9EAF7' } };
+
+  // ── Onglet Catégorie ──
+  var catList = STORE['equip_cat'].slice().sort(function(a, b) { return (parseInt(a.ordre) || 0) - (parseInt(b.ordre) || 0); });
+  var catSheet = workbook.addWorksheet('Catégorie');
+  catSheet.addRow(['ID', 'Value', 'Ordre d\'affichage']);
+  catList.forEach(function(c) { catSheet.addRow([c.id, c.value, c.ordre]); });
+  catSheet.columns.forEach(function(col, i) { col.width = [16, 30, 16][i]; });
+  catSheet.getRow(1).font = { bold: true };
+  catSheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9EAF7' } };
+
+  // ── Onglet Equipement ──
+  var sheet = workbook.addWorksheet('Equipement');
+  var headers = ['Fournisseur', 'Catégorie', 'ID', 'Équipement', 'Stock', 'Description', 'Remarque'];
+  sheet.addRow(headers);
+  STORE['equipements'].forEach(function(eq) {
+    sheet.addRow([eq.type, eq.categorie, eq.id, eq.value, eq.stock, eq.description, eq.remarque]);
+  });
+  var colWidths = [14, 22, 14, 26, 10, 34, 24];
+  sheet.columns.forEach(function(col, i) { col.width = colWidths[i] || 18; });
+  sheet.getRow(1).eachCell(function(cell) {
+    cell.font = { bold: true };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9EAF7' } };
+  });
+  sheet.autoFilter = { from: { row: 1, column: 1 }, to: { row: 1, column: headers.length } };
+  sheet.views = [{ state: 'frozen', ySplit: 1 }];
+
+  // Menus déroulants : Fournisseur (col A) et Catégorie (col B), lignes 2 à 1000
+  var lastShipRow = CFG.equipements.selectCols.type.length + 1;
+  var lastCatRow  = Math.max(catList.length + 1, 2);
+  for (var r = 2; r <= 1000; r++) {
+    sheet.getCell('A' + r).dataValidation = { type: 'list', allowBlank: true, formulae: ['Fournisseur!$A$2:$A$' + lastShipRow] };
+    sheet.getCell('B' + r).dataValidation = { type: 'list', allowBlank: true, formulae: ['Catégorie!$B$2:$B$' + lastCatRow] };
+  }
+
+  var now = new Date();
+  var yyyy = now.getFullYear(), mm = String(now.getMonth() + 1).padStart(2, '0'), dd = String(now.getDate()).padStart(2, '0');
+  var filename = 'TAF2026_EQUIPEMENTS_' + yyyy + '_' + mm + '_' + dd + '.xlsx';
+
+  workbook.xlsx.writeBuffer().then(function(buffer) {
+    var blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('✅ Export Excel généré');
+  }).catch(function(err) {
+    showToast('❌ ' + err.message, true);
+  });
+}
+window.exportEquipementsExcel = exportEquipementsExcel;
+
+// ════════════════════════════════════════════════════════════
+// IMPORT EXCEL — ÉQUIPEMENTS
+// ════════════════════════════════════════════════════════════
+var EQ_IMPORT_PREVIEW = null;
+var EQ_IMPORT_HEADERS = ['Fournisseur', 'Catégorie', 'ID', 'Équipement', 'Stock', 'Description', 'Remarque'];
+
+function toggleEqImportPanel() {
+  document.getElementById('eqImportPanel').classList.toggle('open');
+}
+window.toggleEqImportPanel = toggleEqImportPanel;
+
+function closeEqImportPanel() {
+  document.getElementById('eqImportPanel').classList.remove('open');
+}
+window.closeEqImportPanel = closeEqImportPanel;
+
+function triggerEqImportFile() {
+  document.getElementById('eqImportInput').click();
+}
+window.triggerEqImportFile = triggerEqImportFile;
+
+function eqNormalizeCellValue(value) {
+  if (value == null) return '';
+  if (typeof value === 'object') {
+    if (value.text != null) return eqNormalizeCellValue(value.text);
+    if (value.richText && value.richText.length) return eqNormalizeCellValue(value.richText.map(function(p) { return p.text || ''; }).join(''));
+    if (value.result != null) return eqNormalizeCellValue(value.result);
+  }
+  return String(value).replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
+}
+
+function eqGetImportHeaderError(row) {
+  for (var i = 0; i < EQ_IMPORT_HEADERS.length; i++) {
+    if (eqNormalizeCellValue(row.getCell(i + 1).value) !== EQ_IMPORT_HEADERS[i]) {
+      return 'Structure invalide : colonne ' + String.fromCharCode(65 + i) + ' attendue « ' + EQ_IMPORT_HEADERS[i] + ' ».';
+    }
+  }
+  return '';
+}
+
+function handleEqImportFile(event) {
+  var file = event.target.files && event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  if (!/\.xlsx$/i.test(file.name)) {
+    showToast('❌ Le fichier doit être au format .xlsx', true);
+    eqRenderImportError('Le fichier sélectionné n\'est pas un .xlsx.');
+    return;
+  }
+  if (typeof ExcelJS === 'undefined') {
+    showToast('❌ Bibliothèque Excel indisponible', true);
+    eqRenderImportError('La bibliothèque ExcelJS est indisponible.');
+    return;
+  }
+  document.getElementById('eqImportPanel').classList.add('open');
+  eqRenderImportLoading(file.name);
+  file.arrayBuffer().then(function(buffer) {
+    var workbook = new ExcelJS.Workbook();
+    return workbook.xlsx.load(buffer);
+  }).then(function(workbook) {
+    var sheet = workbook.getWorksheet('Equipement') || workbook.worksheets[0];
+    if (!sheet) throw new Error('Le fichier Excel ne contient aucune feuille.');
+    var headerError = eqGetImportHeaderError(sheet.getRow(1));
+    if (headerError) throw new Error(headerError);
+    var preview = eqBuildImportPreview(sheet);
+    EQ_IMPORT_PREVIEW = preview;
+    eqRenderImportPreview(preview, file.name);
+    if (!preview.items.length) showToast('ℹ️ Aucune modification détectée');
+  }).catch(function(err) {
+    EQ_IMPORT_PREVIEW = null;
+    eqRenderImportError(err.message || 'Import impossible.');
+    showToast('❌ ' + (err.message || 'Import impossible'), true);
+  });
+}
+window.handleEqImportFile = handleEqImportFile;
+
+function eqBuildImportPreview(sheet) {
+  var idMap = {};
+  STORE['equipements'].forEach(function(eq, idx) { idMap[eq.id] = idx; });
+  var usedIds = {};
+  STORE['equipements'].forEach(function(eq) { usedIds[eq.id] = true; });
+
+  var items = [];
+  var warnings = [];
+  var seenIds = {};
+
+  for (var rowNumber = 2; rowNumber <= sheet.rowCount; rowNumber++) {
+    var row = sheet.getRow(rowNumber);
+    var rawId      = eqNormalizeCellValue(row.getCell(3).value);
+    var type       = eqNormalizeCellValue(row.getCell(1).value);
+    var categorie  = eqNormalizeCellValue(row.getCell(2).value);
+    var value      = eqNormalizeCellValue(row.getCell(4).value);
+    var stock      = eqNormalizeCellValue(row.getCell(5).value);
+    var description = eqNormalizeCellValue(row.getCell(6).value);
+    var remarque   = eqNormalizeCellValue(row.getCell(7).value);
+
+    // Ligne totalement vide → ignorée silencieusement
+    if (!rawId && !type && !categorie && !value && !stock && !description && !remarque) continue;
+
+    if (!value) {
+      warnings.push('⚠️ Ligne ' + rowNumber + ' ignorée : le champ Équipement est obligatoire.');
+      continue;
+    }
+
+    var existingIdx = rawId && idMap.hasOwnProperty(rawId) ? idMap[rawId] : -1;
+
+    if (existingIdx !== -1) {
+      // ── Mise à jour d'un équipement existant (ID non modifiable) ──
+      if (seenIds[rawId]) { warnings.push('⚠️ ID dupliqué dans le fichier importé, ligne ' + rowNumber + ' ignorée : ' + rawId + '.'); continue; }
+      seenIds[rawId] = true;
+      var eq = STORE['equipements'][existingIdx];
+      var changes = [];
+      [
+        { key: 'type',        label: 'Fournisseur', next: type,        cur: eq.type },
+        { key: 'categorie',   label: 'Catégorie',    next: categorie,   cur: eq.categorie },
+        { key: 'value',       label: 'Équipement',   next: value,       cur: eq.value },
+        { key: 'stock',       label: 'Stock',        next: stock,       cur: String(eq.stock) },
+        { key: 'description', label: 'Description',  next: description, cur: eq.description },
+        { key: 'remarque',    label: 'Remarque',     next: remarque,    cur: eq.remarque }
+      ].forEach(function(f) {
+        if (f.next !== f.cur) changes.push({ key: f.key, label: f.label, currentValue: f.cur, nextValue: f.next, choice: 'apply' });
+      });
+      if (changes.length) items.push({ mode: 'update', id: rawId, storeIdx: existingIdx, label: eq.value, changes: changes });
+    } else {
+      // ── Création d'un nouvel équipement ──
+      // Si un ID est fourni dans le fichier et qu'il n'est pas déjà utilisé → on l'accepte tel quel.
+      // Si l'ID est fourni mais déjà existant dans le store → warning + ID aléatoire unique.
+      // Si aucun ID fourni → ID automatique EQ_NEWXXX.
+      var newId;
+      var idWasForced = false;
+      var idHadConflict = false;
+      if (rawId) {
+        if (!usedIds[rawId] && !seenIds[rawId]) {
+          // ID libre → on l'utilise directement
+          newId = rawId;
+          idWasForced = true;
+        } else {
+          // ID déjà pris → ID aléatoire unique + warning
+          idHadConflict = true;
+          do { newId = 'EQ_' + Math.random().toString(36).slice(2,8).toUpperCase(); } while (usedIds[newId]);
+          warnings.push('⚠️ Ligne ' + rowNumber + ' : l\'ID « ' + rawId + ' » est déjà utilisé — ID alternatif attribué : ' + newId + '.');
+        }
+      } else {
+        // Aucun ID fourni → séquence EQ_NEWXXX
+        var n = 0;
+        do { newId = 'EQ_NEW' + String(n).padStart(3, '0'); n++; } while (usedIds[newId] && n <= 999);
+      }
+      usedIds[newId] = true;
+      if (rawId) seenIds[rawId] = true;
+      var changes2 = [
+        { key: 'type',        label: 'Fournisseur', currentValue: '', nextValue: type,               choice: 'apply' },
+        { key: 'categorie',   label: 'Catégorie',    currentValue: '', nextValue: categorie,          choice: 'apply' },
+        { key: 'value',       label: 'Équipement',   currentValue: '', nextValue: value,              choice: 'apply' },
+        { key: 'stock',       label: 'Stock',        currentValue: '', nextValue: stock || 'N/A',     choice: 'apply' },
+        { key: 'description', label: 'Description',  currentValue: '', nextValue: description,        choice: 'apply' },
+        { key: 'remarque',    label: 'Remarque',     currentValue: '', nextValue: remarque,           choice: 'apply' }
+      ];
+      items.push({ mode: 'create', id: newId, idForced: idWasForced, idConflict: idHadConflict, storeIdx: -1, label: value, changes: changes2 });
+    }
+  }
+  return { items: items, warnings: warnings, totalChanges: items.reduce(function(sum, it) { return sum + it.changes.length; }, 0) };
+}
+
+function eqRenderImportLoading(filename) {
+  document.getElementById('eqImportSummary').innerHTML =
+    '<div class="import-summary-box"><div class="import-summary-title">Lecture du fichier</div><div class="import-empty">Analyse en cours : ' + esc(filename) + '</div></div>';
+}
+function eqRenderImportError(message) {
+  document.getElementById('eqImportSummary').innerHTML =
+    '<div class="import-summary-box"><div class="import-summary-title status-warn">Import impossible</div><div class="import-empty">' + esc(message) + '</div></div>';
+}
+function eqRenderImportPreview(preview, filename) {
+  var summary = document.getElementById('eqImportSummary');
+  var warningsHtml = (preview.warnings && preview.warnings.length)
+    ? '<div style="margin-bottom:12px;padding:10px 14px;border-radius:6px;background:#fff7ed;border:1px solid #fb923c;color:#9a3412;font-size:13px;line-height:1.6;">' +
+        '<strong>⚠️ ' + preview.warnings.length + ' avertissement(s) — lignes ou valeurs ignorées, import non bloqué</strong>' +
+        '<ul style="margin:6px 0 0 18px;padding:0;">' + preview.warnings.map(function(w) { return '<li>' + esc(w) + '</li>'; }).join('') + '</ul>' +
+      '</div>'
+    : '';
+  if (!preview.items.length) {
+    summary.innerHTML = '<div class="import-summary-box">' + warningsHtml + '<div class="import-summary-title status-ok">Fichier analysé</div><div class="import-empty">Aucune modification détectée dans ' + esc(filename) + '.</div></div>';
+    return;
+  }
+  var updateCount = preview.items.filter(function(it) { return it.mode === 'update'; }).length;
+  var createCount = preview.items.filter(function(it) { return it.mode === 'create'; }).length;
+  summary.innerHTML =
+    '<div class="import-summary-box">' +
+      warningsHtml +
+      '<div class="import-summary-title">Validation des modifications</div>' +
+      '<div class="import-help">Chaque ligne propose les différences détectées. Accepte ou ignore chaque valeur avant l\'enregistrement. Pour les nouveaux équipements : si un ID est fourni dans le fichier et qu\'il est libre, il est utilisé tel quel ; sinon un ID automatique est attribué.</div>' +
+      '<div class="import-item-meta">' + updateCount + ' mise(s) à jour · ' + createCount + ' création(s) · ' + preview.totalChanges + ' changement(s)</div>' +
+      '<div class="import-summary-list">' + preview.items.map(function(item, itemIdx) {
+        var badge;
+        if (item.mode === 'create') {
+          if (item.idForced) {
+            badge = '<span style="font-size:11px;font-weight:700;color:#1e40af;background:#dbeafe;border:1px solid #93c5fd;border-radius:4px;padding:2px 6px;">Nouveau — ID forcé : ' + esc(item.id) + '</span>';
+          } else if (item.idConflict) {
+            badge = '<span style="font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:4px;padding:2px 6px;">Nouveau — ID conflit → ' + esc(item.id) + '</span>';
+          } else {
+            badge = '<span style="font-size:11px;font-weight:700;color:#166534;background:#dcfce7;border:1px solid #86efac;border-radius:4px;padding:2px 6px;">Nouveau — ' + esc(item.id) + '</span>';
+          }
+        } else {
+          badge = '<span class="import-item-meta">ID : ' + esc(item.id) + '</span>';
+        }
+        return '<div class="import-item">' +
+          '<div class="import-item-head">' +
+            '<div>' +
+              '<div class="import-item-title">' + esc(item.label || item.id) + '</div>' +
+              '<div style="margin-top:4px">' + badge + '</div>' +
+            '</div>' +
+            '<div class="import-item-meta">' + item.changes.length + ' changement(s)</div>' +
+          '</div>' +
+          '<div class="import-fields-grid">' + item.changes.map(function(change, changeIdx) {
+            return '<div class="import-field">' +
+              '<div class="import-field-name">' + esc(change.label) + '</div>' +
+              '<div class="import-field-values">' +
+                '<div class="import-field-value">' + esc(change.currentValue || '—') + '</div>' +
+                '<div class="import-field-arrow">→</div>' +
+                '<div class="import-field-value">' + esc(change.nextValue || '—') + '</div>' +
+              '</div>' +
+              '<div class="import-choice">' +
+                '<label><input type="radio" name="eq-import-choice-' + itemIdx + '-' + changeIdx + '" value="apply" checked onchange="setEqImportChoice(' + itemIdx + ',' + changeIdx + ',\'apply\')"> Accepter</label>' +
+                '<label><input type="radio" name="eq-import-choice-' + itemIdx + '-' + changeIdx + '" value="skip" onchange="setEqImportChoice(' + itemIdx + ',' + changeIdx + ',\'skip\')"> Ignorer</label>' +
+              '</div>' +
+            '</div>';
+          }).join('') + '</div>' +
+        '</div>';
+      }).join('') + '</div>' +
+      '<div class="import-actions">' +
+        '<button class="btn" id="eqImportApplyBtn" onclick="applyEqImportPreview()">✅ Valider l\'import</button>' +
+        '<button class="btn btn-sm" id="eqImportCancelBtn" onclick="clearEqImportPreview()">✕ Annuler</button>' +
+      '</div>' +
+    '</div>';
+}
+function clearEqImportPreview() {
+  EQ_IMPORT_PREVIEW = null;
+  document.getElementById('eqImportSummary').innerHTML = '';
+}
+window.clearEqImportPreview = clearEqImportPreview;
+function setEqImportChoice(itemIdx, changeIdx, choice) {
+  if (!EQ_IMPORT_PREVIEW || !EQ_IMPORT_PREVIEW.items[itemIdx] || !EQ_IMPORT_PREVIEW.items[itemIdx].changes[changeIdx]) return;
+  EQ_IMPORT_PREVIEW.items[itemIdx].changes[changeIdx].choice = choice;
+}
+window.setEqImportChoice = setEqImportChoice;
+
+function setEqImportSavingState(isSaving) {
+  var applyBtn = document.getElementById('eqImportApplyBtn');
+  var cancelBtn = document.getElementById('eqImportCancelBtn');
+  if (applyBtn) { applyBtn.disabled = isSaving; applyBtn.textContent = isSaving ? '⏳ Enregistrement en cours...' : '✅ Valider l\'import'; }
+  if (cancelBtn) cancelBtn.disabled = isSaving;
+}
+async function applyEqImportPreview() {
+  if (!EQ_IMPORT_PREVIEW || !EQ_IMPORT_PREVIEW.items.length) return;
+  var items = EQ_IMPORT_PREVIEW.items;
+  var appliedCount = 0;
+
+  items.forEach(function(item) {
+    var selectedChanges = item.changes.filter(function(c) { return c.choice !== 'skip'; });
+    if (!selectedChanges.length) return;
+
+    if (item.mode === 'update') {
+      var eq = STORE['equipements'][item.storeIdx];
+      if (!eq) return;
+      selectedChanges.forEach(function(c) { eq[c.key] = c.nextValue; appliedCount++; });
+    } else {
+      var newEq = { id: item.id, type: '', categorie: '', value: '', stock: 'N/A', description: '', remarque: '' };
+      selectedChanges.forEach(function(c) { newEq[c.key] = c.nextValue; appliedCount++; });
+      if (!newEq.value) return; // sécurité : ne pas créer une ligne sans nom d'équipement
+      STORE['equipements'].push(newEq);
+    }
+  });
+
+  if (!appliedCount) {
+    showToast('ℹ️ Aucune valeur sélectionnée pour l\'import');
+    return;
+  }
+
+  markDirty('equipements');
+  renderTable('equipements');
+
+  setEqImportSavingState(true);
+  try {
+    await saveToServer(CFG.equipements.fileName, genRefFile('equipements'));
+    DIRTY['equipements'] = false;
+    var bar = document.getElementById('bar-equipements');
+    if (bar) bar.classList.remove('on');
+    var sticky = document.getElementById('bar-equipements-sticky');
+    if (sticky) sticky.classList.remove('on');
+    EQ_IMPORT_PREVIEW = null;
+    document.getElementById('eqImportSummary').innerHTML =
+      '<div class="import-summary-box"><div class="import-summary-title status-ok">Import terminé</div><div class="import-empty">Les équipements ont été mis à jour et ref_equipements.js a été sauvegardé.</div></div>';
+    showToast('✅ Import équipements appliqué (' + appliedCount + ' changement(s))');
+  } catch (err) {
+    showToast('❌ ' + err.message + ' — utilisez le bouton Sauvegarder pour réessayer.', true);
+  } finally {
+    setEqImportSavingState(false);
+  }
+}
+window.applyEqImportPreview = applyEqImportPreview;
 
 // ════════════════════════════════════════════════════════════
 // TOAST + MODE NUIT
@@ -722,11 +2158,1465 @@ function showToast(msg, isErr) {
 
 function toggleMode() {
   var dark = document.body.classList.toggle('dark');
-  document.getElementById('modeBtn').textContent = dark ? '☀️ Mode Jour' : '🌙 Mode Nuit';
+  var mt = document.getElementById('modeBtnText');
+  if (mt) {
+    mt.setAttribute('data-i18n', dark ? 'nav_mode_jour' : 'nav_mode_nuit');
+    mt.textContent = I18n.t(dark ? 'nav_mode_jour' : 'nav_mode_nuit');
+  }
 }
 window.toggleMode = toggleMode;
 
+// ── Data Update ──────────────────────────────────────────────────────────────
+(function() {
+  var inp = document.getElementById('dataUpdateInput');
+  if (inp) inp.value = localStorage.getItem('tm_data_update') || '';
+})();
+
+function saveDataUpdate() {
+  var inp = document.getElementById('dataUpdateInput');
+  var status = document.getElementById('dataUpdateStatus');
+  var val = (inp ? inp.value : '').trim();
+  localStorage.setItem('tm_data_update', val);
+  // Mettre à jour le badge sur cette page immédiatement
+  var badge = document.getElementById('tm-data-badge');
+  if (badge) {
+    badge.textContent = val ? ('🗓 Data update : ' + val) : '';
+    badge.style.display = val ? 'block' : 'none';
+  }
+  if (status) {
+    status.textContent = val ? '✅ Enregistré' : '✅ Effacé';
+    setTimeout(function() { status.textContent = ''; }, 2500);
+  }
+}
+window.saveDataUpdate = saveDataUpdate;
+
+// ════════════════════════════════════════════════════════════
+// CONSIGNES TYPE — GESTION DÉDIÉE
+// (structure spéciale : placements est un array, textes longs)
+// ════════════════════════════════════════════════════════════
+
+var CONS_STORE  = (typeof REF_CONSIGNES_TYPE !== 'undefined' ? REF_CONSIGNES_TYPE : [])
+  .map(function(c) { return Object.assign({}, c, { placements: (c.placements || []).slice() }); });
+var CONS_DIRTY  = false;
+var CONS_EDIT_I = null; // index en cours d'édition (-1 = nouveau)
+
+var CONS_PLACEMENTS_ALL = ['Avant','Pendant','Après','Logistique','Spécifique','Participant'];
+
+function consTypesOptions() {
+  return (typeof REF_TYPES !== 'undefined' ? REF_TYPES : []).map(function(t) { return t.value; });
+}
+
+function renderConsignesType() {
+  var tbody = document.getElementById('tbody-consignes_type');
+  if (!tbody) return;
+  if (!CONS_STORE.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty">Aucune consigne générique.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = CONS_STORE.map(function(c, i) {
+    var vFr   = String(c.valueFr || '').length > 55 ? String(c.valueFr).slice(0, 55) + '…' : (c.valueFr || '');
+    var vEn   = String(c.valueEn || '').length > 55 ? String(c.valueEn).slice(0, 55) + '…' : (c.valueEn || '');
+    var desc  = String(c.descriptif || '').length > 55 ? String(c.descriptif).slice(0, 55) + '…' : (c.descriptif || '');
+    var actif = c.actif !== false; // défaut true si absent
+    var typesHtml = (c.types && c.types.length)
+      ? c.types.map(function(t) {
+          return '<span style="background:var(--th-bg);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:11px;">' + esc(t) + '</span>';
+        }).join(' ')
+      : '<span style="font-size:11px;color:var(--muted);font-style:italic;">Tous</span>';
+    return '<tr id="row-cons-' + i + '" style="' + (actif ? '' : 'opacity:.5;') + '">' +
+      '<td style="text-align:center;">' +
+        '<input type="checkbox" ' + (actif ? 'checked' : '') + ' title="Activer / désactiver" onclick="consToggleActif(' + i + ',this.checked)">' +
+      '</td>' +
+      '<td class="td-id">' + esc(c.id) + '</td>' +
+      '<td class="td-val" title="' + esc(c.valueFr||'') + '">' + esc(vFr) + '</td>' +
+      '<td class="td-val" title="' + esc(c.valueEn||'') + '">' + esc(vEn) + '</td>' +
+      '<td class="td-val" title="' + esc(c.descriptif||'') + '">' + esc(desc) + '</td>' +
+      '<td><span style="display:flex;flex-wrap:wrap;gap:3px;">' +
+        (c.placements || []).map(function(p) {
+          return '<span style="background:var(--th-bg);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600;">' + esc(p) + '</span>';
+        }).join('') +
+      '</span></td>' +
+      '<td>' + typesHtml + '</td>' +
+      '<td class="td-act">' +
+        '<button class="btn" onclick="editConsigneType(' + i + ')">✏️</button> ' +
+        '<button class="btn btn-del" onclick="deleteConsigneType(' + i + ')">🗑</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+
+function consToggleActif(i, checked) {
+  if (!CONS_STORE[i]) return;
+  CONS_STORE[i].actif = !!checked;
+  var row = document.getElementById('row-cons-' + i);
+  if (row) row.style.opacity = checked ? '' : '0.5';
+  markConsDirty();
+}
+window.consToggleActif = consToggleActif;
+
+function editConsigneType(i) {
+  CONS_EDIT_I = i;
+  var c = CONS_STORE[i];
+  var row = document.getElementById('row-cons-' + i);
+  if (!row) return;
+
+  var checkboxes = CONS_PLACEMENTS_ALL.map(function(p) {
+    var checked = (c.placements || []).indexOf(p) !== -1 ? ' checked' : '';
+    return '<label style="display:inline-flex;align-items:center;gap:4px;font-size:12px;margin-right:8px;white-space:nowrap;">' +
+      '<input type="checkbox" value="' + p + '"' + checked + ' style="margin:0"> ' + esc(p) + '</label>';
+  }).join('');
+
+  var actif = c.actif !== false;
+  var typesList = consTypesOptions();
+  var typeCheckboxes = typesList.map(function(t) {
+    var checked = (c.types || []).indexOf(t) !== -1 ? ' checked' : '';
+    return '<label style="display:inline-flex;align-items:center;gap:3px;font-size:11px;margin-right:6px;white-space:nowrap;">' +
+      '<input type="checkbox" value="' + esc(t) + '"' + checked + ' style="margin:0"> ' + esc(t) + '</label>';
+  }).join('');
+
+  row.innerHTML =
+    '<td style="text-align:center;"><input type="checkbox" id="inp-cons-actif-' + i + '" ' + (actif ? 'checked' : '') + '></td>' +
+    '<td style="min-width:90px"><input class="inp" id="inp-cons-id-' + i + '" value="' + esc(c.id) + '" style="font-family:monospace;font-size:12px;" placeholder="CONS_…"></td>' +
+    '<td><input class="inp" id="inp-cons-vfr-' + i + '" value="' + esc(c.valueFr||'') + '" placeholder="Texte FR…"></td>' +
+    '<td><input class="inp" id="inp-cons-ven-' + i + '" value="' + esc(c.valueEn||'') + '" placeholder="Text EN…"></td>' +
+    '<td><input class="inp" id="inp-cons-desc-' + i + '" value="' + esc(c.descriptif||'') + '" placeholder="Descriptif…"></td>' +
+    '<td><div style="display:flex;flex-wrap:wrap;gap:2px;" id="inp-cons-pl-' + i + '">' + checkboxes + '</div></td>' +
+    '<td><div style="display:flex;flex-wrap:wrap;gap:2px;max-height:120px;overflow-y:auto;" id="inp-cons-types-' + i + '">' + typeCheckboxes + '</div></td>' +
+    '<td class="td-act">' +
+      '<button class="btn btn-ok" onclick="saveConsigneTypeEdit(' + i + ')">✔</button> ' +
+      '<button class="btn" onclick="cancelConsigneTypeEdit(' + i + ')">✖</button>' +
+    '</td>';
+
+  var el = document.getElementById('inp-cons-vfr-' + i);
+  if (el) { el.focus(); el.select(); }
+}
+window.editConsigneType = editConsigneType;
+
+function saveConsigneTypeEdit(i) {
+  var idEl   = document.getElementById('inp-cons-id-' + i);
+  var vfrEl  = document.getElementById('inp-cons-vfr-' + i);
+  var venEl  = document.getElementById('inp-cons-ven-' + i);
+  var descEl = document.getElementById('inp-cons-desc-' + i);
+  var plCont = document.getElementById('inp-cons-pl-' + i);
+
+  var newId = (idEl ? idEl.value.trim().toUpperCase().replace(/\s+/g, '_') : CONS_STORE[i].id);
+  if (!newId) { if (idEl) { idEl.style.borderColor = '#dc2626'; idEl.focus(); } return; }
+  var isDupe = CONS_STORE.some(function(c, idx) { return idx !== i && c.id === newId; });
+  if (isDupe) { if (idEl) { idEl.style.borderColor = '#dc2626'; idEl.title = 'ID déjà utilisé'; idEl.focus(); } return; }
+
+  var placements = [];
+  if (plCont) {
+    plCont.querySelectorAll('input[type="checkbox"]:checked').forEach(function(cb) { placements.push(cb.value); });
+  }
+
+  var typesCont = document.getElementById('inp-cons-types-' + i);
+  var types = [];
+  if (typesCont) {
+    typesCont.querySelectorAll('input[type="checkbox"]:checked').forEach(function(cb) { types.push(cb.value); });
+  }
+
+  var actifEl = document.getElementById('inp-cons-actif-' + i);
+  var actif = actifEl ? actifEl.checked : true;
+
+  CONS_STORE[i] = {
+    id: newId,
+    valueFr:    vfrEl  ? vfrEl.value  : CONS_STORE[i].valueFr,
+    valueEn:    venEl  ? venEl.value  : CONS_STORE[i].valueEn,
+    descriptif: descEl ? descEl.value : CONS_STORE[i].descriptif,
+    placements: placements,
+    actif:      actif,
+    types:      types,
+  };
+  CONS_EDIT_I = null;
+  markConsDirty();
+  renderConsignesType();
+}
+window.saveConsigneTypeEdit = saveConsigneTypeEdit;
+
+function cancelConsigneTypeEdit() {
+  CONS_EDIT_I = null;
+  renderConsignesType();
+}
+window.cancelConsigneTypeEdit = cancelConsigneTypeEdit;
+
+function deleteConsigneType(i) {
+  var c = CONS_STORE[i];
+  if (!confirm('Supprimer "' + (c.valueFr || c.id) + '" (' + c.id + ') ?')) return;
+  CONS_STORE.splice(i, 1);
+  markConsDirty();
+  renderConsignesType();
+  showToast('🗑 Consigne type supprimée.');
+}
+window.deleteConsigneType = deleteConsigneType;
+
+function addConsigneType() {
+  var ids = CONS_STORE.map(function(c) { return c.id; });
+  var n = 1, newId;
+  do { newId = 'CONS_' + String(n).padStart(3, '0'); n++; } while (ids.indexOf(newId) !== -1);
+  CONS_STORE.push({ id: newId, valueFr: '', valueEn: '', descriptif: '', placements: [], actif: true, types: [] });
+  renderConsignesType();
+  editConsigneType(CONS_STORE.length - 1);
+  markConsDirty();
+}
+window.addConsigneType = addConsigneType;
+window.renderConsignesType = renderConsignesType;
+
+function markConsDirty() {
+  CONS_DIRTY = true;
+  var bar = document.getElementById('bar-consignes_type');
+  if (bar) bar.classList.add('on');
+}
+
+function genConsignesTypeJs() {
+  var lines = CONS_STORE.map(function(c) {
+    var pl = (c.placements || []).map(function(p) { return '"' + escJs(p) + '"'; }).join(',');
+    var ty = (c.types || []).map(function(t) { return '"' + escJs(t) + '"'; }).join(',');
+    return '  {\n' +
+      '    id: "' + escJs(c.id) + '",\n' +
+      '    valueFr: "' + escJs(c.valueFr||'') + '",\n' +
+      '    valueEn: "' + escJs(c.valueEn||'') + '",\n' +
+      '    descriptif: "' + escJs(c.descriptif||'') + '",\n' +
+      '    placements: [' + pl + '],\n' +
+      '    actif: ' + (c.actif !== false ? 'true' : 'false') + ',\n' +
+      '    types: [' + ty + ']\n' +
+      '  },';
+  }).join('\n');
+  return '/**\n' +
+    ' * TANTRAMOUR 2026 — Référentiel : Consignes Type\n' +
+    ' * Chaque entrée : { id, valueFr, valueEn, descriptif, placements, actif, types }\n' +
+    ' *   id          : identifiant unique (préfixe CONS_)\n' +
+    ' *   valueFr     : libellé / texte en français\n' +
+    ' *   valueEn     : libellé / texte en anglais\n' +
+    ' *   descriptif  : description interne (usage, contexte)\n' +
+    ' *   placements  : tableau de valeurs parmi :\n' +
+    ' *                 "Avant"       → Consignes helpers : avant l\'atelier\n' +
+    ' *                 "Pendant"     → Consignes helpers : pendant l\'atelier\n' +
+    ' *                 "Après"       → Consignes helpers : après l\'atelier\n' +
+    ' *                 "Logistique"  → Informations logistiques\n' +
+    ' *                 "Spécifique"  → Besoins logistiques spécifiques\n' +
+    ' *                 "Participant" → Instructions participants\n' +
+    ' *   actif       : true = consigne active, false = désactivée globalement\n' +
+    ' *   types       : tableau de valeurs REF_TYPES (vide = tous les types)\n' +
+    ' */\n' +
+    'var REF_CONSIGNES_TYPE = [\n' + lines + '\n];\n';
+}
+
+async function saveConsignesType() {
+  try {
+    await saveToServer('ref_consignes_type.js', genConsignesTypeJs());
+    CONS_DIRTY = false;
+    var bar = document.getElementById('bar-consignes_type');
+    if (bar) bar.classList.remove('on');
+    showToast('✅ ref_consignes_type.js sauvegardé.', false);
+  } catch(err) {
+    showToast('❌ ' + err.message, true);
+  }
+}
+window.saveConsignesType = saveConsignesType;
+
+// ════════════════════════════════════════════════════════════
+// CONSIGNES RÉCURRENTES — GESTION DÉDIÉE
+// (structure : id, valueFr, valueEn, descriptif, placements[], actif)
+// ════════════════════════════════════════════════════════════
+
+var COREC_STORE = (typeof REF_CONSIGNES_RECURRENTES !== 'undefined' ? REF_CONSIGNES_RECURRENTES : [])
+  .map(function(c) { return Object.assign({}, c, { placements: (c.placements || []).slice(), types: (c.types || []).slice() }); });
+var COREC_DIRTY  = false;
+var COREC_EDIT_I = null;
+
+var COREC_PLACEMENTS_ALL = ['Avant', 'Pendant', 'Après', 'Logistique', 'Spécifique', 'Participant'];
+
+function renderConsignesRecurrentes() {
+  var tbody = document.getElementById('tbody-consignes_recurrentes');
+  if (!tbody) return;
+  if (!COREC_STORE.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty">Aucune consigne spécifique.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = COREC_STORE.map(function(c, i) {
+    var vFr  = String(c.valueFr || '').length > 55 ? String(c.valueFr).slice(0, 55) + '…' : (c.valueFr || '');
+    var vEn  = String(c.valueEn || '').length > 55 ? String(c.valueEn).slice(0, 55) + '…' : (c.valueEn || '');
+    var desc = String(c.descriptif || '').length > 55 ? String(c.descriptif).slice(0, 55) + '…' : (c.descriptif || '');
+    var actif = c.actif !== false;
+    var typesHtml = (c.types && c.types.length)
+      ? c.types.map(function(t) {
+          return '<span style="background:var(--th-bg);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:11px;">' + esc(t) + '</span>';
+        }).join(' ')
+      : '<span style="font-size:11px;color:var(--muted);font-style:italic;">Tous</span>';
+    return '<tr id="row-corec-' + i + '" style="' + (actif ? '' : 'opacity:.5;') + '">' +
+      '<td style="text-align:center;">' +
+        '<input type="checkbox" ' + (actif ? 'checked' : '') + ' title="Activer / désactiver" onclick="corecToggleActif(' + i + ',this.checked)">' +
+      '</td>' +
+      '<td class="td-id">' + esc(c.id) + '</td>' +
+      '<td class="td-val" title="' + esc(c.valueFr || '') + '">' + esc(vFr) + '</td>' +
+      '<td class="td-val" title="' + esc(c.valueEn || '') + '">' + esc(vEn) + '</td>' +
+      '<td class="td-val" title="' + esc(c.descriptif || '') + '">' + esc(desc) + '</td>' +
+      '<td><span style="display:flex;flex-wrap:wrap;gap:3px;">' +
+        (c.placements || []).map(function(p) {
+          return '<span style="background:var(--th-bg);border:1px solid var(--border);border-radius:4px;padding:1px 6px;font-size:11px;font-weight:600;">' + esc(p) + '</span>';
+        }).join('') +
+      '</span></td>' +
+      '<td>' + typesHtml + '</td>' +
+      '<td class="td-act">' +
+        '<button class="btn" onclick="editConsigneRecurrente(' + i + ')">✏️</button> ' +
+        '<button class="btn btn-del" onclick="deleteConsigneRecurrente(' + i + ')">🗑</button>' +
+      '</td>' +
+    '</tr>';
+  }).join('');
+}
+window.renderConsignesRecurrentes = renderConsignesRecurrentes;
+
+function corecToggleActif(i, checked) {
+  if (!COREC_STORE[i]) return;
+  COREC_STORE[i].actif = !!checked;
+  var row = document.getElementById('row-corec-' + i);
+  if (row) row.style.opacity = checked ? '' : '0.5';
+  markCorecDirty();
+}
+window.corecToggleActif = corecToggleActif;
+
+function editConsigneRecurrente(i) {
+  COREC_EDIT_I = i;
+  var c = COREC_STORE[i];
+  var row = document.getElementById('row-corec-' + i);
+  if (!row) return;
+
+  var checkboxes = COREC_PLACEMENTS_ALL.map(function(p) {
+    var checked = (c.placements || []).indexOf(p) !== -1 ? ' checked' : '';
+    return '<label style="display:inline-flex;align-items:center;gap:4px;font-size:12px;margin-right:8px;white-space:nowrap;">' +
+      '<input type="checkbox" value="' + p + '"' + checked + ' style="margin:0"> ' + esc(p) + '</label>';
+  }).join('');
+
+  var actif = c.actif !== false;
+  var typesList = consTypesOptions();
+  var typeCheckboxes = typesList.map(function(t) {
+    var checked = (c.types || []).indexOf(t) !== -1 ? ' checked' : '';
+    return '<label style="display:inline-flex;align-items:center;gap:3px;font-size:11px;margin-right:6px;white-space:nowrap;">' +
+      '<input type="checkbox" value="' + esc(t) + '"' + checked + ' style="margin:0"> ' + esc(t) + '</label>';
+  }).join('');
+
+  row.innerHTML =
+    '<td style="text-align:center;"><input type="checkbox" id="inp-corec-actif-' + i + '" ' + (actif ? 'checked' : '') + '></td>' +
+    '<td style="min-width:90px"><input class="inp" id="inp-corec-id-' + i + '" value="' + esc(c.id) + '" style="font-family:monospace;font-size:12px;" placeholder="COREC_…"></td>' +
+    '<td><input class="inp" id="inp-corec-vfr-' + i + '" value="' + esc(c.valueFr || '') + '" placeholder="Texte FR…"></td>' +
+    '<td><input class="inp" id="inp-corec-ven-' + i + '" value="' + esc(c.valueEn || '') + '" placeholder="Text EN…"></td>' +
+    '<td><input class="inp" id="inp-corec-desc-' + i + '" value="' + esc(c.descriptif || '') + '" placeholder="Descriptif…"></td>' +
+    '<td><div style="display:flex;flex-wrap:wrap;gap:2px;" id="inp-corec-pl-' + i + '">' + checkboxes + '</div></td>' +
+    '<td><div style="display:flex;flex-wrap:wrap;gap:2px;max-height:120px;overflow-y:auto;" id="inp-corec-types-' + i + '">' + typeCheckboxes + '</div></td>' +
+    '<td class="td-act">' +
+      '<button class="btn btn-ok" onclick="saveConsigneRecurrenteEdit(' + i + ')">✔</button> ' +
+      '<button class="btn" onclick="cancelConsigneRecurrenteEdit()">✖</button>' +
+    '</td>';
+
+  var el = document.getElementById('inp-corec-vfr-' + i);
+  if (el) { el.focus(); el.select(); }
+}
+window.editConsigneRecurrente = editConsigneRecurrente;
+
+function saveConsigneRecurrenteEdit(i) {
+  var idEl    = document.getElementById('inp-corec-id-' + i);
+  var vfrEl   = document.getElementById('inp-corec-vfr-' + i);
+  var venEl   = document.getElementById('inp-corec-ven-' + i);
+  var descEl  = document.getElementById('inp-corec-desc-' + i);
+  var plCont  = document.getElementById('inp-corec-pl-' + i);
+  var actifEl = document.getElementById('inp-corec-actif-' + i);
+
+  var newId = (idEl ? idEl.value.trim().toUpperCase().replace(/\s+/g, '_') : COREC_STORE[i].id);
+  if (!newId) { if (idEl) { idEl.style.borderColor = '#dc2626'; idEl.focus(); } return; }
+  var isDupe = COREC_STORE.some(function(c, idx) { return idx !== i && c.id === newId; });
+  if (isDupe) { if (idEl) { idEl.style.borderColor = '#dc2626'; idEl.title = 'ID déjà utilisé'; idEl.focus(); } return; }
+
+  var placements = [];
+  if (plCont) {
+    plCont.querySelectorAll('input[type="checkbox"]:checked').forEach(function(cb) { placements.push(cb.value); });
+  }
+
+  var typesCont = document.getElementById('inp-corec-types-' + i);
+  var types = [];
+  if (typesCont) {
+    typesCont.querySelectorAll('input[type="checkbox"]:checked').forEach(function(cb) { types.push(cb.value); });
+  }
+
+  COREC_STORE[i] = {
+    id:         newId,
+    valueFr:    vfrEl  ? vfrEl.value  : COREC_STORE[i].valueFr,
+    valueEn:    venEl  ? venEl.value  : COREC_STORE[i].valueEn,
+    descriptif: descEl ? descEl.value : COREC_STORE[i].descriptif,
+    placements: placements,
+    actif:      actifEl ? actifEl.checked : true,
+    types:      types,
+  };
+  COREC_EDIT_I = null;
+  markCorecDirty();
+  renderConsignesRecurrentes();
+}
+window.saveConsigneRecurrenteEdit = saveConsigneRecurrenteEdit;
+
+function cancelConsigneRecurrenteEdit() {
+  COREC_EDIT_I = null;
+  renderConsignesRecurrentes();
+}
+window.cancelConsigneRecurrenteEdit = cancelConsigneRecurrenteEdit;
+
+function deleteConsigneRecurrente(i) {
+  var c = COREC_STORE[i];
+  if (!confirm('Supprimer "' + (c.valueFr || c.id) + '" (' + c.id + ') ?')) return;
+  COREC_STORE.splice(i, 1);
+  markCorecDirty();
+  renderConsignesRecurrentes();
+  showToast('🗑 Consigne spécifique supprimée.');
+}
+window.deleteConsigneRecurrente = deleteConsigneRecurrente;
+
+function addConsigneRecurrente() {
+  var ids = COREC_STORE.map(function(c) { return c.id; });
+  var n = 1, newId;
+  do { newId = 'COREC_' + String(n).padStart(3, '0'); n++; } while (ids.indexOf(newId) !== -1);
+  COREC_STORE.push({ id: newId, valueFr: '', valueEn: '', descriptif: '', placements: [], actif: true, types: [] });
+  renderConsignesRecurrentes();
+  editConsigneRecurrente(COREC_STORE.length - 1);
+  markCorecDirty();
+}
+window.addConsigneRecurrente = addConsigneRecurrente;
+
+function markCorecDirty() {
+  COREC_DIRTY = true;
+  var bar = document.getElementById('bar-consignes_recurrentes');
+  if (bar) bar.classList.add('on');
+}
+
+function genConsignesRecurrentesJs() {
+  var lines = COREC_STORE.map(function(c) {
+    var pl = (c.placements || []).map(function(p) { return '"' + escJs(p) + '"'; }).join(',');
+    var ty = (c.types || []).map(function(t) { return '"' + escJs(t) + '"'; }).join(',');
+    return '  {\n' +
+      '    id: "' + escJs(c.id) + '",\n' +
+      '    valueFr: "' + escJs(c.valueFr || '') + '",\n' +
+      '    valueEn: "' + escJs(c.valueEn || '') + '",\n' +
+      '    descriptif: "' + escJs(c.descriptif || '') + '",\n' +
+      '    placements: [' + pl + '],\n' +
+      '    actif: ' + (c.actif !== false ? 'true' : 'false') + ',\n' +
+      '    types: [' + ty + ']\n' +
+      '  },';
+  }).join('\n');
+  return '/**\n' +
+    ' * TANTRAMOUR 2026 — Référentiel : Consignes Récurrentes\n' +
+    ' * Chaque entrée : { id, valueFr, valueEn, descriptif, placements, actif, types }\n' +
+    ' *   id          : identifiant unique (préfixe COREC_)\n' +
+    ' *   valueFr     : texte de la consigne en français\n' +
+    ' *   valueEn     : texte de la consigne en anglais\n' +
+    ' *   descriptif  : description interne (usage, contexte)\n' +
+    ' *   placements  : tableau parmi "Avant", "Pendant", "Après", "Logistique", "Spécifique", "Participant"\n' +
+    ' *   actif       : true = consigne active\n' +
+    ' *   types       : tableau de types d\'ateliers (vide = tous)\n' +
+    ' */\n' +
+    'var REF_CONSIGNES_RECURRENTES = [\n' + lines + '\n];\n';
+}
+
+async function saveConsignesRecurrentes() {
+  try {
+    await saveToServer('ref_consignes_recurrentes.js', genConsignesRecurrentesJs());
+    COREC_DIRTY = false;
+    var bar = document.getElementById('bar-consignes_recurrentes');
+    if (bar) bar.classList.remove('on');
+    showToast('✅ ref_consignes_recurrentes.js sauvegardé.', false);
+  } catch(err) {
+    showToast('❌ ' + err.message, true);
+  }
+}
+window.saveConsignesRecurrentes = saveConsignesRecurrentes;
+
+// Rendu initial consignes récurrentes
+renderConsignesRecurrentes();
+
+// ════════════════════════════════════════════════════════════
+// EXPORT EXCEL — CONSIGNES SPÉCIFIQUES
+// Colonnes : ID | Texte FR | Texte EN | Descriptif
+//          | Avant | Pendant | Après | Logistique | Spécifique | Participant (Oui/Non)
+//          | Types (dropdown — un seul type ou vide = tous)
+// ════════════════════════════════════════════════════════════
+function exportConsignesRecurrentesExcel() {
+  if (typeof ExcelJS === 'undefined') { showToast('❌ Bibliothèque Excel indisponible', true); return; }
+  var wb = new ExcelJS.Workbook();
+
+  // ── 1. Feuille principale : Consignes ──
+  var sheet = wb.addWorksheet('Consignes');
+  var COLS = ['ID', 'Texte FR', 'Texte EN', 'Descriptif',
+              'Avant', 'Pendant', 'Après', 'Logistique', 'Spécifique', 'Participant',
+              'Types d\'ateliers (vide = tous)'];
+  sheet.addRow(COLS);
+
+  COREC_STORE.forEach(function(c) {
+    var pl = c.placements || [];
+    var typesVal = (c.types && c.types.length) ? c.types.join(', ') : '';
+    sheet.addRow([
+      c.id,
+      c.valueFr || '',
+      c.valueEn || '',
+      c.descriptif || '',
+      pl.indexOf('Avant')      !== -1 ? 'Oui' : 'Non',
+      pl.indexOf('Pendant')    !== -1 ? 'Oui' : 'Non',
+      pl.indexOf('Après')      !== -1 ? 'Oui' : 'Non',
+      pl.indexOf('Logistique') !== -1 ? 'Oui' : 'Non',
+      pl.indexOf('Spécifique') !== -1 ? 'Oui' : 'Non',
+      pl.indexOf('Participant')!== -1 ? 'Oui' : 'Non',
+      typesVal
+    ]);
+  });
+
+  var colWidths = [16, 38, 38, 28, 8, 9, 8, 12, 13, 13, 36];
+  sheet.columns.forEach(function(col, i) { col.width = colWidths[i] || 14; });
+
+  // En-tête
+  sheet.getRow(1).eachCell(function(cell) {
+    cell.font = { bold: true };
+    cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFD1FAE5'} };
+  });
+  // Colonne ID : fond gris (lecture seule)
+  for (var r = 2; r <= 1000; r++) {
+    sheet.getCell('A' + r).fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFF3F4F6'} };
+  }
+  sheet.autoFilter = { from:{row:1,column:1}, to:{row:1,column:COLS.length} };
+  sheet.views = [{ state:'frozen', ySplit:1 }];
+
+  // Dropdowns Oui/Non pour colonnes E–J (placements)
+  ['E','F','G','H','I','J'].forEach(function(col) {
+    for (var r = 2; r <= 1000; r++) {
+      sheet.getCell(col + r).dataValidation = { type:'list', allowBlank:true, formulae:['OuiNon!$A$1:$A$2'] };
+    }
+  });
+  // Dropdown Types pour colonne K
+  var lastTypeRow = consTypesOptions().length + 1;
+  for (var r2 = 2; r2 <= 1000; r2++) {
+    sheet.getCell('K' + r2).dataValidation = { type:'list', allowBlank:true, formulae:['Types!$A$2:$A$' + lastTypeRow] };
+  }
+
+  // ── 2. Feuille README ──
+  var readme = wb.addWorksheet('README');
+  readme.properties.tabColor = { argb: 'FF7C5CD8' };
+  var readmeRows = [
+    ['TANTRAMOUR 2026 — Consignes Spécifiques — Guide d\'utilisation'],
+    [''],
+    ['Ce fichier permet de créer ou modifier des consignes spécifiques dans Master Data.'],
+    ['Importez-le via le bouton « Import Excel » de l\'onglet Consignes spécifiques dans Master Data.'],
+    [''],
+    ['ONGLET « Consignes »'],
+    ['Colonne', 'Description', 'Règles'],
+    ['A — ID',          'Identifiant unique de la consigne (ex : COREC_001)',   'NE PAS MODIFIER pour une consigne existante. Laisser vide pour créer une nouvelle consigne.'],
+    ['B — Texte FR',    'Texte affiché en français',                             'Obligatoire. Texte libre, peut contenir des sauts de ligne.'],
+    ['C — Texte EN',    'Texte affiché en anglais',                              'Optionnel. Laisser vide si pas de traduction.'],
+    ['D — Descriptif',  'Note interne (usage, contexte)',                         'Optionnel. Non affiché dans les rapports.'],
+    ['E — Avant',       'Section helpers : avant l\'atelier',                    'Oui = la consigne apparaît dans cette section / Non = elle n\'y apparaît pas'],
+    ['F — Pendant',     'Section helpers : pendant l\'atelier',                  'Oui / Non'],
+    ['G — Après',       'Section helpers : après l\'atelier',                    'Oui / Non'],
+    ['H — Logistique',  'Section Informations logistiques',                      'Oui / Non'],
+    ['I — Spécifique',  'Section Besoins logistiques spécifiques',               'Oui / Non'],
+    ['J — Participant', 'Section Instructions participants (visible festivaliers)','Oui / Non'],
+    ['K — Types',       'Restreindre à un type d\'atelier (ex : MEDITATION / YOGA)', 'Laisser vide = s\'applique à TOUS les types. Choisir dans le menu déroulant (feuille Types).'],
+    [''],
+    ['RÈGLES D\'IMPORT'],
+    ['1. ID existant   → mise à jour du texte, placements et types. L\'ID et le statut Actif ne sont JAMAIS modifiés.'],
+    ['2. ID vide/inconnu → création d\'une nouvelle consigne avec Actif = NON (à activer manuellement dans Master Data).'],
+    ['3. ID dupliqué dans ce fichier → seule la première occurrence est traitée, les suivantes sont ignorées.'],
+    ['4. Type d\'atelier inconnu → la valeur est ignorée avec un avertissement (l\'import n\'est pas bloqué).'],
+    ['5. Ne supprimez pas les colonnes ni ne modifiez les en-têtes de la ligne 1.'],
+    [''],
+    ['STATUT ACTIF'],
+    ['Le statut Actif (cochée/décochée dans Master Data) n\'est pas gérable via cet import.'],
+    ['Les nouvelles consignes importées sont toujours créées avec Actif = NON.'],
+    ['Activez-les manuellement dans Master Data > Consignes spécifiques.'],
+  ];
+  readmeRows.forEach(function(row) { readme.addRow(row); });
+
+  // Style README
+  readme.getColumn(1).width = 28;
+  readme.getColumn(2).width = 48;
+  readme.getColumn(3).width = 70;
+  var titleCell = readme.getCell('A1');
+  titleCell.font = { bold:true, size:14, color:{argb:'FF1F2328'} };
+  titleCell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFD1FAE5'} };
+  readme.mergeCells('A1:C1');
+  [6, 21, 27].forEach(function(lineNo) {
+    var c = readme.getCell('A' + lineNo);
+    c.font = { bold:true, size:11 };
+    c.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFD1FAE5'} };
+    readme.mergeCells('A' + lineNo + ':C' + lineNo);
+  });
+  readme.getRow(7).eachCell(function(cell) {
+    cell.font = { bold:true };
+    cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFF0FDF4'} };
+  });
+  for (var rl = 8; rl <= 19; rl++) {
+    readme.getCell('A' + rl).font = { bold:true, color:{argb:'FF065F46'} };
+  }
+  readme.views = [{ state:'frozen', ySplit:0 }];
+
+  // ── 3. Feuille de référence : Types d'ateliers ──
+  var typesSheet = wb.addWorksheet('Types');
+  typesSheet.addRow(['Type']);
+  consTypesOptions().forEach(function(t) { typesSheet.addRow([t]); });
+  typesSheet.getColumn(1).width = 36;
+  typesSheet.getRow(1).font = { bold: true };
+  typesSheet.getRow(1).fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFD1FAE5'} };
+
+  // ── 4. Feuille de référence : Oui/Non ──
+  var ouiNonSheet = wb.addWorksheet('OuiNon');
+  ouiNonSheet.addRow(['Oui']); ouiNonSheet.addRow(['Non']);
+
+  var now = new Date();
+  var yyyy = now.getFullYear(), mm = String(now.getMonth()+1).padStart(2,'0'), dd = String(now.getDate()).padStart(2,'0');
+  wb.xlsx.writeBuffer().then(function(buffer) {
+    var blob = new Blob([buffer], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'TAF2026_CONSIGNES_SPECIFIQUES_' + yyyy + '_' + mm + '_' + dd + '.xlsx';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('✅ Export Excel généré');
+  }).catch(function(err) { showToast('❌ ' + err.message, true); });
+}
+window.exportConsignesRecurrentesExcel = exportConsignesRecurrentesExcel;
+
+// ════════════════════════════════════════════════════════════
+// IMPORT EXCEL — CONSIGNES SPÉCIFIQUES
+// Règles :
+//  - ID existant → mise à jour textes + placements + types (pas ID, pas actif)
+//  - ID absent/nouveau → création avec actif = false (non actif par défaut)
+//  - Pas de duplication d'ID dans le fichier importé
+//  - Validation avant application (preview avec Accepter/Ignorer par champ)
+// ════════════════════════════════════════════════════════════
+var COREC_IMPORT_PREVIEW = null;
+
+function toggleCorecImportPanel() {
+  document.getElementById('corecImportPanel').classList.toggle('open');
+}
+window.toggleCorecImportPanel = toggleCorecImportPanel;
+
+function closeCorecImportPanel() {
+  document.getElementById('corecImportPanel').classList.remove('open');
+}
+window.closeCorecImportPanel = closeCorecImportPanel;
+
+function triggerCorecImportFile() {
+  document.getElementById('corecImportInput').click();
+}
+window.triggerCorecImportFile = triggerCorecImportFile;
+
+function corecNormCell(value) {
+  if (value == null) return '';
+  if (typeof value === 'object') {
+    if (value.text  != null) return corecNormCell(value.text);
+    if (value.richText && value.richText.length) return corecNormCell(value.richText.map(function(p){return p.text||'';}).join(''));
+    if (value.result != null) return corecNormCell(value.result);
+  }
+  return String(value).replace(/\r\n/g,'\n').replace(/\r/g,'\n').trim();
+}
+
+function handleCorecImportFile(event) {
+  var file = event.target.files && event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  if (!/\.xlsx$/i.test(file.name)) { showToast('❌ Le fichier doit être au format .xlsx', true); return; }
+  if (typeof ExcelJS === 'undefined') { showToast('❌ Bibliothèque Excel indisponible', true); return; }
+  document.getElementById('corecImportPanel').classList.add('open');
+  corecRenderImportLoading(file.name);
+  file.arrayBuffer().then(function(buffer) {
+    return new ExcelJS.Workbook().xlsx.load(buffer);
+  }).then(function(wb) {
+    var sheet = wb.getWorksheet('Consignes') || wb.worksheets[0];
+    if (!sheet) throw new Error('Feuille « Consignes » introuvable dans le fichier.');
+    var h1 = corecNormCell(sheet.getRow(1).getCell(1).value);
+    var h2 = corecNormCell(sheet.getRow(1).getCell(2).value);
+    if (h1 !== 'ID' || h2 !== 'Texte FR') throw new Error('Structure invalide : attendu « ID » en col A, « Texte FR » en col B.');
+    var preview = corecBuildImportPreview(sheet);
+    COREC_IMPORT_PREVIEW = preview;
+    corecRenderImportPreview(preview, file.name);
+    if (!preview.items.length) showToast('ℹ️ Aucune modification détectée');
+  }).catch(function(err) {
+    COREC_IMPORT_PREVIEW = null;
+    corecRenderImportError(err.message || 'Import impossible.');
+    showToast('❌ ' + (err.message || 'Import impossible'), true);
+  });
+}
+window.handleCorecImportFile = handleCorecImportFile;
+
+function corecBuildImportPreview(sheet) {
+  var idMap = {};
+  COREC_STORE.forEach(function(c, idx) { idMap[c.id] = idx; });
+  var usedIds = {};
+  COREC_STORE.forEach(function(c) { usedIds[c.id] = true; });
+
+  var items = [], warnings = [], seenIds = {};
+
+  for (var rn = 2; rn <= sheet.rowCount; rn++) {
+    var row = sheet.getRow(rn);
+    var rawId      = corecNormCell(row.getCell(1).value);
+    var vFr        = corecNormCell(row.getCell(2).value);
+    var vEn        = corecNormCell(row.getCell(3).value);
+    var desc       = corecNormCell(row.getCell(4).value);
+    var avant      = corecNormCell(row.getCell(5).value);
+    var pendant    = corecNormCell(row.getCell(6).value);
+    var apres      = corecNormCell(row.getCell(7).value);
+    var logistique = corecNormCell(row.getCell(8).value);
+    var specifique = corecNormCell(row.getCell(9).value);
+    var participant= corecNormCell(row.getCell(10).value);
+    var typesRaw   = corecNormCell(row.getCell(11).value);
+
+    if (!rawId && !vFr && !vEn && !desc && !avant && !pendant && !apres && !logistique && !specifique && !participant && !typesRaw) continue;
+
+    var newPlacements = [];
+    if (/^oui$/i.test(avant))       newPlacements.push('Avant');
+    if (/^oui$/i.test(pendant))     newPlacements.push('Pendant');
+    if (/^oui$/i.test(apres))       newPlacements.push('Après');
+    if (/^oui$/i.test(logistique))  newPlacements.push('Logistique');
+    if (/^oui$/i.test(specifique))  newPlacements.push('Spécifique');
+    if (/^oui$/i.test(participant)) newPlacements.push('Participant');
+
+    var newTypes = typesRaw ? typesRaw.split(/[,;]/).map(function(t){return t.trim();}).filter(Boolean) : [];
+    var validTypeVals = consTypesOptions();
+    newTypes = newTypes.filter(function(t) {
+      if (validTypeVals.indexOf(t) === -1) {
+        warnings.push('⚠️ Ligne ' + rn + ' : type « ' + t + ' » inconnu, ignoré.');
+        return false;
+      }
+      return true;
+    });
+
+    var existingIdx = rawId && idMap.hasOwnProperty(rawId) ? idMap[rawId] : -1;
+
+    if (existingIdx !== -1) {
+      if (seenIds[rawId]) { warnings.push('⚠️ ID dupliqué dans le fichier, ligne ' + rn + ' ignorée : ' + rawId); continue; }
+      seenIds[rawId] = true;
+      var cur = COREC_STORE[existingIdx];
+      var curPl = (cur.placements || []).slice().sort().join('|');
+      var newPl = newPlacements.slice().sort().join('|');
+      var curTy = (cur.types || []).slice().sort().join('|');
+      var newTy = newTypes.slice().sort().join('|');
+      var changes = [];
+      [
+        { key:'valueFr',    label:'Texte FR',    cur: cur.valueFr    || '', next: vFr },
+        { key:'valueEn',    label:'Texte EN',    cur: cur.valueEn    || '', next: vEn },
+        { key:'descriptif', label:'Descriptif',  cur: cur.descriptif || '', next: desc },
+        { key:'placements', label:'Placements',  cur: curPl, next: newPl, _pl: newPlacements },
+        { key:'types',      label:'Types',        cur: curTy, next: newTy, _ty: newTypes }
+      ].forEach(function(f) {
+        if (f.next !== f.cur) changes.push({ key:f.key, label:f.label, currentValue:f.cur.replace(/\|/g,', '), nextValue:f.next.replace(/\|/g,', '), choice:'apply', _pl:f._pl, _ty:f._ty });
+      });
+      if (changes.length) items.push({ mode:'update', id:rawId, storeIdx:existingIdx, label:vFr||rawId, changes:changes });
+    } else {
+      if (rawId && seenIds[rawId]) { warnings.push('⚠️ ID dupliqué dans le fichier, ligne ' + rn + ' ignorée : ' + rawId); continue; }
+      if (rawId) seenIds[rawId] = true;
+      var n2 = 1, newId2;
+      do { newId2 = 'COREC_NEW' + String(n2).padStart(3,'0'); n2++; } while (usedIds[newId2] && n2 <= 999);
+      usedIds[newId2] = true;
+      var newPl2 = newPlacements.slice().sort().join('|');
+      var newTy2 = newTypes.slice().sort().join('|');
+      var changes2 = [
+        { key:'valueFr',    label:'Texte FR',   currentValue:'', nextValue:vFr,  choice:'apply' },
+        { key:'valueEn',    label:'Texte EN',   currentValue:'', nextValue:vEn,  choice:'apply' },
+        { key:'descriptif', label:'Descriptif', currentValue:'', nextValue:desc, choice:'apply' },
+        { key:'placements', label:'Placements', currentValue:'', nextValue:newPl2.replace(/\|/g,', '), choice:'apply', _pl:newPlacements },
+        { key:'types',      label:'Types',       currentValue:'', nextValue:newTy2.replace(/\|/g,', ')||'Tous', choice:'apply', _ty:newTypes }
+      ];
+      items.push({ mode:'create', id:newId2, originalId:rawId, storeIdx:-1, label:vFr||rawId||newId2, changes:changes2 });
+    }
+  }
+  return { items:items, warnings:warnings, totalChanges:items.reduce(function(s,it){return s+it.changes.length;},0) };
+}
+
+function corecRenderImportLoading(filename) {
+  document.getElementById('corecImportSummary').innerHTML =
+    '<div class="import-summary-box"><div class="import-summary-title">Lecture du fichier</div><div class="import-empty">Analyse en cours : ' + esc(filename) + '</div></div>';
+}
+function corecRenderImportError(message) {
+  document.getElementById('corecImportSummary').innerHTML =
+    '<div class="import-summary-box"><div class="import-summary-title status-warn">Import impossible</div><div class="import-empty">' + esc(message) + '</div></div>';
+}
+function corecRenderImportPreview(preview, filename) {
+  var el = document.getElementById('corecImportSummary');
+  var warningsHtml = (preview.warnings && preview.warnings.length)
+    ? '<div style="margin-bottom:12px;padding:10px 14px;border-radius:6px;background:#fff7ed;border:1px solid #fb923c;color:#9a3412;font-size:13px;line-height:1.6;">' +
+        '<strong>⚠️ ' + preview.warnings.length + ' avertissement(s)</strong>' +
+        '<ul style="margin:6px 0 0 18px;">' + preview.warnings.map(function(w){return '<li>'+esc(w)+'</li>';}).join('') + '</ul>' +
+      '</div>'
+    : '';
+  if (!preview.items.length) {
+    el.innerHTML = '<div class="import-summary-box">' + warningsHtml +
+      '<div class="import-summary-title status-ok">Fichier analysé</div>' +
+      '<div class="import-empty">Aucune modification détectée dans ' + esc(filename) + '.</div></div>';
+    return;
+  }
+  var updateCount = preview.items.filter(function(it){return it.mode==='update';}).length;
+  var createCount = preview.items.filter(function(it){return it.mode==='create';}).length;
+  el.innerHTML =
+    '<div class="import-summary-box">' +
+      warningsHtml +
+      '<div class="import-summary-title">Validation des modifications</div>' +
+      '<div class="import-help">ID et statut Actif ne sont jamais modifiés. Les nouvelles consignes sont créées avec <strong>Actif = NON</strong> — à activer manuellement dans le tableau.</div>' +
+      '<div class="import-item-meta">' + updateCount + ' mise(s) à jour · ' + createCount + ' création(s) · ' + preview.totalChanges + ' changement(s)</div>' +
+      '<div class="import-summary-list">' + preview.items.map(function(item, itemIdx) {
+        var badge = item.mode === 'create'
+          ? '<span style="font-size:11px;font-weight:700;color:#065F46;background:#d1fae5;border:1px solid #6ee7b7;border-radius:4px;padding:2px 6px;">Nouveau · Actif = NON · ID : ' + esc(item.id) + '</span>'
+          : '<span class="import-item-meta">ID : ' + esc(item.id) + ' · Actif inchangé</span>';
+        return '<div class="import-item">' +
+          '<div class="import-item-head">' +
+            '<div><div class="import-item-title">' + esc(item.label) + '</div><div style="margin-top:4px">' + badge + '</div></div>' +
+            '<div class="import-item-meta">' + item.changes.length + ' changement(s)</div>' +
+          '</div>' +
+          '<div class="import-fields-grid">' + item.changes.map(function(change, changeIdx) {
+            return '<div class="import-field">' +
+              '<div class="import-field-name">' + esc(change.label) + '</div>' +
+              '<div class="import-field-values">' +
+                '<div class="import-field-value">' + esc(change.currentValue || '—') + '</div>' +
+                '<div class="import-field-arrow">→</div>' +
+                '<div class="import-field-value">' + esc(change.nextValue || '—') + '</div>' +
+              '</div>' +
+              '<div class="import-choice">' +
+                '<label><input type="radio" name="corec-import-choice-' + itemIdx + '-' + changeIdx + '" value="apply" checked onchange="setCorecImportChoice(' + itemIdx + ',' + changeIdx + ',\'apply\')"> Accepter</label>' +
+                '<label><input type="radio" name="corec-import-choice-' + itemIdx + '-' + changeIdx + '" value="skip" onchange="setCorecImportChoice(' + itemIdx + ',' + changeIdx + ',\'skip\')"> Ignorer</label>' +
+              '</div>' +
+            '</div>';
+          }).join('') + '</div>' +
+        '</div>';
+      }).join('') + '</div>' +
+      '<div class="import-actions">' +
+        '<button class="btn" id="corecImportApplyBtn" onclick="applyCorecImportPreview()">✅ Valider l\'import</button>' +
+        '<button class="btn btn-sm" id="corecImportCancelBtn" onclick="clearCorecImportPreview()">✕ Annuler</button>' +
+      '</div>' +
+    '</div>';
+}
+function clearCorecImportPreview() {
+  COREC_IMPORT_PREVIEW = null;
+  document.getElementById('corecImportSummary').innerHTML = '';
+}
+window.clearCorecImportPreview = clearCorecImportPreview;
+function setCorecImportChoice(itemIdx, changeIdx, choice) {
+  if (!COREC_IMPORT_PREVIEW || !COREC_IMPORT_PREVIEW.items[itemIdx] || !COREC_IMPORT_PREVIEW.items[itemIdx].changes[changeIdx]) return;
+  COREC_IMPORT_PREVIEW.items[itemIdx].changes[changeIdx].choice = choice;
+}
+window.setCorecImportChoice = setCorecImportChoice;
+
+function setCorecImportSavingState(isSaving) {
+  var applyBtn  = document.getElementById('corecImportApplyBtn');
+  var cancelBtn = document.getElementById('corecImportCancelBtn');
+  if (applyBtn)  { applyBtn.disabled = isSaving;  applyBtn.textContent  = isSaving ? '⏳ Enregistrement…' : '✅ Valider l\'import'; }
+  if (cancelBtn) { cancelBtn.disabled = isSaving; }
+}
+
+async function applyCorecImportPreview() {
+  if (!COREC_IMPORT_PREVIEW || !COREC_IMPORT_PREVIEW.items.length) return;
+  var appliedCount = 0;
+
+  COREC_IMPORT_PREVIEW.items.forEach(function(item) {
+    var selected = item.changes.filter(function(c){ return c.choice !== 'skip'; });
+    if (!selected.length) return;
+
+    if (item.mode === 'update') {
+      var cur = COREC_STORE[item.storeIdx];
+      if (!cur) return;
+      selected.forEach(function(c) {
+        if (c.key === 'placements' && c._pl) { cur.placements = c._pl.slice(); }
+        else if (c.key === 'types' && c._ty !== undefined) { cur.types = c._ty.slice(); }
+        else { cur[c.key] = c.nextValue; }
+        appliedCount++;
+      });
+    } else {
+      var newCorec = { id:item.id, valueFr:'', valueEn:'', descriptif:'', placements:[], actif:false, types:[] };
+      selected.forEach(function(c) {
+        if (c.key === 'placements' && c._pl) { newCorec.placements = c._pl.slice(); }
+        else if (c.key === 'types' && c._ty !== undefined) { newCorec.types = c._ty.slice(); }
+        else { newCorec[c.key] = c.nextValue; }
+        appliedCount++;
+      });
+      COREC_STORE.push(newCorec);
+    }
+  });
+
+  if (!appliedCount) { showToast('ℹ️ Aucune valeur sélectionnée pour l\'import'); return; }
+
+  markCorecDirty();
+  renderConsignesRecurrentes();
+  setCorecImportSavingState(true);
+  try {
+    await saveToServer('ref_consignes_recurrentes.js', genConsignesRecurrentesJs());
+    COREC_DIRTY = false;
+    var bar = document.getElementById('bar-consignes_recurrentes');
+    if (bar) bar.classList.remove('on');
+    COREC_IMPORT_PREVIEW = null;
+    document.getElementById('corecImportSummary').innerHTML =
+      '<div class="import-summary-box"><div class="import-summary-title status-ok">Import terminé</div><div class="import-empty">Les consignes spécifiques ont été mises à jour et ref_consignes_recurrentes.js a été sauvegardé.</div></div>';
+    showToast('✅ Import consignes spécifiques appliqué (' + appliedCount + ' changement(s))');
+  } catch(err) {
+    showToast('❌ ' + err.message, true);
+  } finally {
+    setCorecImportSavingState(false);
+  }
+}
+window.applyCorecImportPreview = applyCorecImportPreview;
+
+// ════════════════════════════════════════════════════════════
+// EXPORT EXCEL — CONSIGNES TYPE
+// Colonnes : ID | Texte FR | Texte EN | Descriptif
+//          | Avant | Pendant | Après | Logistique | Spécifique | Participant (Oui/Non)
+//          | Types (dropdown — un seul type ou vide = tous)
+// ════════════════════════════════════════════════════════════
+function exportConsignesTypeExcel() {
+  if (typeof ExcelJS === 'undefined') { showToast('❌ Bibliothèque Excel indisponible', true); return; }
+  var wb = new ExcelJS.Workbook();
+
+  // ── 1. Feuille principale : Consignes (en premier) ──
+  var sheet = wb.addWorksheet('Consignes');
+  var COLS = ['ID', 'Texte FR', 'Texte EN', 'Descriptif',
+              'Avant', 'Pendant', 'Après', 'Logistique', 'Spécifique', 'Participant',
+              'Types d\'ateliers (vide = tous)'];
+  sheet.addRow(COLS);
+
+  CONS_STORE.forEach(function(c) {
+    var pl = c.placements || [];
+    var typesVal = (c.types && c.types.length) ? c.types.join(', ') : '';
+    sheet.addRow([
+      c.id,
+      c.valueFr || '',
+      c.valueEn || '',
+      c.descriptif || '',
+      pl.indexOf('Avant')      !== -1 ? 'Oui' : 'Non',
+      pl.indexOf('Pendant')    !== -1 ? 'Oui' : 'Non',
+      pl.indexOf('Après')      !== -1 ? 'Oui' : 'Non',
+      pl.indexOf('Logistique') !== -1 ? 'Oui' : 'Non',
+      pl.indexOf('Spécifique') !== -1 ? 'Oui' : 'Non',
+      pl.indexOf('Participant')!== -1 ? 'Oui' : 'Non',
+      typesVal
+    ]);
+  });
+
+  var colWidths = [16, 38, 38, 28, 8, 9, 8, 12, 13, 13, 36];
+  sheet.columns.forEach(function(col, i) { col.width = colWidths[i] || 14; });
+
+  // En-tête
+  sheet.getRow(1).eachCell(function(cell) {
+    cell.font = { bold: true };
+    cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFFFF3CD'} };
+  });
+  // Colonne ID : fond gris (lecture seule)
+  for (var r = 2; r <= 1000; r++) {
+    sheet.getCell('A' + r).fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFF3F4F6'} };
+  }
+  sheet.autoFilter = { from:{row:1,column:1}, to:{row:1,column:COLS.length} };
+  sheet.views = [{ state:'frozen', ySplit:1 }];
+
+  // Dropdowns Oui/Non pour colonnes E–J (placements)
+  ['E','F','G','H','I','J'].forEach(function(col) {
+    for (var r = 2; r <= 1000; r++) {
+      sheet.getCell(col + r).dataValidation = { type:'list', allowBlank:true, formulae:['OuiNon!$A$1:$A$2'] };
+    }
+  });
+  // Dropdown Types pour colonne K
+  var lastTypeRow = consTypesOptions().length + 1;
+  for (var r2 = 2; r2 <= 1000; r2++) {
+    sheet.getCell('K' + r2).dataValidation = { type:'list', allowBlank:true, formulae:['Types!$A$2:$A$' + lastTypeRow] };
+  }
+
+  // ── 2. Feuille README ──
+  var readme = wb.addWorksheet('README');
+  readme.properties.tabColor = { argb: 'FF3B82D4' };
+  var readmeRows = [
+    ['TANTRAMOUR 2026 — Consignes Type — Guide d\'utilisation'],
+    [''],
+    ['Ce fichier permet de créer ou modifier des consignes type dans Master Data.'],
+    ['Importez-le via le bouton « Import Excel » de l\'onglet Consignes type dans Master Data.'],
+    [''],
+    ['ONGLET « Consignes »'],
+    ['Colonne', 'Description', 'Règles'],
+    ['A — ID',          'Identifiant unique de la consigne (ex : CONS_001)',     'NE PAS MODIFIER pour une consigne existante. Laisser vide pour créer une nouvelle consigne.'],
+    ['B — Texte FR',    'Texte affiché en français',                              'Obligatoire. Texte libre, peut contenir des sauts de ligne.'],
+    ['C — Texte EN',    'Texte affiché en anglais',                               'Optionnel. Laisser vide si pas de traduction.'],
+    ['D — Descriptif',  'Note interne (usage, contexte)',                          'Optionnel. Non affiché dans les rapports.'],
+    ['E — Avant',       'Consignes helpers : avant l\'atelier',                   'Oui = la consigne apparaît dans cette section / Non = elle n\'y apparaît pas'],
+    ['F — Pendant',     'Consignes helpers : pendant l\'atelier',                 'Oui / Non'],
+    ['G — Après',       'Consignes helpers : après l\'atelier',                   'Oui / Non'],
+    ['H — Logistique',  'Section Informations logistiques',                       'Oui / Non'],
+    ['I — Spécifique',  'Section Besoins logistiques spécifiques',                'Oui / Non'],
+    ['J — Participant', 'Section Instructions participants (visible festivaliers)','Oui / Non'],
+    ['K — Types',       'Restreindre à un type d\'atelier (ex : MEDITATION / YOGA)', 'Laisser vide = s\'applique à TOUS les types. Choisir dans le menu déroulant (feuille Types).'],
+    [''],
+    ['RÈGLES D\'IMPORT'],
+    ['1. ID existant   → mise à jour du texte, placements et types. L\'ID et le statut Actif ne sont JAMAIS modifiés.'],
+    ['2. ID vide/inconnu → création d\'une nouvelle consigne avec Actif = NON (à activer manuellement dans Master Data).'],
+    ['3. ID dupliqué dans ce fichier → seule la première occurrence est traitée, les suivantes sont ignorées.'],
+    ['4. Type d\'atelier inconnu → la valeur est ignorée avec un avertissement (l\'import n\'est pas bloqué).'],
+    ['5. Ne supprimez pas les colonnes ni ne modifiez les en-têtes de la ligne 1.'],
+    [''],
+    ['STATUT ACTIF'],
+    ['Le statut Actif (cochée/décochée dans Master Data) n\'est pas gérable via cet import.'],
+    ['Les nouvelles consignes importées sont toujours créées avec Actif = NON.'],
+    ['Activez-les manuellement dans Master Data > Consignes génériques.'],
+  ];
+  readmeRows.forEach(function(row, i) { readme.addRow(row); });
+
+  // Style README
+  readme.getColumn(1).width = 28;
+  readme.getColumn(2).width = 48;
+  readme.getColumn(3).width = 70;
+  // Titre principal
+  var titleCell = readme.getCell('A1');
+  titleCell.font = { bold:true, size:14, color:{argb:'FF1F2328'} };
+  titleCell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFFFF3CD'} };
+  readme.mergeCells('A1:C1');
+  // Sous-titres de section (lignes 6, 20, 26)
+  [6, 21, 27].forEach(function(lineNo) {
+    var c = readme.getCell('A' + lineNo);
+    c.font = { bold:true, size:11 };
+    c.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFD9EAF7'} };
+    readme.mergeCells('A' + lineNo + ':C' + lineNo);
+  });
+  // En-tête du tableau colonnes (ligne 7)
+  readme.getRow(7).eachCell(function(cell) {
+    cell.font = { bold:true };
+    cell.fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFF0F4FB'} };
+  });
+  // Lignes de données du tableau colonnes (8-18)
+  for (var rl = 8; rl <= 19; rl++) {
+    readme.getCell('A' + rl).font = { bold:true, color:{argb:'FF92400E'} };
+  }
+  readme.views = [{ state:'frozen', ySplit:0 }];
+
+  // ── 3. Feuille de référence : Types d'ateliers ──
+  var typesSheet = wb.addWorksheet('Types');
+  typesSheet.addRow(['Type']);
+  consTypesOptions().forEach(function(t) { typesSheet.addRow([t]); });
+  typesSheet.getColumn(1).width = 36;
+  typesSheet.getRow(1).font = { bold: true };
+  typesSheet.getRow(1).fill = { type:'pattern', pattern:'solid', fgColor:{argb:'FFD9EAF7'} };
+
+  // ── 4. Feuille de référence : Oui/Non ──
+  var ouiNonSheet = wb.addWorksheet('OuiNon');
+  ouiNonSheet.addRow(['Oui']); ouiNonSheet.addRow(['Non']);
+
+  var now = new Date();
+  var yyyy = now.getFullYear(), mm = String(now.getMonth()+1).padStart(2,'0'), dd = String(now.getDate()).padStart(2,'0');
+  wb.xlsx.writeBuffer().then(function(buffer) {
+    var blob = new Blob([buffer], { type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'TAF2026_CONSIGNES_GENERIQUES_' + yyyy + '_' + mm + '_' + dd + '.xlsx';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('✅ Export Excel généré');
+  }).catch(function(err) { showToast('❌ ' + err.message, true); });
+}
+window.exportConsignesTypeExcel = exportConsignesTypeExcel;
+
+// ════════════════════════════════════════════════════════════
+// IMPORT EXCEL — CONSIGNES TYPE
+// Règles :
+//  - ID existant → mise à jour textes + placements + types (pas ID, pas actif)
+//  - ID absent/nouveau → création avec actif = false (non actif par défaut)
+//  - Pas de duplication d'ID dans le fichier importé
+//  - Validation avant application (preview avec Accepter/Ignorer par champ)
+// ════════════════════════════════════════════════════════════
+var CONS_IMPORT_PREVIEW = null;
+var CONS_IMPORT_HEADERS = ['ID', 'Texte FR', 'Texte EN', 'Descriptif',
+  'Avant', 'Pendant', 'Après', 'Logistique', 'Spécifique', 'Participant',
+  'Types d\'ateliers (vide = tous)'];
+
+function toggleConsImportPanel() {
+  document.getElementById('consImportPanel').classList.toggle('open');
+}
+window.toggleConsImportPanel = toggleConsImportPanel;
+
+function closeConsImportPanel() {
+  document.getElementById('consImportPanel').classList.remove('open');
+}
+window.closeConsImportPanel = closeConsImportPanel;
+
+function triggerConsImportFile() {
+  document.getElementById('consImportInput').click();
+}
+window.triggerConsImportFile = triggerConsImportFile;
+
+function consNormCell(value) {
+  if (value == null) return '';
+  if (typeof value === 'object') {
+    if (value.text  != null) return consNormCell(value.text);
+    if (value.richText && value.richText.length) return consNormCell(value.richText.map(function(p){return p.text||'';}).join(''));
+    if (value.result != null) return consNormCell(value.result);
+  }
+  return String(value).replace(/\r\n/g,'\n').replace(/\r/g,'\n').trim();
+}
+
+function handleConsImportFile(event) {
+  var file = event.target.files && event.target.files[0];
+  event.target.value = '';
+  if (!file) return;
+  if (!/\.xlsx$/i.test(file.name)) { showToast('❌ Le fichier doit être au format .xlsx', true); return; }
+  if (typeof ExcelJS === 'undefined') { showToast('❌ Bibliothèque Excel indisponible', true); return; }
+  document.getElementById('consImportPanel').classList.add('open');
+  consRenderImportLoading(file.name);
+  file.arrayBuffer().then(function(buffer) {
+    return new ExcelJS.Workbook().xlsx.load(buffer);
+  }).then(function(wb) {
+    var sheet = wb.getWorksheet('Consignes') || wb.worksheets[0];
+    if (!sheet) throw new Error('Feuille « Consignes » introuvable dans le fichier.');
+    // Vérification colonnes A et B (minimum)
+    var h1 = consNormCell(sheet.getRow(1).getCell(1).value);
+    var h2 = consNormCell(sheet.getRow(1).getCell(2).value);
+    if (h1 !== 'ID' || h2 !== 'Texte FR') throw new Error('Structure invalide : attendu « ID » en col A, « Texte FR » en col B.');
+    var preview = consBuildImportPreview(sheet);
+    CONS_IMPORT_PREVIEW = preview;
+    consRenderImportPreview(preview, file.name);
+    if (!preview.items.length) showToast('ℹ️ Aucune modification détectée');
+  }).catch(function(err) {
+    CONS_IMPORT_PREVIEW = null;
+    consRenderImportError(err.message || 'Import impossible.');
+    showToast('❌ ' + (err.message || 'Import impossible'), true);
+  });
+}
+window.handleConsImportFile = handleConsImportFile;
+
+function consBuildImportPreview(sheet) {
+  // Index ID → position dans CONS_STORE
+  var idMap = {};
+  CONS_STORE.forEach(function(c, idx) { idMap[c.id] = idx; });
+  var usedIds = {};
+  CONS_STORE.forEach(function(c) { usedIds[c.id] = true; });
+
+  var items = [], warnings = [], seenIds = {};
+
+  for (var rn = 2; rn <= sheet.rowCount; rn++) {
+    var row = sheet.getRow(rn);
+    var rawId  = consNormCell(row.getCell(1).value);
+    var vFr    = consNormCell(row.getCell(2).value);
+    var vEn    = consNormCell(row.getCell(3).value);
+    var desc   = consNormCell(row.getCell(4).value);
+    var avant      = consNormCell(row.getCell(5).value);
+    var pendant    = consNormCell(row.getCell(6).value);
+    var apres      = consNormCell(row.getCell(7).value);
+    var logistique = consNormCell(row.getCell(8).value);
+    var specifique = consNormCell(row.getCell(9).value);
+    var participant= consNormCell(row.getCell(10).value);
+    var typesRaw   = consNormCell(row.getCell(11).value);
+
+    // Ligne vide → ignorée
+    if (!rawId && !vFr && !vEn && !desc && !avant && !pendant && !apres && !logistique && !specifique && !participant && !typesRaw) continue;
+
+    // Construire tableau placements depuis colonnes Oui/Non
+    var newPlacements = [];
+    if (/^oui$/i.test(avant))       newPlacements.push('Avant');
+    if (/^oui$/i.test(pendant))     newPlacements.push('Pendant');
+    if (/^oui$/i.test(apres))       newPlacements.push('Après');
+    if (/^oui$/i.test(logistique))  newPlacements.push('Logistique');
+    if (/^oui$/i.test(specifique))  newPlacements.push('Spécifique');
+    if (/^oui$/i.test(participant)) newPlacements.push('Participant');
+
+    // Construire tableau types (séparateur virgule ou point-virgule)
+    var newTypes = typesRaw ? typesRaw.split(/[,;]/).map(function(t){return t.trim();}).filter(Boolean) : [];
+    var validTypeVals = consTypesOptions();
+    newTypes = newTypes.filter(function(t) {
+      if (validTypeVals.indexOf(t) === -1) {
+        warnings.push('⚠️ Ligne ' + rn + ' : type « ' + t + ' » inconnu, ignoré.');
+        return false;
+      }
+      return true;
+    });
+
+    var existingIdx = rawId && idMap.hasOwnProperty(rawId) ? idMap[rawId] : -1;
+
+    if (existingIdx !== -1) {
+      // ── Mise à jour — ID existant (ID et actif non modifiables) ──
+      if (seenIds[rawId]) { warnings.push('⚠️ ID dupliqué dans le fichier, ligne ' + rn + ' ignorée : ' + rawId); continue; }
+      seenIds[rawId] = true;
+      var cur = CONS_STORE[existingIdx];
+      var curPl = (cur.placements || []).slice().sort().join('|');
+      var newPl = newPlacements.slice().sort().join('|');
+      var curTy = (cur.types || []).slice().sort().join('|');
+      var newTy = newTypes.slice().sort().join('|');
+      var changes = [];
+      [
+        { key:'valueFr',    label:'Texte FR',    cur: cur.valueFr    || '', next: vFr },
+        { key:'valueEn',    label:'Texte EN',    cur: cur.valueEn    || '', next: vEn },
+        { key:'descriptif', label:'Descriptif',  cur: cur.descriptif || '', next: desc },
+        { key:'placements', label:'Placements',  cur: curPl, next: newPl, _pl: newPlacements },
+        { key:'types',      label:'Types',        cur: curTy, next: newTy, _ty: newTypes }
+      ].forEach(function(f) {
+        if (f.next !== f.cur) changes.push({ key:f.key, label:f.label, currentValue:f.cur.replace(/\|/g,', '), nextValue:f.next.replace(/\|/g,', '), choice:'apply', _pl:f._pl, _ty:f._ty });
+      });
+      if (changes.length) items.push({ mode:'update', id:rawId, storeIdx:existingIdx, label:vFr||rawId, changes:changes });
+    } else {
+      // ── Création — ID absent ou inconnu → nouveau CONS_NEWxxx, actif = false ──
+      if (rawId && seenIds[rawId]) { warnings.push('⚠️ ID dupliqué dans le fichier, ligne ' + rn + ' ignorée : ' + rawId); continue; }
+      if (rawId) seenIds[rawId] = true;
+      var n2 = 1, newId2;
+      do { newId2 = 'CONS_NEW' + String(n2).padStart(3,'0'); n2++; } while (usedIds[newId2] && n2 <= 999);
+      usedIds[newId2] = true;
+      var newPl2 = newPlacements.slice().sort().join('|');
+      var newTy2 = newTypes.slice().sort().join('|');
+      var changes2 = [
+        { key:'valueFr',    label:'Texte FR',   currentValue:'', nextValue:vFr,  choice:'apply' },
+        { key:'valueEn',    label:'Texte EN',   currentValue:'', nextValue:vEn,  choice:'apply' },
+        { key:'descriptif', label:'Descriptif', currentValue:'', nextValue:desc, choice:'apply' },
+        { key:'placements', label:'Placements', currentValue:'', nextValue:newPl2.replace(/\|/g,', '), choice:'apply', _pl:newPlacements },
+        { key:'types',      label:'Types',       currentValue:'', nextValue:newTy2.replace(/\|/g,', ')||'Tous', choice:'apply', _ty:newTypes }
+      ];
+      items.push({ mode:'create', id:newId2, originalId:rawId, storeIdx:-1, label:vFr||rawId||newId2, changes:changes2 });
+    }
+  }
+  return { items:items, warnings:warnings, totalChanges:items.reduce(function(s,it){return s+it.changes.length;},0) };
+}
+
+function consRenderImportLoading(filename) {
+  document.getElementById('consImportSummary').innerHTML =
+    '<div class="import-summary-box"><div class="import-summary-title">Lecture du fichier</div><div class="import-empty">Analyse en cours : ' + esc(filename) + '</div></div>';
+}
+function consRenderImportError(message) {
+  document.getElementById('consImportSummary').innerHTML =
+    '<div class="import-summary-box"><div class="import-summary-title status-warn">Import impossible</div><div class="import-empty">' + esc(message) + '</div></div>';
+}
+function consRenderImportPreview(preview, filename) {
+  var el = document.getElementById('consImportSummary');
+  var warningsHtml = (preview.warnings && preview.warnings.length)
+    ? '<div style="margin-bottom:12px;padding:10px 14px;border-radius:6px;background:#fff7ed;border:1px solid #fb923c;color:#9a3412;font-size:13px;line-height:1.6;">' +
+        '<strong>⚠️ ' + preview.warnings.length + ' avertissement(s)</strong>' +
+        '<ul style="margin:6px 0 0 18px;">' + preview.warnings.map(function(w){return '<li>'+esc(w)+'</li>';}).join('') + '</ul>' +
+      '</div>'
+    : '';
+  if (!preview.items.length) {
+    el.innerHTML = '<div class="import-summary-box">' + warningsHtml +
+      '<div class="import-summary-title status-ok">Fichier analysé</div>' +
+      '<div class="import-empty">Aucune modification détectée dans ' + esc(filename) + '.</div></div>';
+    return;
+  }
+  var updateCount = preview.items.filter(function(it){return it.mode==='update';}).length;
+  var createCount = preview.items.filter(function(it){return it.mode==='create';}).length;
+  el.innerHTML =
+    '<div class="import-summary-box">' +
+      warningsHtml +
+      '<div class="import-summary-title">Validation des modifications</div>' +
+      '<div class="import-help">ID et statut Actif ne sont jamais modifiés. Les nouvelles consignes sont créées avec <strong>Actif = NON</strong> — à activer manuellement dans le tableau.</div>' +
+      '<div class="import-item-meta">' + updateCount + ' mise(s) à jour · ' + createCount + ' création(s) · ' + preview.totalChanges + ' changement(s)</div>' +
+      '<div class="import-summary-list">' + preview.items.map(function(item, itemIdx) {
+        var badge = item.mode === 'create'
+          ? '<span style="font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:4px;padding:2px 6px;">Nouveau · Actif = NON · ID : ' + esc(item.id) + '</span>'
+          : '<span class="import-item-meta">ID : ' + esc(item.id) + ' · Actif inchangé</span>';
+        return '<div class="import-item">' +
+          '<div class="import-item-head">' +
+            '<div><div class="import-item-title">' + esc(item.label) + '</div><div style="margin-top:4px">' + badge + '</div></div>' +
+            '<div class="import-item-meta">' + item.changes.length + ' changement(s)</div>' +
+          '</div>' +
+          '<div class="import-fields-grid">' + item.changes.map(function(change, changeIdx) {
+            return '<div class="import-field">' +
+              '<div class="import-field-name">' + esc(change.label) + '</div>' +
+              '<div class="import-field-values">' +
+                '<div class="import-field-value">' + esc(change.currentValue || '—') + '</div>' +
+                '<div class="import-field-arrow">→</div>' +
+                '<div class="import-field-value">' + esc(change.nextValue || '—') + '</div>' +
+              '</div>' +
+              '<div class="import-choice">' +
+                '<label><input type="radio" name="cons-import-choice-' + itemIdx + '-' + changeIdx + '" value="apply" checked onchange="setConsImportChoice(' + itemIdx + ',' + changeIdx + ',\'apply\')"> Accepter</label>' +
+                '<label><input type="radio" name="cons-import-choice-' + itemIdx + '-' + changeIdx + '" value="skip" onchange="setConsImportChoice(' + itemIdx + ',' + changeIdx + ',\'skip\')"> Ignorer</label>' +
+              '</div>' +
+            '</div>';
+          }).join('') + '</div>' +
+        '</div>';
+      }).join('') + '</div>' +
+      '<div class="import-actions">' +
+        '<button class="btn" id="consImportApplyBtn" onclick="applyConsImportPreview()">✅ Valider l\'import</button>' +
+        '<button class="btn btn-sm" id="consImportCancelBtn" onclick="clearConsImportPreview()">✕ Annuler</button>' +
+      '</div>' +
+    '</div>';
+}
+function clearConsImportPreview() {
+  CONS_IMPORT_PREVIEW = null;
+  document.getElementById('consImportSummary').innerHTML = '';
+}
+window.clearConsImportPreview = clearConsImportPreview;
+function setConsImportChoice(itemIdx, changeIdx, choice) {
+  if (!CONS_IMPORT_PREVIEW || !CONS_IMPORT_PREVIEW.items[itemIdx] || !CONS_IMPORT_PREVIEW.items[itemIdx].changes[changeIdx]) return;
+  CONS_IMPORT_PREVIEW.items[itemIdx].changes[changeIdx].choice = choice;
+}
+window.setConsImportChoice = setConsImportChoice;
+
+function setConsImportSavingState(isSaving) {
+  var applyBtn  = document.getElementById('consImportApplyBtn');
+  var cancelBtn = document.getElementById('consImportCancelBtn');
+  if (applyBtn)  { applyBtn.disabled = isSaving;  applyBtn.textContent  = isSaving ? '⏳ Enregistrement…' : '✅ Valider l\'import'; }
+  if (cancelBtn) { cancelBtn.disabled = isSaving; }
+}
+
+async function applyConsImportPreview() {
+  if (!CONS_IMPORT_PREVIEW || !CONS_IMPORT_PREVIEW.items.length) return;
+  var appliedCount = 0;
+
+  CONS_IMPORT_PREVIEW.items.forEach(function(item) {
+    var selected = item.changes.filter(function(c){ return c.choice !== 'skip'; });
+    if (!selected.length) return;
+
+    if (item.mode === 'update') {
+      var cur = CONS_STORE[item.storeIdx];
+      if (!cur) return;
+      selected.forEach(function(c) {
+        if (c.key === 'placements' && c._pl) { cur.placements = c._pl.slice(); }
+        else if (c.key === 'types' && c._ty !== undefined) { cur.types = c._ty.slice(); }
+        else { cur[c.key] = c.nextValue; }
+        appliedCount++;
+      });
+    } else {
+      // Nouvelle consigne — actif = false
+      var newCons = { id:item.id, valueFr:'', valueEn:'', descriptif:'', placements:[], actif:false, types:[] };
+      selected.forEach(function(c) {
+        if (c.key === 'placements' && c._pl) { newCons.placements = c._pl.slice(); }
+        else if (c.key === 'types' && c._ty !== undefined) { newCons.types = c._ty.slice(); }
+        else { newCons[c.key] = c.nextValue; }
+        appliedCount++;
+      });
+      CONS_STORE.push(newCons);
+    }
+  });
+
+  if (!appliedCount) { showToast('ℹ️ Aucune valeur sélectionnée pour l\'import'); return; }
+
+  markConsDirty();
+  renderConsignesType();
+  setConsImportSavingState(true);
+  try {
+    await saveToServer('ref_consignes_type.js', genConsignesTypeJs());
+    CONS_DIRTY = false;
+    var bar = document.getElementById('bar-consignes_type');
+    if (bar) bar.classList.remove('on');
+    CONS_IMPORT_PREVIEW = null;
+    document.getElementById('consImportSummary').innerHTML =
+      '<div class="import-summary-box"><div class="import-summary-title status-ok">Import terminé</div><div class="import-empty">Les consignes ont été mises à jour et ref_consignes_type.js a été sauvegardé.</div></div>';
+    showToast('✅ Import consignes type appliqué (' + appliedCount + ' changement(s))');
+  } catch(err) {
+    showToast('❌ ' + err.message, true);
+  } finally {
+    setConsImportSavingState(false);
+  }
+}
+window.applyConsImportPreview = applyConsImportPreview;
+
+// Rendu initial
+try { renderConsignesType(); } catch(e) { console.error('[MasterData] renderConsignesType init error:', e); }
+try { renderConsignesRecurrentes(); } catch(e) { console.error('[MasterData] renderConsignesRecurrentes init error:', e); }
+console.log('[MasterData] loadData callback OK — CONS_STORE:', (typeof CONS_STORE !== 'undefined' ? CONS_STORE.length : 'UNDEFINED'), 'COREC_STORE:', (typeof COREC_STORE !== 'undefined' ? COREC_STORE.length : 'UNDEFINED'));
+
 }); // fin loadData
+</script>
+
+<!-- ── LOGIQUE ONGLET TRADUCTIONS ── -->
+<script>
+// ════════════════════════════════════════════════════════════
+// ÉDITEUR DE TRADUCTIONS
+// Copie de travail de REF_TRANSLATIONS (la colonne "fr" est en lecture seule)
+// ════════════════════════════════════════════════════════════
+var TRANS_STORE = [];
+var TRANS_DIRTY = false;
+
+function initTranslations() {
+  if (typeof REF_TRANSLATIONS === 'undefined') return;
+  // Ne réinitialiser que si le store est vide (premier appel)
+  // ou si aucune modification n'est en cours, pour ne pas écraser les saisies.
+  if (TRANS_STORE.length === 0) {
+    TRANS_STORE = REF_TRANSLATIONS.map(function(e) {
+      return { key: e.key, fr: e.fr, en: e.en || '' };
+    });
+  }
+  renderTransTable(TRANS_STORE);
+  // Réinitialiser la recherche à chaque ouverture de l'onglet
+  var searchEl = document.getElementById('transSearch');
+  if (searchEl) searchEl.value = '';
+}
+window.initTranslations = initTranslations;
+
+function esc2(v) { return String(v||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function renderTransTable(items) {
+  var tbody = document.getElementById('tbody-translations');
+  if (!tbody) return;
+  var count = document.getElementById('transCount');
+  if (count) count.textContent = items.length + ' entrée(s)';
+  tbody.innerHTML = items.map(function(item, i) {
+    var realIdx = TRANS_STORE.indexOf(item);
+    return '<tr>' +
+      '<td class="td-key">' + esc2(item.key) + '</td>' +
+      '<td class="td-fr">' + esc2(item.fr) + '</td>' +
+      '<td><input class="td-en-inp" value="' + esc2(item.en) + '" ' +
+        'data-idx="' + realIdx + '" ' +
+        'onchange="onTransChange(this)" ' +
+        'oninput="onTransChange(this)"></td>' +
+    '</tr>';
+  }).join('');
+}
+
+function onTransChange(el) {
+  var idx = parseInt(el.getAttribute('data-idx'));
+  if (isNaN(idx) || idx < 0 || idx >= TRANS_STORE.length) return;
+  TRANS_STORE[idx].en = el.value;
+  if (!TRANS_DIRTY) {
+    TRANS_DIRTY = true;
+    var bar = document.getElementById('bar-translations');
+    if (bar) bar.classList.add('on');
+  }
+}
+window.onTransChange = onTransChange;
+
+function filterTrans() {
+  var q = (document.getElementById('transSearch').value || '').toLowerCase().trim();
+  if (!q) {
+    renderTransTable(TRANS_STORE);
+    return;
+  }
+  var filtered = TRANS_STORE.filter(function(e) {
+    return e.key.toLowerCase().includes(q) ||
+           e.fr.toLowerCase().includes(q) ||
+           e.en.toLowerCase().includes(q);
+  });
+  renderTransTable(filtered);
+}
+window.filterTrans = filterTrans;
+
+function genTransFile() {
+  var escJs = function(v) { return String(v||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"'); };
+  var lines = TRANS_STORE.map(function(e) {
+    return '  { key: "' + escJs(e.key) + '", fr: "' + escJs(e.fr) + '", en: "' + escJs(e.en) + '" },';
+  }).join('\n');
+  return '/**\n * TANTRAMOUR 2026 — Référentiel de traductions FR → EN\n' +
+    ' * Généré automatiquement via MasterData > Traductions\n */\n' +
+    'var REF_TRANSLATIONS = [\n' + lines + '\n];\n';
+}
+
+async function saveTrans() {
+  try {
+    var content = genTransFile();
+    if (location.protocol === 'file:') throw new Error('Ouvrez via http://localhost:3000 (start.bat).');
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      var res = await fetch('http://localhost:3000/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: 'ref_translations.js', content: content })
+      });
+      if (!res.ok) { var e = await res.json().catch(function(){return{};}); throw new Error(e.error || 'Erreur ' + res.status); }
+    } else {
+      await githubSaveFile('ref_translations.js', content);
+    }
+    TRANS_DIRTY = false;
+    var bar = document.getElementById('bar-translations');
+    if (bar) bar.classList.remove('on');
+    // Mettre à jour le dictionnaire i18n en live
+    if (typeof I18n !== 'undefined') {
+      TRANS_STORE.forEach(function(e) {
+        REF_TRANSLATIONS.forEach(function(r) {
+          if (r.key === e.key) r.en = e.en;
+        });
+      });
+      I18n.apply();
+    }
+    showToast('✅ ref_translations.js sauvegardé.', false);
+  } catch(err) {
+    showToast('❌ ' + err.message, true);
+  }
+}
+window.saveTrans = saveTrans;
+
 </script>
 </body>
 </html>
